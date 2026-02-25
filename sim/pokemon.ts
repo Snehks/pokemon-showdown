@@ -487,6 +487,31 @@ export class Pokemon {
 		this.hp = 0;
 		this.clearVolatile();
 		this.hp = this.maxhp;
+
+		// [PBO] Apply pre-battle state from extended packed format.
+		// Allows starting battles with Pokemon at partial HP, with a status
+		// condition, or with reduced PP. When these fields are absent (standard
+		// packed format), this block is skipped entirely.
+		if (set.currentHp !== undefined && set.currentHp >= 0) {
+			this.hp = Math.min(set.currentHp, this.maxhp);
+			if (this.hp <= 0) {
+				this.hp = 0;
+				this.fainted = true;
+				this.faintQueued = true;
+			}
+		}
+		if (set.status) {
+			this.status = set.status as ID;
+			this.statusState = this.battle.initEffectState({ id: set.status, duration: set.statusDuration || 0 });
+		}
+		if (set.movePP) {
+			for (let k = 0; k < this.baseMoveSlots.length && k < set.movePP.length; k++) {
+				const pp = Math.min(set.movePP[k], this.baseMoveSlots[k].maxpp);
+				this.baseMoveSlots[k].pp = pp;
+			}
+			// Re-copy to moveSlots since clearVolatile already ran
+			this.moveSlots = this.baseMoveSlots.slice();
+		}
 	}
 
 	toJSON(): AnyObject {

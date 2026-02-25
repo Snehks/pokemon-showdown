@@ -108,6 +108,20 @@ export interface PokemonSet {
 	 * Tera Type
 	 */
 	teraType?: string;
+
+	// [PBO] Pre-battle state injection — allows starting battles with
+	// Pokemon that aren't at full HP/PP or already have a status condition.
+	// These fields are parsed from the extended packed format and applied
+	// during Pokemon construction. See pokemon.ts constructor for usage.
+	//
+	// Upgrade note: when merging upstream Showdown updates, keep these
+	// four fields at the end of the PokemonSet interface. They are only
+	// used when the extended packed format supplies them; standard packed
+	// teams work unchanged.
+	currentHp?: number;
+	status?: string;
+	statusDuration?: number;
+	movePP?: number[];
 }
 
 export const Teams = new class Teams {
@@ -200,6 +214,15 @@ export const Teams = new class Teams {
 				buf += `,${set.gigantamax ? 'G' : ''}`;
 				buf += `,${set.dynamaxLevel !== undefined && set.dynamaxLevel !== 10 ? set.dynamaxLevel : ''}`;
 				buf += `,${set.teraType || ''}`;
+			}
+
+			// [PBO] Append pre-battle state (currentHp|status|statusDuration|movePP).
+			// Only written when at least one field is set; standard packing is unchanged.
+			if (set.currentHp !== undefined || set.status || set.movePP) {
+				buf += `|${set.currentHp !== undefined ? set.currentHp : ''}`;
+				buf += `|${set.status || ''}`;
+				buf += `|${set.statusDuration !== undefined && set.statusDuration >= 0 ? set.statusDuration : ''}`;
+				buf += `|${set.movePP ? set.movePP.join(',') : ''}`;
 			}
 		}
 
@@ -316,15 +339,17 @@ export const Teams = new class Teams {
 			if (i !== j) set.level = parseInt(buf.substring(i, j));
 			i = j + 1;
 
-			// happiness
+			// happiness + misc + [PBO] extended state
 			j = buf.indexOf(']', i);
-			let misc;
-			if (j < 0) {
-				if (i < buf.length) misc = buf.substring(i).split(',', 6);
-			} else {
-				if (i !== j) misc = buf.substring(i, j).split(',', 6);
-			}
-			if (misc) {
+			const remaining = j < 0 ? buf.substring(i) : buf.substring(i, j);
+
+			// [PBO] Split on '|' to separate standard misc from extended fields.
+			// Standard packed strings have no '|' here, so segments.length === 1
+			// and PBO fields are simply not set (backward-compatible).
+			const segments = remaining.split('|');
+
+			if (segments[0]) {
+				const misc = segments[0].split(',', 6);
 				set.happiness = (misc[0] ? Number(misc[0]) : 255);
 				set.hpType = misc[1] || '';
 				set.pokeball = this.unpackName(misc[2] || '', Dex.items);
@@ -332,6 +357,15 @@ export const Teams = new class Teams {
 				set.dynamaxLevel = (misc[4] ? Number(misc[4]) : 10);
 				set.teraType = misc[5];
 			}
+
+			// [PBO] Pre-battle state: currentHp|status|statusDuration|movePP
+			if (segments.length > 1 && segments[1]) set.currentHp = parseInt(segments[1]);
+			if (segments.length > 2 && segments[2]) set.status = segments[2];
+			if (segments.length > 3 && segments[3]) set.statusDuration = parseInt(segments[3]);
+			if (segments.length > 4 && segments[4]) {
+				set.movePP = segments[4].split(',').map(Number);
+			}
+
 			if (j < 0) break;
 			i = j + 1;
 		}
