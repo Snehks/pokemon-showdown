@@ -17,8 +17,10 @@ these changes by searching for `[PBO]` comments in the source.
 | 2 | `sim/teams.ts` | Extended `pack()` | Write pre-battle state fields to packed string |
 | 3 | `sim/teams.ts` | Extended `unpack()` | Parse pre-battle state fields from packed string |
 | 4 | `sim/pokemon.ts` | Extended constructor | Apply `currentHp`, `status`, `movePP` during Pokemon init |
+| 5 | `data/mods/pbo/scripts.ts` | PBO mod | Always include level in details string (PBO has levels > 100) |
+| 6 | `config/custom-formats.ts` | PBO custom format | `[Gen 9] PBO Standard Battle` with no team validation |
 
-**Total: 4 changes across 2 files.**
+**Total: 6 changes across 4 files.**
 
 ---
 
@@ -93,10 +95,34 @@ and PBO fields are simply not set.
 
 ---
 
+## Change 5: PBO mod (data/mods/pbo/scripts.ts)
+
+**What it does:** Overrides `pokemon.getUpdatedDetails()` to always include the
+level in the details string (e.g. `Charizard, L100, M`).
+
+**Why:** Vanilla Showdown omits level when `level === 100`. PBO has levels > 100,
+so clients receiving `Charizard, M` can't distinguish L100 from L150. The PBO
+mod ensures every details string includes `L<level>`.
+
+**Pattern:** Same override mechanism as `data/mods/gen1/scripts.ts` which
+overrides `pokemon.getStat()`.
+
+---
+
+## Change 6: PBO custom format (config/custom-formats.ts)
+
+**What it does:** Defines `[Gen 9] PBO Standard Battle` format (ID:
+`gen9pbostandardbattle`) that uses the `pbo` mod.
+
+**Ruleset:** `Cancel Mod`, `HP Percentage Mod` — no team validation rules
+since PBO validates teams server-side.
+
+---
+
 ## How to Upgrade
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
-2. Search for `[PBO]` in `sim/teams.ts` and `sim/pokemon.ts`
+2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `data/mods/pbo/`, and `config/custom-formats.ts`
 3. Resolve conflicts (changes are at end-of-interface and end-of-constructor)
 4. Run tests: `npm test` + PBO integration tests
 5. Tag: `git tag v<new_version>-pbo`
