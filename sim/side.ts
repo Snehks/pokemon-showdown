@@ -89,6 +89,8 @@ export interface PokemonSwitchRequestData {
 	reviving?: boolean;
 	teraType?: string;
 	terastallized?: string;
+	/** [PBO] Stable database ID to avoid ident collision for same-species Pokemon. */
+	databaseId?: number;
 }
 export interface PokemonMoveRequestData {
 	moves: { move: string, id: ID, target?: string, disabled?: string | boolean, disabledSource?: string }[];
