@@ -27,7 +27,7 @@ import { toID } from './dex';
 
 /** A single action that can be chosen. Choices will have one Action for each pokemon. */
 export interface ChosenAction {
-	choice: 'move' | 'switch' | 'instaswitch' | 'revivalblessing' | 'team' | 'shift' | 'pass';// action type
+	choice: 'move' | 'switch' | 'instaswitch' | 'revivalblessing' | 'team' | 'shift' | 'pass' | 'useitem';// action type
 	pokemon?: Pokemon; // the pokemon doing the action
 	targetLoc?: number; // relative location of the target to pokemon (move action only)
 	moveid: string; // a move to use (move action only)
@@ -42,6 +42,9 @@ export interface ChosenAction {
 	maxMove?: string; // if dynamaxed, the name of the max move
 	terastallize?: string; // if terastallizing, tera type
 	priority?: number; // priority of the action
+	// [PBO] Bag item fields for useitem action
+	bagItemScript?: string;
+	bagItemData?: string[];
 }
 
 /** One single turn's choice for one single player. */
@@ -1128,6 +1131,46 @@ export class Side {
 			case 'default':
 				this.autoChoose();
 				break;
+			case 'useitem': {
+				// [PBO] Format: "useitem <targetRef> <scriptName> <data...>"
+				// targetRef: "p1a" for active, "p1:2" for bench pokemon (side.pokemon[2])
+				const parts = data.split(' ');
+				if (parts.length < 2) {
+					return this.emitChoiceError('useitem requires target and script name');
+				}
+				const targetRef = parts[0];
+				const scriptName = parts[1];
+				const itemData = parts.slice(2);
+
+				// Resolve target pokemon
+				let targetPokemon;
+				if (targetRef.includes(':')) {
+					const [sideId, slotStr] = targetRef.split(':');
+					const side = this.battle.getSide(sideId as SideID);
+					targetPokemon = side.pokemon[parseInt(slotStr)];
+				} else {
+					const side = this.battle.getSide(targetRef.slice(0, 2) as SideID);
+					const slotIndex = targetRef.charCodeAt(2) - 'a'.charCodeAt(0);
+					targetPokemon = side.active[slotIndex];
+				}
+
+				if (!targetPokemon) {
+					return this.emitChoiceError(`useitem: invalid target ${targetRef}`);
+				}
+
+				const index = this.getChoiceIndex();
+				if (index >= this.active.length) return false;
+
+				this.choice.actions.push({
+					choice: 'useitem',
+					pokemon: this.active[index],
+					target: targetPokemon,
+					side: this,
+					bagItemScript: scriptName,
+					bagItemData: itemData,
+				} as any);
+				break;
+			}
 			default:
 				this.emitChoiceError(`Unrecognized choice: ${choiceString}`);
 				break;
