@@ -507,11 +507,18 @@ export class Pokemon {
 			this.status = set.status as ID;
 			this.statusState = this.battle.initEffectState({ id: set.status, duration: set.statusDuration || 0 });
 		}
+		if (set.moveMaxPP) {
+			for (let k = 0; k < this.baseMoveSlots.length && k < set.moveMaxPP.length; k++) {
+				this.baseMoveSlots[k].maxpp = set.moveMaxPP[k];
+			}
+		}
 		if (set.movePP) {
 			for (let k = 0; k < this.baseMoveSlots.length && k < set.movePP.length; k++) {
 				const pp = Math.min(set.movePP[k], this.baseMoveSlots[k].maxpp);
 				this.baseMoveSlots[k].pp = pp;
 			}
+		}
+		if (set.moveMaxPP || set.movePP) {
 			// Re-copy to moveSlots since clearVolatile already ran
 			this.moveSlots = this.baseMoveSlots.slice();
 		}

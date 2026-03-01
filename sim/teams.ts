@@ -122,6 +122,7 @@ export interface PokemonSet {
 	status?: string;
 	statusDuration?: number;
 	movePP?: number[];
+	moveMaxPP?: number[];
 	databaseId?: number;
 }
 
@@ -217,14 +218,15 @@ export const Teams = new class Teams {
 				buf += `,${set.teraType || ''}`;
 			}
 
-			// [PBO] Append pre-battle state (currentHp|status|statusDuration|movePP|databaseId).
+			// [PBO] Append pre-battle state (currentHp|status|statusDuration|movePP|databaseId|moveMaxPP).
 			// Only written when at least one field is set; standard packing is unchanged.
-			if (set.currentHp !== undefined || set.status || set.movePP || set.databaseId) {
+			if (set.currentHp !== undefined || set.status || set.movePP || set.databaseId || set.moveMaxPP) {
 				buf += `|${set.currentHp !== undefined ? set.currentHp : ''}`;
 				buf += `|${set.status || ''}`;
 				buf += `|${set.statusDuration !== undefined && set.statusDuration >= 0 ? set.statusDuration : ''}`;
 				buf += `|${set.movePP ? set.movePP.join(',') : ''}`;
 				buf += `|${set.databaseId ?? ''}`;
+				buf += `|${set.moveMaxPP ? set.moveMaxPP.join(',') : ''}`;
 			}
 		}
 
@@ -360,7 +362,7 @@ export const Teams = new class Teams {
 				set.teraType = misc[5];
 			}
 
-			// [PBO] Pre-battle state: currentHp|status|statusDuration|movePP|databaseId
+			// [PBO] Pre-battle state: currentHp|status|statusDuration|movePP|databaseId|moveMaxPP
 			if (segments.length > 1 && segments[1]) set.currentHp = parseInt(segments[1]);
 			if (segments.length > 2 && segments[2]) set.status = segments[2];
 			if (segments.length > 3 && segments[3]) set.statusDuration = parseInt(segments[3]);
@@ -368,6 +370,9 @@ export const Teams = new class Teams {
 				set.movePP = segments[4].split(',').map(Number);
 			}
 			if (segments.length > 5 && segments[5]) set.databaseId = parseInt(segments[5]);
+			if (segments.length > 6 && segments[6]) {
+				set.moveMaxPP = segments[6].split(',').map(Number);
+			}
 
 			if (j < 0) break;
 			i = j + 1;
