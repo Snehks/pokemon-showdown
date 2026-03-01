@@ -82,6 +82,9 @@ export class Pokemon {
 	 */
 	details: string;
 
+	/** [PBO] Stable database ID for this Pokemon, used to avoid ident collisions. */
+	databaseId: number;
+
 	baseSpecies: Species;
 	species: Species;
 	speciesState: EffectState;
@@ -512,6 +515,7 @@ export class Pokemon {
 			// Re-copy to moveSlots since clearVolatile already ran
 			this.moveSlots = this.baseMoveSlots.slice();
 		}
+		this.databaseId = set.databaseId || 0;
 	}
 
 	toJSON(): AnyObject {
@@ -554,7 +558,8 @@ export class Pokemon {
 			);
 		}
 		if (this.terastallized) details += `, tera:${this.terastallized}`;
-		return { side: health.side, secret: `${details}|${health.secret}`, shared: `${details}|${health.shared}` };
+		const pboTag = this.databaseId ? `|[pboId] ${this.databaseId}` : '';
+		return { side: health.side, secret: `${details}|${health.secret}${pboTag}`, shared: `${details}|${health.shared}${pboTag}` };
 	};
 
 	updateSpeed() {
@@ -1157,6 +1162,7 @@ export class Pokemon {
 			entry.teraType = this.teraType;
 			entry.terastallized = this.terastallized || '';
 		}
+		if (this.databaseId) entry.databaseId = this.databaseId;
 		return entry;
 	}
 
