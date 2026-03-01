@@ -178,6 +178,7 @@ export class BattleQueue {
 				beforeTurn: 4,
 				beforeTurnMove: 5,
 				revivalblessing: 6,
+				useitem: 7,        // [PBO] Bag items execute before moves, matching mainline games
 
 				runSwitch: 101,
 				switch: 103,

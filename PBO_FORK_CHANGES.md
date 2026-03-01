@@ -19,8 +19,13 @@ these changes by searching for `[PBO]` comments in the source.
 | 4 | `sim/pokemon.ts` | Extended constructor | Apply `currentHp`, `status`, `movePP` during Pokemon init |
 | 5 | `data/mods/pbo/scripts.ts` | PBO mod | Always include level in details string (PBO has levels > 100) |
 | 6 | `config/custom-formats.ts` | PBO custom format | `[Gen 9] PBO Standard Battle` with no team validation |
+| 7 | `sim/side.ts` | Extended `ChosenAction` | Add `useitem` choice type + `bagItemScript`, `bagItemData` fields |
+| 8 | `sim/side.ts` | Extended `choose()` | Parse `useitem <target> <script> <data...>` command |
+| 9 | `sim/battle-queue.ts` | Extended `resolveAction` | Add `useitem: 7` to action order (before moves) |
+| 10 | `sim/battle.ts` | Extended `runAction` | Execute bag item scripts via `case 'useitem'` |
+| 11 | `data/mods/pbo/scripts.ts` | Bag item scripts | 11 scripts: potion, revive, full_restore, cure_status, ether, elixir, x_stat, dire_hit, guard_spec, clear_boost, potion_by_portion |
 
-**Total: 6 changes across 4 files.**
+**Total: 11 changes across 6 files.**
 
 ---
 
@@ -119,10 +124,88 @@ since PBO validates teams server-side.
 
 ---
 
+## Change 7: `ChosenAction` interface (sim/side.ts)
+
+**Location:** `ChosenAction` interface definition.
+
+**What it does:**
+1. Adds `'useitem'` to the `choice` union type
+2. Adds two optional fields:
+```typescript
+bagItemScript?: string;   // Name of the bag item script to execute
+bagItemData?: string[];    // Additional data passed to the script
+```
+
+**Backward compatible:** Both fields are optional. Existing actions work unchanged.
+
+---
+
+## Change 8: `choose()` method (sim/side.ts)
+
+**Location:** Switch statement in `Side.choose()`, after `case 'default':`.
+
+**What it does:** Parses the `useitem` command format:
+```
+useitem <targetRef> <scriptName> <data...>
+```
+
+Target resolution:
+- `p1a` → active Pokemon (slot a) on side p1
+- `p1:2` → bench Pokemon at index 2 on side p1
+
+Pushes a `ChosenAction` with `choice: 'useitem'`, the resolved target, script name,
+and item data array.
+
+---
+
+## Change 9: `resolveAction` orders (sim/battle-queue.ts)
+
+**Location:** Orders map in `BattleQueue.resolveAction()`.
+
+**What it does:** Adds `useitem: 7` to the action order map. This places bag item
+usage after revival blessing (6) but well before moves (200), matching the mainline
+games where bag items are used before any attacks.
+
+---
+
+## Change 10: `runAction` execution (sim/battle.ts)
+
+**Location:** Switch statement in `Battle.runAction()`, before `case 'residual':`.
+
+**What it does:** Executes the bag item script:
+1. Looks up `bagItems[action.bagItemScript]` from `this.dex.data.Scripts`
+2. Emits `|bagitem|<target>|<scriptName>` protocol line
+3. Calls `script.use(battle, target, scriptName, data)`
+4. Catches and logs errors gracefully
+
+---
+
+## Change 11: Bag item scripts (data/mods/pbo/scripts.ts)
+
+**Location:** `bagItems` record in the PBO mod's `Scripts` export.
+
+**11 scripts ported from Cobblemon's bag item system:**
+
+| Script | Purpose | Data args |
+|--------|---------|-----------|
+| `potion` | Heal flat HP | `[amount]` |
+| `revive` | Revive fainted Pokemon | `[healthRatio]` (0.0-1.0) |
+| `full_restore` | Full heal + cure status + cure confusion | none |
+| `cure_status` | Cure specific statuses | `[status1, status2, ...]` |
+| `ether` | Restore PP for one move | `[moveId, amount?]` |
+| `elixir` | Restore PP for all moves | `[amount?]` |
+| `x_stat` | Boost a stat | `[stat, stages]` |
+| `dire_hit` | Add Focus Energy (crit boost) | none |
+| `guard_spec` | Add Mist side condition | none |
+| `clear_boost` | Clear all stat boosts | none |
+| `potion_by_portion` | Heal by HP ratio, optional confusion | `[ratio, confuse?]` |
+
+---
+
 ## How to Upgrade
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
-2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `data/mods/pbo/`, and `config/custom-formats.ts`
+2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/`, and `config/custom-formats.ts`
 3. Resolve conflicts (changes are at end-of-interface and end-of-constructor)
 4. Run tests: `npm test` + PBO integration tests
 5. Tag: `git tag v<new_version>-pbo`

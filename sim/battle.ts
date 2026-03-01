@@ -2804,6 +2804,22 @@ export class Battle {
 		case 'beforeTurn':
 			this.eachEvent('BeforeTurn');
 			break;
+		// [PBO] Execute bag item script
+		case 'useitem': {
+			const scripts = (this.dex.data.Scripts as any).bagItems;
+			const script = scripts?.[action.bagItemScript];
+			if (script) {
+				try {
+					this.add('|bagitem|' + action.target.getSlotIdent() + '|' + action.bagItemScript);
+					script.use(this, action.target, action.bagItemScript, action.bagItemData || []);
+				} catch (e: any) {
+					this.debug('[PBO] BagItem script error: ' + e.message);
+				}
+			} else {
+				this.debug('[PBO] Unknown bag item script: ' + action.bagItemScript);
+			}
+			break;
+		}
 		case 'residual':
 			this.add('');
 			this.clearActiveMove(true);
