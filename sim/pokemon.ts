@@ -513,7 +513,7 @@ export class Pokemon {
 			if (this.hp <= 0) {
 				this.hp = 0;
 				this.fainted = true;
-				this.faintQueued = true;
+				this.status = 'fnt' as ID;
 			}
 		}
 		if (set.status) {

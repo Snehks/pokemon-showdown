@@ -3256,6 +3256,12 @@ export class Battle {
 			side = new Side(options.name || `Player ${slotNum + 1}`, this, slotNum, team);
 			if (options.avatar) side.avatar = `${options.avatar}`;
 			this.sides[slotNum] = side;
+			// [PBO] Exclude party Pokemon that start fainted from pokemonLeft count.
+			// Without this, pokemonLeft stays at full team size and checkWin() never
+			// triggers when all alive Pokemon faint during battle.
+			if (side.pokemonLeft) {
+				side.pokemonLeft = side.pokemon.filter(pk => !pk.fainted).length;
+			}
 		} else {
 			// edit player
 			side = this.sides[slotNum];
