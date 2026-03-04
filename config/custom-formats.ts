@@ -8,4 +8,9 @@ export const Formats: FormatList = [
 		mod: 'pbo',
 		ruleset: ['Cancel Mod', 'HP Percentage Mod'],
 	},
+	{
+		name: "[Gen 9] PBO NPC National Dex",
+		mod: 'pbo',
+		ruleset: ['Cancel Mod', 'HP Percentage Mod'],
+	},
 ];

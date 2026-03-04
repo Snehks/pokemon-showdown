@@ -25,7 +25,11 @@ these changes by searching for `[PBO]` comments in the source.
 | 10 | `sim/battle.ts` | Extended `runAction` | Execute bag item scripts via `case 'useitem'` |
 | 11 | `data/mods/pbo/scripts.ts` | Bag item scripts | 11 scripts: potion, revive, full_restore, cure_status, ether, elixir, x_stat, dire_hit, guard_spec, clear_boost, potion_by_portion |
 
-**Total: 11 changes across 6 files.**
+| 12 | `data/mods/pbo/abilities.ts` | Dynahax ability | Custom Dynamax raid boss ability — blocks non-move damage, status, specific moves/abilities, draining |
+| 13 | `sim/pokemon.ts` | Skip EV clamp for NPC format | PBO raid bosses use extreme EVs (e.g. 12M HP EV); skip 0-255 clamp when `format.id === 'gen9pbonpcnationaldex'` |
+| 14 | `config/custom-formats.ts` | PBO NPC National Dex format | `[Gen 9] PBO NPC National Dex` — NPC battles with unclamped EVs for raid bosses |
+
+**Total: 14 changes across 7 files.**
 
 ---
 
@@ -202,10 +206,54 @@ games where bag items are used before any attacks.
 
 ---
 
+## Change 12: Dynahax ability (data/mods/pbo/abilities.ts)
+
+**What it does:** Implements the Dynahax ability for Dynamax raid bosses. Ported from
+`AbilityCache.java` (lines 1303-1384).
+
+**Key behaviors:**
+| Effect | Showdown Event | Description |
+|--------|---------------|-------------|
+| Block non-move damage | `onDamage` | Weather, status ticks, Life Orb, hazards, item damage — all blocked |
+| Status immunity | `onSetStatus` | Cannot gain any status condition |
+| Move blocking | `onTryHit` | Blocks 28 specific moves (trapping, OHKO, status theft, etc.) |
+| Ability suppression | `onStart` | Gastro Acids all non-Dynahax foes on entry |
+| Drain nullification | `onSourceTryHeal` | Draining moves heal 0 HP |
+| Unswappable | `flags` | Can't be traced, skill swapped, entrained, or suppressed |
+
+---
+
+## Change 13: Skip EV clamp for NPC format (sim/pokemon.ts)
+
+**Location:** Pokemon constructor, EV clamping loop (after `for (stat in this.set.evs)`).
+
+**What it does:** When `format.id === 'gen9pbonpcnationaldex'`, the EV upper bound is
+`Infinity` instead of `255`. This allows PBO's Dynamax raid bosses to use extreme EVs
+(e.g. 12,000,000 HP EV) to achieve the massive HP pools expected by the DynamaxAttackNpc
+system, without affecting PvP or wild battles.
+
+**Why:** Standard Showdown clamps EVs to 0-255 per stat. PBO NPCPokemon sets HP EVs
+far above 255 to inflate the raid boss's max HP. Without this change, the boss starts
+with far too little HP.
+
+---
+
+## Change 14: PBO NPC National Dex format (config/custom-formats.ts)
+
+**What it does:** Defines `[Gen 9] PBO NPC National Dex` format (ID:
+`gen9pbonpcnationaldex`) that uses the `pbo` mod.
+
+**Ruleset:** Same as PBO Standard Battle (`Cancel Mod`, `HP Percentage Mod`).
+
+**Why:** NPC battles need a separate format so that the EV clamp bypass (Change 13)
+only applies to NPC/raid battles, not to PvP or wild battles.
+
+---
+
 ## How to Upgrade
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
-2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/`, and `config/custom-formats.ts`
+2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/scripts.ts`, `data/mods/pbo/abilities.ts`, and `config/custom-formats.ts`
 3. Resolve conflicts (changes are at end-of-interface and end-of-constructor)
 4. Run tests: `npm test` + PBO integration tests
 5. Tag: `git tag v<new_version>-pbo`

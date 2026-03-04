@@ -27,6 +27,11 @@ const Formats = [
     name: "[Gen 9] PBO Standard Battle",
     mod: "pbo",
     ruleset: ["Cancel Mod", "HP Percentage Mod"]
+  },
+  {
+    name: "[Gen 9] PBO NPC National Dex",
+    mod: "pbo",
+    ruleset: ["Cancel Mod", "HP Percentage Mod"]
   }
 ];
 //# sourceMappingURL=custom-formats.js.map
