@@ -1763,6 +1763,11 @@ export class Pokemon {
 		return true;
 	}
 
+	// [PBO] Sends authoritative PP for all moves to the protocol.
+	updatePP() {
+		this.battle.add('pp_update', `${this.side.id}: ${this.databaseId}`, this.moveSlots.map(move => `${move.id}: ${move.pp}`).join(', '));
+	}
+
 	/**
 	 * Unlike cureStatus, does not give cure message
 	 */

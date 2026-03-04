@@ -1520,6 +1520,7 @@ export class Battle {
 		} else {
 			this.add('tie');
 		}
+		this.updatePP();
 		this.ended = true;
 		this.requestState = '';
 		for (const s of this.sides) {
@@ -1780,6 +1781,7 @@ export class Battle {
 				}
 			}
 		}
+		this.updatePP();
 		if (this.gen === 2) this.quickClawRoll = this.randomChance(60, 256);
 		if (this.gen === 3) this.quickClawRoll = this.randomChance(1, 5);
 
@@ -2523,6 +2525,15 @@ export class Battle {
 					pokemon.status = 'fnt' as ID;
 					pokemon.switchFlag = true;
 				}
+			}
+		}
+	}
+
+	// [PBO] Sends authoritative PP for all pokemon on all sides.
+	updatePP() {
+		for (const side of this.sides) {
+			for (const pokemon of side.pokemon) {
+				pokemon.updatePP();
 			}
 		}
 	}
