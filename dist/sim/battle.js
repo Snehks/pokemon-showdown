@@ -2689,6 +2689,9 @@ class Battle {
       side = new import_side.Side(options.name || `Player ${slotNum + 1}`, this, slotNum, team);
       if (options.avatar) side.avatar = `${options.avatar}`;
       this.sides[slotNum] = side;
+      if (side.pokemonLeft) {
+        side.pokemonLeft = side.pokemon.filter((pk) => !pk.fainted).length;
+      }
     } else {
       side = this.sides[slotNum];
       didSomething = false;

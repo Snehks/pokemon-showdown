@@ -248,7 +248,7 @@ class Pokemon {
       if (this.hp <= 0) {
         this.hp = 0;
         this.fainted = true;
-        this.faintQueued = true;
+        this.status = "fnt";
       }
     }
     if (set.status) {
