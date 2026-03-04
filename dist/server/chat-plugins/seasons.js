@@ -81,8 +81,7 @@ function getBadges(user, curFormat) {
     }
   }
   userBadges = import_lib.Utils.sortBy(userBadges, (x) => Object.keys(BADGE_THRESHOLDS).indexOf(x.type)).slice(0, 2);
-  if (curFormatBadge)
-    userBadges.unshift(curFormatBadge);
+  if (curFormatBadge) userBadges.unshift(curFormatBadge);
   return userBadges;
 }
 function getUserHTML(user, format) {
@@ -90,15 +89,13 @@ function getUserHTML(user, format) {
   const badgeType = getBadges(user, format).find((x) => x.format === format)?.type;
   if (badgeType) {
     let formatType = format.split(/gen\d+/)[1];
-    if (!["ou", "randombattle"].includes(formatType))
-      formatType = "rotating";
+    if (!["ou", "randombattle"].includes(formatType)) formatType = "rotating";
     return `<img src="https://${Config.routes.client}/sprites/misc/${formatType}_${badgeType}.png" />` + buf;
   }
   return buf;
 }
 function setFormatSchedule() {
-  if (data.current.formatsGeneratedAt === getYear())
-    return;
+  if (data.current.formatsGeneratedAt === getYear()) return;
   data.current.formatsGeneratedAt = getYear();
   const formats = generateFormatSchedule();
   for (const [i, formatList] of formats.entries()) {
@@ -110,8 +107,7 @@ class ScheduleGenerator {
   constructor() {
     this.items = /* @__PURE__ */ new Map();
     this.formats = new Array(SEASONS_PER_YEAR).fill(null).map(() => []);
-    for (const format of FORMAT_POOL)
-      this.items.set(format, 0);
+    for (const format of FORMAT_POOL) this.items.set(format, 0);
   }
   generate() {
     for (let i = 0; i < this.formats.length; i++) {
@@ -125,13 +121,10 @@ class ScheduleGenerator {
   swap(x, y) {
     const item = this.formats[x][y];
     for (let i = 0; i < SEASONS_PER_YEAR; i++) {
-      if (this.formats[i].includes(item))
-        continue;
+      if (this.formats[i].includes(item)) continue;
       for (const [j, cur] of this.formats[i].entries()) {
-        if (cur === item)
-          continue;
-        if (this.formats[x].includes(cur))
-          continue;
+        if (cur === item) continue;
+        if (this.formats[x].includes(cur)) continue;
         this.formats[i][j] = item;
         return cur;
       }
@@ -183,8 +176,7 @@ async function updateBadgeholders() {
   for (const formatName of data.formatSchedule[findPeriod()]) {
     const formatid = `gen${Dex.gen}${formatName}`;
     const response = await getLadderTop(formatid);
-    if (!response)
-      continue;
+    if (!response) continue;
     const newHolders = {};
     for (const [i, row] of response.entries()) {
       let badgeType = null;
@@ -194,10 +186,8 @@ async function updateBadgeholders() {
           break;
         }
       }
-      if (!badgeType)
-        break;
-      if (!newHolders[badgeType])
-        newHolders[badgeType] = [];
+      if (!badgeType) break;
+      if (!newHolders[badgeType]) newHolders[badgeType] = [];
       newHolders[badgeType].push(row.userid);
     }
     data.badgeholders[period][formatid] = newHolders;
@@ -205,14 +195,14 @@ async function updateBadgeholders() {
   saveData();
 }
 function getYear() {
-  return new Date().getFullYear();
+  return (/* @__PURE__ */ new Date()).getFullYear();
 }
 function findPeriod(modifier = 0) {
-  return Math.floor((new Date().getMonth() + modifier) / (SEASONS_PER_YEAR - 1)) + 1;
+  return Math.floor(((/* @__PURE__ */ new Date()).getMonth() + modifier) / (SEASONS_PER_YEAR - 1)) + 1;
 }
 function checkPublicPhase() {
-  const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-  return new Date().getDate() >= daysInCurrentMonth - PUBLIC_PHASE_LENGTH && findPeriod() !== findPeriod(1);
+  const daysInCurrentMonth = new Date((/* @__PURE__ */ new Date()).getFullYear(), (/* @__PURE__ */ new Date()).getMonth() + 1, 0).getDate();
+  return (/* @__PURE__ */ new Date()).getDate() >= daysInCurrentMonth - PUBLIC_PHASE_LENGTH && findPeriod() !== findPeriod(1);
 }
 function saveData() {
   (0, import_lib.FS)("config/chat-plugins/seasons.json").writeUpdate(() => JSON.stringify(data));
@@ -235,15 +225,14 @@ function rollSeason() {
 }
 let updateTimeout = null;
 function rollTimer() {
-  if (updateTimeout === true)
-    return;
+  if (updateTimeout === true) return;
   if (updateTimeout) {
     clearTimeout(updateTimeout);
   }
   updateTimeout = true;
   void updateBadgeholders();
   const time = Date.now();
-  const next = new Date();
+  const next = /* @__PURE__ */ new Date();
   next.setHours(next.getHours() + 1, 0, 0, 0);
   updateTimeout = setTimeout(() => rollTimer(), next.getTime() - time);
   const discussionRoom = Rooms.search("seasondiscussion");
@@ -325,8 +314,7 @@ const pages = {
     for (const badgeType in data.badgeholders[season][format]) {
       buf += `<div class="ladder pad"><table>`;
       let formatType = format.split(/gen\d+/)[1];
-      if (!["ou", "randombattle"].includes(formatType))
-        formatType = "rotating";
+      if (!["ou", "randombattle"].includes(formatType)) formatType = "rotating";
       buf += `<tr><h2><img src="https://${Config.routes.client}/sprites/misc/${formatType}_${badgeType}.png" /> ${uppercase(badgeType)}</h2></tr>`;
       for (const userid of data.badgeholders[season][format][badgeType]) {
         i++;
@@ -339,14 +327,11 @@ const pages = {
 };
 const handlers = {
   onBattleStart(user, room) {
-    if (!room.battle)
-      return;
+    if (!room.battle) return;
     const badges = getBadges(user, room.battle.format);
-    if (!badges.length)
-      return;
+    if (!badges.length) return;
     const slot = room.battle.playerTable[user.id]?.slot;
-    if (!slot)
-      return;
+    if (!slot) return;
     for (const badge of badges) {
       room.add(`|badge|${slot}|${badge.type}|${badge.format}|${BADGE_THRESHOLDS[badge.type]}-${data.current.season}`);
     }

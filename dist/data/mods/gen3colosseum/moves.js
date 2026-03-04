@@ -36,8 +36,7 @@ const Moves = {
           immuneMon = true;
         }
       }
-      if (immuneMon)
-        return;
+      if (immuneMon) return;
       if (this.format.gameType === "singles") {
         if (attacker.side.pokemonLeft === 1 && attacker.side.foe.pokemonLeft === 1) {
           return false;

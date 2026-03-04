@@ -36,8 +36,7 @@ function getIPData(ip) {
 }
 const Smogon = new class {
   async post(threadNum, postText) {
-    if (!Config.smogon)
-      return null;
+    if (!Config.smogon) return null;
     try {
       const raw = await (0, import_lib.Net)(`https://www.smogon.com/forums/api/posts`).get({
         method: "POST",
@@ -96,8 +95,7 @@ const Nominations = new class {
   }
   notifyStaff() {
     const usRoom = Rooms.get("upperstaff");
-    if (!usRoom)
-      return;
+    if (!usRoom) return;
     usRoom.send(`|uhtml|permanoms|${this.getDisplayButton()}`);
     Chat.refreshPageFor("permalocks", usRoom);
   }
@@ -108,8 +106,7 @@ const Nominations = new class {
     const alts = rawAlts.split(",").map(toID).filter(Boolean);
     const ips = rawIps.split(",").map((f) => f.trim()).filter(Boolean);
     for (const ip of ips) {
-      if (!IPTools.ipRegex.test(ip))
-        this.error(`Invalid IP: ${ip}`, connection);
+      if (!IPTools.ipRegex.test(ip)) this.error(`Invalid IP: ${ip}`, connection);
     }
     const standings = this.getStandings();
     if (!standings[type]) {
@@ -130,16 +127,12 @@ const Nominations = new class {
     const altTable = new Set(alts);
     for (const alt of [primaryID, ...alts]) {
       const modlog = await this.fetchModlog(alt);
-      if (!modlog?.results.length)
-        continue;
+      if (!modlog?.results.length) continue;
       for (const entry of modlog.results) {
-        if (entry.ip)
-          ipTable.add(entry.ip);
-        if (entry.autoconfirmedID)
-          altTable.add(entry.autoconfirmedID);
+        if (entry.ip) ipTable.add(entry.ip);
+        if (entry.autoconfirmedID) altTable.add(entry.autoconfirmedID);
         if (entry.alts) {
-          for (const id of entry.alts)
-            altTable.add(id);
+          for (const id of entry.alts) altTable.add(id);
         }
       }
     }
@@ -188,8 +181,7 @@ const Nominations = new class {
     return buf;
   }
   displayModlog(results) {
-    if (!results)
-      return "";
+    if (!results) return "";
     let curDate = "";
     return results.map((result) => {
       const date = new Date(result.time || Date.now());
@@ -198,17 +190,12 @@ const Nominations = new class {
       let line = `<small>[${timestamp}] (${entryRoom})</small> ${result.action}`;
       if (result.userid) {
         line += `: [${result.userid}]`;
-        if (result.autoconfirmedID)
-          line += ` ac: [${result.autoconfirmedID}]`;
-        if (result.alts.length)
-          line += ` alts: [${result.alts.join("], [")}]`;
-        if (result.ip)
-          line += ` [<a href="https://whatismyipaddress.com/ip/${result.ip}" target="_blank">${result.ip}</a>]`;
+        if (result.autoconfirmedID) line += ` ac: [${result.autoconfirmedID}]`;
+        if (result.alts.length) line += ` alts: [${result.alts.join("], [")}]`;
+        if (result.ip) line += ` [<a href="https://whatismyipaddress.com/ip/${result.ip}" target="_blank">${result.ip}</a>]`;
       }
-      if (result.loggedBy)
-        line += `: by ${result.loggedBy}`;
-      if (result.note)
-        line += import_lib.Utils.html`: ${result.note}`;
+      if (result.loggedBy) line += `: by ${result.loggedBy}`;
+      if (result.note) line += import_lib.Utils.html`: ${result.note}`;
       if (dateString !== curDate) {
         curDate = dateString;
         dateString = `</p><p>[${dateString}]<br />`;
@@ -251,8 +238,7 @@ const Nominations = new class {
         buf += ` <button class="button notifying" type="submit">Change standing</button>`;
         buf += ` <input name="reason" placeholder="Reason" />`;
         buf += `</form>`;
-        if (nom.alts[i + 1])
-          buf += `<br />`;
+        if (nom.alts[i + 1]) buf += `<br />`;
       }
       buf += `</details>`;
     }
@@ -270,8 +256,7 @@ const Nominations = new class {
         buf += ` <button class="button notifying" type="submit">Change standing for all users on IP</button>`;
         buf += ` <input name="reason" placeholder="Reason" />`;
         buf += `</form>`;
-        if (nom.ips[i + 1])
-          buf += `<br />`;
+        if (nom.ips[i + 1]) buf += `<br />`;
       }
       buf += `</details>`;
     }
@@ -285,8 +270,7 @@ const Nominations = new class {
         buf += `<form data-submitsend="/perma standing ${userid},{standing}">`;
         buf += this.standingDropdown("standing", `${banstate}`);
         buf += ` <button class="button notifying" type="submit">Change standing</button></form>`;
-        if (matches.results[i + 1])
-          buf += `<br />`;
+        if (matches.results[i + 1]) buf += `<br />`;
       }
       buf += `</details>`;
     }
@@ -312,8 +296,7 @@ const Nominations = new class {
     return buf;
   }
   getStandings() {
-    if (Config.standings)
-      return Config.standings;
+    if (Config.standings) return Config.standings;
     Config.standings = {
       "-20": "Confirmed",
       "-10": "Autoconfirmed",
@@ -361,8 +344,7 @@ const Nominations = new class {
       buf += `No permalock nominations active.`;
     } else {
       let className = "button";
-      if (unclaimed.length)
-        className += " notifying";
+      if (unclaimed.length) className += " notifying";
       buf += `<button class="${className}" name="send" value="/j view-permalocks-list">`;
       buf += `${Chat.count(this.noms.length, "nominations")}`;
       if (unclaimed.length !== this.noms.length) {
@@ -404,17 +386,13 @@ const commands = {
       this.checkCan("rangeban");
       const [primaryName, standingName, postReason] = import_lib.Utils.splitFirst(target, ",", 2).map((f) => f.trim());
       const primary = toID(primaryName);
-      if (!primary)
-        return this.popupReply(`Invalid primary username.`);
+      if (!primary) return this.popupReply(`Invalid primary username.`);
       const nom = Nominations.find(primary);
-      if (!nom)
-        return this.popupReply(`No permalock nomination found for ${primary}.`);
+      if (!nom) return this.popupReply(`No permalock nomination found for ${primary}.`);
       const standing = parseInt(standingName);
       const standings = Nominations.getStandings();
-      if (!standings[standing])
-        return this.popupReply(`Invalid standing.`);
-      if (!toID(postReason))
-        return this.popupReply(`A reason must be given.`);
+      if (!standings[standing]) return this.popupReply(`Invalid standing.`);
+      if (!toID(postReason)) return this.popupReply(`A reason must be given.`);
       const threadNum = Config.permathread;
       if (!threadNum) {
         throw new Chat.ErrorMessage("The link to the perma has not been set - the post could not be made.");
@@ -526,8 +504,7 @@ const commands = {
     seticon(target, room, user) {
       this.checkCan("rangeban");
       let [monName, targetId] = target.split(",");
-      if (!targetId)
-        targetId = user.id;
+      if (!targetId) targetId = user.id;
       const mon = Dex.species.get(monName);
       if (!mon.exists) {
         throw new Chat.ErrorMessage(`Species ${monName} does not exist.`);
@@ -565,11 +542,9 @@ const pages = {
     view(query, user) {
       this.checkCan("rangeban");
       const id = toID(query.shift());
-      if (!id)
-        throw new Chat.ErrorMessage(`Invalid userid.`);
+      if (!id) throw new Chat.ErrorMessage(`Invalid userid.`);
       const nom = Nominations.find(id);
-      if (!nom)
-        throw new Chat.ErrorMessage(`No nomination found for '${id}'.`);
+      if (!nom) throw new Chat.ErrorMessage(`No nomination found for '${id}'.`);
       this.title = `[Perma Nom] ${nom.primaryID}`;
       return Nominations.displayActionPage(nom);
     },

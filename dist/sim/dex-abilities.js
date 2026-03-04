@@ -60,17 +60,14 @@ class DexAbilities {
     this.dex = dex;
   }
   get(name = "") {
-    if (name && typeof name !== "string")
-      return name;
+    if (name && typeof name !== "string") return name;
     const id = (0, import_dex_data.toID)(name.trim());
     return this.getByID(id);
   }
   getByID(id) {
-    if (id === "" || id === "constructor")
-      return EMPTY_ABILITY;
+    if (id === "" || id === "constructor") return EMPTY_ABILITY;
     let ability = this.abilityCache.get(id);
-    if (ability)
-      return ability;
+    if (ability) return ability;
     if (this.dex.getAlias(id)) {
       ability = this.get(this.dex.getAlias(id));
     } else if (id && this.dex.data.Abilities.hasOwnProperty(id)) {
@@ -97,13 +94,11 @@ class DexAbilities {
         exists: false
       });
     }
-    if (ability.exists)
-      this.abilityCache.set(id, this.dex.deepFreeze(ability));
+    if (ability.exists) this.abilityCache.set(id, this.dex.deepFreeze(ability));
     return ability;
   }
   all() {
-    if (this.allCache)
-      return this.allCache;
+    if (this.allCache) return this.allCache;
     const abilities = [];
     for (const id in this.dex.data.Abilities) {
       abilities.push(this.getByID(id));

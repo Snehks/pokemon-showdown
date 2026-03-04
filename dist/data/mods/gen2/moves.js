@@ -53,8 +53,7 @@ const Moves = {
       while (currentStage < 6) {
         loopStage = currentStage;
         currentStage++;
-        if (currentStage < 6)
-          currentStage++;
+        if (currentStage < 6) currentStage++;
         target.boosts.atk = loopStage;
         if (target.getStat("atk", false, true) < 999) {
           target.boosts.atk = currentStage;
@@ -82,8 +81,7 @@ const Moves = {
       },
       onDamagePriority: -101,
       onDamage(damage, target, source, move) {
-        if (!move || move.effectType !== "Move" || !source)
-          return;
+        if (!move || move.effectType !== "Move" || !source) return;
         this.effectState.totalDamage += damage;
         this.effectState.lastDamageSource = source;
       },
@@ -136,8 +134,7 @@ const Moves = {
     inherit: true,
     damageCallback(pokemon, target) {
       const lastAttackedBy = pokemon.getLastAttackedBy();
-      if (!lastAttackedBy?.move || !lastAttackedBy.thisTurn)
-        return false;
+      if (!lastAttackedBy?.move || !lastAttackedBy.thisTurn) return false;
       if (this.getCategory(lastAttackedBy.move) === "Physical" && target.lastMove?.id !== "sleeptalk") {
         return 2 * lastAttackedBy.damage;
       }
@@ -181,8 +178,7 @@ const Moves = {
     condition: {
       duration: 2,
       onImmunity(type, pokemon) {
-        if (type === "sandstorm")
-          return false;
+        if (type === "sandstorm") return false;
       },
       onInvulnerability(target, source, move) {
         if (move.id === "earthquake" || move.id === "magnitude" || move.id === "fissure") {
@@ -191,8 +187,7 @@ const Moves = {
         if (["attract", "curse", "foresight", "meanlook", "mimic", "nightmare", "spiderweb", "transform"].includes(move.id)) {
           return false;
         }
-        if (source.volatiles["lockon"] && target === source.volatiles["lockon"].source)
-          return;
+        if (source.volatiles["lockon"] && target === source.volatiles["lockon"].source) return;
         return false;
       },
       onSourceBasePower(basePower, target, source, move) {
@@ -276,8 +271,7 @@ const Moves = {
         if (["attract", "curse", "foresight", "meanlook", "mimic", "nightmare", "spiderweb", "transform"].includes(move.id)) {
           return false;
         }
-        if (source.volatiles["lockon"] && target === source.volatiles["lockon"].source)
-          return;
+        if (source.volatiles["lockon"] && target === source.volatiles["lockon"].source) return;
         return false;
       },
       onSourceBasePower(basePower, target, source, move) {
@@ -301,16 +295,14 @@ const Moves = {
   foresight: {
     inherit: true,
     onTryHit(target) {
-      if (target.volatiles["foresight"])
-        return false;
+      if (target.volatiles["foresight"]) return false;
     },
     condition: {
       onStart(pokemon) {
         this.add("-start", pokemon, "Foresight");
       },
       onNegateImmunity(pokemon, type) {
-        if (pokemon.hasType("Ghost") && ["Normal", "Fighting"].includes(type))
-          return false;
+        if (pokemon.hasType("Ghost") && ["Normal", "Fighting"].includes(type)) return false;
       },
       onModifyBoost(boosts) {
         if (boosts.evasion && boosts.evasion > 0) {
@@ -339,8 +331,7 @@ const Moves = {
     onMoveFail(target, source, move) {
       if (target.runImmunity("Fighting")) {
         const damage = this.actions.getDamage(source, target, move, true);
-        if (typeof damage !== "number")
-          throw new Error("Couldn't get High Jump Kick recoil");
+        if (typeof damage !== "number") throw new Error("Couldn't get High Jump Kick recoil");
         this.damage(this.clampIntRange(damage / 8, 1), source, source, move);
       }
     }
@@ -350,8 +341,7 @@ const Moves = {
     onMoveFail(target, source, move) {
       if (target.runImmunity("Fighting")) {
         const damage = this.actions.getDamage(source, target, move, true);
-        if (typeof damage !== "number")
-          throw new Error("Couldn't get Jump Kick recoil");
+        if (typeof damage !== "number") throw new Error("Couldn't get Jump Kick recoil");
         this.damage(this.clampIntRange(damage / 8, 1), source, source, move);
       }
     }
@@ -370,8 +360,7 @@ const Moves = {
       },
       onAfterMoveSelfPriority: 2,
       onAfterMoveSelf(pokemon) {
-        if (!pokemon.hp)
-          return;
+        if (!pokemon.hp) return;
         const leecher = this.getAtSlot(pokemon.volatiles["leechseed"].sourceSlot);
         if (!leecher || leecher.fainted || leecher.hp <= 0) {
           return;
@@ -401,14 +390,12 @@ const Moves = {
   lockon: {
     inherit: true,
     onTryHit(target) {
-      if (target.volatiles["foresight"] || target.volatiles["lockon"])
-        return false;
+      if (target.volatiles["foresight"] || target.volatiles["lockon"]) return false;
     },
     condition: {
       duration: 2,
       onSourceAccuracy(accuracy, target, source, move) {
-        if (move && source === this.effectState.target && target === this.effectState.source)
-          return true;
+        if (move && source === this.effectState.target && target === this.effectState.source) return true;
       }
     }
   },
@@ -440,16 +427,14 @@ const Moves = {
   mindreader: {
     inherit: true,
     onTryHit(target) {
-      if (target.volatiles["foresight"] || target.volatiles["lockon"])
-        return false;
+      if (target.volatiles["foresight"] || target.volatiles["lockon"]) return false;
     }
   },
   mirrorcoat: {
     inherit: true,
     damageCallback(pokemon, target) {
       const lastAttackedBy = pokemon.getLastAttackedBy();
-      if (!lastAttackedBy?.move || !lastAttackedBy.thisTurn)
-        return false;
+      if (!lastAttackedBy?.move || !lastAttackedBy.thisTurn) return false;
       if (this.getCategory(lastAttackedBy.move) === "Special" && target.lastMove?.id !== "sleeptalk") {
         return 2 * lastAttackedBy.damage;
       }
@@ -548,8 +533,7 @@ const Moves = {
       },
       onAfterMoveSelfPriority: 1,
       onAfterMoveSelf(pokemon) {
-        if (pokemon.status === "slp")
-          this.damage(pokemon.baseMaxhp / 4);
+        if (pokemon.status === "slp") this.damage(pokemon.baseMaxhp / 4);
       }
     }
   },
@@ -605,8 +589,7 @@ const Moves = {
   pursuit: {
     inherit: true,
     beforeTurnCallback(pokemon, target) {
-      if (pokemon.isAlly(target))
-        return;
+      if (pokemon.isAlly(target)) return;
       target.addVolatile("pursuit");
       const data = target.volatiles["pursuit"];
       if (!data.sources) {
@@ -625,8 +608,7 @@ const Moves = {
           if (source.speed < pokemon.speed || source.speed === pokemon.speed && this.randomChance(1, 2)) {
             pokemon.removeVolatile("destinybond");
           }
-          if (!this.queue.cancelMove(source) || !source.hp)
-            continue;
+          if (!this.queue.cancelMove(source) || !source.hp) continue;
           if (!alreadyAdded) {
             this.add("-activate", pokemon, "move: Pursuit");
             alreadyAdded = true;
@@ -674,15 +656,13 @@ const Moves = {
   rest: {
     inherit: true,
     onTry(pokemon) {
-      if (pokemon.hp < pokemon.maxhp)
-        return;
+      if (pokemon.hp < pokemon.maxhp) return;
       this.add("-fail", pokemon);
       return null;
     },
     onHit(target, source, move) {
       if (target.status !== "slp") {
-        if (!target.setStatus("slp", source, move))
-          return;
+        if (!target.setStatus("slp", source, move)) return;
       } else {
         this.add("-status", target, "slp", "[from] move: Rest");
       }
@@ -708,8 +688,7 @@ const Moves = {
     inherit: true,
     onTryHit() {
       for (const action of this.queue) {
-        if (action.choice === "move" || action.choice === "switch")
-          return false;
+        if (action.choice === "move" || action.choice === "switch") return false;
       }
     },
     priority: -1
@@ -726,12 +705,9 @@ const Moves = {
         return 5;
       },
       onSetStatus(status, target, source, effect) {
-        if (!effect || !source)
-          return;
-        if (effect.id === "yawn")
-          return;
-        if (effect.effectType === "Move" && effect.infiltrates && !target.isAlly(source))
-          return;
+        if (!effect || !source) return;
+        if (effect.id === "yawn") return;
+        if (effect.effectType === "Move" && effect.infiltrates && !target.isAlly(source)) return;
         if (target !== source) {
           this.debug("interrupting setStatus");
           if (effect.id === "synchronize" || effect.effectType === "Move" && !effect.secondaries) {
@@ -741,13 +717,10 @@ const Moves = {
         }
       },
       onTryAddVolatile(status, target, source, effect) {
-        if (!effect || !source)
-          return;
-        if (effect.effectType === "Move" && effect.infiltrates && !target.isAlly(source))
-          return;
+        if (!effect || !source) return;
+        if (effect.effectType === "Move" && effect.infiltrates && !target.isAlly(source)) return;
         if ((status.id === "confusion" || status.id === "yawn") && target !== source) {
-          if (effect.effectType === "Move" && !effect.secondaries)
-            this.add("-activate", target, "move: Safeguard");
+          if (effect.effectType === "Move" && !effect.secondaries) this.add("-activate", target, "move: Safeguard");
           return null;
         }
       },
@@ -802,10 +775,8 @@ const Moves = {
         }
       }
       let randomMove = "";
-      if (moves.length)
-        randomMove = this.sample(moves);
-      if (!randomMove)
-        return false;
+      if (moves.length) randomMove = this.sample(moves);
+      if (!randomMove) return false;
       this.actions.useMove(randomMove, pokemon);
     }
   },
@@ -835,8 +806,7 @@ const Moves = {
         }
       },
       onSwitchIn(pokemon) {
-        if (!pokemon.runImmunity("Ground"))
-          return;
+        if (!pokemon.runImmunity("Ground")) return;
         const damageAmounts = [0, 3];
         this.damage(damageAmounts[this.effectState.layers] * pokemon.maxhp / 24);
       }
@@ -984,8 +954,7 @@ const Moves = {
     inherit: true,
     onTryHit() {
       for (const action of this.queue) {
-        if (action.choice === "move" || action.choice === "switch")
-          return false;
+        if (action.choice === "move" || action.choice === "switch") return false;
       }
     },
     priority: -1

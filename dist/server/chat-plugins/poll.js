@@ -41,8 +41,7 @@ class Poll extends Rooms.MinorActivity {
     this.voterIps = options.voterIps || {};
     this.totalVotes = options.totalVotes || 0;
     this.maxVotes = options.maxVotes || 0;
-    if (!options.answers)
-      options.answers = options.questions;
+    if (!options.answers) options.answers = options.questions;
     this.answers = Poll.getAnswers(options.answers);
     this.isQuiz = options.isQuiz ?? [...this.answers.values()].some((answer) => answer.correct);
     this.setTimer(options);
@@ -82,8 +81,7 @@ class Poll extends Rooms.MinorActivity {
       throw new Chat.ErrorMessage(this.room.tr`You have already voted for this poll.`);
     }
     const selected = this.pendingVotes[userid];
-    if (!selected)
-      throw new Chat.ErrorMessage(this.room.tr`No options selected.`);
+    if (!selected) throw new Chat.ErrorMessage(this.room.tr`No options selected.`);
     this.voters[userid] = selected;
     this.voterIps[ip] = selected;
     for (const option of selected) {
@@ -153,13 +151,11 @@ class Poll extends Rooms.MinorActivity {
     return output;
   }
   static getQuestionMarkup(question, supportHTML = false) {
-    if (supportHTML)
-      return question;
+    if (supportHTML) return question;
     return Chat.formatText(question);
   }
   static getAnswerMarkup(answer, supportHTML = false) {
-    if (supportHTML)
-      return answer.name;
+    if (supportHTML) return answer.name;
     return Chat.formatText(answer.name);
   }
   update() {
@@ -314,16 +310,12 @@ const commands = {
     htmlqueuemulti: "new",
     new(target, room, user, connection, cmd, message) {
       room = this.requireRoom();
-      if (!target)
-        return this.parse("/help poll new");
+      if (!target) return this.parse("/help poll new");
       target = target.trim();
-      if (target.length > 1024)
-        throw new Chat.ErrorMessage(this.tr`Poll too long.`);
-      if (room.battle)
-        throw new Chat.ErrorMessage(this.tr`Battles do not support polls.`);
+      if (target.length > 1024) throw new Chat.ErrorMessage(this.tr`Poll too long.`);
+      if (room.battle) throw new Chat.ErrorMessage(this.tr`Battles do not support polls.`);
       const text = this.filter(target);
-      if (target !== text)
-        throw new Chat.ErrorMessage(this.tr`You are not allowed to use filtered words in polls.`);
+      if (target !== text) throw new Chat.ErrorMessage(this.tr`You are not allowed to use filtered words in polls.`);
       const supportHTML = cmd.includes("html");
       const multiPoll = cmd.includes("multi");
       const queue = cmd.includes("queue");
@@ -363,16 +355,13 @@ const commands = {
       params.push(currentParam);
       params = params.map((param) => param.trim());
       this.checkCan("minigame", null, room);
-      if (supportHTML)
-        this.checkCan("declare", null, room);
+      if (supportHTML) this.checkCan("declare", null, room);
       this.checkChat();
       if (room.minorActivity && !queue) {
         throw new Chat.ErrorMessage(this.tr`There is already a poll or announcement in progress in this room.`);
       }
-      if (params.length < 3)
-        throw new Chat.ErrorMessage(this.tr`Not enough arguments for /poll new.`);
-      if (supportHTML)
-        params = params.map((parameter) => this.checkHTML(parameter));
+      if (params.length < 3) throw new Chat.ErrorMessage(this.tr`Not enough arguments for /poll new.`);
+      if (supportHTML) params = params.map((parameter) => this.checkHTML(parameter));
       const questions = params.splice(1);
       if (questions.length > MAX_QUESTIONS) {
         throw new Chat.ErrorMessage(this.tr`Too many options for poll (maximum is ${MAX_QUESTIONS}).`);
@@ -415,8 +404,7 @@ const commands = {
     viewqueuehelp: [`/viewqueue - view the queue of polls in the room. Requires: % @ # ~`],
     deletequeue(target, room, user) {
       room = this.requireRoom();
-      if (!target)
-        return this.parse("/help deletequeue");
+      if (!target) return this.parse("/help deletequeue");
       this.checkCan("mute", null, room);
       const queue = room.getMinorActivityQueue();
       if (!queue) {
@@ -426,8 +414,7 @@ const commands = {
       if (isNaN(slot)) {
         throw new Chat.ErrorMessage(this.tr`Can't delete poll at slot ${target} - "${target}" is not a number.`);
       }
-      if (!queue[slot - 1])
-        throw new Chat.ErrorMessage(this.tr`There is no poll in queue at slot ${slot}.`);
+      if (!queue[slot - 1]) throw new Chat.ErrorMessage(this.tr`There is no poll in queue at slot ${slot}.`);
       room.clearMinorActivityQueue(slot - 1);
       room.modlog({
         action: "DELETEQUEUE",
@@ -460,13 +447,10 @@ const commands = {
     select(target, room, user, connection, cmd) {
       room = this.requireRoom();
       const poll = this.requireMinorActivity(Poll);
-      if (!target)
-        return this.parse("/help poll vote");
+      if (!target) return this.parse("/help poll vote");
       const parsed = parseInt(target);
-      if (isNaN(parsed))
-        throw new Chat.ErrorMessage(this.tr`To vote, specify the number of the option.`);
-      if (!poll.answers.has(parsed))
-        return this.sendReply(this.tr`Option not in poll.`);
+      if (isNaN(parsed)) throw new Chat.ErrorMessage(this.tr`To vote, specify the number of the option.`);
+      if (!poll.answers.has(parsed)) return this.sendReply(this.tr`Option not in poll.`);
       if (cmd === "deselect") {
         poll.deselect(user, parsed);
       } else {
@@ -489,8 +473,7 @@ const commands = {
       if (target) {
         this.checkCan("minigame", null, room);
         if (target === "clear") {
-          if (!poll.endTimer())
-            throw new Chat.ErrorMessage(this.tr("There is no timer to clear."));
+          if (!poll.endTimer()) throw new Chat.ErrorMessage(this.tr("There is no timer to clear."));
           return this.add(this.tr`The poll timer was turned off.`);
         }
         const timeoutMins = parseFloat(target);
@@ -502,8 +485,7 @@ const commands = {
         this.modlog("POLL TIMER", null, `${timeoutMins} minutes`);
         return this.privateModAction(room.tr`The poll timer was set to ${timeoutMins} minute(s) by ${user.name}.`);
       } else {
-        if (!this.runBroadcast())
-          return;
+        if (!this.runBroadcast()) return;
         if (poll.timeout) {
           return this.sendReply(this.tr`The poll timer is on and will end in ${Chat.toDurationString(poll.timeoutMins * MINUTES)}.`);
         } else {
@@ -540,8 +522,7 @@ const commands = {
     ""(target, room, user, connection) {
       room = this.requireRoom();
       const poll = this.requireMinorActivity(Poll);
-      if (!this.runBroadcast())
-        return;
+      if (!this.runBroadcast()) return;
       room.update();
       if (this.broadcasting) {
         poll.display();
@@ -573,8 +554,7 @@ const commands = {
         this.addModAction(`The poll has more votes than the maximum vote cap, and has ended.`);
         ended = true;
       }
-      if (!ended)
-        poll.save();
+      if (!ended) poll.save();
       this.modlog("POLL MAXVOTES", null, `${poll.maxVotes}${ended ? ` (ended poll)` : ""}`);
     }
   },

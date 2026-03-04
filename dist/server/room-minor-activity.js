@@ -49,8 +49,7 @@ class MinorActivity {
     this.supportHTML = false;
   }
   setTimer(options) {
-    if (this.timeout)
-      clearTimeout(this.timeout);
+    if (this.timeout) clearTimeout(this.timeout);
     this.timeoutMins = options.timeoutMins || 0;
     if (!this.timeoutMins) {
       this.timerEnd = 0;
@@ -61,8 +60,7 @@ class MinorActivity {
     this.timerEnd = options.timerEnd || now + this.timeoutMins * 6e4;
     this.timeout = setTimeout(() => {
       const room = this.room;
-      if (!room)
-        return;
+      if (!room) return;
       this.end(room);
     }, this.timerEnd - now);
     this.save();
@@ -71,14 +69,12 @@ class MinorActivity {
     room.minorActivity?.destroy();
     if (room.minorActivityQueue?.length) {
       const pollData = room.minorActivityQueue.shift();
-      if (!room.minorActivityQueue.length)
-        room.clearMinorActivityQueue();
+      if (!room.minorActivityQueue.length) room.clearMinorActivityQueue();
       if (!room.settings.minorActivityQueue?.length) {
         delete room.settings.minorActivityQueue;
         room.saveSettings();
       }
-      if (pollData.activityid !== "poll")
-        throw new Error(`Unexpected Minor Activity (${pollData.activityid}) in queue`);
+      if (pollData.activityid !== "poll") throw new Error(`Unexpected Minor Activity (${pollData.activityid}) in queue`);
       room.add(`|c|~|/log ${room.tr`The queued poll was started.`}`).update();
       room.modlog({
         action: "POLL",
@@ -95,8 +91,7 @@ class MinorActivity {
     }
   }
   endTimer() {
-    if (!this.timeout)
-      return false;
+    if (!this.timeout) return false;
     clearTimeout(this.timeout);
     this.timeoutMins = 0;
     this.timerEnd = 0;

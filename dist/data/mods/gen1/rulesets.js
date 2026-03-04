@@ -41,8 +41,7 @@ const Rulesets = {
       if (bst <= 350) {
         newSpecies.bst = 0;
         for (const stat in newSpecies.baseStats) {
-          if (stat === "spd")
-            continue;
+          if (stat === "spd") continue;
           newSpecies.baseStats[stat] = this.clampIntRange(newSpecies.baseStats[stat] * 2, 1, 255);
           newSpecies.bst += newSpecies.baseStats[stat];
         }
@@ -87,8 +86,7 @@ const Rulesets = {
       const scale = 500 - newSpecies.baseStats["hp"];
       newSpecies.bst = newSpecies.baseStats["hp"];
       for (const stat in newSpecies.baseStats) {
-        if (stat === "hp" || stat === "spd")
-          continue;
+        if (stat === "hp" || stat === "spd") continue;
         newSpecies.baseStats[stat] = this.clampIntRange(newSpecies.baseStats[stat] * scale / pst, 1, 255);
         newSpecies.bst += newSpecies.baseStats[stat];
       }

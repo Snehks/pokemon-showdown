@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../../../../data/random-battles/gen5pokebilities/teams.ts"],
-  "sourcesContent": ["import RandomGen5Teams from '../gen5/teams';\n\nexport class RandomGen5PokebilitiesTeams extends RandomGen5Teams {}\n\nexport default RandomGen5PokebilitiesTeams;\n"],
+  "sourcesContent": ["import RandomGen5Teams from '../gen5/teams';\r\n\r\nexport class RandomGen5PokebilitiesTeams extends RandomGen5Teams {}\r\n\r\nexport default RandomGen5PokebilitiesTeams;\r\n"],
   "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,mBAA4B;AAErB,MAAM,oCAAoC,aAAAA,QAAgB;AAAC;AAElE,IAAO,gBAAQ;",
   "names": ["RandomGen5Teams"]
 }

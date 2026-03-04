@@ -26,11 +26,9 @@ const Scripts = {
   init() {
     for (const i in this.data.Items) {
       const item = this.data.Items[i];
-      if (!item.megaStone && !item.onDrive && !(item.onPlate && !item.zMove) && !item.onMemory)
-        continue;
+      if (!item.megaStone && !item.onDrive && !(item.onPlate && !item.zMove) && !item.onMemory) continue;
       this.modData("Items", i).onTakeItem = false;
-      if (item.isNonstandard === "Past" || item.isNonstandard === "Future")
-        this.modData("Items", i).isNonstandard = null;
+      if (item.isNonstandard === "Past" || item.isNonstandard === "Future") this.modData("Items", i).isNonstandard = null;
       if (item.megaStone) {
         for (const megaEvo of Object.values(item.megaStone)) {
           this.modData("FormatsData", this.toID(megaEvo)).isNonstandard = null;
@@ -39,12 +37,9 @@ const Scripts = {
     }
   },
   start() {
-    if (this.deserialized)
-      return;
-    if (!this.sides.every((side) => !!side))
-      throw new Error(`Missing sides: ${this.sides}`);
-    if (this.started)
-      throw new Error(`Battle already started`);
+    if (this.deserialized) return;
+    if (!this.sides.every((side) => !!side)) throw new Error(`Missing sides: ${this.sides}`);
+    if (this.started) throw new Error(`Battle already started`);
     const format = this.format;
     this.started = true;
     if (this.gameType === "multi") {
@@ -69,14 +64,12 @@ const Scripts = {
     this.add("gen", this.gen);
     this.add("tier", format.name);
     if (this.rated) {
-      if (this.rated === "Rated battle")
-        this.rated = true;
+      if (this.rated === "Rated battle") this.rated = true;
       this.add("rated", typeof this.rated === "string" ? this.rated : "");
     }
     format.onBegin?.call(this);
     for (const rule of this.ruleTable.keys()) {
-      if ("+*-!".includes(rule.charAt(0)))
-        continue;
+      if ("+*-!".includes(rule.charAt(0))) continue;
       const subFormat = this.dex.formats.get(rule);
       subFormat.onBegin?.call(this);
     }
@@ -85,8 +78,7 @@ const Scripts = {
       if (item.forcedForme && !item.zMove && item.forcedForme !== pokemon.species.name) {
         const rawSpecies = this.actions.getMixedSpecies(pokemon.m.originalSpecies, item.forcedForme, pokemon);
         const species = pokemon.setSpecies(rawSpecies);
-        if (!species)
-          continue;
+        if (!species) continue;
         pokemon.baseSpecies = rawSpecies;
         pokemon.details = pokemon.getUpdatedDetails();
         pokemon.ability = this.toID(species.abilities["0"]);
@@ -107,8 +99,7 @@ const Scripts = {
     this.runPickTeam();
     this.queue.addChoice({ choice: "start" });
     this.midTurn = true;
-    if (!this.requestState)
-      this.turnLoop();
+    if (!this.requestState) this.turnLoop();
   },
   runAction(action) {
     const pokemonOriginalHP = action.pokemon?.hp;
@@ -116,8 +107,7 @@ const Scripts = {
     switch (action.choice) {
       case "start": {
         for (const side of this.sides) {
-          if (side.pokemonLeft)
-            side.pokemonLeft = side.pokemon.length;
+          if (side.pokemonLeft) side.pokemonLeft = side.pokemon.length;
           this.add("teamsize", side.id, side.pokemon.length);
         }
         this.add("start");
@@ -129,11 +119,9 @@ const Scripts = {
           } else if (item.id === "rustedshield") {
             rawSpecies = this.actions.getMixedSpecies(pokemon.m.originalSpecies, "Zamazenta-Crowned", pokemon);
           }
-          if (!rawSpecies)
-            continue;
+          if (!rawSpecies) continue;
           const species = pokemon.setSpecies(rawSpecies);
-          if (!species)
-            continue;
+          if (!species) continue;
           pokemon.baseSpecies = rawSpecies;
           pokemon.details = pokemon.getUpdatedDetails();
           pokemon.ability = this.toID(species.abilities["0"]);
@@ -160,8 +148,7 @@ const Scripts = {
         }
         this.format.onBattleStart?.call(this);
         for (const rule of this.ruleTable.keys()) {
-          if ("+*-!".includes(rule.charAt(0)))
-            continue;
+          if ("+*-!".includes(rule.charAt(0))) continue;
           const subFormat = this.dex.formats.get(rule);
           subFormat.onBattleStart?.call(this);
         }
@@ -183,10 +170,8 @@ const Scripts = {
         break;
       }
       case "move":
-        if (!action.pokemon.isActive)
-          return false;
-        if (action.pokemon.fainted)
-          return false;
+        if (!action.pokemon.isActive) return false;
+        if (action.pokemon.fainted) return false;
         this.actions.runMove(action.move, action.pokemon, action.targetLoc, {
           sourceEffect: action.sourceEffect,
           zMove: action.zmove,
@@ -200,33 +185,25 @@ const Scripts = {
       case "runDynamax":
         action.pokemon.addVolatile("dynamax");
         action.pokemon.side.dynamaxUsed = true;
-        if (action.pokemon.side.allySide)
-          action.pokemon.side.allySide.dynamaxUsed = true;
+        if (action.pokemon.side.allySide) action.pokemon.side.allySide.dynamaxUsed = true;
         break;
       case "terastallize":
         this.actions.terastallize(action.pokemon);
         break;
       case "beforeTurnMove":
-        if (!action.pokemon.isActive)
-          return false;
-        if (action.pokemon.fainted)
-          return false;
+        if (!action.pokemon.isActive) return false;
+        if (action.pokemon.fainted) return false;
         this.debug("before turn callback: " + action.move.id);
         const target = this.getTarget(action.pokemon, action.move, action.targetLoc);
-        if (!target)
-          return false;
-        if (!action.move.beforeTurnCallback)
-          throw new Error(`beforeTurnMove has no beforeTurnCallback`);
+        if (!target) return false;
+        if (!action.move.beforeTurnCallback) throw new Error(`beforeTurnMove has no beforeTurnCallback`);
         action.move.beforeTurnCallback.call(this, action.pokemon, target);
         break;
       case "priorityChargeMove":
-        if (!action.pokemon.isActive)
-          return false;
-        if (action.pokemon.fainted)
-          return false;
+        if (!action.pokemon.isActive) return false;
+        if (action.pokemon.fainted) return false;
         this.debug("priority charge callback: " + action.move.id);
-        if (!action.move.priorityChargeCallback)
-          throw new Error(`priorityChargeMove has no priorityChargeCallback`);
+        if (!action.move.priorityChargeCallback) throw new Error(`priorityChargeMove has no priorityChargeCallback`);
         action.move.priorityChargeCallback.call(this, action.pokemon);
         break;
       case "event":
@@ -280,10 +257,8 @@ const Scripts = {
         this.actions.runSwitch(action.pokemon);
         break;
       case "shift":
-        if (!action.pokemon.isActive)
-          return false;
-        if (action.pokemon.fainted)
-          return false;
+        if (!action.pokemon.isActive) return false;
+        if (action.pokemon.fainted) return false;
         this.swapPosition(action.pokemon, 1);
         break;
       case "beforeTurn":
@@ -301,16 +276,14 @@ const Scripts = {
     for (const side of this.sides) {
       for (const pokemon of side.active) {
         if (pokemon.forceSwitchFlag) {
-          if (pokemon.hp)
-            this.actions.dragIn(pokemon.side, pokemon.position);
+          if (pokemon.hp) this.actions.dragIn(pokemon.side, pokemon.position);
           pokemon.forceSwitchFlag = false;
         }
       }
     }
     this.clearActiveMove();
     this.faintMessages();
-    if (this.ended)
-      return true;
+    if (this.ended) return true;
     if (!this.queue.peek() || this.gen <= 3 && ["move", "residual"].includes(this.queue.peek().choice)) {
       this.checkFainted();
     } else if (action.choice === "megaEvo" && this.gen === 7) {
@@ -355,16 +328,14 @@ const Scripts = {
           }
           pokemon.switchFlag = false;
         }
-        if (!reviveSwitch)
-          switches[i] = false;
+        if (!reviveSwitch) switches[i] = false;
       } else if (switches[i]) {
         for (const pokemon of this.sides[i].active) {
           if (pokemon.switchFlag && pokemon.switchFlag !== "revivalblessing" && !pokemon.skipBeforeSwitchOutEventFlag) {
             this.runEvent("BeforeSwitchOut", pokemon);
             pokemon.skipBeforeSwitchOutEventFlag = true;
             this.faintMessages();
-            if (this.ended)
-              return true;
+            if (this.ended) return true;
             if (pokemon.fainted) {
               switches[i] = this.sides[i].active.some((sidePokemon) => sidePokemon && !!sidePokemon.switchFlag);
             }
@@ -378,13 +349,11 @@ const Scripts = {
         return true;
       }
     }
-    if (this.gen < 5)
-      this.eachEvent("Update");
+    if (this.gen < 5) this.eachEvent("Update");
     if (this.gen >= 8 && (this.queue.peek()?.choice === "move" || this.queue.peek()?.choice === "runDynamax")) {
       this.updateSpeed();
       for (const queueAction of this.queue.list) {
-        if (queueAction.pokemon)
-          this.getActionSpeed(queueAction);
+        if (queueAction.pokemon) this.getActionSpeed(queueAction);
       }
       this.queue.sort();
     }
@@ -392,16 +361,13 @@ const Scripts = {
   },
   actions: {
     canMegaEvo(pokemon) {
-      if (pokemon.species.isMega)
-        return null;
+      if (pokemon.species.isMega) return null;
       const item = pokemon.getItem();
-      if (!item.megaStone)
-        return null;
+      if (!item.megaStone) return null;
       return Object.values(item.megaStone)[0];
     },
     runMegaEvo(pokemon) {
-      if (pokemon.species.isMega)
-        return false;
+      if (pokemon.species.isMega) return false;
       const species = this.getMixedSpecies(pokemon.m.originalSpecies, pokemon.canMegaEvo, pokemon);
       const oSpecies = this.dex.species.get(pokemon.m.originalSpecies);
       const oMegaSpecies = this.dex.species.get(species.originalSpecies);
@@ -498,29 +464,23 @@ const Scripts = {
         formeType = "Primary";
         deltas.isMega = true;
       }
-      if (formeChangeSpecies.isMega && !formeType)
-        formeType = "Mega";
-      if (formeChangeSpecies.isPrimal)
-        formeType = "Primal";
-      if (formeChangeSpecies.name.endsWith("Crowned"))
-        formeType = "Crowned";
-      if (formeType)
-        deltas.formeType = formeType;
+      if (formeChangeSpecies.isMega && !formeType) formeType = "Mega";
+      if (formeChangeSpecies.isPrimal) formeType = "Primal";
+      if (formeChangeSpecies.name.endsWith("Crowned")) formeType = "Crowned";
+      if (formeType) deltas.formeType = formeType;
       if (!deltas.formeType && formeChangeSpecies.abilities["H"] && pokemon && pokemon.baseSpecies.abilities["H"] === pokemon.getAbility().name) {
         deltas.ability = formeChangeSpecies.abilities["H"];
       }
       return deltas;
     },
     mutateOriginalSpecies(speciesOrForme, deltas) {
-      if (!deltas)
-        throw new TypeError("Must specify deltas!");
+      if (!deltas) throw new TypeError("Must specify deltas!");
       const species = this.dex.deepClone(this.dex.species.get(speciesOrForme));
       species.abilities = { "0": deltas.ability };
       if (deltas.formeType === "Primary") {
         const secondType = species.types[1];
         species.types = [deltas.type];
-        if (secondType && secondType !== deltas.type)
-          species.types.push(secondType);
+        if (secondType && secondType !== deltas.type) species.types.push(secondType);
       } else if (species.types[0] === deltas.type) {
         species.types = [deltas.type];
       } else if (deltas.type === "mono") {
@@ -536,10 +496,8 @@ const Scripts = {
       species.heightm = Math.max(0.1, (species.heightm * 10 + deltas.heightm * 10) / 10);
       species.originalSpecies = deltas.originalSpecies;
       species.requiredItem = deltas.requiredItem;
-      if (deltas.formeType === "Mega" || deltas.isMega)
-        species.isMega = true;
-      if (deltas.formeType === "Primal")
-        species.isPrimal = true;
+      if (deltas.formeType === "Mega" || deltas.isMega) species.isMega = true;
+      if (deltas.formeType === "Primal") species.isPrimal = true;
       return species;
     }
   }

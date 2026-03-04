@@ -33,8 +33,7 @@ const Moves = {
       } else if (this.field.isTerrain(["mistyterrain", "psychicterrain"])) {
         newType = "Psychic";
       }
-      if (target.getTypes().join() === newType || !target.setType(newType))
-        return false;
+      if (target.getTypes().join() === newType || !target.setType(newType)) return false;
       this.add("-start", target, "typechange", newType);
     }
   },
@@ -85,8 +84,7 @@ const Moves = {
   terrainpulse: {
     inherit: true,
     onModifyType(move, pokemon) {
-      if (!pokemon.isGrounded())
-        return;
+      if (!pokemon.isGrounded()) return;
       switch (this.field.terrain) {
         case "electricterrain":
           move.type = "Electric";
@@ -104,13 +102,10 @@ const Moves = {
   thousandarrows: {
     inherit: true,
     onEffectiveness(typeMod, target, type, move) {
-      if (move.type !== "Fighting")
-        return;
-      if (!target)
-        return;
+      if (move.type !== "Fighting") return;
+      if (!target) return;
       if (!target.runImmunity("Fighting")) {
-        if (target.hasType("Normal"))
-          return 0;
+        if (target.hasType("Normal")) return 0;
       }
     },
     ignoreImmunity: { "Fighting": true }
@@ -118,10 +113,8 @@ const Moves = {
   trickortreat: {
     inherit: true,
     onHit(target) {
-      if (target.hasType("Psychic"))
-        return false;
-      if (!target.addType("Psychic"))
-        return false;
+      if (target.hasType("Psychic")) return false;
+      if (!target.addType("Psychic")) return false;
       this.add("-start", target, "typeadd", "Psychic", "[from] move: Trick-or-Treat");
       if (target.side.active.length === 2 && target.position === 1) {
         const action = this.queue.willMove(target);

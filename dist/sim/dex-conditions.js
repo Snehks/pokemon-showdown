@@ -38,18 +38,14 @@ class DexConditions {
     this.dex = dex;
   }
   get(name) {
-    if (!name)
-      return EMPTY_CONDITION;
-    if (typeof name !== "string")
-      return name;
+    if (!name) return EMPTY_CONDITION;
+    if (typeof name !== "string") return name;
     return this.getByID(name.startsWith("item:") || name.startsWith("ability:") ? name : (0, import_dex_data.toID)(name));
   }
   getByID(id) {
-    if (id === "" || id === "constructor")
-      return EMPTY_CONDITION;
+    if (id === "" || id === "constructor") return EMPTY_CONDITION;
     let condition = this.conditionCache.get(id);
-    if (condition)
-      return condition;
+    if (condition) return condition;
     let found;
     if (id.startsWith("item:")) {
       const item = this.dex.items.getByID(id.slice(5));

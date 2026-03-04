@@ -38,8 +38,7 @@ class RandomPlayerAI extends import_battle_stream.BattlePlayer {
     this.prng = import_prng.PRNG.get(options.seed);
   }
   receiveError(error) {
-    if (error.message.startsWith("[Unavailable choice]"))
-      return;
+    if (error.message.startsWith("[Unavailable choice]")) return;
     throw error;
   }
   receiveRequest(request) {
@@ -48,13 +47,12 @@ class RandomPlayerAI extends import_battle_stream.BattlePlayer {
       const pokemon = request.side.pokemon;
       const chosen = [];
       const choices = request.forceSwitch.map((mustSwitch, i) => {
-        if (!mustSwitch)
-          return `pass`;
-        const canSwitch = range(1, 6).filter((j) => pokemon[j - 1] && (j > request.forceSwitch.length || pokemon[i].reviving) && // not chosen for a simultaneous switch
+        if (!mustSwitch) return `pass`;
+        const canSwitch = range(1, 6).filter((j) => pokemon[j - 1] && // not active
+        (j > request.forceSwitch.length || pokemon[i].reviving) && // not chosen for a simultaneous switch
         !chosen.includes(j) && // not fainted or fainted and using Revival Blessing
         !pokemon[j - 1].condition.endsWith(` fnt`) === !pokemon[i].reviving);
-        if (!canSwitch.length)
-          return `pass`;
+        if (!canSwitch.length) return `pass`;
         const target = this.chooseSwitch(
           void 0,
           canSwitch.map((slot) => ({ slot, pokemon: pokemon[slot - 1] }))
@@ -70,8 +68,7 @@ class RandomPlayerAI extends import_battle_stream.BattlePlayer {
       const pokemon = request.side.pokemon;
       const chosen = [];
       const choices = request.active.map((active, i) => {
-        if (pokemon[i].condition.endsWith(` fnt`) || pokemon[i].commanding)
-          return `pass`;
+        if (pokemon[i].condition.endsWith(` fnt`) || pokemon[i].commanding) return `pass`;
         canMegaEvo = canMegaEvo && active.canMegaEvo;
         canUltraBurst = canUltraBurst && active.canUltraBurst;
         canZMove = canZMove && !!active.canZMove;
@@ -80,8 +77,10 @@ class RandomPlayerAI extends import_battle_stream.BattlePlayer {
         const change = (canMegaEvo || canUltraBurst || canDynamax) && this.prng.random() < this.mega;
         const useMaxMoves = !active.canDynamax && active.maxMoves || change && canDynamax;
         const possibleMoves = useMaxMoves ? active.maxMoves.maxMoves : active.moves;
-        let canMove = range(1, possibleMoves.length).filter((j) => // not disabled
-        !possibleMoves[j - 1].disabled).map((j) => ({
+        let canMove = range(1, possibleMoves.length).filter((j) => (
+          // not disabled
+          !possibleMoves[j - 1].disabled
+        )).map((j) => ({
           slot: j,
           move: possibleMoves[j - 1].move,
           target: possibleMoves[j - 1].target,
@@ -115,8 +114,7 @@ class RandomPlayerAI extends import_battle_stream.BattlePlayer {
               }
             }
           }
-          if (m.zMove)
-            move += ` zmove`;
+          if (m.zMove) move += ` zmove`;
           return { choice: move, move: m };
         });
         const canSwitch = range(1, 6).filter((j) => pokemon[j - 1] && // not active

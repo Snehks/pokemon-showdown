@@ -67,13 +67,10 @@ const Scripts = {
       move = this.battle.dex.moves.get(move);
       for (let i = 0; i < 2; i++) {
         for (const ppData of this.moveSlots) {
-          if (ppData.id !== move.id)
-            continue;
+          if (ppData.id !== move.id) continue;
           ppData.used = true;
-          if (!ppData.pp && i === 0)
-            continue;
-          if (!amount)
-            amount = 1;
+          if (!ppData.pp && i === 0) continue;
+          if (!amount) amount = 1;
           ppData.pp -= amount;
           return amount;
         }
@@ -81,16 +78,13 @@ const Scripts = {
       return 0;
     },
     getStat(statName, unmodified) {
-      if (statName === "hp")
-        throw new Error("Please read `maxhp` directly");
-      if (unmodified)
-        return this.baseStoredStats[statName];
+      if (statName === "hp") throw new Error("Please read `maxhp` directly");
+      if (unmodified) return this.baseStoredStats[statName];
       return this.modifiedStats[statName];
     },
     // Gen 1 function to apply a stat modification that is only active until the stat is recalculated or mon switched.
     modifyStat(statName, modifier) {
-      if (!(statName in this.storedStats))
-        throw new Error("Invalid `statName` passed to `modifyStat`");
+      if (!(statName in this.storedStats)) throw new Error("Invalid `statName` passed to `modifyStat`");
       const modifiedStats = this.battle.clampIntRange(Math.floor(this.modifiedStats[statName] * modifier), 1);
       this.modifiedStats[statName] = modifiedStats;
     },
@@ -100,12 +94,9 @@ const Scripts = {
       let i;
       for (i in boost) {
         const delta = boost[i];
-        if (delta === void 0)
-          continue;
-        if (delta > 0 && this.boosts[i] >= 6)
-          continue;
-        if (delta < 0 && this.boosts[i] <= -6)
-          continue;
+        if (delta === void 0) continue;
+        if (delta > 0 && this.boosts[i] >= 6) continue;
+        if (delta < 0 && this.boosts[i] <= -6) continue;
         if (i === "evasion" || i === "accuracy") {
           this.boosts[i] += delta;
           if (this.boosts[i] > 6) {
@@ -167,8 +158,7 @@ const Scripts = {
       let i;
       for (i in this.boosts) {
         this.boosts[i] = 0;
-        if (i === "evasion" || i === "accuracy")
-          continue;
+        if (i === "evasion" || i === "accuracy") continue;
         this.modifiedStats[i] = this.storedStats[i];
       }
     }
@@ -192,8 +182,7 @@ const Scripts = {
         move = this.battle.dex.getActiveMove("hyperbeam");
         this.battle.hint(`In Gen 1, partial trapping moves like Wrap remove Hyper Beam recharges. If the target would have recharged, it will automatically use Hyper Beam instead.`, true);
       }
-      if (target?.subFainted)
-        target.subFainted = null;
+      if (target?.subFainted) target.subFainted = null;
       this.battle.setActiveMove(move, pokemon, target);
       if (pokemon.moveThisTurn || !this.battle.runEvent("BeforeMove", pokemon, target, move)) {
         this.battle.clearActiveMove(true);
@@ -205,8 +194,7 @@ const Scripts = {
         return;
       }
       const lockedMove = pokemon.getLockedMove();
-      if (lockedMove)
-        sourceEffect = move;
+      if (lockedMove) sourceEffect = move;
       if (!lockedMove || pokemon.volatiles["twoturnmove"]) {
         const ppMove = pokemon.volatiles["twoturnmove"]?.ppMove || move.id;
         pokemon.deductPP(ppMove, null, target);
@@ -227,17 +215,14 @@ const Scripts = {
     useMove(moveOrMoveName, pokemon, options) {
       let sourceEffect = options?.sourceEffect;
       let target = options?.target;
-      if (!sourceEffect && this.battle.effect.id)
-        sourceEffect = this.battle.effect;
+      if (!sourceEffect && this.battle.effect.id) sourceEffect = this.battle.effect;
       const baseMove = this.battle.dex.moves.get(moveOrMoveName);
       let move = this.battle.dex.getActiveMove(baseMove);
-      if (target === void 0)
-        target = this.battle.getRandomTarget(pokemon, move);
+      if (target === void 0) target = this.battle.getRandomTarget(pokemon, move);
       if (move.target === "self") {
         target = pokemon;
       }
-      if (sourceEffect)
-        move.sourceEffect = sourceEffect.id;
+      if (sourceEffect) move.sourceEffect = sourceEffect.id;
       this.battle.singleEvent("ModifyMove", move, null, pokemon, target, move, move);
       if (baseMove.target !== move.target) {
         target = this.battle.getRandomTarget(pokemon, move);
@@ -246,8 +231,7 @@ const Scripts = {
       if (baseMove.target !== move.target) {
         target = this.battle.getRandomTarget(pokemon, move);
       }
-      if (!TWO_TURN_MOVES.includes(move.id) || pokemon.volatiles["twoturnmove"])
-        pokemon.lastMove = move;
+      if (!TWO_TURN_MOVES.includes(move.id) || pokemon.volatiles["twoturnmove"]) pokemon.lastMove = move;
       const moveResult = this.useMoveInner(moveOrMoveName, pokemon, { target, sourceEffect });
       if (move.id !== "metronome") {
         if (move.id !== "mirrormove" || (!pokemon.side.foe.active[0]?.lastMove || pokemon.side.foe.active[0].lastMove?.id === "mirrormove")) {
@@ -265,17 +249,14 @@ const Scripts = {
     useMoveInner(moveOrMoveName, pokemon, options) {
       let sourceEffect = options?.sourceEffect;
       let target = options?.target;
-      if (!sourceEffect && this.battle.effect.id)
-        sourceEffect = this.battle.effect;
+      if (!sourceEffect && this.battle.effect.id) sourceEffect = this.battle.effect;
       const baseMove = this.battle.dex.moves.get(moveOrMoveName);
       let move = this.battle.dex.getActiveMove(baseMove);
-      if (target === void 0)
-        target = this.battle.getRandomTarget(pokemon, move);
+      if (target === void 0) target = this.battle.getRandomTarget(pokemon, move);
       if (move.target === "self") {
         target = pokemon;
       }
-      if (sourceEffect)
-        move.sourceEffect = sourceEffect.id;
+      if (sourceEffect) move.sourceEffect = sourceEffect.id;
       this.battle.setActiveMove(move, pokemon, target);
       this.battle.singleEvent("ModifyMove", move, null, pokemon, target, move, move);
       if (baseMove.target !== move.target) {
@@ -286,14 +267,12 @@ const Scripts = {
         target = this.battle.getRandomTarget(pokemon, move);
         this.battle.debug("not a gen 1 mechanic");
       }
-      if (!move)
-        return false;
+      if (!move) return false;
       let attrs = "";
       if (pokemon.fainted) {
         return false;
       }
-      if (sourceEffect)
-        attrs += `|[from] ${this.battle.dex.conditions.get(sourceEffect).name}`;
+      if (sourceEffect) attrs += `|[from] ${this.battle.dex.conditions.get(sourceEffect).name}`;
       this.battle.addMove("move", pokemon, move.name, `${target}${attrs}`);
       if (!this.battle.singleEvent("Try", move, null, pokemon, target, move)) {
         return true;
@@ -310,8 +289,7 @@ const Scripts = {
         this.battle.add("-notarget");
         return true;
       }
-      if (!SKIP_LASTDAMAGE.has(move.id))
-        this.battle.lastDamage = 0;
+      if (!SKIP_LASTDAMAGE.has(move.id)) this.battle.lastDamage = 0;
       damage = this.tryMoveHit(target, pokemon, move);
       if (target.boosts.atk < 6 && (move.selfdestruct || move.id === "disable") && target.volatiles["rage"]) {
         this.battle.boost({ atk: 1 }, target, pokemon, this.dex.conditions.get("rage"));
@@ -373,10 +351,8 @@ const Scripts = {
       const boostTable = [25, 28, 33, 40, 50, 66, 100, 150, 200, 250, 300, 350, 400];
       if (accuracy !== true) {
         accuracy = Math.floor(accuracy * 255 / 100);
-        if (pokemon.volatiles["lockedmove"])
-          accuracy = pokemon.volatiles["lockedmove"].accuracy;
-        if (pokemon.volatiles["rage"])
-          accuracy = pokemon.volatiles["rage"].accuracy;
+        if (pokemon.volatiles["lockedmove"]) accuracy = pokemon.volatiles["lockedmove"].accuracy;
+        if (pokemon.volatiles["rage"]) accuracy = pokemon.volatiles["rage"].accuracy;
         if (accuracy !== true) {
           if (!move.ignoreAccuracy) {
             accuracy = Math.floor(accuracy * (boostTable[pokemon.boosts.accuracy + 6] / 100));
@@ -386,19 +362,15 @@ const Scripts = {
           }
           accuracy = this.battle.clampIntRange(accuracy, 1, 255);
         }
-        if (pokemon.volatiles["lockedmove"])
-          pokemon.volatiles["lockedmove"].accuracy = accuracy;
-        if (pokemon.volatiles["rage"])
-          pokemon.volatiles["rage"].accuracy = accuracy;
+        if (pokemon.volatiles["lockedmove"]) pokemon.volatiles["lockedmove"].accuracy = accuracy;
+        if (pokemon.volatiles["rage"]) pokemon.volatiles["rage"].accuracy = accuracy;
       }
       accuracy = this.battle.runEvent("Accuracy", target, pokemon, move, accuracy);
-      if (move.target === "self" && accuracy !== true)
-        accuracy++;
+      if (move.target === "self" && accuracy !== true) accuracy++;
       if (accuracy !== true && !this.battle.randomChance(accuracy, 256)) {
         this.battle.attrLastMove("[miss]");
         this.battle.add("-miss", pokemon);
-        if (accuracy === 255)
-          this.battle.hint("In Gen 1, moves with 100% accuracy can still miss 1/256 of the time.");
+        if (accuracy === 255) this.battle.hint("In Gen 1, moves with 100% accuracy can still miss 1/256 of the time.");
         damage = false;
         this.battle.lastDamage = 0;
       }
@@ -417,22 +389,18 @@ const Scripts = {
           let i;
           for (i = 0; i < hits && target.hp && pokemon.hp; i++) {
             move.hit = i + 1;
-            if (move.hit === hits)
-              move.lastHit = true;
+            if (move.hit === hits) move.lastHit = true;
             moveDamage = this.moveHit(target, pokemon, move);
-            if (moveDamage === false)
-              break;
+            if (moveDamage === false) break;
             damage = moveDamage || 0;
-            if (i === 0)
-              move.damage = damage;
+            if (i === 0) move.damage = damage;
             if (target.subFainted) {
               i++;
               break;
             }
           }
           move.damage = null;
-          if (i === 0)
-            return 1;
+          if (i === 0) return 1;
           this.battle.add("-hitcount", target, i);
         } else {
           damage = this.moveHit(target, pokemon, move);
@@ -452,8 +420,7 @@ const Scripts = {
         delete pokemon.volatiles["partialtrappinglock"];
         return false;
       }
-      if (move.ohko)
-        this.battle.add("-ohko");
+      if (move.ohko) this.battle.add("-ohko");
       this.battle.singleEvent("AfterMoveSecondary", move, null, target, pokemon, move);
       this.battle.runEvent("AfterMoveSecondary", target, pokemon, move);
       return damage;
@@ -462,11 +429,9 @@ const Scripts = {
     // This function also deals with the Gen 1 Substitute behaviour on the hitting process.
     moveHit(target, pokemon, move, moveData, isSecondary, isSelf) {
       let damage = 0;
-      if (!isSecondary && !isSelf)
-        this.battle.setActiveMove(move, pokemon, target);
+      if (!isSecondary && !isSelf) this.battle.setActiveMove(move, pokemon, target);
       let hitResult = true;
-      if (!moveData)
-        moveData = move;
+      if (!moveData) moveData = move;
       if (move.ignoreImmunity === void 0) {
         move.ignoreImmunity = move.category === "Status";
       }
@@ -476,15 +441,13 @@ const Scripts = {
       if (target) {
         hitResult = this.battle.singleEvent("TryHit", moveData, {}, target, pokemon, move);
         if (!hitResult) {
-          if (hitResult === false)
-            this.battle.add("-fail", target);
+          if (hitResult === false) this.battle.add("-fail", target);
           return false;
         }
         if (!isSelf && !isSecondary) {
           hitResult = this.battle.runEvent("TryHit", target, pokemon, move);
           if (!hitResult) {
-            if (hitResult === false)
-              this.battle.add("-fail", target);
+            if (hitResult === false) this.battle.add("-fail", target);
             if (hitResult !== 0) {
               return false;
             }
@@ -499,8 +462,7 @@ const Scripts = {
           targetHasSub = !!target?.volatiles["substitute"];
           target = null;
         } else if (!hitResult) {
-          if (hitResult === false)
-            this.battle.add("-fail", target);
+          if (hitResult === false) this.battle.add("-fail", target);
           return false;
         }
       }
@@ -512,8 +474,7 @@ const Scripts = {
         }
         if ((damage || damage === 0) && !target.fainted) {
           damage = this.battle.damage(damage, target, pokemon, move);
-          if (!(damage || damage === 0))
-            return false;
+          if (!(damage || damage === 0)) return false;
           didSomething = true;
         } else if (damage === false && typeof hitResult === "undefined") {
           this.battle.add("-fail", target);
@@ -556,10 +517,8 @@ const Scripts = {
             }
           } else if (!target.status) {
             if (target.setStatus(moveData.status, pokemon, move)) {
-              if (moveData.status === "brn")
-                target.modifyStat("atk", 0.5);
-              if (moveData.status === "par")
-                target.modifyStat("spe", 0.25);
+              if (moveData.status === "brn") target.modifyStat("atk", 0.5);
+              if (moveData.status === "par") target.modifyStat("spe", 0.25);
             }
           } else if (!isSecondary) {
             if (target.status === moveData.status) {
@@ -572,10 +531,8 @@ const Scripts = {
         }
         if (moveData.forceStatus) {
           if (target.setStatus(moveData.forceStatus, pokemon, move)) {
-            if (moveData.forceStatus === "brn")
-              target.modifyStat("atk", 0.5);
-            if (moveData.forceStatus === "par")
-              target.modifyStat("spe", 0.25);
+            if (moveData.forceStatus === "brn") target.modifyStat("atk", 0.5);
+            if (moveData.forceStatus === "par") target.modifyStat("spe", 0.25);
             didSomething = true;
           }
         }
@@ -599,13 +556,11 @@ const Scripts = {
           this.battle.runEvent("Hit", target, pokemon, move);
         }
         if (!hitResult && !didSomething) {
-          if (hitResult === false)
-            this.battle.add("-fail", target);
+          if (hitResult === false) this.battle.add("-fail", target);
           return false;
         }
       }
-      if (targetHasSub === void 0)
-        targetHasSub = !!target?.volatiles["substitute"];
+      if (targetHasSub === void 0) targetHasSub = !!target?.volatiles["substitute"];
       const doSelf = targetHadSub && targetHasSub || !targetHadSub;
       if (moveData.self && moveData.self.volatileStatus !== "lockedmove" && (doSelf || moveData.self.volatileStatus === "partialtrappinglock")) {
         this.moveHit(pokemon, pokemon, move, moveData.self, isSecondary, true);
@@ -618,8 +573,7 @@ const Scripts = {
                 this.moveHit(target, pokemon, move, secondary, true, isSelf);
               } else {
                 let secondaryChance = Math.ceil(secondary.chance * 256 / 100);
-                if (secondary?.volatileStatus === "confusion")
-                  secondaryChance--;
+                if (secondary?.volatileStatus === "confusion") secondaryChance--;
                 if (this.battle.randomChance(secondaryChance, 256)) {
                   this.moveHit(target, pokemon, move, secondary, true, isSelf);
                 }
@@ -667,10 +621,8 @@ const Scripts = {
       if (source.volatiles["partialtrappinglock"] && target === source.volatiles["partialtrappinglock"].locked) {
         return source.volatiles["partialtrappinglock"].damage;
       }
-      if (!move.category)
-        move.category = "Physical";
-      if (!move.type)
-        move.type = "???";
+      if (!move.category) move.category = "Physical";
+      if (!move.type) move.type = "???";
       const type = move.type;
       let basePower = move.basePower;
       if (move.basePowerCallback) {
@@ -697,16 +649,14 @@ const Scripts = {
           isCrit = this.battle.randomChance(critChance, 256);
         }
       }
-      if (isCrit)
-        target.getMoveHitData(move).crit = true;
+      if (isCrit) target.getMoveHitData(move).crit = true;
       if (basePower) {
         basePower = this.battle.runEvent("BasePower", source, target, move, basePower);
         if (basePower && move.basePowerModifier) {
           basePower *= move.basePowerModifier;
         }
       }
-      if (!basePower)
-        return 0;
+      if (!basePower) return 0;
       basePower = this.battle.clampIntRange(basePower, 1);
       let level = source.level;
       const attacker = move.overrideOffensivePokemon === "target" ? target : source;
@@ -724,8 +674,7 @@ const Scripts = {
         move.ignoreOffensive = true;
         move.ignoreDefensive = true;
         level *= 2;
-        if (!suppressMessages)
-          this.battle.add("-crit", target);
+        if (!suppressMessages) this.battle.add("-crit", target);
       }
       if (move.ignoreOffensive) {
         this.battle.debug("Negating (sp)atk boost/penalty.");
@@ -774,15 +723,12 @@ const Scripts = {
       }
       const totalTypeMod = target.runEffectiveness(move);
       if (totalTypeMod > 0) {
-        if (!suppressMessages)
-          this.battle.add("-supereffective", target);
+        if (!suppressMessages) this.battle.add("-supereffective", target);
       }
       if (totalTypeMod < 0) {
-        if (!suppressMessages)
-          this.battle.add("-resisted", target);
+        if (!suppressMessages) this.battle.add("-resisted", target);
       }
-      if (damage === 0)
-        return damage;
+      if (damage === 0) return damage;
       if (damage > 1) {
         damage *= this.battle.random(217, 256);
         damage = Math.floor(damage / 255);
@@ -793,17 +739,12 @@ const Scripts = {
   // deals with Pokémon stat boosting.
   boost(boost, target, source = null, effect = null) {
     if (this.event) {
-      if (!target)
-        target = this.event.target;
-      if (!source)
-        source = this.event.source;
-      if (!effect)
-        effect = this.effect;
+      if (!target) target = this.event.target;
+      if (!source) source = this.event.source;
+      if (!effect) effect = this.effect;
     }
-    if (typeof effect === "string")
-      effect = this.dex.conditions.get(effect);
-    if (!target?.hp)
-      return 0;
+    if (typeof effect === "string") effect = this.dex.conditions.get(effect);
+    if (!target?.hp) return 0;
     let success = null;
     boost = this.runEvent("TryBoost", target, source, effect, { ...boost });
     let i;

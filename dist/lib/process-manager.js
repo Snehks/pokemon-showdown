@@ -60,26 +60,20 @@ const processManagers = [];
 function exec(args, execOptions) {
   if (Array.isArray(args)) {
     const cmd = args.shift();
-    if (!cmd)
-      throw new Error(`You must pass a command to ProcessManager.exec.`);
+    if (!cmd) throw new Error(`You must pass a command to ProcessManager.exec.`);
     return new Promise((resolve, reject) => {
       child_process.execFile(cmd, args, execOptions, (err, stdout, stderr) => {
-        if (err)
-          reject(err);
-        if (typeof stdout !== "string")
-          stdout = stdout.toString();
-        if (typeof stderr !== "string")
-          stderr = stderr.toString();
+        if (err) reject(err);
+        if (typeof stdout !== "string") stdout = stdout.toString();
+        if (typeof stderr !== "string") stderr = stderr.toString();
         resolve({ stdout, stderr });
       });
     });
   } else {
     return new Promise((resolve, reject) => {
       child_process.exec(args, execOptions, (error, stdout, stderr) => {
-        if (error)
-          reject(error);
-        if (typeof stdout !== "string")
-          stdout = stdout.toString();
+        if (error) reject(error);
+        if (typeof stdout !== "string") stdout = stdout.toString();
         resolve(stdout);
       });
     });
@@ -107,8 +101,7 @@ ${message2}`);
 WRITEEND`);
   }
   _destroy() {
-    if (!this.process.process.connected)
-      return;
+    if (!this.process.process.connected) return;
     this.process.process.send(`${this.taskId}
 DESTROY`);
     this.process.deleteStream(this.taskId);
@@ -152,17 +145,14 @@ class QueryProcessWrapper {
         return;
       }
       const nlLoc2 = message2.indexOf("\n");
-      if (nlLoc2 <= 0)
-        throw new Error(`Invalid response ${message2}`);
+      if (nlLoc2 <= 0) throw new Error(`Invalid response ${message2}`);
       const taskId2 = parseInt(message2.slice(0, nlLoc2));
       const resolve = this.pendingTasks.get(taskId2);
-      if (!resolve)
-        throw new Error(`Invalid taskId ${message2.slice(0, nlLoc2)}`);
+      if (!resolve) throw new Error(`Invalid taskId ${message2.slice(0, nlLoc2)}`);
       this.pendingTasks.delete(taskId2);
       const resp = this.safeJSON(message2.slice(nlLoc2 + 1));
       resolve(resp);
-      if (this.resolveRelease && !this.getLoad())
-        this.destroy();
+      if (this.resolveRelease && !this.getLoad()) this.destroy();
     });
   }
   safeJSON(obj) {
@@ -192,8 +182,7 @@ ${JSON.stringify(input)}`);
     });
   }
   release() {
-    if (this.pendingRelease)
-      return this.pendingRelease;
+    if (this.pendingRelease) return this.pendingRelease;
     if (!this.getLoad()) {
       this.destroy();
     } else {
@@ -244,16 +233,13 @@ class StreamProcessWrapper {
         return;
       }
       let nlLoc2 = message2.indexOf("\n");
-      if (nlLoc2 <= 0)
-        throw new Error(`Invalid response ${message2}`);
+      if (nlLoc2 <= 0) throw new Error(`Invalid response ${message2}`);
       const taskId2 = parseInt(message2.slice(0, nlLoc2));
       const stream2 = this.activeStreams.get(taskId2);
-      if (!stream2)
-        return;
+      if (!stream2) return;
       message2 = message2.slice(nlLoc2 + 1);
       nlLoc2 = message2.indexOf("\n");
-      if (nlLoc2 < 0)
-        nlLoc2 = message2.length;
+      if (nlLoc2 < 0) nlLoc2 = message2.length;
       const messageType2 = message2.slice(0, nlLoc2);
       message2 = message2.slice(nlLoc2 + 1);
       if (messageType2 === "END") {
@@ -281,8 +267,7 @@ class StreamProcessWrapper {
   }
   deleteStream(taskId2) {
     this.activeStreams.delete(taskId2);
-    if (this.resolveRelease && !this.getLoad())
-      void this.destroy();
+    if (this.resolveRelease && !this.getLoad()) void this.destroy();
   }
   createStream() {
     this.taskId++;
@@ -292,8 +277,7 @@ class StreamProcessWrapper {
     return stream2;
   }
   release() {
-    if (this.pendingRelease)
-      return this.pendingRelease;
+    if (this.pendingRelease) return this.pendingRelease;
     if (!this.getLoad()) {
       void this.destroy();
     } else {
@@ -358,8 +342,7 @@ class RawProcessWrapper {
     return this.process.process ? this.process.process : this.process;
   }
   release() {
-    if (this.pendingRelease)
-      return this.pendingRelease;
+    if (this.pendingRelease) return this.pendingRelease;
     if (!this.getLoad()) {
       void this.destroy();
     } else {
@@ -377,7 +360,7 @@ class RawProcessWrapper {
     this.process.disconnect();
   }
 }
-const _ProcessManager = class {
+class ProcessManager {
   constructor(id, ctx) {
     this.processes = [];
     this.releasingProcesses = [];
@@ -389,6 +372,9 @@ const _ProcessManager = class {
     this.basename = path.basename(ctx.filename);
     this.isParentProcess = require.main !== ctx || !process.send;
     this.listen();
+  }
+  static {
+    this.disabled = false;
   }
   acquire() {
     if (!this.processes.length) {
@@ -404,8 +390,7 @@ const _ProcessManager = class {
   }
   releaseCrashed(process2) {
     const index = this.processes.indexOf(process2);
-    if (index < 0)
-      return;
+    if (index < 0) return;
     this.processes.splice(index, 1);
     this.destroyProcess(process2);
     void process2.release().then(() => {
@@ -419,8 +404,7 @@ const _ProcessManager = class {
       this.crashTime = 0;
       this.crashRespawnCount = 0;
     }
-    if (!this.crashTime)
-      this.crashTime = now;
+    if (!this.crashTime) this.crashTime = now;
     this.crashRespawnCount += 1;
     void Promise.reject(
       new Error(`Process ${this.basename} ${process2.getProcess().pid} crashed and had to be restarted`)
@@ -437,45 +421,36 @@ const _ProcessManager = class {
     ));
   }
   async unspawnOne(process2) {
-    if (!process2)
-      return;
+    if (!process2) return;
     this.destroyProcess(process2);
     const processIndex = this.processes.indexOf(process2);
-    if (processIndex < 0)
-      throw new Error("Process inactive");
+    if (processIndex < 0) throw new Error("Process inactive");
     this.processes.splice(this.processes.indexOf(process2), 1);
     this.releasingProcesses.push(process2);
     await process2.release();
     const index = this.releasingProcesses.indexOf(process2);
-    if (index < 0)
-      return;
+    if (index < 0) return;
     this.releasingProcesses.splice(index, 1);
   }
   spawn(count = 1, force) {
-    if (!this.isParentProcess)
-      return;
-    if (_ProcessManager.disabled && !force)
-      return;
+    if (!this.isParentProcess) return;
+    if (ProcessManager.disabled && !force) return;
     const spawnCount = count - this.processes.length;
     for (let i = 0; i < spawnCount; i++) {
       this.spawnOne(force);
     }
   }
   spawnOne(force) {
-    if (!this.isParentProcess)
-      throw new Error("Must use in parent process");
-    if (_ProcessManager.disabled && !force)
-      return null;
+    if (!this.isParentProcess) throw new Error("Must use in parent process");
+    if (ProcessManager.disabled && !force) return null;
     const process2 = this.createProcess();
     process2.process.on("disconnect", () => this.releaseCrashed(process2));
     this.processes.push(process2);
     return process2;
   }
   respawn(count = null) {
-    if (count === null)
-      count = this.processes.length;
-    if (count === 0)
-      throw new Error(`${this.id} is not using multiple processes.`);
+    if (count === null) count = this.processes.length;
+    if (count === 0) throw new Error(`${this.id} is not using multiple processes.`);
     const unspawned = this.unspawn();
     this.spawn(count);
     return unspawned;
@@ -489,13 +464,10 @@ const _ProcessManager = class {
   }
   destroy() {
     const index = processManagers.indexOf(this);
-    if (index >= 0)
-      processManagers.splice(index, 1);
+    if (index >= 0) processManagers.splice(index, 1);
     return this.unspawn();
   }
-};
-let ProcessManager = _ProcessManager;
-ProcessManager.disabled = false;
+}
 class QueryProcessManager extends ProcessManager {
   /**
    * @param timeout The number of milliseconds to wait before terminating a query. Defaults to 900000 ms (15 minutes).
@@ -508,8 +480,7 @@ class QueryProcessManager extends ProcessManager {
     processManagers.push(this);
   }
   async query(input, process2 = this.acquire()) {
-    if (!process2)
-      return this._query(input);
+    if (!process2) return this._query(input);
     const timeout = setTimeout(() => {
       const debugInfo = process2.debug || "No debug information found.";
       process2.destroy();
@@ -533,12 +504,10 @@ ${debugInfo}`
     return new QueryProcessWrapper(this.filename, this.messageCallback);
   }
   listen() {
-    if (this.isParentProcess)
-      return;
+    if (this.isParentProcess) return;
     process.on("message", (message) => {
       const nlLoc = message.indexOf("\n");
-      if (nlLoc <= 0)
-        throw new Error(`Invalid response ${message}`);
+      if (nlLoc <= 0) throw new Error(`Invalid response ${message}`);
       const taskId = message.slice(0, nlLoc);
       message = message.slice(nlLoc + 1);
       if (taskId.startsWith("EVAL")) {
@@ -566,8 +535,7 @@ class StreamProcessManager extends ProcessManager {
   }
   createStream() {
     const process2 = this.acquire();
-    if (!process2)
-      return this._createStream();
+    if (!process2) return this._createStream();
     return process2.createStream();
   }
   createProcess() {
@@ -596,18 +564,15 @@ END`);
     this.activeStreams.delete(taskId2);
   }
   listen() {
-    if (this.isParentProcess)
-      return;
+    if (this.isParentProcess) return;
     process.on("message", (message) => {
       let nlLoc = message.indexOf("\n");
-      if (nlLoc <= 0)
-        throw new Error(`Invalid request ${message}`);
+      if (nlLoc <= 0) throw new Error(`Invalid request ${message}`);
       const taskId = message.slice(0, nlLoc);
       const stream = this.activeStreams.get(taskId);
       message = message.slice(nlLoc + 1);
       nlLoc = message.indexOf("\n");
-      if (nlLoc < 0)
-        nlLoc = message.length;
+      if (nlLoc < 0) nlLoc = message.length;
       const messageType = message.slice(0, nlLoc);
       message = message.slice(nlLoc + 1);
       if (taskId.startsWith("EVAL")) {
@@ -616,23 +581,19 @@ END`);
         return;
       }
       if (messageType === "NEW") {
-        if (stream)
-          throw new Error(`NEW: taskId ${taskId} already exists`);
+        if (stream) throw new Error(`NEW: taskId ${taskId} already exists`);
         const newStream = this._createStream();
         this.activeStreams.set(taskId, newStream);
         void this.pipeStream(taskId, newStream);
       } else if (messageType === "DESTROY") {
-        if (!stream)
-          throw new Error(`DESTROY: Invalid taskId ${taskId}`);
+        if (!stream) throw new Error(`DESTROY: Invalid taskId ${taskId}`);
         void stream.destroy();
         this.activeStreams.delete(taskId);
       } else if (messageType === "WRITE") {
-        if (!stream)
-          throw new Error(`WRITE: Invalid taskId ${taskId}`);
+        if (!stream) throw new Error(`WRITE: Invalid taskId ${taskId}`);
         void stream.write(message);
       } else if (messageType === "WRITEEND") {
-        if (!stream)
-          throw new Error(`WRITEEND: Invalid taskId ${taskId}`);
+        if (!stream) throw new Error(`WRITEEND: Invalid taskId ${taskId}`);
         void stream.writeEnd();
       } else {
         throw new Error(`Unrecognized messageType ${messageType}`);
@@ -689,8 +650,7 @@ class RawProcessManager extends ProcessManager {
   }
   destroyProcess(process2) {
     const index = this.workers.indexOf(process2);
-    if (index >= 0)
-      this.workers.splice(index, 1);
+    if (index >= 0) this.workers.splice(index, 1);
     this.unspawnSubscription?.(process2);
   }
   async pipeStream(stream2) {
@@ -707,8 +667,7 @@ ${err.stack}`);
     }
   }
   listen() {
-    if (this.isParentProcess)
-      return;
+    if (this.isParentProcess) return;
     setImmediate(() => {
       this.activeStream = this._setupChild();
       void this.pipeStream(this.activeStream);

@@ -55,33 +55,25 @@ function escapeRegex(str) {
   return str.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
 }
 function escapeHTML(str) {
-  if (str === null || str === void 0)
-    return "";
+  if (str === null || str === void 0) return "";
   return `${str}`.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;").replace(/\//g, "&#x2f;").replace(/\n/g, "<br />");
 }
 function stripHTML(htmlContent) {
-  if (!htmlContent)
-    return "";
+  if (!htmlContent) return "";
   return htmlContent.replace(/<[^>]*>/g, "");
 }
 function formatOrder(place) {
   let remainder = place % 100;
-  if (remainder >= 10 && remainder <= 20)
-    return `${place}th`;
+  if (remainder >= 10 && remainder <= 20) return `${place}th`;
   remainder = place % 10;
-  if (remainder === 1)
-    return `${place}st`;
-  if (remainder === 2)
-    return `${place}nd`;
-  if (remainder === 3)
-    return `${place}rd`;
+  if (remainder === 1) return `${place}st`;
+  if (remainder === 2) return `${place}nd`;
+  if (remainder === 3) return `${place}rd`;
   return `${place}th`;
 }
 function visualize(value, depth = 0) {
-  if (value === void 0)
-    return `undefined`;
-  if (value === null)
-    return `null`;
+  if (value === void 0) return `undefined`;
+  if (value === null) return `null`;
   if (typeof value === "number" || typeof value === "boolean") {
     return `${value}`;
   }
@@ -92,35 +84,30 @@ function visualize(value, depth = 0) {
     return value.toString();
   }
   if (Array.isArray(value)) {
-    if (depth > 10)
-      return `[array]`;
+    if (depth > 10) return `[array]`;
     return `[` + value.map((elem) => visualize(elem, depth + 1)).join(`, `) + `]`;
   }
   if (value instanceof RegExp || value instanceof Date || value instanceof Function) {
-    if (depth && value instanceof Function)
-      return `Function`;
+    if (depth && value instanceof Function) return `Function`;
     return `${value}`;
   }
   let constructor = "";
   if (typeof value.constructor?.name === "string") {
     constructor = value.constructor.name;
-    if (constructor === "Object")
-      constructor = "";
+    if (constructor === "Object") constructor = "";
   } else {
     constructor = "null";
   }
   const baseClass = value?.toString && /\[object (.*)\]/.exec(value.toString())?.[1] || constructor;
   switch (baseClass) {
     case "Map":
-      if (depth > 2)
-        return `Map`;
+      if (depth > 2) return `Map`;
       const mapped = [...value.entries()].map(
         (val) => `${visualize(val[0], depth + 1)} => ${visualize(val[1], depth + 1)}`
       );
       return `${constructor} (${value.size}) { ${mapped.join(", ")} }`;
     case "Set":
-      if (depth > 2)
-        return `Set`;
+      if (depth > 2) return `Set`;
       return `${constructor} (${value.size}) { ${[...value].map((v) => visualize(v, depth + 1)).join(", ")} }`;
   }
   if (value.toString) {
@@ -134,21 +121,17 @@ function visualize(value, depth = 0) {
   }
   let buf = "";
   for (const key in value) {
-    if (!Object.prototype.hasOwnProperty.call(value, key))
-      continue;
+    if (!Object.prototype.hasOwnProperty.call(value, key)) continue;
     if (depth > 2 || depth && constructor) {
       buf = "...";
       break;
     }
-    if (buf)
-      buf += `, `;
+    if (buf) buf += `, `;
     let displayedKey = key;
-    if (!/^[A-Za-z0-9_$]+$/.test(key))
-      displayedKey = JSON.stringify(key);
+    if (!/^[A-Za-z0-9_$]+$/.test(key)) displayedKey = JSON.stringify(key);
     buf += `${displayedKey}: ` + visualize(value[key], depth + 1);
   }
-  if (constructor && !buf && constructor !== "null")
-    return constructor;
+  if (constructor && !buf && constructor !== "null") return constructor;
   return `${constructor}{${buf}}`;
 }
 function compare(a, b) {
@@ -164,8 +147,7 @@ function compare(a, b) {
   if (Array.isArray(a)) {
     for (let i = 0; i < a.length; i++) {
       const comparison = compare(a[i], b[i]);
-      if (comparison)
-        return comparison;
+      if (comparison) return comparison;
     }
     return 0;
   }
@@ -175,8 +157,7 @@ function compare(a, b) {
   throw new Error(`Passed value ${a} is not comparable`);
 }
 function sortBy(array, callback) {
-  if (!callback)
-    return array.sort(compare);
+  if (!callback) return array.sort(compare);
   return array.sort((a, b) => compare(callback(a), callback(b)));
 }
 function splitFirst(str, delimiter, limit = 1) {
@@ -241,44 +222,35 @@ function randomElement(arr) {
   return arr[i];
 }
 function clampIntRange(num, min, max) {
-  if (typeof num !== "number")
-    num = 0;
+  if (typeof num !== "number") num = 0;
   num = Math.floor(num);
-  if (min !== void 0 && num < min)
-    num = min;
-  if (max !== void 0 && num > max)
-    num = max;
+  if (min !== void 0 && num < min) num = min;
+  if (max !== void 0 && num > max) num = max;
   return num;
 }
 function clearRequireCache(options = {}) {
   const excludes = options?.exclude || [];
   excludes.push("/node_modules/");
   for (const path in require.cache) {
-    if (excludes.some((p) => path.includes(p)))
-      continue;
+    if (excludes.some((p) => path.includes(p))) continue;
     const mod = require.cache[path];
-    if (!mod)
-      continue;
+    if (!mod) continue;
     uncacheModuleTree(mod, excludes);
     delete require.cache[path];
   }
 }
 function uncacheModuleTree(mod, excludes) {
-  if (!mod.children?.length || excludes.some((p) => mod.filename.includes(p)))
-    return;
+  if (!mod.children?.length || excludes.some((p) => mod.filename.includes(p))) return;
   for (const [i, child] of mod.children.entries()) {
-    if (excludes.some((p) => child.filename.includes(p)))
-      continue;
+    if (excludes.some((p) => child.filename.includes(p))) continue;
     mod.children?.splice(i, 1);
     uncacheModuleTree(child, excludes);
   }
   delete mod.children;
 }
 function deepClone(obj) {
-  if (obj === null || typeof obj !== "object")
-    return obj;
-  if (Array.isArray(obj))
-    return obj.map((prop) => deepClone(prop));
+  if (obj === null || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) return obj.map((prop) => deepClone(prop));
   const clone = Object.create(Object.getPrototypeOf(obj));
   for (const key of Object.keys(obj)) {
     clone[key] = deepClone(obj[key]);
@@ -286,17 +258,13 @@ function deepClone(obj) {
   return clone;
 }
 function deepFreeze(obj) {
-  if (obj === null || typeof obj !== "object")
-    return obj;
-  if (Object.isFrozen(obj))
-    return obj;
+  if (obj === null || typeof obj !== "object") return obj;
+  if (Object.isFrozen(obj)) return obj;
   Object.freeze(obj);
   if (Array.isArray(obj)) {
-    for (const elem of obj)
-      deepFreeze(elem);
+    for (const elem of obj) deepFreeze(elem);
   } else {
-    for (const elem of Object.values(obj))
-      deepFreeze(elem);
+    for (const elem of Object.values(obj)) deepFreeze(elem);
   }
   return obj;
 }
@@ -304,32 +272,23 @@ function levenshtein(s, t, l) {
   const d = [];
   const n = s.length;
   const m = t.length;
-  if (n === 0)
-    return m;
-  if (m === 0)
-    return n;
-  if (l && Math.abs(m - n) > l)
-    return Math.abs(m - n);
-  for (let i = n; i >= 0; i--)
-    d[i] = [];
-  for (let i = n; i >= 0; i--)
-    d[i][0] = i;
-  for (let j = m; j >= 0; j--)
-    d[0][j] = j;
+  if (n === 0) return m;
+  if (m === 0) return n;
+  if (l && Math.abs(m - n) > l) return Math.abs(m - n);
+  for (let i = n; i >= 0; i--) d[i] = [];
+  for (let i = n; i >= 0; i--) d[i][0] = i;
+  for (let j = m; j >= 0; j--) d[0][j] = j;
   for (let i = 1; i <= n; i++) {
     const si = s.charAt(i - 1);
     for (let j = 1; j <= m; j++) {
-      if (i === j && d[i][j] > 4)
-        return n;
+      if (i === j && d[i][j] > 4) return n;
       const tj = t.charAt(j - 1);
       const cost = si === tj ? 0 : 1;
       let mi = d[i - 1][j] + 1;
       const b = d[i][j - 1] + 1;
       const c = d[i - 1][j - 1] + cost;
-      if (b < mi)
-        mi = b;
-      if (c < mi)
-        mi = c;
+      if (b < mi) mi = b;
+      if (c < mi) mi = c;
       d[i][j] = mi;
     }
   }
@@ -341,8 +300,7 @@ function waitUntil(time) {
   });
 }
 function parseExactInt(str) {
-  if (!/^-?(0|[1-9][0-9]*)$/.test(str))
-    return NaN;
+  if (!/^-?(0|[1-9][0-9]*)$/.test(str)) return NaN;
   return parseInt(str);
 }
 function formatSQLArray(arr, args) {
@@ -373,8 +331,7 @@ class Multiset extends Map {
   }
   remove(key) {
     const newValue = this.get(key) - 1;
-    if (newValue <= 0)
-      return this.delete(key);
+    if (newValue <= 0) return this.delete(key);
     this.set(key, newValue);
     return true;
   }

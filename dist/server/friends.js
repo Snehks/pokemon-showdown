@@ -68,12 +68,9 @@ function sendPM(message, to, from = "~") {
   receivingUser?.send(`|pm|${fromIdentity}|${toIdentity}|${message}`);
 }
 function canPM(sender, receiver) {
-  if (!receiver?.settings.blockPMs)
-    return true;
-  if (receiver.settings.blockPMs === true)
-    return sender.can("lock");
-  if (receiver.settings.blockPMs === "friends")
-    return false;
+  if (!receiver?.settings.blockPMs) return true;
+  if (receiver.settings.blockPMs === true) return sender.can("lock");
+  if (receiver.settings.blockPMs === "friends") return false;
   return Users.globalAuth.atLeast(sender, receiver.settings.blockPMs);
 }
 class FriendsDatabase {
@@ -135,8 +132,7 @@ class FriendsDatabase {
       await this.run("deleteReceivedRequests", [user.id]);
     }
     const sentResults = await this.all("getSent", [user.id]);
-    if (sentResults === null)
-      return { sent, received };
+    if (sentResults === null) return { sent, received };
     for (const request of sentResults) {
       sent.add(request.receiver);
     }
@@ -208,18 +204,15 @@ class FriendsDatabase {
     return result;
   }
   async removeRequest(receiverID, senderID) {
-    if (!senderID)
-      throw new Chat.ErrorMessage(`Invalid sender username.`);
-    if (!receiverID)
-      throw new Chat.ErrorMessage(`Invalid receiver username.`);
+    if (!senderID) throw new Chat.ErrorMessage(`Invalid sender username.`);
+    if (!receiverID) throw new Chat.ErrorMessage(`Invalid receiver username.`);
     return this.run("deleteRequest", [senderID, receiverID]);
   }
   async approveRequest(receiverID, senderID) {
     return this.transaction("accept", [senderID, receiverID]);
   }
   async removeFriend(userid, friendID) {
-    if (!friendID || !userid)
-      throw new Chat.ErrorMessage(`Invalid usernames supplied.`);
+    if (!friendID || !userid) throw new Chat.ErrorMessage(`Invalid usernames supplied.`);
     const result = await this.run("delete", { user1: userid, user2: friendID });
     if (result.changes < 1) {
       throw new Chat.ErrorMessage(`You do not have ${friendID} friended.`);
@@ -280,8 +273,7 @@ const ACTIONS = {
 };
 const FUNCTIONS = {
   "should_expire": (sentTime) => {
-    if (Date.now() - sentTime > REQUEST_EXPIRY_TIME)
-      return 1;
+    if (Date.now() - sentTime > REQUEST_EXPIRY_TIME) return 1;
     return 0;
   }
 };
@@ -326,8 +318,7 @@ const TRANSACTIONS = {
         throw new FailureMessage(`You are at the maximum number of friends.`);
       }
       const { result } = TRANSACTIONS.removeRequest([request]);
-      if (!result.length)
-        throw new FailureMessage(`You have no request pending from ${senderID}.`);
+      if (!result.length) throw new FailureMessage(`You have no request pending from ${senderID}.`);
       TRANSACTIONS.add([request]);
     }
     return { result: [] };
@@ -337,8 +328,7 @@ const TRANSACTIONS = {
     for (const request of requests) {
       const [to, from] = request;
       const { changes } = statements.deleteRequest.run(to, from);
-      if (changes)
-        result.push(changes);
+      if (changes) result.push(changes);
     }
     return { result };
   }
@@ -348,10 +338,8 @@ function findFriendship(users) {
   return !!statements.findFriendship.get({ user1: users[0], user2: users[1] });
 }
 const setup = () => {
-  if (!process.send)
-    throw new Error("You should not be using this function in the main process");
-  if (!Object.keys(statements).length)
-    FriendsDatabase.setupDatabase();
+  if (!process.send) throw new Error("You should not be using this function in the main process");
+  if (!Object.keys(statements).length) FriendsDatabase.setupDatabase();
 };
 const PM = new import_lib.ProcessManager.QueryProcessManager("friends", module, (query) => {
   const { type, statement, data } = query;

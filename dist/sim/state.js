@@ -155,8 +155,7 @@ const State = new class {
     return state;
   }
   normalizeLog(log) {
-    if (!log)
-      return log;
+    if (!log) return log;
     const normalized = (typeof log === "string" ? log.split("\n") : log).map((line) => line.startsWith(`|t:|`) ? `|t:|` : line);
     return typeof log === "string" ? normalized.join("\n") : normalized;
   }
@@ -176,8 +175,7 @@ const State = new class {
     }
     state.team = team.join(team.length > 9 ? "," : "");
     state.choice = this.serializeChoice(side.choice, side.battle);
-    if (side.activeRequest === null)
-      state.activeRequest = null;
+    if (side.activeRequest === null) state.activeRequest = null;
     return state;
   }
   deserializeSide(state, side) {
@@ -211,8 +209,7 @@ const State = new class {
       baseMoveSlots = pokemon.moveSlots.slice();
     }
     pokemon.baseMoveSlots = baseMoveSlots;
-    if (state.showCure === void 0)
-      pokemon.showCure = void 0;
+    if (state.showCure === void 0) pokemon.showCure = void 0;
   }
   serializeChoice(choice, battle) {
     const state = this.serialize(choice, CHOICE, battle);
@@ -242,8 +239,7 @@ const State = new class {
     const base = battle.dex.moves.get(move.id);
     const skip = new Set(ACTIVE_MOVE);
     for (const [key, value] of Object.entries(base)) {
-      if (typeof value === "object" || move[key] === value)
-        skip.add(key);
+      if (typeof value === "object" || move[key] === value) skip.add(key);
     }
     const state = this.serialize(move, skip, battle);
     state.move = `[Move:${move.id}]`;
@@ -258,14 +254,14 @@ const State = new class {
     switch (typeof obj) {
       case "function":
         return void 0;
+      // elide functions
       case "undefined":
       case "boolean":
       case "number":
       case "string":
         return obj;
       case "object":
-        if (obj === null)
-          return null;
+        if (obj === null) return null;
         if (Array.isArray(obj)) {
           const arr = new Array(obj.length);
           for (const [i, o2] of obj.entries()) {
@@ -273,10 +269,8 @@ const State = new class {
           }
           return arr;
         }
-        if (this.isActiveMove(obj))
-          return this.serializeActiveMove(obj, battle);
-        if (this.isReferable(obj))
-          return this.toRef(obj);
+        if (this.isActiveMove(obj)) return this.serializeActiveMove(obj, battle);
+        if (this.isReferable(obj)) return this.toRef(obj);
         if (obj.constructor !== Object) {
           throw new TypeError(`Unsupported type ${obj.constructor.name}: ${obj}`);
         }
@@ -298,8 +292,7 @@ const State = new class {
       case "string":
         return this.fromRef(obj, battle) || obj;
       case "object":
-        if (obj === null)
-          return null;
+        if (obj === null) return null;
         if (Array.isArray(obj)) {
           const arr = new Array(obj.length);
           for (const [i, o2] of obj.entries()) {
@@ -307,14 +300,14 @@ const State = new class {
           }
           return arr;
         }
-        if (this.isActiveMove(obj))
-          return this.deserializeActiveMove(obj, battle);
+        if (this.isActiveMove(obj)) return this.deserializeActiveMove(obj, battle);
         const o = {};
         for (const [key, value] of Object.entries(obj)) {
           o[key] = this.deserializeWithRefs(value, battle);
         }
         return o;
       case "function":
+      // lol wtf
       default:
         throw new TypeError(`Unexpected typeof === '${typeof obj}': ${obj}`);
     }
@@ -340,13 +333,10 @@ const State = new class {
     return `[${obj.constructor.name}${id ? ":" : ""}${id}]`;
   }
   fromRef(ref, battle) {
-    if (!ref.startsWith("[") && !ref.endsWith("]"))
-      return void 0;
+    if (!ref.startsWith("[") && !ref.endsWith("]")) return void 0;
     ref = ref.substring(1, ref.length - 1);
-    if (ref === "Battle")
-      return battle;
-    if (ref === "Field")
-      return battle.field;
+    if (ref === "Battle") return battle;
+    if (ref === "Field") return battle.field;
     const [type, id] = ref.split(":");
     switch (type) {
       case "Side":
@@ -370,18 +360,15 @@ const State = new class {
   serialize(obj, skip, battle) {
     const state = {};
     for (const [key, value] of Object.entries(obj)) {
-      if (skip.has(key))
-        continue;
+      if (skip.has(key)) continue;
       const val = this.serializeWithRefs(value, battle);
-      if (typeof val !== "undefined")
-        state[key] = val;
+      if (typeof val !== "undefined") state[key] = val;
     }
     return state;
   }
   deserialize(state, obj, skip, battle) {
     for (const [key, value] of Object.entries(state)) {
-      if (skip.has(key))
-        continue;
+      if (skip.has(key)) continue;
       obj[key] = this.deserializeWithRefs(value, battle);
     }
   }

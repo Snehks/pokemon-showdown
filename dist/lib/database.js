@@ -58,8 +58,7 @@ class SQLStatement {
   }
   append(value) {
     if (isSQL(value)) {
-      if (!value.sql.length)
-        return this;
+      if (!value.sql.length) return this;
       this.appendRaw(value.sql[0]);
       this.sql = this.sql.concat(value.sql.slice(1));
       this.values = this.values.concat(value.values);
@@ -69,8 +68,7 @@ class SQLStatement {
     } else if (value === void 0) {
     } else if (Array.isArray(value)) {
       if (!value.length || isSQL(value[0])) {
-        for (const part of value)
-          this.append(part);
+        for (const part of value) this.append(part);
       } else if ('"`'.includes(this.sql[this.sql.length - 1].slice(-1))) {
         const quoteChar = this.sql[this.sql.length - 1].slice(-1);
         for (const col of value) {
@@ -109,8 +107,7 @@ class SQLStatement {
   }
 }
 function SQL(strings, ...values) {
-  if (typeof strings === "string")
-    strings = [strings];
+  if (typeof strings === "string") strings = [strings];
   return new SQLStatement(strings, values);
 }
 const connectedDatabases = [];
@@ -122,19 +119,16 @@ class Database {
     connectedDatabases.push(this);
   }
   query(sql) {
-    if (!sql)
-      return (strings, ...rest) => this.query(new SQLStatement(strings, rest));
+    if (!sql) return (strings, ...rest) => this.query(new SQLStatement(strings, rest));
     const [query, values] = this._resolveSQL(sql);
     return this._query(query, values);
   }
   queryOne(sql) {
-    if (!sql)
-      return (strings, ...rest) => this.queryOne(new SQLStatement(strings, rest));
+    if (!sql) return (strings, ...rest) => this.queryOne(new SQLStatement(strings, rest));
     return this.query(sql).then((res) => Array.isArray(res) ? res[0] : res);
   }
   queryExec(sql) {
-    if (!sql)
-      return (strings, ...rest) => this.queryExec(new SQLStatement(strings, rest));
+    if (!sql) return (strings, ...rest) => this.queryExec(new SQLStatement(strings, rest));
     const [query, values] = this._resolveSQL(sql);
     return this._queryExec(query, values);
   }
@@ -165,17 +159,13 @@ class DatabaseTable {
   }
   // low-level
   selectAll(entries) {
-    if (!entries)
-      entries = SQL`*`;
-    if (Array.isArray(entries))
-      entries = SQL`"${entries}"`;
+    if (!entries) entries = SQL`*`;
+    if (Array.isArray(entries)) entries = SQL`"${entries}"`;
     return (strings, ...rest) => this.query()`SELECT ${entries} FROM "${this.name}" ${new SQLStatement(strings, rest)}`;
   }
   selectOne(entries) {
-    if (!entries)
-      entries = SQL`*`;
-    if (Array.isArray(entries))
-      entries = SQL`"${entries}"`;
+    if (!entries) entries = SQL`*`;
+    if (Array.isArray(entries)) entries = SQL`"${entries}"`;
     return (strings, ...rest) => this.queryOne()`SELECT ${entries} FROM "${this.name}" ${new SQLStatement(strings, rest)} LIMIT 1`;
   }
   updateAll(partialRow) {
@@ -218,25 +208,21 @@ class DatabaseTable {
   }
   replace(partialRow, where) {
     if (this.db.type === "pg") {
-      if (!this.primaryKeyName)
-        throw new Error(`Cannot replace() without a single-column primary key`);
+      if (!this.primaryKeyName) throw new Error(`Cannot replace() without a single-column primary key`);
       return this.queryExec()`INSERT INTO "${this.name}" (${partialRow}) ON CONFLICT ("${this.primaryKeyName}") DO UPDATE SET ${partialRow} ${where}`;
     }
     return this.queryExec()`REPLACE INTO "${this.name}" (${partialRow}) ${where}`;
   }
   get(primaryKey, entries) {
-    if (!this.primaryKeyName)
-      throw new Error(`Cannot get() without a single-column primary key`);
+    if (!this.primaryKeyName) throw new Error(`Cannot get() without a single-column primary key`);
     return this.selectOne(entries)`WHERE "${this.primaryKeyName}" = ${primaryKey}`;
   }
   delete(primaryKey) {
-    if (!this.primaryKeyName)
-      throw new Error(`Cannot delete() without a single-column primary key`);
+    if (!this.primaryKeyName) throw new Error(`Cannot delete() without a single-column primary key`);
     return this.deleteAll()`WHERE "${this.primaryKeyName}" = ${primaryKey}`;
   }
   update(primaryKey, data) {
-    if (!this.primaryKeyName)
-      throw new Error(`Cannot update() without a single-column primary key`);
+    if (!this.primaryKeyName) throw new Error(`Cannot update() without a single-column primary key`);
     return this.updateAll(data)`WHERE "${this.primaryKeyName}" = ${primaryKey}`;
   }
 }
@@ -273,8 +259,7 @@ class MySQLDatabase extends Database {
         if (Array.isArray(results)) {
           for (const row of results) {
             for (const col in row) {
-              if (Buffer.isBuffer(row[col]))
-                row[col] = row[col].toString();
+              if (Buffer.isBuffer(row[col])) row[col] = row[col].toString();
             }
           }
         }

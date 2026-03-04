@@ -35,15 +35,13 @@ class BestOfPlayer extends import_room_game.RoomGamePlayer {
   }
   avatar() {
     let avatar = Users.get(this.id)?.avatar;
-    if (!avatar || typeof avatar === "number")
-      avatar = "unknownf";
+    if (!avatar || typeof avatar === "number") avatar = "unknownf";
     const url = Chat.plugins.avatars?.Avatars.src(avatar) || `https://${Config.routes.client}/sprites/trainers/${avatar}.png`;
     return url;
   }
   updateReadyButton() {
     const user = this.getUser();
-    if (!user?.connected)
-      return;
+    if (!user?.connected) return;
     this.dcAutoloseTime = null;
     const room = this.game.room;
     const battleRoom = Rooms.get(this.game.games[this.game.games.length - 1]?.room);
@@ -121,8 +119,7 @@ class BestOfGame extends import_room_game.RoomGame {
   }
   addPlayer(user, options) {
     const player = super.addPlayer(user, options);
-    if (!player)
-      throw new Error(`Failed to make player ${user} in ${this.roomid}`);
+    if (!player) throw new Error(`Failed to make player ${user} in ${this.roomid}`);
     this.room.auth.set(user.id, Users.PLAYER_SYMBOL);
     return player;
   }
@@ -148,8 +145,7 @@ class BestOfGame extends import_room_game.RoomGame {
         room.add(`|raw|<div class="broadcast-blue"><strong>This best-of set is required to be public due to a player having a name starting with '${this.forcedSettings.privacy}'.</div>`);
       } else if (!options.tour || room.tour?.allowModjoin) {
         room.setPrivate("hidden");
-        if (inviteOnly)
-          room.settings.modjoin = "%";
+        if (inviteOnly) room.settings.modjoin = "%";
         room.privacySetter = privacySetter;
         if (inviteOnly) {
           room.settings.modjoin = "%";
@@ -209,8 +205,7 @@ class BestOfGame extends import_room_game.RoomGame {
   }
   nextGame() {
     const prevBattleRoom = this.waitingBattle;
-    if (!prevBattleRoom && this.games.length)
-      return;
+    if (!prevBattleRoom && this.games.length) return;
     this.clearWaiting();
     const options = this.getOptions();
     if (!options) {
@@ -223,8 +218,7 @@ class BestOfGame extends import_room_game.RoomGame {
       throw new Error(`Failed to get options for ${this.roomid}`);
     }
     const battleRoom = Rooms.createBattle(options);
-    if (!battleRoom)
-      throw new Error("Failed to create battle for " + this.title);
+    if (!battleRoom) throw new Error("Failed to create battle for " + this.title);
     this.games.push({
       room: battleRoom.roomid,
       winner: void 0,
@@ -314,8 +308,7 @@ class BestOfGame extends import_room_game.RoomGame {
       const mirrorLeftPlayer = !i ? ' style="transform: scaleX(-1)"' : "";
       buf += `<td>`;
       for (const [j, set] of team.entries()) {
-        if (j % 3 === 0 && j > 1)
-          buf += `<br />`;
+        if (j % 3 === 0 && j > 1) buf += `<br />`;
         buf += `<psicon pokemon="${set.species}"${mirrorLeftPlayer} />`;
       }
       buf += `</td>`;
@@ -324,10 +317,8 @@ class BestOfGame extends import_room_game.RoomGame {
     this.room.add(`|fieldhtml|<center>${buf}</center>`);
     buf = this.games.map(({ room, winner }, index) => {
       let progress = `being played`;
-      if (winner)
-        progress = import_lib.Utils.html`won by ${winner.name}`;
-      if (winner === null)
-        progress = `tied`;
+      if (winner) progress = import_lib.Utils.html`won by ${winner.name}`;
+      if (winner === null) progress = `tied`;
       return import_lib.Utils.html`<p>Game ${index + 1}: <a href="/${room}"><strong>${progress}</strong></a></p>`;
     }).join("");
     if (this.winner) {
@@ -345,8 +336,7 @@ class BestOfGame extends import_room_game.RoomGame {
     }
   }
   onBattleWin(room, winnerid) {
-    if (this.ended)
-      return;
+    if (this.ended) return;
     const winner = winnerid ? this.playerTable[winnerid] : null;
     this.games[this.games.length - 1].winner = winner;
     if (winner) {
@@ -362,15 +352,12 @@ class BestOfGame extends import_room_game.RoomGame {
       this.room.add(`|html|Game ${this.games.length} was a tie.`).update();
     }
     const overallWinner = this.players.find((p) => p.wins >= this.winThreshold);
-    if (overallWinner)
-      return this.end(overallWinner.id);
-    if (this.games.length >= this.bestOf)
-      return this.end("");
+    if (overallWinner) return this.end(overallWinner.id);
+    if (this.games.length >= this.bestOf) return this.end("");
     this.promptNextGame(room);
   }
   promptNextGame(room) {
-    if (!room.battle || this.winner)
-      return;
+    if (!room.battle || this.winner) return;
     this.updateDisplay();
     this.waitingBattle = room;
     const now = Date.now();
@@ -386,8 +373,7 @@ class BestOfGame extends import_room_game.RoomGame {
     this.nextBattleTimer = setInterval(() => this.pokeNextBattleTimer(), 1e4);
   }
   pokeNextBattleTimer() {
-    if (!this.nextBattleTimerEnd || !this.nextBattleTimer)
-      return;
+    if (!this.nextBattleTimerEnd || !this.nextBattleTimer) return;
     if (Date.now() >= this.nextBattleTimerEnd) {
       return this.nextGame();
     }
@@ -427,8 +413,7 @@ class BestOfGame extends import_room_game.RoomGame {
     super.setEnded();
   }
   end(winnerid) {
-    if (this.ended)
-      return;
+    if (this.ended) return;
     this.setEnded();
     this.room.add(`|allowleave|`).update();
     const winner = winnerid ? this.playerTable[winnerid] : null;
@@ -458,27 +443,22 @@ class BestOfGame extends import_room_game.RoomGame {
   forfeit(user, message = "") {
     const userid = typeof user !== "string" ? user.id : toID(user);
     const loser = this.playerTable[userid];
-    if (loser)
-      this.forfeitPlayer(loser, message);
+    if (loser) this.forfeitPlayer(loser, message);
   }
   forfeitPlayer(loser, message = "") {
-    if (this.ended || this.winner)
-      return false;
+    if (this.ended || this.winner) return false;
     this.winner = this.players.find((p) => p !== loser);
     this.room.add(`||${loser.name}${message || " forfeited."}`);
     this.end(this.winner.id);
     const lastBattle = Rooms.get(this.games[this.games.length - 1].room)?.battle;
-    if (lastBattle && !lastBattle.ended)
-      lastBattle.forfeit(loser.id, message);
+    if (lastBattle && !lastBattle.ended) lastBattle.forfeit(loser.id, message);
     return true;
   }
   destroy() {
     this.setEnded();
-    for (const { room } of this.games)
-      Rooms.get(room)?.setParent(null);
+    for (const { room } of this.games) Rooms.get(room)?.setParent(null);
     this.games = [];
-    for (const p of this.players)
-      p.destroy();
+    for (const p of this.players) p.destroy();
     this.players = [];
     this.playerTable = {};
     this.winner = null;

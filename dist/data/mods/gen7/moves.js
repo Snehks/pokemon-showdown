@@ -149,14 +149,12 @@ const Moves = {
     inherit: true,
     onHit(target, source, move) {
       let success = false;
-      if (!target.volatiles["substitute"] || move.infiltrates)
-        success = !!this.boost({ evasion: -1 });
+      if (!target.volatiles["substitute"] || move.infiltrates) success = !!this.boost({ evasion: -1 });
       const removeAll = ["spikes", "toxicspikes", "stealthrock", "stickyweb"];
       const removeTarget = ["reflect", "lightscreen", "auroraveil", "safeguard", "mist", ...removeAll];
       for (const targetCondition of removeTarget) {
         if (target.side.removeSideCondition(targetCondition)) {
-          if (!removeAll.includes(targetCondition))
-            continue;
+          if (!removeAll.includes(targetCondition)) continue;
           this.add("-sideend", target.side, this.dex.conditions.get(targetCondition).name, "[from] move: Defog", `[of] ${source}`);
           success = true;
         }
@@ -232,8 +230,7 @@ const Moves = {
         }
       },
       onTryAddVolatile(status, target) {
-        if (!target.isGrounded() || target.isSemiInvulnerable())
-          return;
+        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
         if (status.id === "yawn") {
           this.add("-activate", target, "move: Electric Terrain");
           return null;
@@ -408,8 +405,7 @@ const Moves = {
           this.add("-immune", ally, "[from] ability: Soundproof");
           continue;
         }
-        if (ally.cureStatus())
-          success = true;
+        if (ally.cureStatus()) success = true;
       }
       return success;
     }
@@ -603,8 +599,7 @@ const Moves = {
       onTryHitPriority: 3,
       onTryHit(target, source, move) {
         if (!move.flags["protect"] || move.category === "Status") {
-          if (move.isZ || move.isMax)
-            target.getMoveHitData(move).zBrokeProtect = true;
+          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
           return;
         }
         this.add("-activate", target, "move: Protect");
@@ -832,8 +827,7 @@ const Moves = {
         if (effect && (effect.priority <= 0.1 || effect.target === "self")) {
           return;
         }
-        if (target.isSemiInvulnerable() || target.isAlly(source))
-          return;
+        if (target.isSemiInvulnerable() || target.isAlly(source)) return;
         if (!target.isGrounded()) {
           const baseMove = this.dex.moves.get(effect.id);
           if (baseMove.priority > 0) {
@@ -883,8 +877,7 @@ const Moves = {
   purify: {
     inherit: true,
     onHit(target, source) {
-      if (!target.cureStatus())
-        return false;
+      if (!target.cureStatus()) return false;
       this.heal(Math.ceil(source.maxhp * 0.5), source);
     }
   },
@@ -895,11 +888,9 @@ const Moves = {
   quash: {
     inherit: true,
     onHit(target) {
-      if (this.activePerHalf === 1)
-        return false;
+      if (this.activePerHalf === 1) return false;
       const action = this.queue.willMove(target);
-      if (!action)
-        return false;
+      if (!action) return false;
       action.priority = -7.1;
       this.queue.cancelMove(target);
       for (let i = this.queue.list.length - 1; i >= 0; i--) {
@@ -1090,8 +1081,7 @@ const Moves = {
       const layers = pokemon.volatiles["stockpile"]?.layers || 1;
       const healAmount = [0.25, 0.5, 1];
       const success = !!this.heal(this.modify(pokemon.maxhp, healAmount[layers - 1]));
-      if (!success)
-        this.add("-fail", pokemon, "heal");
+      if (!success) this.add("-fail", pokemon, "heal");
       pokemon.removeVolatile("stockpile");
       return success || null;
     }
@@ -1102,17 +1092,13 @@ const Moves = {
       const yourItem = target.takeItem(source);
       const myItem = source.takeItem();
       if (target.item || source.item || !yourItem && !myItem) {
-        if (yourItem)
-          target.item = yourItem.id;
-        if (myItem)
-          source.item = myItem.id;
+        if (yourItem) target.item = yourItem.id;
+        if (myItem) source.item = myItem.id;
         return false;
       }
       if (myItem && !this.singleEvent("TakeItem", myItem, source.itemState, target, source, move, myItem) || yourItem && !this.singleEvent("TakeItem", yourItem, target.itemState, source, target, move, yourItem)) {
-        if (yourItem)
-          target.item = yourItem.id;
-        if (myItem)
-          source.item = myItem.id;
+        if (yourItem) target.item = yourItem.id;
+        if (myItem) source.item = myItem.id;
         return false;
       }
       this.add("-activate", source, "move: Trick", `[of] ${target}`);
@@ -1179,20 +1165,17 @@ const Moves = {
   toxic: {
     inherit: true,
     onPrepareHit(target, source, move) {
-      if (source.hasType("Poison"))
-        source.addVolatile("toxic");
+      if (source.hasType("Poison")) source.addVolatile("toxic");
     },
     condition: {
       noCopy: true,
       duration: 1,
       onSourceInvulnerabilityPriority: 1,
       onSourceInvulnerability(target, source, move) {
-        if (move && source === this.effectState.target)
-          return 0;
+        if (move && source === this.effectState.target) return 0;
       },
       onSourceAccuracy(accuracy, target, source, move) {
-        if (move && source === this.effectState.target)
-          return true;
+        if (move && source === this.effectState.target) return true;
       }
     }
   },

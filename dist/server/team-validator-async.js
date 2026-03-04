@@ -70,28 +70,28 @@ const PM = new import_process_manager.QueryProcessManager("team-validator", modu
   const packedTeam = Teams.pack(parsedTeam);
   return "1" + packedTeam;
 }, 2 * 60 * 1e3);
-const _TeamValidatorAsync = class {
+class TeamValidatorAsync {
+  static {
+    this.PM = PM;
+  }
   constructor(format) {
     this.format = Dex.formats.get(format);
   }
   validateTeam(team, options) {
     let formatid = this.format.id;
-    if (this.format.customRules)
-      formatid += "@@@" + this.format.customRules.join(",");
+    if (this.format.customRules) formatid += "@@@" + this.format.customRules.join(",");
     if (team.length > 25 * 1024 - 6) {
       return Promise.resolve("0Your team is over 25KB. Please use a smaller team.");
     }
     return PM.query({ formatid, options, team });
   }
   static get(format) {
-    return new _TeamValidatorAsync(format);
+    return new TeamValidatorAsync(format);
   }
   static start(processCount) {
     start(processCount);
   }
-};
-let TeamValidatorAsync = _TeamValidatorAsync;
-TeamValidatorAsync.PM = PM;
+}
 const get = TeamValidatorAsync.get;
 if (!PM.isParentProcess) {
   ConfigLoader.ensureLoaded();

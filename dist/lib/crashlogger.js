@@ -129,8 +129,7 @@ ${stack}`;
       subject: emailOpts.subject,
       text
     }, (err) => {
-      if (err)
-        console.error(`Error sending email: ${err}`);
+      if (err) console.error(`Error sending email: ${err}`);
     });
   }
   return null;

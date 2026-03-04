@@ -41,12 +41,10 @@ const STATUS_TITLES = {
 const LOGIN_NOTIFY_THROTTLE = 15 * 60 * 1e3;
 const Friends = new class {
   async notifyPending(user) {
-    if (user.settings.blockFriendRequests)
-      return;
+    if (user.settings.blockFriendRequests) return;
     const friendRequests = await Chat.Friends.getRequests(user);
     const pendingCount = friendRequests.received.size;
-    if (pendingCount < 1)
-      return;
+    if (pendingCount < 1) return;
     if (pendingCount === 1) {
       const sender = [...friendRequests.received][0];
       const senderName = Users.getExact(sender)?.name || sender;
@@ -111,8 +109,7 @@ const Friends = new class {
     buf += `<button class="button" type="submit">Add <i class="fa fa-paper-plane"></i></button></form>`;
     for (const key in categorized) {
       const friendArray = categorized[key].sort();
-      if (friendArray.length === 0)
-        continue;
+      if (friendArray.length === 0) continue;
       buf += `<h4>${STATUS_TITLES[key]} (${friendArray.length})</h4>`;
       for (const friend of friendArray) {
         const friendID = toID(friend);
@@ -144,8 +141,7 @@ const Friends = new class {
     buf += `<br />`;
     const curUser = Users.get(userid);
     if (user) {
-      if (user.userMessage)
-        buf += import_utils.Utils.html`Status: <i>${user.userMessage}</i><br />`;
+      if (user.userMessage) buf += import_utils.Utils.html`Status: <i>${user.userMessage}</i><br />`;
     } else if (curUser && curUser.id !== userid) {
       buf += `<small>On an alternate account</small><br />`;
     }
@@ -188,8 +184,7 @@ const Friends = new class {
     return Chat.Friends.removeRequest(receiverID, senderID);
   }
   updateSpectatorLists(user) {
-    if (!user.friends)
-      return;
+    if (!user.friends) return;
     for (const id of user.friends) {
       const curUser = Users.getExact(id);
       if (curUser) {
@@ -251,10 +246,8 @@ const commands = {
     viewlist(target, room, user) {
       Friends.checkCanUse(this);
       target = toID(target);
-      if (!target)
-        throw new Chat.ErrorMessage(`Specify a user.`);
-      if (target === user.id)
-        return this.parse(`/friends list`);
+      if (!target) throw new Chat.ErrorMessage(`Specify a user.`);
+      if (target === user.id) return this.parse(`/friends list`);
       return this.parse(`/j view-friends-viewuser-${target}`);
     },
     request: "add",
@@ -264,8 +257,7 @@ const commands = {
       if (target.length > 18) {
         throw new Chat.ErrorMessage(this.tr`That name is too long - choose a valid name.`);
       }
-      if (!target)
-        return this.parse("/help friends");
+      if (!target) return this.parse("/help friends");
       await Friends.request(user, target);
       this.refreshPage("friends-sent");
       return this.sendReply(`You sent a friend request to '${target}'.`);
@@ -274,15 +266,13 @@ const commands = {
     async remove(target, room, user) {
       Friends.checkCanUse(this);
       target = toID(target);
-      if (!target)
-        return this.parse("/help friends");
+      if (!target) return this.parse("/help friends");
       await Friends.removeFriend(user.id, target);
       this.sendReply(`Removed friend '${target}'.`);
       await Chat.Friends.updateUserCache(user);
       this.refreshPage("friends-all");
       const targetUser = Users.get(target);
-      if (targetUser)
-        await Chat.Friends.updateUserCache(targetUser);
+      if (targetUser) await Chat.Friends.updateUserCache(targetUser);
     },
     view(target) {
       return this.parse(`/join view-friends-${target}`);
@@ -296,8 +286,7 @@ const commands = {
       if (user.settings.blockFriendRequests) {
         throw new Chat.ErrorMessage(this.tr`You are currently blocking friend requests, and so cannot accept your own.`);
       }
-      if (!target)
-        return this.parse("/help friends");
+      if (!target) return this.parse("/help friends");
       await Friends.approveRequest(user.id, target);
       const targetUser = Users.get(target);
       (0, import_friends.sendPM)(`You accepted a friend request from "${target}".`, user.id);
@@ -308,15 +297,13 @@ const commands = {
         (0, import_friends.sendPM)(`/uhtmlchange undo-${targetUser.id},`, targetUser.id);
       }
       await Chat.Friends.updateUserCache(user);
-      if (targetUser)
-        await Chat.Friends.updateUserCache(targetUser);
+      if (targetUser) await Chat.Friends.updateUserCache(targetUser);
     },
     deny: "reject",
     async reject(target, room, user, connection) {
       Friends.checkCanUse(this);
       target = toID(target);
-      if (!target)
-        return this.parse("/help friends");
+      if (!target) return this.parse("/help friends");
       const res = await Friends.removeRequest(user.id, target);
       if (!res.changes) {
         throw new Chat.ErrorMessage(`You do not have a friend request pending from '${target}'.`);
@@ -329,18 +316,15 @@ const commands = {
       const setting = user.settings.blockFriendRequests;
       target = target.trim();
       if (this.meansYes(target)) {
-        if (!setting)
-          throw new Chat.ErrorMessage(this.tr`You already are allowing friend requests.`);
+        if (!setting) throw new Chat.ErrorMessage(this.tr`You already are allowing friend requests.`);
         user.settings.blockFriendRequests = false;
         this.sendReply(this.tr`You are now allowing friend requests.`);
       } else if (this.meansNo(target)) {
-        if (setting)
-          throw new Chat.ErrorMessage(this.tr`You already are blocking incoming friend requests.`);
+        if (setting) throw new Chat.ErrorMessage(this.tr`You already are blocking incoming friend requests.`);
         user.settings.blockFriendRequests = true;
         this.sendReply(this.tr`You are now blocking incoming friend requests.`);
       } else {
-        if (target)
-          this.errorReply(this.tr`Unrecognized setting.`);
+        if (target) this.errorReply(this.tr`Unrecognized setting.`);
         this.sendReply(
           this.tr(setting ? `You are currently blocking friend requests.` : `You are not blocking friend requests.`)
         );
@@ -362,18 +346,15 @@ const commands = {
       const setting = user.settings.allowFriendNotifications;
       target = target.trim();
       if (!cmd.includes("hide") || target && this.meansYes(target)) {
-        if (setting)
-          throw new Chat.ErrorMessage(this.tr(`You are already allowing friend notifications.`));
+        if (setting) throw new Chat.ErrorMessage(this.tr(`You are already allowing friend notifications.`));
         user.settings.allowFriendNotifications = true;
         this.sendReply(this.tr(`You will now receive friend notifications.`));
       } else if (cmd.includes("hide") || target && this.meansNo(target)) {
-        if (!setting)
-          throw new Chat.ErrorMessage(this.tr`You are already not receiving friend notifications.`);
+        if (!setting) throw new Chat.ErrorMessage(this.tr`You are already not receiving friend notifications.`);
         user.settings.allowFriendNotifications = false;
         this.sendReply(this.tr`You will not receive friend notifications.`);
       } else {
-        if (target)
-          this.errorReply(this.tr`Unrecognized setting.`);
+        if (target) this.errorReply(this.tr`Unrecognized setting.`);
         this.sendReply(
           this.tr(setting ? `You are currently allowing friend notifications.` : `Your friend notifications are disabled.`)
         );
@@ -387,14 +368,12 @@ const commands = {
       Friends.checkCanUse(this);
       const setting = user.settings.hideLogins;
       if (cmd.includes("hide")) {
-        if (setting)
-          throw new Chat.ErrorMessage(this.tr`You are already hiding your logins from friends.`);
+        if (setting) throw new Chat.ErrorMessage(this.tr`You are already hiding your logins from friends.`);
         user.settings.hideLogins = true;
         await Chat.Friends.hideLoginData(user.id);
         this.sendReply(`You are now hiding your login times from your friends.`);
       } else if (cmd.includes("show")) {
-        if (!setting)
-          throw new Chat.ErrorMessage(this.tr`You are already allowing friends to see your login times.`);
+        if (!setting) throw new Chat.ErrorMessage(this.tr`You are already allowing friends to see your login times.`);
         user.settings.hideLogins = false;
         await Chat.Friends.allowLoginData(user.id);
         this.sendReply(`You are now allowing your friends to see your login times.`);
@@ -452,8 +431,7 @@ const commands = {
         user.settings.displayBattlesToFriends = false;
         this.sendReply(`You are now hiding your ongoing battles from your friends.`);
       } else {
-        if (!target)
-          return this.parse("/help friends sharebattles");
+        if (!target) return this.parse("/help friends sharebattles");
         throw new Chat.ErrorMessage(`Invalid setting '${target}'. Provide 'on' or 'off'.`);
       }
       user.update();
@@ -486,8 +464,7 @@ const commands = {
 };
 const pages = {
   async friends(args, user) {
-    if (!user.named)
-      return Rooms.RETRY_AFTER_LOGIN;
+    if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
     Friends.checkCanUse(this);
     const type = args.shift();
     let buf = '<div class="pad">';
@@ -536,14 +513,12 @@ const pages = {
         break;
       case "viewuser":
         const target = toID(args.shift());
-        if (!target)
-          throw new Chat.ErrorMessage(`Specify a user.`);
+        if (!target) throw new Chat.ErrorMessage(`Specify a user.`);
         if (target === user.id) {
           throw new Chat.ErrorMessage(`Use /friends list to view your own list.`);
         }
         const { public_list: isAllowing } = await Chat.Friends.getSettings(target);
-        if (!isAllowing)
-          throw new Chat.ErrorMessage(`${target}'s friends list is not public or they do not have one.`);
+        if (!isAllowing) throw new Chat.ErrorMessage(`${target}'s friends list is not public or they do not have one.`);
         this.title = `[Friends List] ${target}`;
         buf += await Friends.visualizePublicList(target);
         break;
@@ -623,8 +598,7 @@ const pages = {
         const friends = [];
         for (const friendID of user.friends) {
           const friend = Users.getExact(friendID);
-          if (!friend)
-            continue;
+          if (!friend) continue;
           friends.push(friend);
         }
         if (!friends.length) {
@@ -637,8 +611,7 @@ const pages = {
             const battle = Rooms.get(id)?.battle;
             return battle?.playerTable[friend.id] && (!battle.roomid.endsWith("pw") || friend.settings.displayBattlesToFriends);
           }).map((id) => [friend, id]);
-          if (!curBattles.length)
-            continue;
+          if (!curBattles.length) continue;
           battles.push(...curBattles);
         }
         import_utils.Utils.sortBy(battles, ([, id]) => -Number(id.split("-")[2]));
@@ -673,8 +646,7 @@ const handlers = {
   onBattleEnd(battle, winner, players) {
     for (const id of players) {
       const user = Users.get(id);
-      if (!user)
-        continue;
+      if (!user) continue;
       Friends.updateSpectatorLists(user);
     }
   },

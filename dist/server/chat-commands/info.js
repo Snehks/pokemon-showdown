@@ -57,8 +57,7 @@ const OFFLINE_SYMBOL = ` \u25CC `;
 function getCommonBattles(userID1, user1, userID2, user2, connection) {
   const battles = [];
   for (const curRoom of Rooms.rooms.values()) {
-    if (!curRoom.battle)
-      continue;
+    if (!curRoom.battle) continue;
     if ((user1?.inRooms.has(curRoom.roomid) || curRoom.auth.get(userID1) === Users.PLAYER_SYMBOL) && (user2?.inRooms.has(curRoom.roomid) || curRoom.auth.get(userID2) === Users.PLAYER_SYMBOL)) {
       if (connection) {
         void curRoom.uploadReplay(connection.user, connection, "forpunishment");
@@ -97,8 +96,7 @@ function findFormats(targetId, isOMSearch = false) {
         }
       }
       totalMatches++;
-      if (!sections[sectionId])
-        sections[sectionId] = { name: format.section, formats: [] };
+      if (!sections[sectionId]) sections[sectionId] = { name: format.section, formats: [] };
       sections[sectionId].formats.push(format.id);
     }
   }
@@ -107,8 +105,7 @@ function findFormats(targetId, isOMSearch = false) {
 const formatsDataCache = /* @__PURE__ */ new Map();
 async function getFormatResources(format) {
   const cached = formatsDataCache.get(format);
-  if (cached !== void 0)
-    return cached;
+  if (cached !== void 0) return cached;
   try {
     const raw = await (0, import_lib.Net)(`https://www.smogon.com/dex/api/formats/by-ps-name/${format}`).get();
     const data = JSON.parse(raw);
@@ -132,14 +129,12 @@ const commands = {
   altsnorecurse: "whois",
   profile: "whois",
   whois(target, room, user, connection, cmd) {
-    if (room?.roomid === "staff" && !this.runBroadcast())
-      return;
+    if (room?.roomid === "staff" && !this.runBroadcast()) return;
     const targetUser = this.getUserOrSelf(target, { exactName: user.tempGroup === " " });
     const showAll = cmd === "ip" || cmd === "whoare" || cmd === "alt" || cmd === "alts" || cmd === "altsnorecurse";
     const showRecursiveAlts = showAll && cmd !== "altsnorecurse";
     if (!targetUser) {
-      if (showAll)
-        return this.parse("/offlinewhois " + target);
+      if (showAll) return this.parse("/offlinewhois " + target);
       throw new Chat.ErrorMessage(`User ${target} not found.`);
     }
     if (showAll && !user.trusted && targetUser !== user) {
@@ -154,8 +149,7 @@ const commands = {
     if (trusted && showAll) {
       buf += ` <small style="color:gray">(trusted${targetUser.id === trusted ? `` : `: <span class="username">${trusted}</span>`})</small>`;
     }
-    if (!targetUser.connected)
-      buf += ` <em style="color:gray">(offline)</em>`;
+    if (!targetUser.connected) buf += ` <em style="color:gray">(offline)</em>`;
     const roomauth = room?.auth.getDirect(targetUser.id);
     if (roomauth && Config.groups[roomauth]?.name) {
       buf += import_lib.Utils.html`<br />${Config.groups[roomauth].name} (${roomauth})`;
@@ -181,18 +175,14 @@ const commands = {
       const battleTitle = targetRoom.battle ? ` title="${targetRoom.title}"` : "";
       const output = `${authSymbol}<a href="/${roomid}"${battleTitle}>${roomid}</a>`;
       if (targetRoom.settings.isPrivate === true) {
-        if (targetRoom.settings.modjoin === "~")
-          continue;
-        if (privaterooms)
-          privaterooms += ` | `;
+        if (targetRoom.settings.modjoin === "~") continue;
+        if (privaterooms) privaterooms += ` | `;
         privaterooms += output;
       } else if (targetRoom.settings.isPrivate) {
-        if (hiddenrooms)
-          hiddenrooms += ` | `;
+        if (hiddenrooms) hiddenrooms += ` | `;
         hiddenrooms += output;
       } else {
-        if (publicrooms)
-          publicrooms += ` | `;
+        if (publicrooms) publicrooms += ` | `;
         publicrooms += output;
       }
     }
@@ -207,34 +197,27 @@ const commands = {
     if (canViewAlts) {
       let prevNames = targetUser.previousIDs.map((userid) => {
         const punishments = Punishments.userids.get(userid);
-        if (!punishments || !user.can("alts"))
-          return userid;
+        if (!punishments || !user.can("alts")) return userid;
         return punishments.map(
           (punishment) => `${userid}${punishment ? ` (${Punishments.punishmentTypes.get(punishment.type)?.desc || `punished`}${punishment.id !== targetUser.id ? ` as ${punishment.id}` : ``})` : ``}`
         ).join(" | ");
       }).join(", ");
-      if (prevNames)
-        buf += import_lib.Utils.html`<br />Previous names: ${prevNames}`;
+      if (prevNames) buf += import_lib.Utils.html`<br />Previous names: ${prevNames}`;
       for (const targetAlt of targetUser.getAltUsers(true)) {
-        if (!targetAlt.named && !targetAlt.connected)
-          continue;
-        if (targetAlt.tempGroup === "~" && user.tempGroup !== "~")
-          continue;
+        if (!targetAlt.named && !targetAlt.connected) continue;
+        if (targetAlt.tempGroup === "~" && user.tempGroup !== "~") continue;
         const punishments = Punishments.userids.get(targetAlt.id) || [];
         const punishMsg = !user.can("alts") ? "" : punishments.map((punishment) => ` (${Punishments.punishmentTypes.get(punishment.type)?.desc || "punished"}${punishment.id !== targetAlt.id ? ` as ${punishment.id}` : ""})`).join(" | ");
         buf += import_lib.Utils.html`<br />Alt: <span class="username">${targetAlt.name}</span>${punishMsg}`;
-        if (!targetAlt.connected)
-          buf += ` <em style="color:gray">(offline)</em>`;
+        if (!targetAlt.connected) buf += ` <em style="color:gray">(offline)</em>`;
         prevNames = targetAlt.previousIDs.map((userid) => {
           const p = Punishments.userids.get(userid);
-          if (!p || !user.can("alts"))
-            return userid;
+          if (!p || !user.can("alts")) return userid;
           return p.map(
             (cur) => `${userid} (${Punishments.punishmentTypes.get(cur.type)?.desc || "punished"}${cur.id !== targetAlt.id ? ` as ${cur.id}` : ``})`
           ).join(" | ");
         }).join(", ");
-        if (prevNames)
-          buf += `<br />Previous names: ${prevNames}`;
+        if (prevNames) buf += `<br />Previous names: ${prevNames}`;
       }
     }
     if (canViewPunishments) {
@@ -243,10 +226,8 @@ const commands = {
         const punishment = Punishments.userids.getByType(targetUser.locked, "NAMELOCK");
         if (punishment) {
           const expiresIn = Punishments.checkLockExpiration(targetUser.locked);
-          if (expiresIn)
-            buf += expiresIn;
-          if (punishment.reason)
-            buf += import_lib.Utils.html` (reason: ${punishment.reason})`;
+          if (expiresIn) buf += expiresIn;
+          if (punishment.reason) buf += import_lib.Utils.html` (reason: ${punishment.reason})`;
         }
       } else if (targetUser.locked) {
         buf += `<br />LOCKED: ${targetUser.locked}`;
@@ -261,10 +242,8 @@ const commands = {
         const punishment = Punishments.userids.getByType(targetUser.locked, "LOCK");
         if (punishment) {
           const expiresIn = Punishments.checkLockExpiration(targetUser.locked);
-          if (expiresIn)
-            buf += expiresIn;
-          if (punishment.reason)
-            buf += import_lib.Utils.html` (reason: ${punishment.reason})`;
+          if (expiresIn) buf += expiresIn;
+          if (punishment.reason) buf += import_lib.Utils.html` (reason: ${punishment.reason})`;
         }
       }
       if (user.can("lock")) {
@@ -272,22 +251,19 @@ const commands = {
         if (battlebanned) {
           buf += `<br />BATTLEBANNED: ${battlebanned.id}`;
           buf += ` ${Punishments.checkPunishmentExpiration(battlebanned)}`;
-          if (battlebanned.reason)
-            buf += import_lib.Utils.html` (reason: ${battlebanned.reason})`;
+          if (battlebanned.reason) buf += import_lib.Utils.html` (reason: ${battlebanned.reason})`;
         }
         const groupchatbanned = Punishments.isGroupchatBanned(targetUser);
         if (groupchatbanned) {
           buf += `<br />Banned from using groupchats${groupchatbanned.id !== targetUser.id ? `: ${groupchatbanned.id}` : ``}`;
           buf += ` ${Punishments.checkPunishmentExpiration(groupchatbanned)}`;
-          if (groupchatbanned.reason)
-            buf += import_lib.Utils.html` (reason: ${groupchatbanned.reason})`;
+          if (groupchatbanned.reason) buf += import_lib.Utils.html` (reason: ${groupchatbanned.reason})`;
         }
         const ticketbanned = Punishments.isTicketBanned(targetUser.id);
         if (ticketbanned) {
           buf += `<br />Banned from creating help tickets${ticketbanned.id !== targetUser.id ? `: ${ticketbanned.id}` : ``}`;
           buf += ` ${Punishments.checkPunishmentExpiration(ticketbanned)}`;
-          if (ticketbanned.reason)
-            buf += import_lib.Utils.html` (reason: ${ticketbanned.reason})`;
+          if (ticketbanned.reason) buf += import_lib.Utils.html` (reason: ${ticketbanned.reason})`;
         }
       }
       if (targetUser.semilocked) {
@@ -302,8 +278,7 @@ const commands = {
           for (const punishment of punishments) {
             const { type, id } = punishment;
             let punishMsg = Punishments.punishmentTypes.get(type)?.desc || type;
-            if (id !== targetUser.id)
-              punishMsg += ` as ${id}`;
+            if (id !== targetUser.id) punishMsg += ` as ${id}`;
             status.push(punishMsg);
           }
         }
@@ -331,8 +306,7 @@ const commands = {
     }
     const gameRooms = [];
     for (const curRoom of Rooms.rooms.values()) {
-      if (!curRoom.game)
-        continue;
+      if (!curRoom.game) continue;
       const inPlayerTable = targetUser.id in curRoom.game.playerTable && !targetUser.inRooms.has(curRoom.roomid);
       const hasPlayerSymbol = curRoom.auth.getDirect(targetUser.id) === Users.PLAYER_SYMBOL;
       const canSeeRoom = canViewAlts || user === targetUser || !curRoom.settings.isPrivate;
@@ -353,13 +327,11 @@ const commands = {
         buf += punishments.map(([curRoom, curPunishment]) => {
           const { type: punishType, id: punishUserid, expireTime, reason } = curPunishment;
           let punishDesc = Punishments.roomPunishmentTypes.get(punishType)?.desc || punishType;
-          if (punishUserid !== targetUser.id)
-            punishDesc += ` as ${punishUserid}`;
+          if (punishUserid !== targetUser.id) punishDesc += ` as ${punishUserid}`;
           const expiresIn = new Date(expireTime).getTime() - Date.now();
           const expireString = Chat.toDurationString(expiresIn, { precision: 1 });
           punishDesc += ` for ${expireString}`;
-          if (reason)
-            punishDesc += `: ${reason}`;
+          if (reason) punishDesc += `: ${reason}`;
           return `<a href="/${curRoom}">${curRoom}</a> (${punishDesc})`;
         }).join(", ");
       }
@@ -385,12 +357,10 @@ const commands = {
       throw new Chat.ErrorMessage("/offlinewhois - Access denied.");
     }
     const userid = toID(target);
-    if (!userid)
-      throw new Chat.ErrorMessage("Please enter a valid username.");
+    if (!userid) throw new Chat.ErrorMessage("Please enter a valid username.");
     const targetUser = Users.get(userid);
     let buf = import_lib.Utils.html`<strong class="username">${target}</strong>`;
-    if (!targetUser?.connected)
-      buf += ` <em style="color:gray">(offline)</em>`;
+    if (!targetUser?.connected) buf += ` <em style="color:gray">(offline)</em>`;
     const roomauth = room?.auth.getDirect(userid);
     if (roomauth && Config.groups[roomauth]?.name) {
       buf += `<br />${Config.groups[roomauth].name} (${roomauth})`;
@@ -408,15 +378,12 @@ const commands = {
     if (idPunishments) {
       for (const p of idPunishments) {
         const { type: punishType, id: punishUserid, reason } = p;
-        if (!user.can("alts") && !["LOCK", "BAN"].includes(punishType))
-          continue;
+        if (!user.can("alts") && !["LOCK", "BAN"].includes(punishType)) continue;
         const punishDesc = Punishments.punishmentTypes.get(punishType)?.desc || punishType;
         buf += `${punishDesc}: ${punishUserid}`;
         const expiresIn = Punishments.checkLockExpiration(userid);
-        if (expiresIn)
-          buf += expiresIn;
-        if (reason)
-          buf += import_lib.Utils.html` (reason: ${reason})`;
+        if (expiresIn) buf += expiresIn;
+        if (reason) buf += import_lib.Utils.html` (reason: ${reason})`;
         buf += "<br />";
         atLeastOne = true;
       }
@@ -433,13 +400,11 @@ const commands = {
       buf += punishments.map(([curRoom, curPunishment]) => {
         const { type: punishType, id: punishUserid, expireTime, reason } = curPunishment;
         let punishDesc = Punishments.roomPunishmentTypes.get(punishType)?.desc || punishType;
-        if (punishUserid !== userid)
-          punishDesc += ` as ${punishUserid}`;
+        if (punishUserid !== userid) punishDesc += ` as ${punishUserid}`;
         const expiresIn = new Date(expireTime).getTime() - Date.now();
         const expireString = Chat.toDurationString(expiresIn, { precision: 1 });
         punishDesc += ` for ${expireString}`;
-        if (reason)
-          punishDesc += `: ${reason}`;
+        if (reason) punishDesc += `: ${reason}`;
         return `<a href="/${curRoom}">${curRoom}</a> (${punishDesc})`;
       }).join(", ");
       atLeastOne = true;
@@ -457,15 +422,13 @@ const commands = {
   sharedbattles(target, room) {
     this.checkCan("lock");
     const [targetUsername1, targetUsername2] = target.split(",");
-    if (!targetUsername1 || !targetUsername2)
-      return this.parse(`/help sharedbattles`);
+    if (!targetUsername1 || !targetUsername2) return this.parse(`/help sharedbattles`);
     const user1 = Users.get(targetUsername1);
     const user2 = Users.get(targetUsername2);
     const userID1 = toID(targetUsername1);
     const userID2 = toID(targetUsername2);
     const battles = getCommonBattles(userID1, user1, userID2, user2, this.connection);
-    if (!battles.length)
-      return this.sendReply(`${targetUsername1} and ${targetUsername2} have no common battles.`);
+    if (!battles.length) return this.sendReply(`${targetUsername1} and ${targetUsername2} have no common battles.`);
     this.sendReplyBox(import_lib.Utils.html`Common battles between ${targetUsername1} and ${targetUsername2}:<br />` + battles.map((id) => {
       const shortId = id.startsWith("battle-") ? id.slice(7) : id;
       return import_lib.Utils.html`<a href="/${id}">${shortId}</a>`;
@@ -488,12 +451,10 @@ const commands = {
   },
   showglobalpunishmentshelp: [`/showpunishments - Shows the current global punishments. Requires: % @ # ~`],
   async host(target, room, user, connection, cmd) {
-    if (!target)
-      return this.parse("/help host");
+    if (!target) return this.parse("/help host");
     this.checkCan("alts");
     target = target.trim();
-    if (!net.isIPv4(target))
-      throw new Chat.ErrorMessage("You must pass a valid IPv4 IP to /host.");
+    if (!net.isIPv4(target)) throw new Chat.ErrorMessage("You must pass a valid IPv4 IP to /host.");
     const { dnsbl, host, hostType } = await IPTools.lookup(target);
     const dnsblMessage = dnsbl ? ` [${dnsbl}]` : ``;
     this.sendReply(`IP ${target}: ${host || "ERROR"} [${hostType}]${dnsblMessage}`);
@@ -503,8 +464,7 @@ const commands = {
   ipsearchall: "ipsearch",
   hostsearch: "ipsearch",
   ipsearch(target, room, user, connection, cmd) {
-    if (!target.trim())
-      return this.parse(`/help ipsearch`);
+    if (!target.trim()) return this.parse(`/help ipsearch`);
     this.checkCan("rangeban");
     const [ipOrHost, roomid] = this.splitOne(target);
     const targetRoom = roomid ? Rooms.get(roomid) : null;
@@ -516,33 +476,25 @@ const commands = {
     if (/[a-z]/.test(ipOrHost)) {
       this.sendReply(`Users with host ${ipOrHost}${targetRoom ? ` in the room ${targetRoom.title}` : ``}:`);
       for (const curUser of Users.users.values()) {
-        if (results.length > 100 && !isAll)
-          break;
-        if (!curUser.latestHost?.endsWith(ipOrHost))
-          continue;
-        if (targetRoom && !curUser.inRooms.has(targetRoom.roomid))
-          continue;
+        if (results.length > 100 && !isAll) break;
+        if (!curUser.latestHost?.endsWith(ipOrHost)) continue;
+        if (targetRoom && !curUser.inRooms.has(targetRoom.roomid)) continue;
         results.push(`${curUser.connected ? ONLINE_SYMBOL : OFFLINE_SYMBOL} ${curUser.name}`);
       }
     } else if (IPTools.ipRegex.test(ipOrHost)) {
       this.sendReply(`Users with IP ${ipOrHost}${targetRoom ? ` in the room ${targetRoom.title}` : ``}:`);
       for (const curUser of Users.users.values()) {
-        if (!curUser.ips.some((ip) => ip === ipOrHost))
-          continue;
-        if (targetRoom && !curUser.inRooms.has(targetRoom.roomid))
-          continue;
+        if (!curUser.ips.some((ip) => ip === ipOrHost)) continue;
+        if (targetRoom && !curUser.inRooms.has(targetRoom.roomid)) continue;
         results.push(`${curUser.connected ? ONLINE_SYMBOL : OFFLINE_SYMBOL} ${curUser.name}`);
       }
     } else if (IPTools.isValidRange(ipOrHost)) {
       this.sendReply(`Users in IP range ${ipOrHost}${targetRoom ? ` in the room ${targetRoom.title}` : ``}:`);
       const checker = IPTools.checker(ipOrHost);
       for (const curUser of Users.users.values()) {
-        if (results.length > 100 && !isAll)
-          continue;
-        if (!curUser.ips.some((ip) => checker(ip)))
-          continue;
-        if (targetRoom && !curUser.inRooms.has(targetRoom.roomid))
-          continue;
+        if (results.length > 100 && !isAll) continue;
+        if (!curUser.ips.some((ip) => checker(ip))) continue;
+        if (targetRoom && !curUser.inRooms.has(targetRoom.roomid)) continue;
         results.push(`${curUser.connected ? ONLINE_SYMBOL : OFFLINE_SYMBOL} ${curUser.name}`);
       }
     } else {
@@ -559,20 +511,16 @@ const commands = {
   ipsearchhelp: [`/ipsearch [ip|range|host], (room) - Find all users with specified IP, IP range, or host. If a room is provided only users in the room will be shown. Requires: ~`],
   checkchallenges(target, room, user) {
     room = this.requireRoom();
-    if (!user.can("addhtml", null, room))
-      this.checkCan("ban", null, room);
-    if (!this.runBroadcast(true))
-      return;
+    if (!user.can("addhtml", null, room)) this.checkCan("ban", null, room);
+    if (!this.runBroadcast(true)) return;
     if (!this.broadcasting) {
       this.errorReply(`This command must be broadcast:`);
       return this.parse(`/help checkchallenges`);
     }
-    if (!target?.includes(","))
-      return this.parse(`/help checkchallenges`);
+    if (!target?.includes(",")) return this.parse(`/help checkchallenges`);
     const { targetUser: user1, rest } = this.requireUser(target);
     const { targetUser: user2, rest: rest2 } = this.requireUser(rest);
-    if (user1 === user2 || rest2)
-      return this.parse(`/help checkchallenges`);
+    if (user1 === user2 || rest2) return this.parse(`/help checkchallenges`);
     if (!(user1.id in room.users) || !(user2.id in room.users)) {
       throw new Chat.ErrorMessage(`Both users must be in this room.`);
     }
@@ -603,19 +551,16 @@ const commands = {
   dex: "data",
   pokedex: "data",
   data(target, room, user, connection, cmd) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     target = target.trim();
     const gen = parseInt(cmd.substr(-1));
-    if (gen)
-      target += `, gen${gen}`;
+    if (gen) target += `, gen${gen}`;
     const { dex, format, targets } = this.splitFormat(target, true, true);
     const prefix = `|c|${user.getIdentity(room)}|/raw `;
     let buffer = "";
     target = targets.join(",");
     const targetId = toID(target);
-    if (!targetId)
-      return this.parse("/help data");
+    if (!targetId) return this.parse("/help data");
     const targetNum = parseInt(target);
     if (!isNaN(targetNum) && `${targetNum}` === target) {
       for (const pokemon of Dex.species.all()) {
@@ -662,8 +607,7 @@ const commands = {
               tierDisplay = "National Dex tiers";
             }
           }
-          if (!tierDisplay)
-            tierDisplay = "tiers";
+          if (!tierDisplay) tierDisplay = "tiers";
           const displayedTier = tierDisplay === "tiers" ? pokemon.tier : tierDisplay === "doubles tiers" ? pokemon.doublesTier : tierDisplay === "National Dex tiers" ? pokemon.natDexTier : pokemon.num >= 0 ? String(pokemon.num) : pokemon.tier;
           buffer += `${prefix}${Chat.getDataPokemonHTML(pokemon, dex.gen, displayedTier)}
 `;
@@ -687,14 +631,10 @@ const commands = {
             };
             details["Weight"] = `${pokemon.weighthg / 10} kg <em>(${weighthit} BP)</em>`;
             const gmaxMove = pokemon.canGigantamax || dex.species.get(pokemon.changesFrom).canGigantamax;
-            if (gmaxMove && dex.gen === 8)
-              details["G-Max Move"] = gmaxMove;
-            if (dex.gen === 1)
-              details["Crit Rate"] = `${(pokemon.baseStats.spe * 100 / 512).toFixed(2)}%`;
-            if (pokemon.color && dex.gen >= 5)
-              details["Dex Colour"] = pokemon.color;
-            if (pokemon.eggGroups && dex.gen >= 2)
-              details["Egg Group(s)"] = pokemon.eggGroups.join(", ");
+            if (gmaxMove && dex.gen === 8) details["G-Max Move"] = gmaxMove;
+            if (dex.gen === 1) details["Crit Rate"] = `${(pokemon.baseStats.spe * 100 / 512).toFixed(2)}%`;
+            if (pokemon.color && dex.gen >= 5) details["Dex Colour"] = pokemon.color;
+            if (pokemon.eggGroups && dex.gen >= 2) details["Egg Group(s)"] = pokemon.eggGroups.join(", ");
             const evos = [];
             for (const evoName of pokemon.evos) {
               const evo = dex.species.get(evoName);
@@ -748,14 +688,10 @@ const commands = {
             if (dex.gen >= 4) {
               if (item.fling) {
                 details["Fling Base Power"] = String(item.fling.basePower);
-                if (item.fling.status)
-                  details["Fling Effect"] = item.fling.status;
-                if (item.fling.volatileStatus)
-                  details["Fling Effect"] = item.fling.volatileStatus;
-                if (item.isBerry)
-                  details["Fling Effect"] = "Activates the Berry's effect on the target.";
-                if (item.id === "whiteherb")
-                  details["Fling Effect"] = "Restores the target's negative stat stages to 0.";
+                if (item.fling.status) details["Fling Effect"] = item.fling.status;
+                if (item.fling.volatileStatus) details["Fling Effect"] = item.fling.volatileStatus;
+                if (item.isBerry) details["Fling Effect"] = "Activates the Berry's effect on the target.";
+                if (item.id === "whiteherb") details["Fling Effect"] = "Restores the target's negative stat stages to 0.";
                 if (item.id === "mentalherb") {
                   const flingEffect = "Removes the effects of Attract, Disable, Encore, Heal Block, Taunt, and Torment from the target.";
                   details["Fling Effect"] = flingEffect;
@@ -783,44 +719,25 @@ const commands = {
               Gen: String(move.gen) || "CAP"
             };
             const pastGensOnly = move.isNonstandard === "Past" && dex.gen >= 8 || move.isNonstandard === "Gigantamax" && dex.gen !== 8;
-            if (pastGensOnly)
-              details["&#10007; Past Gens Only"] = "";
-            if (move.secondary || move.secondaries || move.hasSheerForce)
-              details["&#10003; Boosted by Sheer Force"] = "";
-            if (move.flags["contact"] && dex.gen >= 3)
-              details["&#10003; Contact"] = "";
-            if (move.flags["sound"] && dex.gen >= 3)
-              details["&#10003; Sound"] = "";
-            if (move.flags["bullet"] && dex.gen >= 6)
-              details["&#10003; Bullet"] = "";
-            if (move.flags["pulse"] && dex.gen >= 6)
-              details["&#10003; Pulse"] = "";
-            if (!move.flags["protect"] && move.target !== "self")
-              details["&#10003; Bypasses Protect"] = "";
-            if (move.flags["bypasssub"])
-              details["&#10003; Bypasses Substitutes"] = "";
-            if (move.flags["defrost"])
-              details["&#10003; Thaws user"] = "";
-            if (move.flags["bite"] && dex.gen >= 6)
-              details["&#10003; Bite"] = "";
-            if (move.flags["punch"] && dex.gen >= 4)
-              details["&#10003; Punch"] = "";
-            if (move.flags["powder"] && dex.gen >= 6)
-              details["&#10003; Powder"] = "";
-            if (move.flags["reflectable"] && dex.gen >= 3)
-              details["&#10003; Bounceable"] = "";
-            if (move.flags["charge"])
-              details["&#10003; Two-turn move"] = "";
-            if (move.flags["recharge"])
-              details["&#10003; Has recharge turn"] = "";
-            if (move.flags["gravity"] && dex.gen >= 4)
-              details["&#10007; Suppressed by Gravity"] = "";
-            if (move.flags["dance"] && dex.gen >= 7)
-              details["&#10003; Dance move"] = "";
-            if (move.flags["slicing"] && dex.gen >= 9)
-              details["&#10003; Slicing move"] = "";
-            if (move.flags["wind"] && dex.gen >= 9)
-              details["&#10003; Wind move"] = "";
+            if (pastGensOnly) details["&#10007; Past Gens Only"] = "";
+            if (move.secondary || move.secondaries || move.hasSheerForce) details["&#10003; Boosted by Sheer Force"] = "";
+            if (move.flags["contact"] && dex.gen >= 3) details["&#10003; Contact"] = "";
+            if (move.flags["sound"] && dex.gen >= 3) details["&#10003; Sound"] = "";
+            if (move.flags["bullet"] && dex.gen >= 6) details["&#10003; Bullet"] = "";
+            if (move.flags["pulse"] && dex.gen >= 6) details["&#10003; Pulse"] = "";
+            if (!move.flags["protect"] && move.target !== "self") details["&#10003; Bypasses Protect"] = "";
+            if (move.flags["bypasssub"]) details["&#10003; Bypasses Substitutes"] = "";
+            if (move.flags["defrost"]) details["&#10003; Thaws user"] = "";
+            if (move.flags["bite"] && dex.gen >= 6) details["&#10003; Bite"] = "";
+            if (move.flags["punch"] && dex.gen >= 4) details["&#10003; Punch"] = "";
+            if (move.flags["powder"] && dex.gen >= 6) details["&#10003; Powder"] = "";
+            if (move.flags["reflectable"] && dex.gen >= 3) details["&#10003; Bounceable"] = "";
+            if (move.flags["charge"]) details["&#10003; Two-turn move"] = "";
+            if (move.flags["recharge"]) details["&#10003; Has recharge turn"] = "";
+            if (move.flags["gravity"] && dex.gen >= 4) details["&#10007; Suppressed by Gravity"] = "";
+            if (move.flags["dance"] && dex.gen >= 7) details["&#10003; Dance move"] = "";
+            if (move.flags["slicing"] && dex.gen >= 9) details["&#10003; Slicing move"] = "";
+            if (move.flags["wind"] && dex.gen >= 9) details["&#10003; Wind move"] = "";
             if (dex.gen >= 7) {
               if (move.gen >= 8 && move.isMax) {
               } else if (move.zMove?.basePower) {
@@ -865,8 +782,7 @@ const commands = {
             }
             if (move.isMax) {
               details["&#10003; Max Move"] = "";
-              if (typeof move.isMax === "string")
-                details["User"] = `${move.isMax}`;
+              if (typeof move.isMax === "string") details["User"] = `${move.isMax}`;
             } else if (dex.gen === 8 && move.maxMove?.basePower) {
               details["Dynamax Power"] = String(move.maxMove.basePower);
             }
@@ -907,10 +823,8 @@ const commands = {
             details = {
               Gen: String(ability.gen) || "CAP"
             };
-            if (ability.flags["cantsuppress"])
-              details["&#10003; Not affected by Gastro Acid"] = "";
-            if (ability.flags["breakable"])
-              details["&#10003; Ignored by Mold Breaker"] = "";
+            if (ability.flags["cantsuppress"]) details["&#10003; Not affected by Gastro Acid"] = "";
+            if (ability.flags["breakable"]) details["&#10003; Ignored by Mold Breaker"] = "";
           }
           break;
         default:
@@ -939,8 +853,7 @@ const commands = {
   dt8: "details",
   dt9: "details",
   details(target) {
-    if (!target)
-      return this.parse("/help details");
+    if (!target) return this.parse("/help details");
     this.run("data");
   },
   detailshelp() {
@@ -952,10 +865,8 @@ const commands = {
   weak: "weakness",
   resist: "weakness",
   weakness(target, room, user) {
-    if (!target)
-      return this.parse("/help weakness");
-    if (!this.runBroadcast())
-      return;
+    if (!target) return this.parse("/help weakness");
+    if (!this.runBroadcast()) return;
     const { format, dex, targets } = this.splitFormat(target.split(/[,/]/).map(toID));
     let isInverse = false;
     if (format && Dex.formats.getRuleTable(format).has("inversemod")) {
@@ -1106,8 +1017,7 @@ const commands = {
   matchup: "effectiveness",
   effectiveness(target, room, user) {
     const { dex, targets } = this.splitFormat(target.split(/[,/]/));
-    if (targets.length !== 2)
-      throw new Chat.ErrorMessage("Attacker and defender must be separated with a comma.");
+    if (targets.length !== 2) throw new Chat.ErrorMessage("Attacker and defender must be separated with a comma.");
     let searchMethods = ["types", "moves", "species"];
     const sourceMethods = ["types", "moves"];
     const targetMethods = ["types", "species"];
@@ -1125,8 +1035,7 @@ const commands = {
           break;
         }
       }
-      if (!foundData.exists)
-        return this.parse("/help effectiveness");
+      if (!foundData.exists) return this.parse("/help effectiveness");
       if (!source && sourceMethods.includes(method)) {
         if (foundData.type) {
           source = foundData;
@@ -1147,8 +1056,7 @@ const commands = {
         searchMethods = sourceMethods;
       }
     }
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     let factor = 0;
     if (dex.getImmunity(source, defender) || source.ignoreImmunity && (source.ignoreImmunity === true || source.ignoreImmunity[source.type])) {
       let totalTypeMod = 0;
@@ -1171,10 +1079,8 @@ const commands = {
   ],
   cover: "coverage",
   coverage(target, room, user) {
-    if (!this.runBroadcast())
-      return;
-    if (!target)
-      return this.parse("/help coverage");
+    if (!this.runBroadcast()) return;
+    if (!target) return this.parse("/help coverage");
     const { dex, targets } = this.splitFormat(target.split(/[,+/]/));
     const sources = [];
     let dispTable = false;
@@ -1185,11 +1091,9 @@ const commands = {
     }
     for (let arg of targets) {
       arg = toID(arg);
-      if (arg === dex.currentMod)
-        continue;
+      if (arg === dex.currentMod) continue;
       if (arg === "table" || arg === "all") {
-        if (this.broadcasting)
-          return this.sendReplyBox("The full table cannot be broadcast.");
+        if (this.broadcasting) return this.sendReplyBox("The full table cannot be broadcast.");
         dispTable = true;
         continue;
       }
@@ -1198,11 +1102,9 @@ const commands = {
       if (dex.types.isName(argType)) {
         sources.push(argType);
         for (const type in bestCoverage) {
-          if (!dex.getImmunity(argType, type))
-            continue;
+          if (!dex.getImmunity(argType, type)) continue;
           eff = dex.getEffectiveness(argType, type);
-          if (eff > bestCoverage[type])
-            bestCoverage[type] = eff;
+          if (eff > bestCoverage[type]) bestCoverage[type] = eff;
         }
         continue;
       }
@@ -1212,30 +1114,25 @@ const commands = {
       } else if (move.gen > dex.gen) {
         throw new Chat.ErrorMessage(`Move '${arg}' is not available in Gen ${dex.gen}.`);
       }
-      if (!move.basePower && !move.basePowerCallback)
-        continue;
-      if (move.id === "thousandarrows")
-        hasThousandArrows = true;
+      if (!move.basePower && !move.basePowerCallback) continue;
+      if (move.id === "thousandarrows") hasThousandArrows = true;
       sources.push(move);
       for (const type in bestCoverage) {
         if (move.id === "struggle") {
           eff = 0;
         } else {
-          if (!dex.getImmunity(move.type, type) && !move.ignoreImmunity)
-            continue;
+          if (!dex.getImmunity(move.type, type) && !move.ignoreImmunity) continue;
           const baseMod = dex.getEffectiveness(move, type);
           const moveMod = move.onEffectiveness?.call({ dex }, baseMod, null, type, move);
           eff = typeof moveMod === "number" ? moveMod : baseMod;
         }
-        if (eff > bestCoverage[type])
-          bestCoverage[type] = eff;
+        if (eff > bestCoverage[type]) bestCoverage[type] = eff;
       }
     }
     if (sources.length === 0) {
       throw new Chat.ErrorMessage("No moves using a type table for determining damage were specified.");
     }
-    if (sources.length > 4)
-      throw new Chat.ErrorMessage("Specify a maximum of 4 moves or types.");
+    if (sources.length > 4) throw new Chat.ErrorMessage("Specify a maximum of 4 moves or types.");
     for (const type in bestCoverage) {
       if (bestCoverage[type] === -5) {
         bestCoverage[type] = 0;
@@ -1306,8 +1203,7 @@ const commands = {
                 moveMod = move.onEffectiveness?.call({ dex }, baseMod, null, type2, move);
                 curEff += typeof moveMod === "number" ? moveMod : baseMod;
               }
-              if (curEff > bestEff)
-                bestEff = curEff;
+              if (curEff > bestEff) bestEff = curEff;
             }
             if (bestEff === -5) {
               bestEff = 0;
@@ -1341,10 +1237,8 @@ const commands = {
     `Adding the parameter 'all' or 'table' will display the information with a table of all type combinations.`
   ],
   statcalc(target, room, user) {
-    if (!target)
-      return this.parse("/help statcalc");
-    if (!this.runBroadcast())
-      return;
+    if (!target) return this.parse("/help statcalc");
+    if (!this.runBroadcast()) return;
     const targets = target.split(" ");
     let lvlSet = false;
     let natureSet = false;
@@ -1495,8 +1389,7 @@ const commands = {
         if (modifier > 6) {
           return this.sendReplyBox("Modifier should be a number between -6 and +6");
         }
-        if (modSet)
-          continue;
+        if (modSet) continue;
       }
       const tempStat = parseInt(arg);
       if (!realSet) {
@@ -1553,8 +1446,7 @@ const commands = {
           ev = Math.ceil(-1 * (2 * (nature * (baseStat * level + 250) - 50 * Math.ceil(realStat))) / (level * nature));
         }
         ev -= 31;
-        if (ev < 0)
-          iv += ev;
+        if (ev < 0) iv += ev;
         ev *= 4;
         if (iv < 0 || ev > 255) {
           return this.sendReplyBox(`No valid EV/IV combination possible with given parameters. Maybe try a different nature?${ev}`);
@@ -1588,16 +1480,14 @@ const commands = {
    * Informational commands
    *********************************************************/
   uptime(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     const uptime = process.uptime();
     let uptimeText;
     if (uptime > 24 * 60 * 60) {
       const uptimeDays = Math.floor(uptime / (24 * 60 * 60));
       uptimeText = `${uptimeDays} ${uptimeDays === 1 ? "day" : "days"}`;
       const uptimeHours = Math.floor(uptime / (60 * 60)) - uptimeDays * 24;
-      if (uptimeHours)
-        uptimeText += `, ${uptimeHours} ${uptimeHours === 1 ? "hour" : "hours"}`;
+      if (uptimeHours) uptimeText += `, ${uptimeHours} ${uptimeHours === 1 ? "hour" : "hours"}`;
     } else {
       uptimeText = Chat.toDurationString(uptime * 1e3);
     }
@@ -1606,15 +1496,13 @@ const commands = {
   uptimehelp: [`/uptime - Shows how long the server has been online for.`],
   st: "servertime",
   servertime(target, room, user) {
-    if (!this.runBroadcast())
-      return;
-    const servertime = new Date();
+    if (!this.runBroadcast()) return;
+    const servertime = /* @__PURE__ */ new Date();
     this.sendReplyBox(`Server time: <b>${servertime.toLocaleString()}</b>`);
   },
   servertimehelp: [`/servertime - Shows the current time where the server is.`],
   groups(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     target = toID(target);
     const showRoom = target !== "global";
     const showGlobal = target !== "room" && target !== "rooms";
@@ -1645,8 +1533,7 @@ const commands = {
     `!groups - Shows everyone that information. Requires: + % @ # ~`
   ],
   punishments(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     target = toID(target);
     const showRoom = target !== "global";
     const showGlobal = target !== "room" && target !== "rooms";
@@ -1683,8 +1570,7 @@ const commands = {
   repository: "opensource",
   git: "opensource",
   opensource(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(
       `Pok&eacute;mon Showdown is open source:<br />- Language: mostly TypeScript, a little PHP<br />- <a href="https://github.com/smogon/pokemon-showdown/commits/master">What's new?</a><br />- <a href="https://github.com/smogon/pokemon-showdown">Server source code</a><br />- <a href="https://github.com/smogon/pokemon-showdown-client">Client source code</a><br />- <a href="https://github.com/Zarel/Pokemon-Showdown-Dex">Dex source code</a><br />- <a href="https://github.com/smogon/pokemon-showdown-loginserver">Login server source code</a>`
     );
@@ -1694,20 +1580,17 @@ const commands = {
     `!opensource - Show everyone that information. Requires: + % @ # ~`
   ],
   staff(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(`<a href="https://www.smogon.com/forums/posts/10715136/">Pok&eacute;mon Showdown Staff List</a>`);
   },
   staffhelp: [`/staff - View the staff list.`],
   forums(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(`<a href="https://www.smogon.com/forums/forums/209/">Pok&eacute;mon Showdown Forums</a>`);
   },
   forumshelp: [`/forums - Links to the PS forums.`],
   privacypolicy(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox([
       this.tr`- We log PMs so you can report them - staff can't look at them without permission unless there's a law enforcement reason.`,
       this.tr`- We log IPs to enforce bans and mutes.`,
@@ -1719,16 +1602,14 @@ const commands = {
   suggest: "suggestions",
   suggestion: "suggestions",
   suggestions(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(`<a href="https://play.pokemonshowdown.com/suggestions">Make a suggestion for Pok&eacute;mon Showdown</a>`);
   },
   suggestionshelp: [`/suggestions - Links to the place to make suggestions for Pokemon Showdown.`],
   bugreport: "bugs",
   bugreports: "bugs",
   bugs(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     if (room?.battle) {
       this.sendReplyBox(`<center><button name="saveReplay"><i class="fa fa-upload"></i> Save Replay</button> &mdash; <a href="https://www.smogon.com/forums/threads/3520646/">Questions</a> &mdash; <a href="https://play.pokemonshowdown.com/bugs">Bug Reports</a></center>`);
     } else {
@@ -1740,23 +1621,20 @@ const commands = {
   bugshelp: [`/bugs - Links to the various bug reporting services.`],
   optionbutton: "optionsbutton",
   optionsbutton(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(`<button name="openOptions" class="button"><i style="font-size: 16px; vertical-align: -1px" class="fa fa-cog"></i> Options</button> (The Sound and Options buttons are at the top right, next to your username)`);
   },
   optionsbuttonhelp: [`/optionsbutton - Provides a button to the Options menu.`],
   soundsbutton: "soundbutton",
   volumebutton: "soundbutton",
   soundbutton(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(`<button name="openSounds" class="button"><i style="font-size: 16px; vertical-align: -1px" class="fa fa-volume-up"></i> Sound</button> (The Sound and Options buttons are at the top right, next to your username)`);
   },
   soundbuttonhelp: [`/soundbutton - Provides a button to the Sounds menu.`],
   introduction: "intro",
   intro(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(
       `New to competitive Pok&eacute;mon?<br />- <a href="https://www.smogon.com/forums/threads/3676132/">Beginner's Guide to Pok&eacute;mon Showdown</a><br />- <a href="https://www.smogon.com/dp/articles/intro_comp_pokemon">An introduction to competitive Pok&eacute;mon</a><br />- <a href="https://www.smogon.com/sm/articles/sm_tiers">What do 'OU', 'UU', etc mean?</a><br />- <a href="https://www.smogon.com/dex/sv/formats/">What are the rules for each format?</a><br />- <a href="https://www.smogon.com/sv/articles/clauses">What is 'Sleep Clause' and other clauses?</a><br />- <a href="https://www.smogon.com/articles/getting-started">Next Steps for Competitive Battling</a>`
     );
@@ -1768,8 +1646,7 @@ const commands = {
   mentoring: "smogintro",
   smogonintro: "smogintro",
   smogintro(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(
       `Welcome to Smogon's official simulator! The <a href="https://www.smogon.com/forums/forums/intro_hub">Information & Resources forum</a> can help you get integrated into the community.<br />- <a href="https://www.smogon.com/forums/threads/3710821/">Introduction to Smogon</a><br />- <a href="https://www.smogon.com/forums/threads/3652546/">Smogon Discord Directory</a><br />`
     );
@@ -1786,10 +1663,8 @@ const commands = {
   randbatscalc: "calc",
   rcalc: "calc",
   calc(target, room, user, connection, cmd) {
-    if (cmd === "calc" && target)
-      return this.run("calculate");
-    if (!this.runBroadcast())
-      return;
+    if (cmd === "calc" && target) return this.run("calculate");
+    if (!this.runBroadcast()) return;
     const DEFAULT_CALC_COMMANDS = ["honkalculator", "honkocalc"];
     const RANDOMS_CALC_COMMANDS = ["randomscalc", "randbatscalc", "rcalc"];
     const BATTLESPOT_CALC_COMMANDS = ["bsscalc", "cantsaycalc"];
@@ -1828,8 +1703,7 @@ const commands = {
   ],
   capintro: "cap",
   cap(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(
       `An introduction to the Create-A-Pok&eacute;mon project:<br />- <a href="https://www.smogon.com/cap/">CAP project website and description</a><br />- <a href="https://www.smogon.com/forums/forums/66/">CAP project discussion forum</a><br />- <a href="https://www.smogon.com/forums/threads/48782/">What Pok&eacute;mon have been made?</a><br />- <a href="https://www.smogon.com/forums/forums/477">Talk about the metagame here</a><br />- <a href="https://www.smogon.com/forums/threads/3718107/">Sample SV CAP teams</a>`
     );
@@ -1859,16 +1733,12 @@ const commands = {
     }
     const isOMSearch = cmd === "om" || cmd === "othermetas";
     let targetId = toID(target);
-    if (targetId === "ladder")
-      targetId = "search";
-    if (targetId === "all")
-      targetId = "";
+    if (targetId === "ladder") targetId = "search";
+    if (targetId === "all") targetId = "";
     const { totalMatches, sections } = findFormats(targetId, isOMSearch);
-    if (!totalMatches)
-      return this.errorReply("No matched formats found.");
+    if (!totalMatches) return this.errorReply("No matched formats found.");
     const format = totalMatches === 1 ? Dex.formats.get(Object.values(sections)[0].formats[0]) : null;
-    if (!this.runBroadcast(`!formathelp ${format ? format.id : target}`))
-      return;
+    if (!this.runBroadcast(`!formathelp ${format ? format.id : target}`)) return;
     if (format) {
       const rules = [];
       let rulesetHtml = "";
@@ -1942,10 +1812,8 @@ const commands = {
   roomhelp(target, room, user) {
     room = this.requireRoom();
     this.checkBroadcast(false, "!htmlbox");
-    if (this.broadcastMessage)
-      this.checkCan("declare", null, room);
-    if (!this.runBroadcast(false, "!htmlbox"))
-      return;
+    if (this.broadcastMessage) this.checkCan("declare", null, room);
+    if (!this.runBroadcast(false, "!htmlbox")) return;
     const strings = [
       [
         `<strong>Room drivers (%)</strong> can use:`,
@@ -1999,10 +1867,8 @@ const commands = {
     );
   },
   restarthelp(target, room, user) {
-    if (!Rooms.global.lockdown)
-      this.checkCan("lockdown");
-    if (!this.runBroadcast())
-      return;
+    if (!Rooms.global.lockdown) this.checkCan("lockdown");
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(
       `The server is restarting. Things to know:<br />- We wait a few minutes before restarting so people can finish up their battles<br />- The restart itself will take around 0.6 seconds<br />- Your ladder ranking and teams will not change<br />- We are restarting to update Pok&eacute;mon Showdown to a newer version`
     );
@@ -2011,8 +1877,7 @@ const commands = {
   roomrules: "rules",
   rules(target, room, user, connection, cmd) {
     if (!target) {
-      if (!this.runBroadcast())
-        return;
+      if (!this.runBroadcast()) return;
       this.sendReplyBox(
         `${room ? this.tr`Please follow the rules:` + "<br />" : ``}${room?.settings.rulesLink ? import_lib.Utils.html`- <a href="${room.settings.rulesLink}">${this.tr`${room.title} room rules`}</a><br />` : ``}- <a href="https://${Config.routes.root}${this.tr`/rules`}">${this.tr`Global Rules`}</a>`
       );
@@ -2045,8 +1910,7 @@ const commands = {
     }
     target = target.trim();
     if (target === "delete" || target === "remove") {
-      if (!room.settings.rulesLink)
-        throw new Chat.ErrorMessage(`This room does not have rules set to remove.`);
+      if (!room.settings.rulesLink) throw new Chat.ErrorMessage(`This room does not have rules set to remove.`);
       delete room.settings.rulesLink;
       this.privateModAction(`${user.name} has removed the room rules link.`);
       this.modlog("RULES", null, `removed room rules link`);
@@ -2075,8 +1939,7 @@ const commands = {
     }
     if (showAll || target === "autoconfirmed" || target === "ac") {
       buffer.push(this.tr`A user is autoconfirmed when they have won at least one rated battle and have been registered for one week or longer. In order to prevent spamming and trolling, most chatrooms only allow autoconfirmed users to chat. If you are not autoconfirmed, you can politely PM a staff member (staff have %, @, or # in front of their username) in the room you would like to chat and ask them to disable modchat. However, staff are not obligated to disable modchat.`);
-      if (!this.shouldBroadcast())
-        void this.parse(`/regtime`);
+      if (!this.shouldBroadcast()) void this.parse(`/regtime`);
     }
     if (showAll || target === "ladder" || target === "ladderhelp" || target === "decay") {
       buffer.push(`<a href="https://${Config.routes.root}/${this.tr`pages/ladderhelp`}">${this.tr`How the ladder works`}</a>`);
@@ -2112,8 +1975,7 @@ const commands = {
     if (!target || showAll) {
       buffer.unshift(`<a href="https://pokemonshowdown.com/${this.tr`pages/faq`}">${this.tr`Frequently Asked Questions`}</a>`);
     }
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(buffer.join(`<br />`));
   },
   faqhelp: [
@@ -2123,10 +1985,8 @@ const commands = {
   analysis: "smogdex",
   strategy: "smogdex",
   smogdex(target, room, user) {
-    if (!target)
-      return this.parse("/help smogdex");
-    if (!this.runBroadcast())
-      return;
+    if (!target) return this.parse("/help smogdex");
+    if (!this.runBroadcast()) return;
     const targets = target.split(",");
     let pokemon = Dex.species.get(targets[0]);
     const item = Dex.items.get(targets[0]);
@@ -2211,10 +2071,8 @@ const commands = {
         portuguese: "pt"
       };
       let id = pokemon.name.toLowerCase();
-      if (id === "meowstic")
-        id = "meowstic-m";
-      if (id === "zygarde-10%")
-        id = "zygarde-10";
+      if (id === "meowstic") id = "meowstic-m";
+      if (id === "zygarde-10%") id = "zygarde-10";
       if (["ou", "uu"].includes(formatId) && generation === "sm" && room?.settings.language && room.settings.language in supportedLanguages) {
         this.sendReplyBox(
           import_lib.Utils.html`<a href="https://www.smogon.com/dex/${generation}/pokemon/${id}/${formatId}/?lang=${supportedLanguages[room.settings.language]}">${generation.toUpperCase()} ${formatName} ${pokemon.name} analysis</a>, brought to you by <a href="https://www.smogon.com">Smogon University</a>`
@@ -2283,10 +2141,8 @@ const commands = {
     `!analysis [pokemon], [generation], [format] - Shows everyone this link. Requires: + % @ # ~`
   ],
   bulbapedia(target, broadcast, user) {
-    if (!target)
-      return this.parse("/help bulbapedia");
-    if (!this.runBroadcast())
-      return;
+    if (!target) return this.parse("/help bulbapedia");
+    if (!this.runBroadcast()) return;
     const baseLink = "https://bulbapedia.bulbagarden.net/wiki/";
     const pokemon = Dex.species.get(target);
     const item = Dex.items.get(target);
@@ -2300,8 +2156,7 @@ const commands = {
         throw new Chat.ErrorMessage(`${pokemon.name} is not a real Pok\xE9mon.`);
       }
       let baseSpecies = pokemon.baseSpecies;
-      if (pokemon.id.startsWith("flabebe"))
-        baseSpecies = "Flab\xE9b\xE9";
+      if (pokemon.id.startsWith("flabebe")) baseSpecies = "Flab\xE9b\xE9";
       const link = `${baseLink}${encodeURIComponent(baseSpecies)}_(Pok\xE9mon)`;
       this.sendReplyBox(import_lib.Utils.html`<a href="${link}">${pokemon.name} in-game information</a>, provided by Bulbapedia`);
     }
@@ -2311,8 +2166,7 @@ const commands = {
         throw new Chat.ErrorMessage(`${item.name} is not a real item.`);
       }
       let link = `${baseLink}${encodeURIComponent(item.name)}`;
-      if (Dex.moves.get(item.name).exists)
-        link += "_(item)";
+      if (Dex.moves.get(item.name).exists) link += "_(item)";
       this.sendReplyBox(import_lib.Utils.html`<a href="${link}">${item.name} item description</a>, provided by Bulbapedia`);
     }
     if (ability.exists) {
@@ -2345,8 +2199,7 @@ const commands = {
     `!bulbapedia [pokemon/item/move/ability/nature] - Shows everyone this link. Requires: + % @ # ~`
   ],
   register() {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(`You will be prompted to register upon winning a rated battle. Alternatively, there is a register button in the <button name="openOptions"><i class="fa fa-cog"></i> Options</button> menu in the upper right.`);
   },
   registerhelp: [`/register - Provides information on how to register.`],
@@ -2355,16 +2208,13 @@ const commands = {
    *********************************************************/
   roll: "dice",
   dice(target, room, user) {
-    if (!target || /[^\d\sdHL+-]/i.test(target))
-      return this.parse("/help dice");
-    if (!this.runBroadcast(true))
-      return;
+    if (!target || /[^\d\sdHL+-]/i.test(target)) return this.parse("/help dice");
+    if (!this.runBroadcast(true)) return;
     const maxDice = 40;
     let diceQuantity = 1;
     const diceDataStart = target.indexOf("d");
     if (diceDataStart >= 0) {
-      if (diceDataStart)
-        diceQuantity = Number(target.slice(0, diceDataStart));
+      if (diceDataStart) diceQuantity = Number(target.slice(0, diceDataStart));
       target = target.slice(diceDataStart + 1);
       if (!Number.isInteger(diceQuantity) || diceQuantity <= 0 || diceQuantity > maxDice) {
         return this.sendReply(`The amount of dice rolled should be a natural number up to ${maxDice}.`);
@@ -2383,8 +2233,7 @@ const commands = {
           break;
         default:
           offset = Number(target.slice(modifierData.index));
-          if (isNaN(offset))
-            return this.parse("/help dice");
+          if (isNaN(offset)) return this.parse("/help dice");
           if (!Number.isSafeInteger(offset)) {
             throw new Chat.ErrorMessage(`The specified offset must be an integer up to ${Number.MAX_SAFE_INTEGER}.`);
           }
@@ -2414,25 +2263,19 @@ const commands = {
     for (let i = 0; i < diceQuantity; ++i) {
       const curRoll = Math.floor(Math.random() * diceFaces) + 1;
       rollSum += curRoll;
-      if (curRoll > maxRoll)
-        maxRoll = curRoll;
-      if (curRoll < minRoll)
-        minRoll = curRoll;
-      if (trackRolls)
-        rolls.push(curRoll);
+      if (curRoll > maxRoll) maxRoll = curRoll;
+      if (curRoll < minRoll) minRoll = curRoll;
+      if (trackRolls) rolls.push(curRoll);
     }
     if (removeOutlier > 0) {
       rollSum -= maxRoll;
     } else if (removeOutlier < 0) {
       rollSum -= minRoll;
     }
-    if (offset)
-      rollSum += offset;
+    if (offset) rollSum += offset;
     let offsetFragment = "";
-    if (offset)
-      offsetFragment += `${offset > 0 ? ` + ${offset}` : offset}`;
-    if (diceQuantity === 1)
-      return this.sendReplyBox(`Rolling (1 to ${diceFaces})${offsetFragment}: ${rollSum}`);
+    if (offset) offsetFragment += `${offset > 0 ? ` + ${offset}` : offset}`;
+    if (diceQuantity === 1) return this.sendReplyBox(`Rolling (1 to ${diceFaces})${offsetFragment}: ${rollSum}`);
     const outlierFragment = removeOutlier ? ` except ${removeOutlier > 0 ? "highest" : "lowest"}` : ``;
     const rollsFragment = trackRolls ? ": " + rolls.join(", ") : "";
     return this.sendReplyBox(
@@ -2448,10 +2291,8 @@ const commands = {
   pr: "pickrandom",
   pick: "pickrandom",
   pickrandom(target, room, user) {
-    if (!target?.includes(","))
-      return this.parse("/help pick");
-    if (!this.runBroadcast(true))
-      return false;
+    if (!target?.includes(",")) return this.parse("/help pick");
+    if (!this.runBroadcast(true)) return false;
     if (this.broadcasting) {
       [, target] = import_lib.Utils.splitFirst(this.message, " ");
     }
@@ -2461,11 +2302,9 @@ const commands = {
   },
   pickrandomhelp: [`/pick [option], [option], ... - Randomly selects an item from a list containing 2 or more elements.`],
   shuffle(target, room, user) {
-    if (!target?.includes(","))
-      return this.parse("/help shuffle");
+    if (!target?.includes(",")) return this.parse("/help shuffle");
     const args = target.split(",");
-    if (!this.runBroadcast(true))
-      return false;
+    if (!this.runBroadcast(true)) return false;
     const results = import_lib.Utils.shuffle(args.map((arg) => arg.trim()));
     return this.sendReplyBox(import_lib.Utils.html`<em>Shuffled:</em><br> ${results.join(", ")}`);
   },
@@ -2481,15 +2320,11 @@ const commands = {
     if (!room.settings.requestShowEnabled) {
       throw new Chat.ErrorMessage(`Media approvals are disabled in this room.`);
     }
-    if (user.can("showmedia", null, room, "show"))
-      throw new Chat.ErrorMessage(`Use !show instead.`);
-    if (room.pendingApprovals?.has(user.id))
-      throw new Chat.ErrorMessage("You have a request pending already.");
-    if (!toID(target))
-      return this.parse(`/help requestshow`);
+    if (user.can("showmedia", null, room, "show")) throw new Chat.ErrorMessage(`Use !show instead.`);
+    if (room.pendingApprovals?.has(user.id)) throw new Chat.ErrorMessage("You have a request pending already.");
+    if (!toID(target)) return this.parse(`/help requestshow`);
     let [link, comment] = this.splitOne(target);
-    if (!/^https?:\/\//.test(link))
-      link = `https://${link}`;
+    if (!/^https?:\/\//.test(link)) link = `https://${link}`;
     link = encodeURI(link);
     let dimensions;
     if (!/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)(\/|$)/i.test(link)) {
@@ -2505,8 +2340,7 @@ const commands = {
     if (comment && this.checkChat(comment) !== comment) {
       throw new Chat.ErrorMessage(`You cannot use filtered words in comments.`);
     }
-    if (!room.pendingApprovals)
-      room.pendingApprovals = /* @__PURE__ */ new Map();
+    if (!room.pendingApprovals) room.pendingApprovals = /* @__PURE__ */ new Map();
     room.pendingApprovals.set(user.id, {
       name: user.name,
       link,
@@ -2528,11 +2362,9 @@ const commands = {
       throw new Chat.ErrorMessage(`Media approvals are disabled in this room.`);
     }
     const userid = toID(target);
-    if (!userid)
-      return this.parse(`/help approveshow`);
+    if (!userid) return this.parse(`/help approveshow`);
     const request = room.pendingApprovals?.get(userid);
-    if (!request)
-      throw new Chat.ErrorMessage(`${userid} has no pending request.`);
+    if (!request) throw new Chat.ErrorMessage(`${userid} has no pending request.`);
     if (userid === user.id) {
       throw new Chat.ErrorMessage(`You can't approve your own /show request.`);
     }
@@ -2543,12 +2375,10 @@ const commands = {
     if (request.dimensions) {
       const [width, height, resized] = request.dimensions;
       buf = import_lib.Utils.html`<img src="${request.link}" width="${width}" height="${height}" />`;
-      if (resized)
-        buf += import_lib.Utils.html`<br /><a href="${request.link}" target="_blank">full-size image</a>`;
+      if (resized) buf += import_lib.Utils.html`<br /><a href="${request.link}" target="_blank">full-size image</a>`;
     } else {
       buf = await import_youtube.YouTube.generateVideoDisplay(request.link, false);
-      if (!buf)
-        throw new Chat.ErrorMessage("Could not get YouTube video");
+      if (!buf) throw new Chat.ErrorMessage("Could not get YouTube video");
     }
     buf += import_lib.Utils.html`<br /><div class="infobox"><small>(Requested by ${request.name})</small>`;
     if (request.comment) {
@@ -2567,18 +2397,15 @@ const commands = {
       throw new Chat.ErrorMessage(`Media approvals are disabled in this room.`);
     }
     target = toID(target);
-    if (!target)
-      return this.parse(`/help denyshow`);
+    if (!target) return this.parse(`/help denyshow`);
     const entry = room.pendingApprovals?.get(target);
-    if (!entry)
-      throw new Chat.ErrorMessage(`${target} has no pending request.`);
+    if (!entry) throw new Chat.ErrorMessage(`${target} has no pending request.`);
     room.pendingApprovals.delete(target);
     room.sendMods(`|uhtmlchange|request-${target}|`);
     room.sendRankedUsers(`|tempnotifyoff|pendingapprovals`, "%");
     this.privateModAction(`${user.name} denied ${target}'s request to display ${entry.link}.`);
     const targetUser = Users.get(target);
-    if (!targetUser)
-      return;
+    if (!targetUser) return;
     room.sendUser(targetUser, `|raw|<div class="broadcast-red">Your media request was denied.</div>`);
     room.sendUser(targetUser, `|notify|Media request denied`);
   },
@@ -2600,8 +2427,7 @@ const commands = {
     if (!room?.persist && !this.pmTarget && !room?.roomid.startsWith("help-")) {
       throw new Chat.ErrorMessage(`/show cannot be used in temporary rooms.`);
     }
-    if (!toID(target).trim())
-      return this.parse(`/help show`);
+    if (!toID(target).trim()) return this.parse(`/help show`);
     if (Monitor.countNetRequests(connection.ip)) {
       throw new Chat.ErrorMessage(`You are using this command too quickly. Wait a bit and try again.`);
     }
@@ -2621,8 +2447,7 @@ const commands = {
       this.message = this.message.replace(/&ab_channel=(.*)(&|)/ig, "").replace(/https:\/\/www\./ig, "");
     } else if (import_youtube.Twitch.linkRegex.test(link)) {
       const channelId = import_youtube.Twitch.linkRegex.exec(link)?.[2]?.trim();
-      if (!channelId)
-        throw new Chat.ErrorMessage(`Specify a Twitch channel.`);
+      if (!channelId) throw new Chat.ErrorMessage(`Specify a Twitch channel.`);
       buf = import_lib.Utils.html`Watching <b><a class="subtle" href="https://twitch.tv/${toID(channelId)}">${channelId}</a></b>...<br />`;
       buf += import_lib.Utils.html`<twitch src="${link}" />`;
     } else {
@@ -2640,8 +2465,7 @@ const commands = {
         try {
           const [width, height, resized] = await Chat.fitImage(link);
           buf = import_lib.Utils.html`<img src="${link}" width="${width}" height="${height}" />`;
-          if (resized)
-            buf += import_lib.Utils.html`<br /><a href="${link}" target="_blank">full-size image</a>`;
+          if (resized) buf += import_lib.Utils.html`<br /><a href="${link}" target="_blank">full-size image</a>`;
         } catch {
           throw new Chat.ErrorMessage("Invalid image, audio, or video URL.");
         }
@@ -2677,17 +2501,14 @@ const commands = {
     if (Monitor.countNetRequests(connection.ip)) {
       throw new Chat.ErrorMessage(`You are using this command too quickly. Wait a bit and try again.`);
     }
-    if (!user.autoconfirmed)
-      throw new Chat.ErrorMessage(`Only autoconfirmed users can use this command.`);
+    if (!user.autoconfirmed) throw new Chat.ErrorMessage(`Only autoconfirmed users can use this command.`);
     target = toID(target);
-    if (!target)
-      target = user.id;
+    if (!target) target = user.id;
     let rawResult;
     try {
       rawResult = await (0, import_lib.Net)(`https://${Config.routes.root}/users/${target}.json`).get();
     } catch (e) {
-      if (e.message.includes("Not found"))
-        throw new Chat.ErrorMessage(`User '${target}' is unregistered.`);
+      if (e.message.includes("Not found")) throw new Chat.ErrorMessage(`User '${target}' is unregistered.`);
       throw new Chat.ErrorMessage(e.message);
     }
     const result = JSON.parse(rawResult);
@@ -2698,8 +2519,7 @@ const commands = {
   },
   registertimehelp: [`/registertime OR /regtime [user] - Find out when [user] registered.`],
   pi(target, room, user) {
-    if (!this.runBroadcast())
-      return false;
+    if (!this.runBroadcast()) return false;
     return this.sendReplyBox(
       'Did you mean: 1. 3.1415926535897932384626... (Decimal)<br />2. 3.184809493B91866... (Duodecimal)<br />3. 3.243F6A8885A308D... (Hexadecimal)<br /><br />How many digits of pi do YOU know? Test it out <a href="http://guangcongluo.com/mempi/">here</a>!'
     );
@@ -2707,17 +2527,14 @@ const commands = {
   pihelp: [`/pi - Displays the first several digits of pi in several notation types.`],
   code(target, room, user, connection) {
     target = this.message.substr(this.cmdToken.length + this.cmd.length + (this.message.includes(" ") ? 1 : 0)).trimRight();
-    if (!target)
-      return this.parse("/help code");
-    if (target.length >= 8192)
-      throw new Chat.ErrorMessage("Your code must be under 8192 characters long!");
+    if (!target) return this.parse("/help code");
+    if (target.length >= 8192) throw new Chat.ErrorMessage("Your code must be under 8192 characters long!");
     if (target.length < 80 && !target.includes("\n") && !target.includes("```") && this.shouldBroadcast()) {
       return this.checkChat(`\`\`\`${target}\`\`\``);
     }
     if (this.room?.settings.isPersonal !== false && this.shouldBroadcast()) {
       target = this.filter(target);
-      if (!target)
-        throw new Chat.ErrorMessage(`Invalid code.`);
+      if (!target) throw new Chat.ErrorMessage(`Invalid code.`);
     }
     this.checkBroadcast(true, "!code");
     this.runBroadcast(true);
@@ -2770,8 +2587,7 @@ const commands = {
     }
     delete args.bans;
     for (const k in args) {
-      if (k.endsWith("-enabled"))
-        continue;
+      if (k.endsWith("-enabled")) continue;
       let name = k;
       if (name.endsWith("-val")) {
         name = name.slice(0, -4);
@@ -2899,8 +2715,7 @@ const commands = {
     if (!toID(target).length) {
       return this.parse(`/help randtopic`);
     }
-    if (!room.settings.topics)
-      room.settings.topics = [];
+    if (!room.settings.topics) room.settings.topics = [];
     room.settings.topics.push(target);
     this.privateModAction(`${user.name} added the topic "${target}" to the random topic pool.`);
     this.modlog("ADDTOPIC", null, target);
@@ -2935,8 +2750,7 @@ const commands = {
 };
 const handlers = {
   onRename(user, oldID, newID) {
-    if (oldID === newID || !Config.usesqlite || [oldID, newID].some((f) => f.startsWith("guest")))
-      return;
+    if (oldID === newID || !Config.usesqlite || [oldID, newID].some((f) => f.startsWith("guest"))) return;
     void Chat.database.run(
       `REPLACE INTO alts_log (to_id, from_id, ip) VALUES (?, ?, ?)`,
       [newID, oldID, user.latestIp]
@@ -2984,8 +2798,7 @@ const pages = {
         prevIps.push(result.ip);
       }
       useridToIp.set(id, prevIps);
-      if (!ipTable[result.ip])
-        ipTable[result.ip] = 0;
+      if (!ipTable[result.ip]) ipTable[result.ip] = 0;
       ipTable[result.ip]++;
     }
     buf += `<div class="ladder pad"><table><tr><th>Userid</th>${showIPs ? `<th>Latest IP</th>` : ""}</tr>`;
@@ -3056,8 +2869,7 @@ const pages = {
       `<div class="ladder"><table><tr><th>Rule Name</th><th>Description</th></tr>`
     ];
     for (const rule of rules) {
-      if (rule.hasValue)
-        continue;
+      if (rule.hasValue) continue;
       const desc = rule.desc ? rule.desc : "No description.";
       rulesets.push(`<tr><td>${rule.name}</td><td>${desc}</td></tr>`);
     }
@@ -3070,8 +2882,7 @@ const pages = {
       `<div class="ladder"><table><tr><th>Rule Name</th><th>Description</th></tr>`
     );
     for (const rule of rules) {
-      if (!rule.hasValue)
-        continue;
+      if (!rule.hasValue) continue;
       const desc = rule.desc ? rule.desc : "No description.";
       rulesets.push(`<tr><td>${rule.name}</td><td>${desc}</td></tr>`);
     }
@@ -3131,8 +2942,7 @@ const pages = {
     buf += `<p>Note that if you do not explicitly check a mod to include it, it will not be included in the final output.</p>`;
     buf += `<div class="ladder"><table><tr><th>Rule Name</th><th>Description</th><th>Toggle</th></tr>`;
     for (const rule of rules) {
-      if (rule.hasValue)
-        continue;
+      if (rule.hasValue) continue;
       const desc = rule.desc || "No description.";
       const id = toID(rule.name);
       buf += `<tr>`;
@@ -3146,8 +2956,7 @@ const pages = {
     buf += `Click the "enabled" checkbox and fill in a value to enable a rule - uncheck the box to remove the rule.`;
     buf += `<div class="ladder"><table><tr><th>Rule Name</th><th>Description</th><th>Toggle</th></tr>`;
     for (const rule of rules) {
-      if (!rule.hasValue)
-        continue;
+      if (!rule.hasValue) continue;
       const desc = rule.desc || "No description.";
       buf += `<tr>`;
       const id = toID(rule.name);
@@ -3170,10 +2979,8 @@ const pages = {
     this.title = "Punishments";
     const room = this.requireRoom();
     let buf = "";
-    if (!user.named)
-      return Rooms.RETRY_AFTER_LOGIN;
-    if (!room.persist)
-      return;
+    if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
+    if (!room.persist) return;
     this.checkCan("mute", null, room);
     const sortedPunishments = import_lib.Utils.sortBy([...Punishments.getPunishments(room.roomid)], ([id, entry]) => entry.expireTime);
     const sP = /* @__PURE__ */ new Map();
@@ -3186,8 +2993,7 @@ const pages = {
   globalpunishments(query, user) {
     this.title = "Global Punishments";
     let buf = "";
-    if (!user.named)
-      return Rooms.RETRY_AFTER_LOGIN;
+    if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
     this.checkCan("lock");
     const sortedPunishments = import_lib.Utils.sortBy([...Punishments.getPunishments()], ([id, entry]) => entry.expireTime);
     const sP = /* @__PURE__ */ new Map();
@@ -3200,10 +3006,8 @@ const pages = {
   approvals(args) {
     const room = Rooms.get(args[0]);
     this.checkCan("mute", null, room);
-    if (!room.pendingApprovals)
-      room.pendingApprovals = /* @__PURE__ */ new Map();
-    if (room.pendingApprovals.size < 1)
-      return `<h2>No pending approvals on ${room.title}</h2>`;
+    if (!room.pendingApprovals) room.pendingApprovals = /* @__PURE__ */ new Map();
+    if (room.pendingApprovals.size < 1) return `<h2>No pending approvals on ${room.title}</h2>`;
     let buf = `<div class="pad"><strong>Pending media requests on ${room.title}</strong><hr />`;
     for (const [userid, entry] of room.pendingApprovals) {
       buf += `<strong>${entry.name}</strong><div class="infobox">`;

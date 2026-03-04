@@ -54,11 +54,9 @@ class Side {
     /** only used by Gen 1 Counter */
     this.lastSelectedMove = "";
     const sideScripts = battle.dex.data.Scripts.side;
-    if (sideScripts)
-      Object.assign(this, sideScripts);
+    if (sideScripts) Object.assign(this, sideScripts);
     this.battle = battle;
-    if (this.battle.format.side)
-      Object.assign(this, this.battle.format.side);
+    if (this.battle.format.side) Object.assign(this, this.battle.format.side);
     this.id = ["p1", "p2", "p3", "p4"][sideNum];
     this.n = sideNum;
     this.name = name;
@@ -87,8 +85,7 @@ class Side {
     this.dynamaxUsed = this.battle.gen !== 8;
     this.sideConditions = {};
     this.slotConditions = [];
-    for (let i = 0; i < this.active.length; i++)
-      this.slotConditions[i] = {};
+    for (let i = 0; i < this.active.length; i++) this.slotConditions[i] = {};
     this.activeRequest = null;
     this.choice = {
       cantUndo: false,
@@ -109,17 +106,13 @@ class Side {
     return import_state.State.serializeSide(this);
   }
   get requestState() {
-    if (!this.activeRequest || this.activeRequest.wait)
-      return "";
-    if (this.activeRequest.teamPreview)
-      return "teampreview";
-    if (this.activeRequest.forceSwitch)
-      return "switch";
+    if (!this.activeRequest || this.activeRequest.wait) return "";
+    if (this.activeRequest.teamPreview) return "teampreview";
+    if (this.activeRequest.forceSwitch) return "switch";
     return "move";
   }
   addPokemon(set) {
-    if (this.pokemon.length >= 24)
-      return null;
+    if (this.pokemon.length >= 24) return null;
     const newPokemon = new import_pokemon.Pokemon(set, this);
     newPokemon.position = this.pokemon.length;
     this.pokemon.push(newPokemon);
@@ -127,10 +120,8 @@ class Side {
     return newPokemon;
   }
   canDynamaxNow() {
-    if (this.battle.gen !== 8)
-      return false;
-    if (this.battle.gameType === "multi" && this.battle.turn % 2 !== [1, 1, 0, 0][this.n])
-      return false;
+    if (this.battle.gen !== 8) return false;
+    if (this.battle.gameType === "multi" && this.battle.turn % 2 !== [1, 1, 0, 0][this.n]) return false;
     return !this.dynamaxUsed;
   }
   /** convert a Choice into a choice string */
@@ -142,20 +133,13 @@ class Side {
       switch (action.choice) {
         case "move":
           let details = ``;
-          if (action.targetLoc && this.active.length > 1)
-            details += ` ${action.targetLoc > 0 ? "+" : ""}${action.targetLoc}`;
-          if (action.mega)
-            details += action.pokemon.item === "ultranecroziumz" ? ` ultra` : ` mega`;
-          if (action.megax)
-            details += ` megax`;
-          if (action.megay)
-            details += ` megay`;
-          if (action.zmove)
-            details += ` zmove`;
-          if (action.maxMove)
-            details += ` dynamax`;
-          if (action.terastallize)
-            details += ` terastallize`;
+          if (action.targetLoc && this.active.length > 1) details += ` ${action.targetLoc > 0 ? "+" : ""}${action.targetLoc}`;
+          if (action.mega) details += action.pokemon.item === "ultranecroziumz" ? ` ultra` : ` mega`;
+          if (action.megax) details += ` megax`;
+          if (action.megay) details += ` megay`;
+          if (action.zmove) details += ` zmove`;
+          if (action.maxMove) details += ` dynamax`;
+          if (action.terastallize) details += ` terastallize`;
           return `move ${action.moveid}${details}`;
         case "switch":
         case "instaswitch":
@@ -184,28 +168,24 @@ class Side {
   }
   randomFoe() {
     const actives = this.foes();
-    if (!actives.length)
-      return null;
+    if (!actives.length) return null;
     return this.battle.sample(actives);
   }
   /** Intended as a way to iterate through all foe side conditions - do not use for anything else. */
   foeSidesWithConditions() {
-    if (this.battle.gameType === "freeforall")
-      return this.battle.sides.filter((side) => side !== this);
+    if (this.battle.gameType === "freeforall") return this.battle.sides.filter((side) => side !== this);
     return [this.foe];
   }
   foePokemonLeft() {
     if (this.battle.gameType === "freeforall") {
       return this.battle.sides.filter((side) => side !== this).map((side) => side.pokemonLeft).reduce((a, b) => a + b);
     }
-    if (this.foe.allySide)
-      return this.foe.pokemonLeft + this.foe.allySide.pokemonLeft;
+    if (this.foe.allySide) return this.foe.pokemonLeft + this.foe.allySide.pokemonLeft;
     return this.foe.pokemonLeft;
   }
   allies(all) {
     let allies = this.activeTeam().filter((ally) => ally);
-    if (!all)
-      allies = allies.filter((ally) => !!ally.hp);
+    if (!all) allies = allies.filter((ally) => !!ally.hp);
     return allies;
   }
   foes(all) {
@@ -215,26 +195,20 @@ class Side {
     return this.foe.allies(all);
   }
   activeTeam() {
-    if (this.battle.gameType !== "multi")
-      return this.active;
+    if (this.battle.gameType !== "multi") return this.active;
     return this.battle.sides[this.n % 2].active.concat(this.battle.sides[this.n % 2 + 2].active);
   }
   hasAlly(pokemon) {
     return pokemon.side === this || pokemon.side === this.allySide;
   }
   addSideCondition(status, source = null, sourceEffect = null) {
-    if (!source && this.battle.event?.target)
-      source = this.battle.event.target;
-    if (source === "debug")
-      source = this.active[0];
-    if (!source)
-      throw new Error(`setting sidecond without a source`);
-    if (!source.getSlot)
-      source = source.active[0];
+    if (!source && this.battle.event?.target) source = this.battle.event.target;
+    if (source === "debug") source = this.active[0];
+    if (!source) throw new Error(`setting sidecond without a source`);
+    if (!source.getSlot) source = source.active[0];
     status = this.battle.dex.conditions.get(status);
     if (this.sideConditions[status.id]) {
-      if (!status.onSideRestart)
-        return false;
+      if (!status.onSideRestart) return false;
       return this.battle.singleEvent("SideRestart", status, this.sideConditions[status.id], this, source, sourceEffect);
     }
     this.sideConditions[status.id] = this.battle.initEffectState({
@@ -256,8 +230,7 @@ class Side {
   }
   getSideCondition(status) {
     status = this.battle.dex.conditions.get(status);
-    if (!this.sideConditions[status.id])
-      return null;
+    if (!this.sideConditions[status.id]) return null;
     return status;
   }
   getSideConditionData(status) {
@@ -266,24 +239,19 @@ class Side {
   }
   removeSideCondition(status) {
     status = this.battle.dex.conditions.get(status);
-    if (!this.sideConditions[status.id])
-      return false;
+    if (!this.sideConditions[status.id]) return false;
     this.battle.singleEvent("SideEnd", status, this.sideConditions[status.id], this);
     delete this.sideConditions[status.id];
     return true;
   }
   addSlotCondition(target, status, source = null, sourceEffect = null) {
-    source ?? (source = this.battle.event?.target || null);
-    if (source === "debug")
-      source = this.active[0];
-    if (target instanceof import_pokemon.Pokemon)
-      target = target.position;
-    if (!source)
-      throw new Error(`setting sidecond without a source`);
+    source ??= this.battle.event?.target || null;
+    if (source === "debug") source = this.active[0];
+    if (target instanceof import_pokemon.Pokemon) target = target.position;
+    if (!source) throw new Error(`setting sidecond without a source`);
     status = this.battle.dex.conditions.get(status);
     if (this.slotConditions[target][status.id]) {
-      if (!status.onRestart)
-        return false;
+      if (!status.onRestart) return false;
       return this.battle.singleEvent("Restart", status, this.slotConditions[target][status.id], this, source, sourceEffect);
     }
     const conditionState = this.slotConditions[target][status.id] = this.battle.initEffectState({
@@ -304,35 +272,29 @@ class Side {
     return true;
   }
   getSlotCondition(target, status) {
-    if (target instanceof import_pokemon.Pokemon)
-      target = target.position;
+    if (target instanceof import_pokemon.Pokemon) target = target.position;
     status = this.battle.dex.conditions.get(status);
-    if (!this.slotConditions[target][status.id])
-      return null;
+    if (!this.slotConditions[target][status.id]) return null;
     return status;
   }
   removeSlotCondition(target, status) {
-    if (target instanceof import_pokemon.Pokemon)
-      target = target.position;
+    if (target instanceof import_pokemon.Pokemon) target = target.position;
     status = this.battle.dex.conditions.get(status);
-    if (!this.slotConditions[target][status.id])
-      return false;
+    if (!this.slotConditions[target][status.id]) return false;
     this.battle.singleEvent("End", status, this.slotConditions[target][status.id], this.active[target]);
     delete this.slotConditions[target][status.id];
     return true;
   }
   send(...parts) {
     const sideUpdate = "|" + parts.map((part) => {
-      if (typeof part !== "function")
-        return part;
+      if (typeof part !== "function") return part;
       return part(this);
     }).join("|");
     this.battle.send("sideupdate", `${this.id}
 ${sideUpdate}`);
   }
   emitRequest(update = this.activeRequest, updatedRequest = false) {
-    if (updatedRequest)
-      this.activeRequest.update = true;
+    if (updatedRequest) this.activeRequest.update = true;
     this.battle.send("sideupdate", `${this.id}
 |request|${JSON.stringify(update)}`);
     this.activeRequest = update;
@@ -343,17 +305,13 @@ ${sideUpdate}`);
     const type = `[${updated ? "Unavailable" : "Invalid"} choice]`;
     this.battle.send("sideupdate", `${this.id}
 |error|${type} ${message}`);
-    if (updated)
-      this.emitRequest(this.activeRequest, true);
-    if (this.battle.strictChoices)
-      throw new Error(`${type} ${message}`);
+    if (updated) this.emitRequest(this.activeRequest, true);
+    if (this.battle.strictChoices) throw new Error(`${type} ${message}`);
     return false;
   }
   isChoiceDone() {
-    if (!this.requestState)
-      return true;
-    if (this.choice.forcedSwitchesLeft)
-      return false;
+    if (!this.requestState) return true;
+    if (this.choice.forcedSwitchesLeft) return false;
     if (this.requestState === "teampreview") {
       return this.choice.actions.length >= this.pickedTeamSize();
     }
@@ -373,8 +331,7 @@ ${sideUpdate}`);
     const request = pokemon.getMoveRequestData();
     let moveid = "";
     let targetType = "";
-    if (autoChoose)
-      moveText = 1;
+    if (autoChoose) moveText = 1;
     if (typeof moveText === "number" || moveText && /^[0-9]+$/.test(moveText)) {
       const moveIndex = Number(moveText) - 1;
       if (moveIndex < 0 || moveIndex >= request.moves.length || !request.moves[moveIndex]) {
@@ -388,8 +345,7 @@ ${sideUpdate}`);
         moveid = "hiddenpower";
       }
       for (const move2 of request.moves) {
-        if (move2.id !== moveid)
-          continue;
+        if (move2.id !== moveid) continue;
         targetType = move2.target || "normal";
         break;
       }
@@ -405,8 +361,7 @@ ${sideUpdate}`);
       }
       if (!targetType && ["", "zmove"].includes(event) && request.canZMove) {
         for (const [i, moveRequest] of request.canZMove.entries()) {
-          if (!moveRequest)
-            continue;
+          if (!moveRequest) continue;
           if (moveid === (0, import_dex.toID)(moveRequest.move)) {
             moveid = request.moves[i].id;
             targetType = moveRequest.target;
@@ -424,10 +379,8 @@ ${sideUpdate}`);
     const moves = pokemon.getMoves();
     if (autoChoose) {
       for (const [i, move2] of request.moves.entries()) {
-        if (move2.disabled)
-          continue;
-        if (i < moves.length && move2.id === moves[i].id && moves[i].disabled)
-          continue;
+        if (move2.disabled) continue;
+        if (i < moves.length && move2.id === moves[i].id && moves[i].disabled) continue;
         moveid = move2.id;
         targetType = move2.target;
         break;
@@ -441,14 +394,12 @@ ${sideUpdate}`);
     if (zMove && this.choice.zMove) {
       return this.emitChoiceError(`Can't move: You can't Z-move more than once per battle`);
     }
-    if (zMove)
-      targetType = this.battle.dex.moves.get(zMove).target;
+    if (zMove) targetType = this.battle.dex.moves.get(zMove).target;
     const maxMove = event === "dynamax" || pokemon.volatiles["dynamax"] ? this.battle.actions.getMaxMove(move, pokemon) : void 0;
     if (event === "dynamax" && !maxMove) {
       return this.emitChoiceError(`Can't move: ${pokemon.name} can't use ${move.name} as a Max Move`);
     }
-    if (maxMove)
-      targetType = this.battle.dex.moves.get(maxMove).target;
+    if (maxMove) targetType = this.battle.dex.moves.get(maxMove).target;
     if (autoChoose || moveid === "testfight") {
       targetLoc = 0;
     } else if (this.battle.actions.targetTypeChoices(targetType)) {
@@ -470,8 +421,7 @@ ${sideUpdate}`);
       if (pokemon.volatiles[lockedMoveID]?.targetLoc) {
         lockedMoveTargetLoc = pokemon.volatiles[lockedMoveID].targetLoc;
       }
-      if (pokemon.maybeLocked)
-        this.choice.cantUndo = true;
+      if (pokemon.maybeLocked) this.choice.cantUndo = true;
       this.choice.actions.push({
         choice: "move",
         pokemon,
@@ -480,10 +430,8 @@ ${sideUpdate}`);
       });
       return true;
     } else if (!moves.length) {
-      if (this.battle.gen <= 4)
-        this.send("-activate", pokemon, "move: Struggle");
-      if (pokemon.maybeLocked)
-        this.choice.cantUndo = true;
+      if (this.battle.gen <= 4) this.send("-activate", pokemon, "move: Struggle");
+      if (pokemon.maybeLocked) this.choice.cantUndo = true;
       this.choice.actions.push({
         choice: "move",
         pokemon,
@@ -506,8 +454,7 @@ ${sideUpdate}`);
       let isEnabled = false;
       let disabledSource = "";
       for (const m of moves) {
-        if (m.id !== moveid)
-          continue;
+        if (m.id !== moveid) continue;
         if (!m.disabled) {
           isEnabled = true;
           break;
@@ -516,8 +463,7 @@ ${sideUpdate}`);
         }
       }
       if (!isEnabled) {
-        if (autoChoose)
-          throw new Error(`autoChoose chose a disabled move`);
+        if (autoChoose) throw new Error(`autoChoose chose a disabled move`);
         return this.emitChoiceError(`Can't move: ${pokemon.name}'s ${move.name} is disabled`, { pokemon, update: (req) => {
           let updated = this.updateDisabledRequest(pokemon, req);
           for (const m of req.moves) {
@@ -601,16 +547,11 @@ ${sideUpdate}`);
     if (pokemon.maybeDisabled && (this.battle.gameType === "singles" || this.battle.gen <= 3 && !this.battle.actions.targetTypeChoices(targetType))) {
       this.choice.cantUndo = true;
     }
-    if (mega || megax || megay)
-      this.choice.mega = true;
-    if (ultra)
-      this.choice.ultra = true;
-    if (zMove)
-      this.choice.zMove = true;
-    if (dynamax)
-      this.choice.dynamax = true;
-    if (terastallize)
-      this.choice.terastallize = true;
+    if (mega || megax || megay) this.choice.mega = true;
+    if (ultra) this.choice.ultra = true;
+    if (zMove) this.choice.zMove = true;
+    if (dynamax) this.choice.dynamax = true;
+    if (terastallize) this.choice.terastallize = true;
     return true;
   }
   updateDisabledRequest(pokemon, req) {
@@ -672,8 +613,7 @@ ${sideUpdate}`);
       throw new Error(`Can't update a request without active Pokemon`);
     }
     const req = this.activeRequest.active[pokemon.position];
-    if (!req)
-      throw new Error(`Pokemon not found in request's active field`);
+    if (!req) throw new Error(`Pokemon not found in request's active field`);
     return update(req) ?? true;
   }
   chooseSwitch(slotText) {
@@ -695,14 +635,11 @@ ${sideUpdate}`);
       }
       if (this.slotConditions[pokemon.position]["revivalblessing"]) {
         slot = 0;
-        while (!this.pokemon[slot].fainted)
-          slot++;
+        while (!this.pokemon[slot].fainted) slot++;
       } else {
-        if (!this.choice.forcedSwitchesLeft)
-          return this.choosePass();
+        if (!this.choice.forcedSwitchesLeft) return this.choosePass();
         slot = this.active.length;
-        while (this.choice.switchIns.has(slot) || this.pokemon[slot].fainted)
-          slot++;
+        while (this.choice.switchIns.has(slot) || this.pokemon[slot].fainted) slot++;
       }
     } else {
       slot = parseInt(slotText) - 1;
@@ -795,10 +732,8 @@ ${sideUpdate}`);
     positions.splice(pickedTeamSize);
     if (positions.length < pickedTeamSize) {
       for (let i = 0; i < pickedTeamSize; i++) {
-        if (!positions.includes(i))
-          positions.push(i);
-        if (positions.length >= pickedTeamSize)
-          break;
+        if (!positions.includes(i)) positions.push(i);
+        if (positions.length >= pickedTeamSize) break;
       }
     }
     for (const [index, pos] of positions.entries()) {
@@ -902,87 +837,78 @@ ${sideUpdate}`);
           let event = "";
           while (true) {
             if (/\s(?:-|\+)?[1-3]$/.test(data) && (0, import_dex.toID)(data) !== "conversion2") {
-              if (targetLoc !== void 0)
-                return error();
+              if (targetLoc !== void 0) return error();
               targetLoc = parseInt(data.slice(-2));
               data = data.slice(0, -2).trim();
             } else if (data.endsWith(" mega")) {
-              if (event)
-                return error();
+              if (event) return error();
               event = "mega";
               data = data.slice(0, -5);
             } else if (data.endsWith(" megax")) {
-              if (event)
-                return error();
+              if (event) return error();
               event = "megax";
               data = data.slice(0, -6);
             } else if (data.endsWith(" megay")) {
-              if (event)
-                return error();
+              if (event) return error();
               event = "megay";
               data = data.slice(0, -6);
             } else if (data.endsWith(" zmove")) {
-              if (event)
-                return error();
+              if (event) return error();
               event = "zmove";
               data = data.slice(0, -6);
             } else if (data.endsWith(" ultra")) {
-              if (event)
-                return error();
+              if (event) return error();
               event = "ultra";
               data = data.slice(0, -6);
             } else if (data.endsWith(" dynamax")) {
-              if (event)
-                return error();
+              if (event) return error();
               event = "dynamax";
               data = data.slice(0, -8);
             } else if (data.endsWith(" gigantamax")) {
-              if (event)
-                return error();
+              if (event) return error();
               event = "dynamax";
               data = data.slice(0, -11);
             } else if (data.endsWith(" max")) {
-              if (event)
-                return error();
+              if (event) return error();
               event = "dynamax";
               data = data.slice(0, -4);
             } else if (data.endsWith(" terastal")) {
-              if (event)
-                return error();
+              if (event) return error();
               event = "terastallize";
               data = data.slice(0, -9);
             } else if (data.endsWith(" terastallize")) {
-              if (event)
-                return error();
+              if (event) return error();
               event = "terastallize";
               data = data.slice(0, -13);
             } else {
               break;
             }
           }
-          if (!this.chooseMove(data, targetLoc, event))
-            return false;
+          if (!this.chooseMove(data, targetLoc, event)) return false;
           break;
         case "switch":
           this.chooseSwitch(data);
           break;
         case "shift":
-          if (data)
-            return this.emitChoiceError(`Unrecognized data after "shift": ${data}`);
-          if (!this.chooseShift())
-            return false;
+          if (data) return this.emitChoiceError(`Unrecognized data after "shift": ${data}`);
+          if (!this.chooseShift()) return false;
           break;
         case "team":
-          if (!this.chooseTeam(data))
-            return false;
+          if (!this.chooseTeam(data)) return false;
           break;
         case "pass":
         case "skip":
-          if (data)
-            return this.emitChoiceError(`Unrecognized data after "pass": ${data}`);
-          if (!this.choosePass())
-            return false;
+          if (data) return this.emitChoiceError(`Unrecognized data after "pass": ${data}`);
+          if (!this.choosePass()) return false;
           break;
+        case "forcepass": {
+          const index = this.getChoiceIndex(true);
+          if (index >= this.active.length) return false;
+          this.choice.actions.push({
+            choice: "pass"
+          });
+          break;
+        }
         case "auto":
         case "default":
           this.autoChoose();
@@ -1009,8 +935,7 @@ ${sideUpdate}`);
             return this.emitChoiceError(`useitem: invalid target ${targetRef}`);
           }
           const index = this.getChoiceIndex();
-          if (index >= this.active.length)
-            return false;
+          if (index >= this.active.length) return false;
           this.choice.actions.push({
             choice: "useitem",
             pokemon: this.active[index],
@@ -1050,8 +975,7 @@ ${sideUpdate}`);
   }
   choosePass() {
     const index = this.getChoiceIndex(true);
-    if (index >= this.active.length)
-      return false;
+    if (index >= this.active.length) return false;
     const pokemon = this.active[index];
     switch (this.requestState) {
       case "switch":
@@ -1078,33 +1002,27 @@ ${sideUpdate}`);
   /** Automatically finish a choice if not currently complete. */
   autoChoose() {
     if (this.requestState === "teampreview") {
-      if (!this.isChoiceDone())
-        this.chooseTeam();
+      if (!this.isChoiceDone()) this.chooseTeam();
     } else if (this.requestState === "switch") {
       let i = 0;
       while (!this.isChoiceDone()) {
-        if (!this.chooseSwitch())
-          throw new Error(`autoChoose switch crashed: ${this.choice.error}`);
+        if (!this.chooseSwitch()) throw new Error(`autoChoose switch crashed: ${this.choice.error}`);
         i++;
-        if (i > 10)
-          throw new Error(`autoChoose failed: infinite looping`);
+        if (i > 10) throw new Error(`autoChoose failed: infinite looping`);
       }
     } else if (this.requestState === "move") {
       let i = 0;
       while (!this.isChoiceDone()) {
-        if (!this.chooseMove())
-          throw new Error(`autoChoose crashed: ${this.choice.error}`);
+        if (!this.chooseMove()) throw new Error(`autoChoose crashed: ${this.choice.error}`);
         i++;
-        if (i > 10)
-          throw new Error(`autoChoose failed: infinite looping`);
+        if (i > 10) throw new Error(`autoChoose failed: infinite looping`);
       }
     }
     return true;
   }
   destroy() {
     for (const pokemon of this.pokemon) {
-      if (pokemon)
-        pokemon.destroy();
+      if (pokemon) pokemon.destroy();
     }
     for (const action of this.choice.actions) {
       delete action.side;

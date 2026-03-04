@@ -58,28 +58,22 @@ class GameChallenge extends AbstractChallenge {
 }
 class BattleInvite extends AbstractChallenge {
   destroy(accepted) {
-    if (accepted)
-      return;
+    if (accepted) return;
     const room = Rooms.get(this.roomid);
-    if (!room)
-      return;
+    if (!room) return;
     const battle = room.battle;
     let invitesFull = true;
     for (const player of battle.players) {
-      if (!player.invite && !player.id)
-        invitesFull = false;
-      if (player.invite === this.to)
-        player.invite = "";
+      if (!player.invite && !player.id) invitesFull = false;
+      if (player.invite === this.to) player.invite = "";
     }
-    if (invitesFull)
-      battle.sendInviteForm(true);
+    if (invitesFull) battle.sendInviteForm(true);
   }
 }
 class Challenges extends Map {
   getOrCreate(userid) {
     let challenges2 = this.get(userid);
-    if (challenges2)
-      return challenges2;
+    if (challenges2) return challenges2;
     challenges2 = [];
     this.set(userid, challenges2);
     return challenges2;
@@ -105,15 +99,13 @@ class Challenges extends Map {
     let success = false;
     if (toIndex >= 0) {
       to.splice(toIndex, 1);
-      if (!to.length)
-        this.delete(challenge.to);
+      if (!to.length) this.delete(challenge.to);
       success = true;
     }
     const fromIndex = from.indexOf(challenge);
     if (fromIndex >= 0) {
       from.splice(fromIndex, 1);
-      if (!from.length)
-        this.delete(challenge.from);
+      if (!from.length) this.delete(challenge.from);
     }
     if (success) {
       this.update(challenge.to, challenge.from);
@@ -123,8 +115,7 @@ class Challenges extends Map {
   }
   search(userid1, userid2) {
     const challenges2 = this.get(userid1);
-    if (!challenges2)
-      return null;
+    if (!challenges2) return null;
     for (const challenge of challenges2) {
       if (challenge.to === userid1 && challenge.from === userid2 || challenge.to === userid2 && challenge.from === userid1) {
         return challenge;
@@ -134,11 +125,9 @@ class Challenges extends Map {
   }
   searchByRoom(userid, roomid) {
     const challenges2 = this.get(userid);
-    if (!challenges2)
-      return null;
+    if (!challenges2) return null;
     for (const challenge of challenges2) {
-      if (challenge.roomid === roomid)
-        return challenge;
+      if (challenge.roomid === roomid) return challenge;
     }
     return null;
   }
@@ -158,32 +147,26 @@ class Challenges extends Map {
     const chall = this.resolveAcceptCommand(context);
     this.remove(chall, true);
     const fromUser = Users.get(chall.from);
-    if (!fromUser)
-      throw new Chat.ErrorMessage(`User "${chall.from}" is not available right now.`);
+    if (!fromUser) throw new Chat.ErrorMessage(`User "${chall.from}" is not available right now.`);
     return fromUser;
   }
   clearFor(userid, reason) {
     const user = Users.get(userid);
     const userIdentity = user ? user.getIdentity() : ` ${userid}`;
     const challenges2 = this.get(userid);
-    if (!challenges2)
-      return 0;
+    if (!challenges2) return 0;
     for (const challenge of challenges2) {
       const otherid = challenge.to === userid ? challenge.from : challenge.to;
       const otherUser = Users.get(otherid);
       const otherIdentity = otherUser ? otherUser.getIdentity() : ` ${otherid}`;
       const otherChallenges = this.get(otherid);
       const otherIndex = otherChallenges.indexOf(challenge);
-      if (otherIndex >= 0)
-        otherChallenges.splice(otherIndex, 1);
-      if (otherChallenges.length === 0)
-        this.delete(otherid);
-      if (!user && !otherUser)
-        continue;
+      if (otherIndex >= 0) otherChallenges.splice(otherIndex, 1);
+      if (otherChallenges.length === 0) this.delete(otherid);
+      if (!user && !otherUser) continue;
       const header = `|pm|${userIdentity}|${otherIdentity}|`;
       let message = `${header}/challenge`;
-      if (reason)
-        message = `${header}/text Challenge cancelled because ${reason}.
+      if (reason) message = `${header}/text Challenge cancelled because ${reason}.
 ${message}`;
       user?.send(message);
       otherUser?.send(message);
@@ -192,8 +175,7 @@ ${message}`;
     return challenges2.length;
   }
   getUpdate(challenge) {
-    if (!challenge)
-      return `/challenge`;
+    if (!challenge) return `/challenge`;
     const teambuilderFormat = challenge.ready ? challenge.ready.formatid : "";
     return `/challenge ${challenge.format}|${teambuilderFormat}|${challenge.message}|${challenge.acceptButton}|${challenge.rejectButton}`;
   }
@@ -215,8 +197,7 @@ ${message}`;
   updateFor(connection) {
     const user = connection.user;
     const challenges2 = this.get(user.id);
-    if (!challenges2)
-      return;
+    if (!challenges2) return;
     const userIdentity = user.getIdentity();
     let messages = "";
     for (const challenge of challenges2) {

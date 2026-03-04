@@ -37,16 +37,14 @@ const Conditions = {
         }
         this.add("cant", pokemon, "slp");
       }
-      if (move.sleepUsable)
-        return;
+      if (move.sleepUsable) return;
       return false;
     }
   },
   frz: {
     inherit: true,
     onBeforeMove(pokemon, target, move) {
-      if (move.flags["defrost"] && !(move.id === "burnup" && !pokemon.hasType("Fire")))
-        return;
+      if (move.flags["defrost"] && !(move.id === "burnup" && !pokemon.hasType("Fire"))) return;
       if (this.effectState.durationRolled !== this.turn && this.randomChance(1, 5)) {
         pokemon.cureStatus();
         return;
@@ -75,8 +73,7 @@ const Conditions = {
       }
       this.activeTarget = pokemon;
       const damage = this.actions.getConfusionDamage(pokemon, 40);
-      if (typeof damage !== "number")
-        throw new Error("Confusion damage not dealt");
+      if (typeof damage !== "number") throw new Error("Confusion damage not dealt");
       const activeMove = { id: this.toID("confused"), effectType: "Move", type: "???" };
       this.damage(damage, pokemon, pokemon, activeMove);
       return false;
@@ -85,8 +82,7 @@ const Conditions = {
   gem: {
     inherit: true,
     onBeforeMove(pokemon) {
-      if (pokemon.moveThisTurn)
-        pokemon.removeVolatile("gem");
+      if (pokemon.moveThisTurn) pokemon.removeVolatile("gem");
     }
   }
 };

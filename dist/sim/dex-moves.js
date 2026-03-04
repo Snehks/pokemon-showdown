@@ -103,8 +103,7 @@ class DataMove extends import_dex_data.BasicEffect {
     if (this.category !== "Status" && !data.zMove && !this.isZ && !this.isMax && this.id !== "struggle") {
       let basePower = this.basePower;
       this.zMove = {};
-      if (Array.isArray(data.multihit))
-        basePower *= 3;
+      if (Array.isArray(data.multihit)) basePower *= 3;
       if (!basePower) {
         this.zMove.basePower = 100;
       } else if (basePower >= 140) {
@@ -161,17 +160,14 @@ class DexMoves {
     this.dex = dex;
   }
   get(name) {
-    if (name && typeof name !== "string")
-      return name;
+    if (name && typeof name !== "string") return name;
     const id = name ? (0, import_dex_data.toID)(name.trim()) : "";
     return this.getByID(id);
   }
   getByID(id) {
-    if (id === "" || id === "constructor")
-      return EMPTY_MOVE;
+    if (id === "" || id === "constructor") return EMPTY_MOVE;
     let move = this.moveCache.get(id);
-    if (move)
-      return move;
+    if (move) return move;
     if (this.dex.getAlias(id)) {
       move = this.get(this.dex.getAlias(id));
       if (move.exists) {
@@ -208,13 +204,11 @@ class DexMoves {
         exists: false
       });
     }
-    if (move.exists)
-      this.moveCache.set(id, this.dex.deepFreeze(move));
+    if (move.exists) this.moveCache.set(id, this.dex.deepFreeze(move));
     return move;
   }
   all() {
-    if (this.allCache)
-      return this.allCache;
+    if (this.allCache) return this.allCache;
     const moves = [];
     for (const id in this.dex.data.Moves) {
       moves.push(this.getByID(id));

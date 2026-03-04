@@ -88,8 +88,7 @@ try {
   for (const t in ticketData) {
     const ticket = ticketData[t];
     if (ticket.banned) {
-      if (ticket.expires && ticket.expires <= Date.now())
-        continue;
+      if (ticket.expires && ticket.expires <= Date.now()) continue;
       void Punishments.punish(ticket.userid, {
         type: "TICKETBAN",
         id: ticket.userid,
@@ -111,14 +110,12 @@ try {
         }
         continue;
       }
-      if (ticket.open && !Chat.oldPlugins.helptickets)
-        ticket.open = false;
+      if (ticket.open && !Chat.oldPlugins.helptickets) ticket.open = false;
       tickets[t] = ticket;
     }
   }
 } catch (e) {
-  if (e.code !== "ENOENT")
-    throw e;
+  if (e.code !== "ENOENT") throw e;
 }
 function writeTickets() {
   (0, import_lib.FS)(TICKET_FILE).writeUpdate(
@@ -131,20 +128,18 @@ function writeSettings() {
 }
 async function convertRoomPunishments() {
   for (const [id, punishment] of Punishments.getPunishments("staff")) {
-    if (punishment.punishType !== "TICKETBAN")
-      continue;
+    if (punishment.punishType !== "TICKETBAN") continue;
     Punishments.roomUnpunish("staff", id, "TICKETBAN");
     await HelpTicket.ban(id, punishment.reason);
   }
 }
 function writeStats(line) {
-  const date = new Date();
+  const date = /* @__PURE__ */ new Date();
   const month = Chat.toTimestamp(date).split(" ")[0].split("-", 2).join("-");
   try {
     Monitor.logPath(`tickets/${month}.tsv`).appendSync(line + "\n");
   } catch (e) {
-    if (e.code !== "ENOENT")
-      throw e;
+    if (e.code !== "ENOENT") throw e;
   }
 }
 class HelpTicket extends Rooms.SimpleRoomGame {
@@ -169,11 +164,9 @@ class HelpTicket extends Rooms.SimpleRoomGame {
     this.lastUnclaimedStart = ticket.active ? this.createTime : 0;
   }
   onJoin(user, connection) {
-    if (!this.ticket.open)
-      return false;
+    if (!this.ticket.open) return false;
     if (!user.isStaff || user.id === this.ticket.userid) {
-      if (this.emptyRoom)
-        this.emptyRoom = false;
+      if (this.emptyRoom) this.emptyRoom = false;
       this.addPlayer(user);
       if (this.ticket.offline) {
         delete this.ticket.offline;
@@ -189,8 +182,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
         const users = Object.entries(this.room.users).filter(
           (u) => !(u[1].isStaff && u[1].id !== this.ticket.userid || !u[1].named)
         );
-        if (!users.length)
-          this.emptyRoom = true;
+        if (!users.length) this.emptyRoom = true;
       }
       if (this.ticket.active) {
         this.unclaimedTime += Date.now() - this.lastUnclaimedStart;
@@ -214,8 +206,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
       notifyStaff();
       return;
     }
-    if (!this.ticket.open)
-      return;
+    if (!this.ticket.open) return;
     if (toID(this.ticket.claimed) === user.id) {
       if (this.claimQueue.length) {
         this.ticket.claimed = this.claimQueue.shift() || null;
@@ -233,17 +224,13 @@ class HelpTicket extends Rooms.SimpleRoomGame {
       writeTickets();
     } else {
       const index = this.claimQueue.map(toID).indexOf(user.id);
-      if (index > -1)
-        this.claimQueue.splice(index, 1);
+      if (index > -1) this.claimQueue.splice(index, 1);
     }
   }
   onLogMessage(message, user) {
-    if (!this.ticket.open)
-      return;
-    if (user.isStaff && this.ticket.userid !== user.id)
-      this.involvedStaff.add(user.id);
-    if (this.ticket.active)
-      return;
+    if (!this.ticket.open) return;
+    if (user.isStaff && this.ticket.userid !== user.id) this.involvedStaff.add(user.id);
+    if (this.ticket.active) return;
     const blockedMessages = [
       "hello",
       "hullo",
@@ -266,8 +253,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
     if ((!user.isStaff || this.ticket.userid === user.id) && !this.ticket.active) {
       this.ticket.active = true;
       this.activationTime = Date.now();
-      if (!this.ticket.claimed)
-        this.lastUnclaimedStart = Date.now();
+      if (!this.ticket.claimed) this.lastUnclaimedStart = Date.now();
       notifyStaff();
       this.room.add(`|c|~Staff|${this.room.tr`Thank you for the information, global staff will be here shortly. Please stay in the room.`}`).update();
       switch (this.ticket.type) {
@@ -281,15 +267,12 @@ class HelpTicket extends Rooms.SimpleRoomGame {
     }
   }
   forfeit(user) {
-    if (!(user.id in this.playerTable))
-      return;
+    if (!(user.id in this.playerTable)) return;
     this.removePlayer(this.playerTable[user.id]);
-    if (!this.ticket.open)
-      return;
+    if (!this.ticket.open) return;
     this.room.modlog({ action: "TICKETABANDON", isGlobal: false, loggedBy: user.id });
     this.addText(`${user.name} is no longer interested in this ticket.`, user);
-    if (this.playerCount - 1 > 0)
-      return;
+    if (this.playerCount - 1 > 0) return;
     this.close(!!this.firstClaimTime, user);
     return true;
   }
@@ -307,8 +290,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
     const user = Users.get(this.ticket.creator);
     let details = "";
     if (user?.namelocked && !this.ticket.state?.namelocked) {
-      if (!this.ticket.state)
-        this.ticket.state = {};
+      if (!this.ticket.state) this.ticket.state = {};
       this.ticket.state.namelocked = user.namelocked;
     }
     if (this.ticket.state?.namelocked) {
@@ -323,28 +305,23 @@ class HelpTicket extends Rooms.SimpleRoomGame {
     return `<a class="button ${color}" href="/help-${this.ticket.userid}" ${this.getPreview()}>Help ${creator}${details}: ${this.ticket.type}</a> `;
   }
   getPreview() {
-    if (!this.ticket.active)
-      return `title="The ticket creator has not spoken yet."`;
+    if (!this.ticket.active) return `title="The ticket creator has not spoken yet."`;
     const hoverText = [];
     const noteBuf = Object.entries(this.ticket.notes || {}).map(([userid, note]) => import_lib.Utils.html`${note} (by ${userid})`).join("&#10;");
     const notes = this.ticket.notes ? `&#10;Staff notes:&#10;${noteBuf}` : "";
     for (let i = this.room.log.log.length - 1; i >= 0; i--) {
       const entry = this.room.log.log[i].split("\n")[0].split("|");
       entry.shift();
-      if (!/c:?/.test(entry[0]))
-        continue;
-      if (entry[0] === "c:")
-        entry.shift();
+      if (!/c:?/.test(entry[0])) continue;
+      if (entry[0] === "c:") entry.shift();
       entry.shift();
       const user = entry.shift();
       let message = entry.join("|");
       message = message.startsWith("/log ") ? message.slice(5) : `${user}: ${message}`;
       hoverText.push(import_lib.Utils.html`${message}`);
-      if (hoverText.length >= 3)
-        break;
+      if (hoverText.length >= 3) break;
     }
-    if (!hoverText.length)
-      return `title="The ticket creator has not spoken yet.${notes}"`;
+    if (!hoverText.length) return `title="The ticket creator has not spoken yet.${notes}"`;
     return `title="${hoverText.reverse().join(`&#10;`)}${notes}"`;
   }
   close(result, staff) {
@@ -358,8 +335,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
     for (const ticketGameUser of Object.values(this.playerTable)) {
       this.removePlayer(ticketGameUser);
       const user = Users.get(ticketGameUser.id);
-      if (user)
-        user.updateSearch();
+      if (user) user.updateSearch();
     }
     if (!this.involvedStaff.size) {
       if (staff?.isStaff && staff.id !== this.ticket.userid) {
@@ -372,8 +348,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
   }
   writeStats(result) {
     this.closeTime = Date.now();
-    if (this.lastUnclaimedStart)
-      this.unclaimedTime += this.closeTime - this.lastUnclaimedStart;
+    if (this.lastUnclaimedStart) this.unclaimedTime += this.closeTime - this.lastUnclaimedStart;
     if (!this.ticket.active) {
       this.resolution = "dead";
     } else if (!this.firstClaimTime || this.emptyRoom) {
@@ -432,8 +407,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
     this.room.game = null;
     this.room = null;
     this.setEnded();
-    for (const player of this.players)
-      player.destroy();
+    for (const player of this.players) player.destroy();
     this.players = null;
     this.playerTable = null;
   }
@@ -466,7 +440,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
       state: ticket.state || {},
       recommended: ticket.recommended
     };
-    const date = Chat.toTimestamp(new Date()).split(" ")[0];
+    const date = Chat.toTimestamp(/* @__PURE__ */ new Date()).split(" ")[0];
     void Monitor.logPath(`tickets/${date.slice(0, -3)}.jsonl`).append(JSON.stringify(entry) + "\n");
   }
   /**
@@ -511,12 +485,10 @@ class HelpTicket extends Rooms.SimpleRoomGame {
         }
       }
       for (const line of lines.stdout.split("\n")) {
-        if (line.trim())
-          results.push(JSON.parse(line));
+        if (line.trim()) results.push(JSON.parse(line));
       }
     } else {
-      if (!date)
-        throw new Chat.ErrorMessage(`Specify a month.`);
+      if (!date) throw new Chat.ErrorMessage(`Specify a month.`);
       const path = Monitor.logPath(`tickets/${date}.jsonl`);
       if (!path.existsSync()) {
         throw new Chat.ErrorMessage(`There are no logs for the month "${date}".`);
@@ -527,10 +499,8 @@ class HelpTicket extends Rooms.SimpleRoomGame {
           const data = JSON.parse(line);
           const searched = data[search[0]];
           let matched = !!searched;
-          if (search[1])
-            matched = searched === search[1];
-          if (matched)
-            results.push(data);
+          if (search[1]) matched = searched === search[1];
+          if (matched) results.push(data);
         }
       }
     }
@@ -562,16 +532,14 @@ class HelpTicket extends Rooms.SimpleRoomGame {
       buf += `<span class="username"><strong style="color: ${this.colorName(userid, info)}">`;
       buf += import_lib.Utils.html`${username}:</strong></span> ${message}</div>`;
     }
-    if (buf)
-      buf = `<div class="infobox"><strong><a href="${info.url}">${info.title}</a></strong><hr />${buf}</div>`;
+    if (buf) buf = `<div class="infobox"><strong><a href="${info.url}">${info.title}</a></strong><hr />${buf}</div>`;
     return buf;
   }
   static async visualizeBattleLogs(rooms, reported) {
     const logs = [];
     for (const room of rooms) {
       const log = await getBattleLog(room);
-      if (log)
-        logs.push(log);
+      if (log) logs.push(log);
     }
     const existingRooms = logs.filter(Boolean);
     if (existingRooms.length) {
@@ -582,11 +550,9 @@ class HelpTicket extends Rooms.SimpleRoomGame {
     }
   }
   static displayPunishmentList(reportUserid, proofString, ticket, title, inner) {
-    if (ticket.resolved)
-      return "";
+    if (ticket.resolved) return "";
     let buf = `<details class="readmore"><summary>${title || "Punish reported user:"}</summary><div class="infobox">`;
-    if (inner)
-      buf += inner;
+    if (inner) buf += inner;
     const punishments = ["Warn", "Lock", "Weeklock", "Namelock", "Weeknamelock"];
     for (const name of punishments) {
       buf += `<form data-submitsend="/msgroom staff,/${toID(name)} ${reportUserid},{reason} spoiler: ${proofString}">`;
@@ -609,8 +575,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
     const user = Users.get(ticket.userid);
     let namelockDisplay = "";
     if (user?.namelocked && !ticket.state?.namelocked) {
-      if (!ticket.state)
-        ticket.state = {};
+      if (!ticket.state) ticket.state = {};
       ticket.state.namelocked = user.namelocked;
     }
     if (ticket.state?.namelocked) {
@@ -624,8 +589,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
   static async ban(user, reason = "") {
     const userid = toID(user);
     const userObj = Users.get(user);
-    if (userObj)
-      user = userObj;
+    if (userObj) user = userObj;
     let duration = Date.now() + TICKET_BAN_DURATION;
     const punishments = Punishments.userids.get(userid) || [];
     for (const punishment of punishments) {
@@ -653,8 +617,7 @@ class HelpTicket extends Rooms.SimpleRoomGame {
   }
   static notifyResolved(user, ticket, userid = user.id) {
     const { result, time, by, seen, note } = ticket.resolved;
-    if (seen)
-      return;
+    if (seen) return;
     const timeString = Date.now() - time > 1e3 ? `, ${Chat.toDurationString(Date.now() - time)} ago.` : ".";
     user.send(`|pm|~Staff|${user.getIdentity()}|Hello! Your report was resolved by ${by}${timeString}`);
     if (result?.trim()) {
@@ -676,8 +639,7 @@ const unclaimedTicketTimer = { upperstaff: null, staff: null };
 const timerEnds = { upperstaff: 0, staff: 0 };
 function pokeUnclaimedTicketTimer(hasUnclaimed, hasAssistRequest) {
   const room = Rooms.get("staff");
-  if (!room)
-    return;
+  if (!room) return;
   if (hasUnclaimed && !unclaimedTicketTimer[room.roomid]) {
     unclaimedTicketTimer[room.roomid] = setTimeout(
       () => notifyUnclaimedTicket(hasAssistRequest),
@@ -696,16 +658,13 @@ function pokeUnclaimedTicketTimer(hasUnclaimed, hasAssistRequest) {
 }
 function notifyUnclaimedTicket(hasAssistRequest) {
   const room = Rooms.get("staff");
-  if (!room)
-    return;
+  if (!room) return;
   clearTimeout(unclaimedTicketTimer[room.roomid]);
   unclaimedTicketTimer[room.roomid] = null;
   timerEnds[room.roomid] = 0;
   for (const ticket of Object.values(tickets)) {
-    if (!ticket.open)
-      continue;
-    if (!ticket.active)
-      continue;
+    if (!ticket.open) continue;
+    if (!ticket.active) continue;
     const ticketRoom = Rooms.get(`help-${ticket.userid}`);
     if (ticket.needsDelayWarning && !ticket.claimed && delayWarnings[ticket.type]) {
       ticketRoom.add(
@@ -726,8 +685,7 @@ function notifyUnclaimedTicket(hasAssistRequest) {
 }
 function notifyStaff() {
   const room = Rooms.get("staff");
-  if (!room)
-    return;
+  if (!room) return;
   let buf = ``;
   const sortedTickets = HelpTicket.list();
   const listOnlyTypes = Object.keys(textTickets).filter((type) => textTickets[type].listOnly);
@@ -738,14 +696,11 @@ function notifyStaff() {
   let fourthTicketIndex = 0;
   let hasAssistRequest = false;
   for (const ticket of sortedTickets) {
-    if (!ticket.open || listOnlyTypes.includes(HelpTicket.getTypeId(ticket.type)))
-      continue;
-    if (!ticket.active)
-      continue;
+    if (!ticket.open || listOnlyTypes.includes(HelpTicket.getTypeId(ticket.type))) continue;
+    if (!ticket.active) continue;
     if (count >= 3) {
       hiddenTicketCount++;
-      if (!ticket.claimed)
-        hiddenTicketUnclaimedCount++;
+      if (!ticket.claimed) hiddenTicketUnclaimedCount++;
       if (hiddenTicketCount === 1) {
         fourthTicketIndex = buf.length;
       } else {
@@ -756,8 +711,7 @@ function notifyStaff() {
     const ticketGame = ticketRoom?.getGame(HelpTicket);
     if (!ticket.claimed) {
       hasUnclaimed = true;
-      if (ticket.type === "Public Room Assistance Request")
-        hasAssistRequest = true;
+      if (ticket.type === "Public Room Assistance Request") hasAssistRequest = true;
     }
     if (ticket.text) {
       buf += HelpTicket.getTextButton(ticket);
@@ -769,8 +723,7 @@ function notifyStaff() {
   }
   if (hiddenTicketCount > 1) {
     const notifying = hiddenTicketUnclaimedCount > 0 ? ` notifying` : ``;
-    if (hiddenTicketUnclaimedCount > 0)
-      hasUnclaimed = true;
+    if (hiddenTicketUnclaimedCount > 0) hasUnclaimed = true;
     buf = buf.slice(0, fourthTicketIndex) + `<button class="button${notifying}" name="send" value="/ht list">and ${hiddenTicketCount} more Help ticket${Chat.plural(hiddenTicketCount)} (${hiddenTicketUnclaimedCount} unclaimed)</button> `;
   }
   for (const type of listOnlyTypes) {
@@ -794,8 +747,7 @@ function notifyStaff() {
     buf = `${buf}|${hasAssistRequest ? "Public Room Staff need help" : "There are unclaimed Help tickets"}`;
   }
   for (const user of Object.values(room.users)) {
-    if (user.can("lock") && !user.settings.ignoreTickets)
-      user.sendTo(room, buf);
+    if (user.can("lock") && !user.settings.ignoreTickets) user.sendTo(room, buf);
     for (const connection of user.connections) {
       if (connection.openPages?.has("help-tickets")) {
         void Chat.resolvePage("view-help-tickets", user, connection);
@@ -817,8 +769,7 @@ function getBattleLinks(text) {
   const battles = text.match(BATTLES_REGEX);
   const replays = text.match(REPLAY_REGEX);
   if (battles) {
-    for (const battle of battles)
-      rooms.add(battle);
+    for (const battle of battles) rooms.add(battle);
   }
   if (replays) {
     for (const r of replays) {
@@ -828,8 +779,7 @@ function getBattleLinks(text) {
   return [...rooms];
 }
 function getReportedUser(ticket) {
-  if (!ticket.meta?.startsWith("user-"))
-    return null;
+  if (!ticket.meta?.startsWith("user-")) return null;
   const id = toID(ticket.meta.slice(5));
   return !id || id === ticket.userid ? null : id;
 }
@@ -838,19 +788,16 @@ async function listOpponentsFrom(ticket) {
   const links = getBattleLinks(ticket.text[0]).concat(getBattleLinks(ticket.text[1]));
   for (const link of links) {
     const opp = await getOpponent(link, ticket.userid);
-    if (opp && opp !== ticket.userid)
-      opps.add(opp);
+    if (opp && opp !== ticket.userid) opps.add(opp);
   }
   return import_lib.Utils.sortBy([...opps], ([, count]) => -count).map((opp) => toID(opp[0]));
 }
 async function getOpponent(link, submitter) {
   const room = Rooms.get(link);
   if (room?.battle) {
-    if (room.battle.playerCap > 2)
-      return null;
+    if (room.battle.playerCap > 2) return null;
     for (const k in room.battle.playerTable) {
-      if (k === submitter)
-        continue;
+      if (k === submitter) continue;
       return k;
     }
   }
@@ -872,8 +819,7 @@ async function getBattleLog(battle, noReplay = false) {
       players: battleRoom.battle.players.map((x) => x.id)
     };
   } else {
-    if (noReplay)
-      return null;
+    if (noReplay) return null;
     battle = battle.replace(`battle-`, "");
     if (Rooms.Replays.db) {
       if (battle.endsWith("pw")) {
@@ -905,12 +851,10 @@ async function getBattleLog(battle, noReplay = false) {
         let [slot, name] = playerWithNick.split(":");
         slot = slot.slice(0, -1);
         const id = players[slot];
-        if (!mons[id])
-          mons[id] = [];
+        if (!mons[id]) mons[id] = [];
         name = name?.trim() || "";
         const setId = `${name || ""}-${species}`;
-        if (seenPokemon.has(setId))
-          continue;
+        if (seenPokemon.has(setId)) continue;
         seenPokemon.add(setId);
         mons[id].push({
           species,
@@ -930,11 +874,9 @@ async function getBattleLog(battle, noReplay = false) {
   return null;
 }
 for (const room of Rooms.rooms.values()) {
-  if (!room.settings.isHelp || !room.game)
-    continue;
+  if (!room.settings.isHelp || !room.game) continue;
   const game = room.getGame(HelpTicket);
-  if (game.ticket && tickets[game.ticket.userid])
-    game.ticket = tickets[game.ticket.userid];
+  if (game.ticket && tickets[game.ticket.userid]) game.ticket = tickets[game.ticket.userid];
 }
 void convertRoomPunishments();
 const delayWarningPreamble = `Hi! All global staff members are busy right now and we apologize for the delay. `;
@@ -1084,8 +1026,7 @@ const textTickets = {
     },
     getReviewDisplay(ticket, staff, conn, state) {
       let buf = ``;
-      if (!ticket.open)
-        return buf;
+      if (!ticket.open) return buf;
       const cmds = [
         ["Forcerename", "/forcerename"],
         ["Namelock", "/namelock"],
@@ -1173,8 +1114,7 @@ const textTickets = {
       buf += `<strong>Battle links:</strong> ${rooms.map((url) => Chat.formatText(`<<${url}>>`)).join(", ")}<br />`;
       buf += `<br />`;
       const battleLogHTML = await HelpTicket.visualizeBattleLogs(rooms, opp);
-      if (battleLogHTML)
-        buf += battleLogHTML;
+      if (battleLogHTML) buf += battleLogHTML;
       return buf;
     }
   },
@@ -1209,16 +1149,14 @@ const textTickets = {
     title: "Please provide replays of the battle with inappropriate Pokemon nicknames",
     disclaimer: "If the nickname is offensive in a non-english language, or if it's not obvious, please be sure to explain.",
     checker(input) {
-      if (BATTLES_REGEX.test(input) || REPLAY_REGEX.test(input))
-        return true;
+      if (BATTLES_REGEX.test(input) || REPLAY_REGEX.test(input)) return true;
       return ["Please provide at least one valid battle or replay URL."];
     },
     async getReviewDisplay(ticket, staff, conn) {
       let buf = ``;
       const [text, context] = ticket.text;
       let links = getBattleLinks(text);
-      if (context)
-        links.push(...getBattleLinks(context));
+      if (context) links.push(...getBattleLinks(context));
       const proof = links.join(", ");
       const opp = getReportedUser(ticket) || (await listOpponentsFrom(ticket))[0];
       buf += HelpTicket.displayPunishmentList(
@@ -1245,8 +1183,7 @@ const textTickets = {
       for (const link of links) {
         const names = [];
         const roomData = await getBattleLog(link);
-        if (!roomData)
-          continue;
+        if (!roomData) continue;
         for (const id of Object.values(roomData.players)) {
           const user = Users.get(id)?.name || id;
           const team = roomData.pokemon[id];
@@ -1297,8 +1234,7 @@ const textTickets = {
         const ipPunishments = Punishments.ips.get(ip);
         if (ipPunishments) {
           const str = ipPunishments.map((p) => `${Punishments.punishmentTypes.get(p.type)?.desc || p.type} as <a href="https://${Config.routes.root}/users/${p.id}">${p.id}</a>` + (p.reason ? import_lib.Utils.html` (${p.reason})` : ""));
-          if (str)
-            buf += `Punishments: ${str.join(" | ")}<br />`;
+          if (str) buf += `Punishments: ${str.join(" | ")}<br />`;
         }
         buf += `Host: ${data.shortHost} [${data.hostType}]<br />`;
         buf += `<button class="button" name="send" value="/modlog room=global,ip=${ip}">Modlog</button><br />`;
@@ -1378,16 +1314,14 @@ const pages = {
       let ticket = tickets[user.id];
       const ipTicket = checkIp(user.latestIp);
       if (ticket?.open || ipTicket) {
-        if (!ticket && ipTicket)
-          ticket = ipTicket;
+        if (!ticket && ipTicket) ticket = ipTicket;
         const helpRoom = Rooms.get(`help-${ticket.userid}`);
         if (!helpRoom && !ticket.text) {
           tickets[ticket.userid].open = false;
           writeTickets();
         } else {
           if (helpRoom) {
-            if (!helpRoom.auth.has(user.id))
-              helpRoom.auth.set(user.id, "+");
+            if (!helpRoom.auth.has(user.id)) helpRoom.auth.set(user.id, "+");
             user.joinRoom(`help-${ticket.userid}`);
           }
           connection.popup(this.tr`You already have a Help ticket.`);
@@ -1397,17 +1331,14 @@ const pages = {
       const isStaff = user.can("lock");
       let meta = "";
       const targetTypeIndex = Math.max(query.indexOf("user"), query.indexOf("room"));
-      if (targetTypeIndex >= 0)
-        meta = "-" + query.splice(targetTypeIndex).join("-");
-      if (!query.length)
-        query = [""];
+      if (targetTypeIndex >= 0) meta = "-" + query.splice(targetTypeIndex).join("-");
+      if (!query.length) query = [""];
       for (const [i, page] of query.entries()) {
         const isLast = i === query.length - 1;
         const isFirst = i === 1;
         if (page && page in ticketPages && !page.startsWith("confirm")) {
           let prevPageLink = query.slice(0, i).join("-");
-          if (prevPageLink)
-            prevPageLink = `-${prevPageLink}`;
+          if (prevPageLink) prevPageLink = `-${prevPageLink}`;
           buf += `<p><a href="/view-help-request${prevPageLink}${!isFirst ? meta : ""}" target="replace"><button class="button">${this.tr`Back`}</button></a> <button class="button disabled" disabled>${this.tr(ticketPages[page])}</button></p>`;
         }
         switch (page) {
@@ -1418,16 +1349,14 @@ const pages = {
             } else {
               buf += `<p class="message-error">${this.tr`Abuse of Help requests can result in punishments.`}</p>`;
             }
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>report</Button></p>`;
             buf += `<p><Button>appeal</Button></p>`;
             buf += `<p><Button>misc</Button></p>`;
             break;
           case "report":
             buf += `<p><b>${this.tr`What do you want to report someone for?`}</b></p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>pmharassment</Button></p>`;
             buf += `<p><Button>battleharassment</Button></p>`;
             buf += `<p><Button>inapname</Button></p>`;
@@ -1440,8 +1369,7 @@ const pages = {
               buf += ` If it's a minor issue, consider using <code>/ignore [username]</code> instead.`;
             }
             buf += `</p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>confirmpmharassment</Button></p>`;
             break;
           case "battleharassment":
@@ -1451,21 +1379,18 @@ const pages = {
             }
             buf += `</p>`;
             buf += `<p>${this.tr`Please save a replay of the battle if it has ended, or provide a link to the battle if it is still ongoing.`}</p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>confirmbattleharassment</Button></p>`;
             break;
           case "inapname":
             buf += `<p>${this.tr`If a user has an inappropriate name, click the button below and a global staff member will take a look.`}</p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>confirminapname</Button></p>`;
             break;
           case "inappokemon":
             buf += `<p>${this.tr`If a user has inappropriate Pokemon nicknames, click the button below and a global staff member will take a look.`}</p>`;
             buf += `<p>${this.tr`Please save a replay of the battle if it has ended, or provide a link to the battle if it is still ongoing.`}</p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>confirminappokemon</Button></p>`;
             break;
           case "cheating":
@@ -1478,8 +1403,7 @@ const pages = {
             buf += `<p style="text-align: center"><button class="button" name="send" value="/j help"><strong>Join the Help Room</strong></button></p>`;
             break;
           case "appeal":
-            if (!isLast)
-              break;
+            if (!isLast) break;
             if (user.locked || isStaff) {
               const hostfiltered = user.locked === "#hostfilter" || user.latestHostType === "proxy" && user.locked !== user.id;
               if (!hostfiltered) {
@@ -1524,14 +1448,12 @@ const pages = {
           case "lock":
             buf += `<p>${this.tr`If you want to appeal your lock or namelock, click the button below and a global staff member will be with you shortly.`}</p>`;
             buf += `<p>You will have to explain in detail why your punishment is unjustified and why we would want to unlock you. Insufficient explanations such as "lol this is bs unlock me" will not be considered.</p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>confirmappeal</Button></p>`;
             break;
           case "ip":
             buf += `<p>${this.tr`If you are locked or namelocked under a name you don't recognize, click the button below to call a global staff member so we can check.`}</p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>confirmipappeal</Button></p>`;
             break;
           case "homeip":
@@ -1546,8 +1468,7 @@ const pages = {
             buf += `<p>If you are not the user who was punished, the lock should expire on its own within a few hours.</p>`;
             buf += `<p>If you are in a hurry to communicate with another user, you can click on the following button to open a ticket.</p>`;
             buf += `<p>A staff member will look at your case as soon as possible.</p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<button name="send" value="/ht submit IP-Appeal|||I am on a mobile IP.|">Submit ticket</button>`;
             break;
           case "public":
@@ -1595,8 +1516,7 @@ const pages = {
             break;
           case "semilock":
             buf += `<p>${this.tr`Do you have an autoconfirmed account? An account is autoconfirmed when it has won at least one rated battle and has been registered for one week or longer.`}</p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>hasautoconfirmed</Button> <Button>lacksautoconfirmed</Button></p>`;
             break;
           case "hasautoconfirmed":
@@ -1612,11 +1532,9 @@ const pages = {
             break;
           case "misc":
             buf += `<p><b>${this.tr`Maybe one of these options will be helpful?`}</b></p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>password</Button></p>`;
-            if (user.trusted || isStaff)
-              buf += `<p><Button>roomhelp</Button></p>`;
+            if (user.trusted || isStaff) buf += `<p><Button>roomhelp</Button></p>`;
             buf += `<p><Button>other</Button></p>`;
             break;
           case "password":
@@ -1628,8 +1546,7 @@ const pages = {
             break;
           case "other":
             buf += `<p>${this.tr`If your issue is not handled above, click the button below to talk to a global staff member. Please be ready to explain the situation.`}</p>`;
-            if (!isLast)
-              break;
+            if (!isLast) break;
             buf += `<p><Button>confirmother</Button></p>`;
             break;
           default:
@@ -1677,8 +1594,7 @@ const pages = {
       return buf;
     },
     async list(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
       this.checkCan("lock");
       const type = toID(query.shift());
       let buf = `<div class="pad">`;
@@ -1731,8 +1647,7 @@ const pages = {
       return buf;
     },
     tickets(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
       this.title = this.tr`Ticket List`;
       this.checkCan("lock");
       let buf = `<div class="pad ladder"><button class="button" name="send" value="/helpticket list" style="float:left"><i class="fa fa-refresh"></i> ${this.tr`Refresh`}</button> <button class="button" name="send" value="/helpticket stats" style="float: right"><i class="fa fa-th-list"></i> ${this.tr`Help Ticket Stats`}</button><br /><br />`;
@@ -1798,8 +1713,7 @@ const pages = {
       );
       for (const [userid, entry] of ticketBans) {
         let ids = [userid];
-        if (entry.userids)
-          ids = ids.concat(entry.userids);
+        if (entry.userids) ids = ids.concat(entry.userids);
         buf += `<tr><td>${ids.map(import_lib.Utils.escapeHTML).join(", ")}</td>`;
         buf += `<td>${entry.ips.join(", ")}</td>`;
         buf += `<td>${Chat.toDurationString(entry.expireTime - Date.now(), { precision: 1 })}</td>`;
@@ -1809,8 +1723,7 @@ const pages = {
       return buf;
     },
     async text(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
       this.title = this.tr`Queued Tickets`;
       this.checkCan("lock");
       const userid = query.shift();
@@ -1831,8 +1744,7 @@ const pages = {
       buf += `<h2>Issue: ${ticket.type}</h2>`;
       if (!ticket.claimed && ticket.open) {
         ticket.claimed = user.id;
-        if (!ticket.state)
-          ticket.state = {};
+        if (!ticket.state) ticket.state = {};
         ticket.state.claimTime = Date.now();
         writeTickets();
         notifyStaff();
@@ -1878,8 +1790,7 @@ const pages = {
           const responseKeys = Object.keys(responses);
           for (const [i, name] of responseKeys.entries()) {
             buf += `<button class="button" name="send" value="/helpticket resolve ${ticket.userid},${responses[name]}">${name}</button>`;
-            if (responseKeys[i + 1])
-              buf += `<br />`;
+            if (responseKeys[i + 1]) buf += `<br />`;
           }
           buf += `</details></div><br />`;
         }
@@ -1901,8 +1812,7 @@ const pages = {
       this.checkCan("lock");
       const args = query.join("-").split("--");
       const userid = toID(args.shift());
-      if (!userid)
-        throw new Chat.ErrorMessage(`Specify a userid to view ticket logs for.`);
+      if (!userid) throw new Chat.ErrorMessage(`Specify a userid to view ticket logs for.`);
       const date = args.shift();
       if (date) {
         const parsed = new Date(date);
@@ -1964,25 +1874,22 @@ const pages = {
       return buf;
     },
     stats(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
       this.title = this.tr`Ticket Stats`;
       this.checkCan("lock");
       let [table, yearString, monthString, col] = query;
-      if (!["staff", "tickets"].includes(table))
-        table = "tickets";
+      if (!["staff", "tickets"].includes(table)) table = "tickets";
       const year = parseInt(yearString);
       const month = parseInt(monthString) - 1;
       let date = null;
       if (isNaN(year) || isNaN(month) || month < 0 || month > 11 || year < 2010) {
-        date = new Date();
+        date = /* @__PURE__ */ new Date();
       } else {
         date = new Date(year, month);
       }
       const dateUrl = Chat.toTimestamp(date).split(" ")[0].split("-", 2).join("-");
       const rawTicketStats = Monitor.logPath(`tickets/${dateUrl}.tsv`).readIfExistsSync();
-      if (!rawTicketStats)
-        return `<div class="pad"><br />${this.tr`No ticket stats found.`}</div>`;
+      if (!rawTicketStats) return `<div class="pad"><br />${this.tr`No ticket stats found.`}</div>`;
       const prevDate = new Date(
         date.getMonth() === 0 ? date.getFullYear() - 1 : date.getFullYear(),
         date.getMonth() === 0 ? 11 : date.getMonth() - 1
@@ -2008,12 +1915,10 @@ const pages = {
       let buf = `<div class="pad ladder"><div style="text-align: center">${buttonBar}</div><br />`;
       buf += `<table style="margin-left: auto; margin-right: auto"><tbody><tr><th colspan="${table === "tickets" ? 7 : 3}"><h2 style="margin: 5px auto">${this.tr`Help Ticket Stats`} - ${date.toLocaleString("en-us", { month: "long", year: "numeric" })}</h1></th></tr>`;
       if (table === "tickets") {
-        if (!["type", "totaltickets", "total", "initwait", "wait", "resolution", "result"].includes(col))
-          col = "type";
+        if (!["type", "totaltickets", "total", "initwait", "wait", "resolution", "result"].includes(col)) col = "type";
         buf += `<tr><th><Button>type</Button></th><th><Button>totaltickets</Button></th><th><Button>total</Button></th><th><Button>initwait</Button></th><th><Button>wait</Button></th><th><Button>resolution</Button></th><th><Button>result</Button></th></tr>`;
       } else {
-        if (!["staff", "num", "time"].includes(col))
-          col = "num";
+        if (!["staff", "num", "time"].includes(col)) col = "num";
         buf += `<tr><th><Button>staff</Button></th><th><Button>num</Button></th><th><Button>time</Button></th></tr>`;
       }
       const ticketStats = rawTicketStats.split("\n").filter(
@@ -2052,8 +1957,7 @@ const pages = {
           type.total += parseInt(stats.total);
           type.initwait += parseInt(stats.initwait);
           type.wait += parseInt(stats.wait);
-          if (["approved", "valid", "assisted"].includes(stats.result.toString()))
-            type.result++;
+          if (["approved", "valid", "assisted"].includes(stats.result.toString())) type.result++;
           if (["dead", "unresolved", "resolved"].includes(stats.resolution.toString())) {
             type[stats.resolution.toString()]++;
           }
@@ -2084,10 +1988,8 @@ const pages = {
         for (const stats of ticketStats) {
           const staffArray = typeof stats.staff === "string" ? stats.staff.split(",") : [];
           for (const staff of staffArray) {
-            if (!staff)
-              continue;
-            if (!staffStats[staff])
-              staffStats[staff] = { num: 0, time: 0 };
+            if (!staff) continue;
+            if (!staffStats[staff]) staffStats[staff] = { num: 0, time: 0 };
             staffStats[staff].num++;
             staffStats[staff].time += parseInt(stats.total) - parseInt(stats.initwait);
           }
@@ -2119,8 +2021,7 @@ const pages = {
         time: "Average Time Per Ticket"
       };
       buf = buf.replace(/<Button>([a-z]+)<\/Button>/g, (match, id) => {
-        if (col === id)
-          return this.tr(headerTitles[id]);
+        if (col === id) return this.tr(headerTitles[id]);
         return `<a class="button" href="/view-help-stats-${table}-${dateUrl}-${id}" target="replace">${this.tr(headerTitles[id])}</a>`;
       });
       return buf;
@@ -2129,8 +2030,7 @@ const pages = {
 };
 const commands = {
   report(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     const meta = this.pmTarget ? `-user-${this.pmTarget.id}` : this.room ? `-room-${this.room.roomid}` : "";
     if (this.broadcasting) {
       return this.sendReplyBox(`<button name="joinRoom" value="view-help-request--report${meta}" class="button"><strong>${this.tr`Report someone`}</strong></button>`);
@@ -2138,8 +2038,7 @@ const commands = {
     return this.parse(`/join view-help-request--report${meta}`);
   },
   appeal(target, room, user) {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     const meta = this.pmTarget ? `-user-${this.pmTarget.id}` : this.room ? `-room-${this.room.roomid}` : "";
     if (this.broadcasting) {
       return this.sendReplyBox(`<button name="joinRoom" value="view-help-request--appeal${meta}" class="button"><strong>${this.tr`Appeal a punishment`}</strong></button>`);
@@ -2152,8 +2051,7 @@ const commands = {
   helpticket: {
     "": "create",
     create(target, room, user) {
-      if (!this.runBroadcast())
-        return;
+      if (!this.runBroadcast()) return;
       const meta = this.pmTarget ? `-user-${this.pmTarget.id}` : this.room ? `-room-${this.room.roomid}` : "";
       if (this.broadcasting) {
         return this.sendReplyBox(`<button name="joinRoom" value="view-help-request${meta}" class="button"><strong>${this.tr`Request help`}</strong></button>`);
@@ -2161,8 +2059,7 @@ const commands = {
       if (user.can("lock")) {
         return this.parse("/join view-help-request");
       }
-      if (!user.named)
-        throw new Chat.ErrorMessage(this.tr`You need to choose a username before doing this.`);
+      if (!user.named) throw new Chat.ErrorMessage(this.tr`You need to choose a username before doing this.`);
       return this.parse(`/join view-help-request${meta}`);
     },
     createhelp: [`/helpticket create - Creates a new ticket requesting help from global staff.`],
@@ -2171,8 +2068,7 @@ const commands = {
       if (user.can("lock") && !user.can("bypassall")) {
         return this.popupReply(this.tr`Global staff can't make tickets. They can only use the form for reference.`);
       }
-      if (!user.named)
-        return this.popupReply(this.tr`You need to choose a username before doing this.`);
+      if (!user.named) return this.popupReply(this.tr`You need to choose a username before doing this.`);
       const ticketBan = Punishments.isTicketBanned(user);
       if (ticketBan) {
         return this.popupReply(HelpTicket.getBanMessage(user.id, ticketBan));
@@ -2180,8 +2076,7 @@ const commands = {
       let ticket = tickets[user.id];
       const ipTicket = checkIp(user.latestIp);
       if (ticket?.open || ipTicket) {
-        if (!ticket && ipTicket)
-          ticket = ipTicket;
+        if (!ticket && ipTicket) ticket = ipTicket;
         if (ticket.text) {
           return this.popupReply(`You already have a pending ticket, please wait.`);
         }
@@ -2206,8 +2101,7 @@ const commands = {
         contextString
       ] = import_lib.Utils.splitFirst(target, "|", 4).map((s) => s.trim());
       reportTarget = import_lib.Utils.escapeHTML(reportTarget);
-      if (!Object.values(ticketTitles).includes(ticketType))
-        return this.parse("/helpticket");
+      if (!Object.values(ticketTitles).includes(ticketType)) return this.parse("/helpticket");
       const contexts = {
         "PM Harassment": `Hi! Who was harassing you in private messages?`,
         "Battle Harassment": `Hi! Who was harassing you, and in which battle did it happen? Please post a link to the battle or a replay of the battle.`,
@@ -2300,8 +2194,7 @@ const commands = {
       if (reportTargetType === "user" && reportTarget) {
         switch (ticket.type) {
           case "PM Harassment":
-            if (!Config.pmLogButton)
-              break;
+            if (!Config.pmLogButton) break;
             pmRequestButton = Config.pmLogButton(user.id, toID(reportTarget));
             contexts["PM Harassment"] = this.tr`Hi! Please click the button below to give global staff permission to check PMs.` + this.tr` Or if ${reportTarget} is not the user you want to report, please tell us the name of the user who you want to report.`;
             break;
@@ -2364,8 +2257,7 @@ const commands = {
         helpRoom.pokeExpireTimer();
         helpRoom.settings.introMessage = introMsg;
         helpRoom.settings.staffMessage = staffMessage + staffHint + reportTargetInfo;
-        if (helpRoom.game)
-          helpRoom.game.destroy();
+        if (helpRoom.game) helpRoom.game.destroy();
         helpRoom.game = new HelpTicket(helpRoom, ticket);
       }
       const ticketGame = helpRoom.getGame(HelpTicket);
@@ -2410,8 +2302,7 @@ const commands = {
         return this.parse(`/help helpticket`);
       }
       const ticket = tickets[ticketId];
-      if (!ticket)
-        return this.popupReply(`That ticket was not found.`);
+      if (!ticket) return this.popupReply(`That ticket was not found.`);
       if (ticket.resolved) {
         return this.popupReply(`That ticket has already been resolved.`);
       }
@@ -2473,26 +2364,19 @@ const commands = {
     addnote(target, room, user) {
       this.checkCan("lock");
       target = target.trim();
-      if (!target)
-        return this.parse(`/help helpticket addnote`);
+      if (!target) return this.parse(`/help helpticket addnote`);
       const [ticketName, note] = import_lib.Utils.splitFirst(target, ",").map((i) => i.trim());
       const ticketId = toID(ticketName);
-      if (!ticketId)
-        throw new Chat.ErrorMessage(`Specify the userid that created the ticket you want to mark.`);
+      if (!ticketId) throw new Chat.ErrorMessage(`Specify the userid that created the ticket you want to mark.`);
       const ticket = tickets[ticketId];
-      if (!ticket)
-        throw new Chat.ErrorMessage(`${ticketId} does not have an active ticket.`);
-      if (ticket.resolved)
-        throw new Chat.ErrorMessage(`${ticketId}'s ticket has already been resolved.`);
-      if (!note)
-        throw new Chat.ErrorMessage(`You must specify a note to add.`);
-      if (!ticket.notes)
-        ticket.notes = {};
+      if (!ticket) throw new Chat.ErrorMessage(`${ticketId} does not have an active ticket.`);
+      if (ticket.resolved) throw new Chat.ErrorMessage(`${ticketId}'s ticket has already been resolved.`);
+      if (!note) throw new Chat.ErrorMessage(`You must specify a note to add.`);
+      if (!ticket.notes) ticket.notes = {};
       ticket.notes[user.id] = note;
       writeTickets();
       notifyStaff();
-      if (!room || room.roomid !== "staff")
-        this.sendReply(`Added the note "${note}" to ${ticketId}'s ticket.`);
+      if (!room || room.roomid !== "staff") this.sendReply(`Added the note "${note}" to ${ticketId}'s ticket.`);
       this.room = Rooms.get("staff") || null;
       this.addGlobalModAction(`${user.name} added the note "${note}" to ${ticket.userid}'s helpticket.`);
       this.globalModlog(`HELPTICKET NOTE`, ticket.userid, note);
@@ -2503,19 +2387,16 @@ const commands = {
     removenote(target, room, user) {
       this.checkCan("lock");
       target = target.trim();
-      if (!target)
-        return this.parse(`/help helpticket removenote`);
+      if (!target) return this.parse(`/help helpticket removenote`);
       let [ticketName, staff] = import_lib.Utils.splitFirst(target, ",").map((i) => i.trim());
       const targetId = toID(ticketName);
       if (!targetId) {
         throw new Chat.ErrorMessage(`Specify the userid that created the ticket you want to remove a note from.`);
       }
       const ticket = tickets[targetId];
-      if (!ticket || ticket.resolved)
-        throw new Chat.ErrorMessage(`${targetId} does not have a pending ticket.`);
+      if (!ticket || ticket.resolved) throw new Chat.ErrorMessage(`${targetId} does not have a pending ticket.`);
       staff = toID(staff) || user.id;
-      if (!ticket.notes)
-        throw new Chat.ErrorMessage(`${targetId}'s ticket does not have any notes.`);
+      if (!ticket.notes) throw new Chat.ErrorMessage(`${targetId}'s ticket does not have any notes.`);
       const note = ticket.notes[staff];
       if (!note) {
         throw new Chat.ErrorMessage(`${staff === user.id ? "you do" : `'${staff}' does`} not have a note on that ticket.`);
@@ -2524,8 +2405,7 @@ const commands = {
         this.sendReply(`You removed the note '${note}' (by ${staff}) on ${ticket.userid}'s ticket.`);
       }
       delete ticket.notes[staff];
-      if (!Object.keys(ticket.notes).length)
-        delete ticket.notes;
+      if (!Object.keys(ticket.notes).length) delete ticket.notes;
       writeTickets();
       notifyStaff();
       this.room = Rooms.get("staff") || null;
@@ -2575,8 +2455,7 @@ const commands = {
     removeresponse(target, room, user) {
       this.checkCan("lock");
       const [type, name] = import_lib.Utils.splitFirst(target, ",").map((f) => f.trim());
-      if (!toID(type) || !toID(name))
-        return this.parse(`/help helpticket removeresponse`);
+      if (!toID(type) || !toID(name)) return this.parse(`/help helpticket removeresponse`);
       const typeId = HelpTicket.getTypeId(type);
       if (!(type in textTickets)) {
         throw new Chat.ErrorMessage(`'${type}' is not a valid text ticket type.`);
@@ -2653,8 +2532,7 @@ const commands = {
     tb: "ban",
     ticketban: "ban",
     async ban(target, room, user) {
-      if (!target)
-        return this.parse("/help helpticket ban");
+      if (!target) return this.parse("/help helpticket ban");
       const { targetUser, targetUsername, rest: reason } = this.splitUser(target, { exactName: true });
       this.checkCan("lock", targetUser);
       const punishment = Punishments.roomUserids.nestedGet("staff", toID(targetUsername));
@@ -2709,8 +2587,7 @@ Your ban will expire in a few days.`);
       for (const userObj of affected) {
         const userObjID = typeof userObj !== "string" ? userObj.getLastId() : toID(userObj);
         const targetTicket = tickets[userObjID];
-        if (targetTicket?.open)
-          targetTicket.open = false;
+        if (targetTicket?.open) targetTicket.open = false;
         const helpRoom = Rooms.get(`help-${userObjID}`);
         if (helpRoom) {
           const ticketGame = helpRoom.getGame(HelpTicket);
@@ -2736,8 +2613,7 @@ Your ban will expire in a few days.`);
                   conn.send(`>view-help-text-${userObj}
 |deinit|`);
                   conn.openPages.delete(`help-text-${userObjID}`);
-                  if (!conn.openPages.size)
-                    conn.openPages = null;
+                  if (!conn.openPages.size) conn.openPages = null;
                 }
               }
             }
@@ -2751,8 +2627,7 @@ Your ban will expire in a few days.`);
     banhelp: [`/helpticket ban [user], (reason) - Bans a user from creating tickets for 2 days. Requires: % @ ~`],
     unticketban: "unban",
     unban(target, room, user) {
-      if (!target)
-        return this.parse("/help helpticket unban");
+      if (!target) return this.parse("/help helpticket unban");
       this.checkCan("lock");
       target = toID(target);
       const targetID = Users.get(target)?.id || target;
@@ -2788,11 +2663,9 @@ Your ban will expire in a few days.`);
     unignorehelp: [`/helpticket unignore - Stop ignoring notifications for help tickets. Requires: % @ ~`],
     delete(target, room, user) {
       this.checkCan("makeroom");
-      if (!target)
-        return this.parse(`/help helpticket delete`);
+      if (!target) return this.parse(`/help helpticket delete`);
       const ticket = tickets[toID(target)];
-      if (!ticket)
-        throw new Chat.ErrorMessage(this.tr`${target} does not have a ticket.`);
+      if (!ticket) throw new Chat.ErrorMessage(this.tr`${target} does not have a ticket.`);
       const targetRoom = Rooms.get(`help-${ticket.userid}`);
       if (targetRoom) {
         targetRoom.getGame(HelpTicket).deleteTicket(user);
@@ -2808,8 +2681,7 @@ Your ban will expire in a few days.`);
       this.checkCan("lock");
       const [targetString, dateString] = import_lib.Utils.splitFirst(target, ",").map((i) => i.trim());
       const id = toID(targetString);
-      if (!id)
-        throw new Chat.ErrorMessage(`Specify a userid.`);
+      if (!id) throw new Chat.ErrorMessage(`Specify a userid.`);
       return this.parse(`/j view-help-logs-${id}${dateString ? `--${dateString}` : ""}`);
     },
     logshelp: [
@@ -2819,12 +2691,10 @@ Your ban will expire in a few days.`);
     ],
     async private(target, room, user) {
       this.checkCan("bypassall");
-      if (!target)
-        return this.parse(`/help helpticket`);
+      if (!target) return this.parse(`/help helpticket`);
       const [username, date] = target.split(",");
       const userid = toID(username);
-      if (!userid)
-        return this.parse(`/help helpticket`);
+      if (!userid) return this.parse(`/help helpticket`);
       if (!/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(date)) {
         throw new Chat.ErrorMessage(`Invalid date (must be YYYY-MM-DD format).`);
       }
@@ -2845,12 +2715,10 @@ Your ban will expire in a few days.`);
     ],
     async public(target, room, user) {
       this.checkCan("bypassall");
-      if (!target)
-        return this.parse(`/help helpticket`);
+      if (!target) return this.parse(`/help helpticket`);
       const [username, date] = target.split(",");
       const userid = toID(username);
-      if (!userid)
-        return this.parse(`/help helpticket`);
+      if (!userid) return this.parse(`/help helpticket`);
       if (!/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(date)) {
         throw new Chat.ErrorMessage(`Invalid date (must be YYYY-MM-DD format).`);
       }
@@ -2892,8 +2760,7 @@ Your ban will expire in a few days.`);
   ]
 };
 const punishmentfilter = (user, punishment) => {
-  if (punishment.type !== "BAN")
-    return;
+  if (punishment.type !== "BAN") return;
   const userId = toID(user);
   if (typeof user === "object") {
     const ids = [userId, ...user.previousIDs];
@@ -2902,8 +2769,7 @@ const punishmentfilter = (user, punishment) => {
     }
   } else {
     const helpRoom = Rooms.get(`help-${userId}`);
-    if (helpRoom?.game?.gameid !== "helpticket")
-      return;
+    if (helpRoom?.game?.gameid !== "helpticket") return;
     const ticket = helpRoom.game;
     ticket.close("ticketban");
   }
@@ -2916,16 +2782,14 @@ const loginfilter = (user) => {
 };
 const handlers = {
   onRoomClose(room, user, conn, isPage) {
-    if (!isPage || !room.includes("view-help-text"))
-      return;
+    if (!isPage || !room.includes("view-help-text")) return;
     const userid = room.slice("view-help-text".length + 1);
     const ticket = tickets[userid];
     if (ticket?.open && ticket.claimed === user.id) {
       ticket.claimed = null;
       if (ticket.state?.claimTime) {
         delete ticket.state.claimTime;
-        if (!Object.keys(ticket.state).length)
-          delete ticket.state;
+        if (!Object.keys(ticket.state).length) delete ticket.state;
       }
       writeTickets();
       notifyStaff();

@@ -1138,8 +1138,7 @@ const Formats = [
     onBeforeSwitchIn(pokemon) {
       if (pokemon.m.innates) {
         for (const innate of pokemon.m.innates) {
-          if (pokemon.hasAbility(innate))
-            continue;
+          if (pokemon.hasAbility(innate)) continue;
           const effect = "ability:" + this.toID(innate);
           pokemon.volatiles[effect] = this.initEffectState({ id: effect, target: pokemon });
         }
@@ -1609,11 +1608,9 @@ const Formats = [
       const itemTable = /* @__PURE__ */ new Set();
       for (const set of team) {
         const item = this.dex.items.get(set.item);
-        if (!(item.forcedForme && !item.zMove) && !item.megaStone && !item.isPrimalOrb && !item.name.startsWith("Rusted"))
-          continue;
+        if (!(item.forcedForme && !item.zMove) && !item.megaStone && !item.isPrimalOrb && !item.name.startsWith("Rusted")) continue;
         const natdex = this.ruleTable.has("natdexmod");
-        if (natdex && item.id !== "ultranecroziumz")
-          continue;
+        if (natdex && item.id !== "ultranecroziumz") continue;
         const species = this.dex.species.get(set.species);
         if (species.isNonstandard && !this.ruleTable.has(`+pokemontag:${this.toID(species.isNonstandard)}`)) {
           return [`${species.baseSpecies} does not exist in gen 9.`];
@@ -1762,8 +1759,7 @@ const Formats = [
     getSharedPower(pokemon) {
       const sharedPower = /* @__PURE__ */ new Set();
       for (const ally of pokemon.side.pokemon) {
-        if (pokemon.battle.ruleTable.isRestricted(`ability:${ally.baseAbility}`))
-          continue;
+        if (pokemon.battle.ruleTable.isRestricted(`ability:${ally.baseAbility}`)) continue;
         if (ally.previouslySwitchedIn > 0) {
           if (pokemon.battle.dex.currentMod !== "sharedpower" && ["trace", "mirrorarmor"].includes(ally.baseAbility)) {
             sharedPower.add("noability");
@@ -1777,15 +1773,12 @@ const Formats = [
     },
     onBeforeSwitchIn(pokemon) {
       let format = this.format;
-      if (!format.getSharedPower)
-        format = this.dex.formats.get("gen9sharedpower");
+      if (!format.getSharedPower) format = this.dex.formats.get("gen9sharedpower");
       for (const ability of format.getSharedPower(pokemon)) {
         const effect = "ability:" + this.toID(ability);
         pokemon.volatiles[effect] = this.initEffectState({ id: effect, target: pokemon });
-        if (!pokemon.m.abils)
-          pokemon.m.abils = [];
-        if (!pokemon.m.abils.includes(effect))
-          pokemon.m.abils.push(effect);
+        if (!pokemon.m.abils) pokemon.m.abils = [];
+        if (!pokemon.m.abils.includes(effect)) pokemon.m.abils.push(effect);
       }
     }
   },
@@ -1984,8 +1977,7 @@ const Formats = [
     side: {
       allies(all) {
         let allies = this.active.filter((ally) => ally);
-        if (!all)
-          allies = allies.filter((ally) => ally.hp && !ally.volatiles["commanding"]);
+        if (!all) allies = allies.filter((ally) => ally.hp && !ally.volatiles["commanding"]);
         return allies;
       }
     }
@@ -2257,14 +2249,10 @@ const Formats = [
       let requiredItems = [];
       let requiredMove = "";
       let requiredAbility = "";
-      if (species.requiredItems)
-        requiredItems = species.requiredItems;
-      if (species.requiredMove)
-        requiredMove = species.requiredMove;
-      if (species.requiredAbility)
-        requiredAbility = species.requiredAbility;
-      if (species.battleOnly)
-        species = dex.species.get(species.battleOnly);
+      if (species.requiredItems) requiredItems = species.requiredItems;
+      if (species.requiredMove) requiredMove = species.requiredMove;
+      if (species.requiredAbility) requiredAbility = species.requiredAbility;
+      if (species.battleOnly) species = dex.species.get(species.battleOnly);
       const effectFunctions = [dex.abilities, dex.items, dex.moves];
       if (!effectFunctions.some((f) => f.get(set.ability).exists) && !(set.item && effectFunctions.some((f) => f.get(set.item).exists)) && !set.moves.every((move) => effectFunctions.some((f) => f.get(move).exists))) {
         return this.validateSet(set, teamHas);
@@ -2283,23 +2271,19 @@ const Formats = [
       }
       const moves = allThings.map((e) => this.dex.moves.get(e)).filter((thing) => thing.id !== "metronome" && thing.exists);
       for (const m of moves) {
-        if (this.ruleTable.isBanned(`move:${m.id}`))
-          return [`${set.species}'s move ${m.name} is banned.`];
+        if (this.ruleTable.isBanned(`move:${m.id}`)) return [`${set.species}'s move ${m.name} is banned.`];
       }
       const abilities = allThings.map((e) => this.dex.abilities.get(e)).filter((thing) => thing.exists);
       for (const a of abilities) {
-        if (this.ruleTable.isBanned(`ability:${a.id}`))
-          return [`${set.species}'s ability ${a.name} is banned.`];
+        if (this.ruleTable.isBanned(`ability:${a.id}`)) return [`${set.species}'s ability ${a.name} is banned.`];
       }
       const items = allThings.map((e) => this.dex.items.get(e)).filter((thing) => thing.exists);
       for (const i of items) {
-        if (this.ruleTable.isBanned(`item:${i.id}`))
-          return [`${set.species}'s item ${i.name} is banned.`];
+        if (this.ruleTable.isBanned(`item:${i.id}`)) return [`${set.species}'s item ${i.name} is banned.`];
       }
       const setHas = {};
       for (const thing of [...moves, ...items, ...abilities]) {
-        if (setHas[thing.id])
-          return [`${set.species} has multiple copies of ${thing.name}.`];
+        if (setHas[thing.id]) return [`${set.species} has multiple copies of ${thing.name}.`];
         setHas[thing.id] = true;
       }
       const normalAbility = set.ability;
@@ -2309,8 +2293,7 @@ const Formats = [
         set.ability = abilities[0].id;
       }
       if (abilities.some((abil) => !Object.values(species.abilities).map(this.toID).includes(abil.id)) && this.ruleTable.has("obtainableabilities")) {
-        if (set.ability !== "noability")
-          return [`${set.species} has illegal abilities.`];
+        if (set.ability !== "noability") return [`${set.species} has illegal abilities.`];
       }
       if (requiredAbility && !abilities.map((a) => a.id).includes(this.toID(requiredAbility))) {
         return [`${set.species} requires ${requiredAbility} on its set.`];
@@ -2347,10 +2330,8 @@ const Formats = [
           set.moves.push(requiredMove);
         }
         let problems = this.validateSet(set, teamHas);
-        if (problems)
-          problems = problems.filter((p) => !p.endsWith("needs to have an ability."));
-        if (problems?.length)
-          return problems;
+        if (problems) problems = problems.filter((p) => !p.endsWith("needs to have an ability."));
+        if (problems?.length) return problems;
       }
       set.ability = normalAbility;
       set.item = normalItem;
@@ -2369,15 +2350,13 @@ const Formats = [
         ngas = false;
       }
       for (const ability of pokemon.m.scrambled.abilities) {
-        if (this.field.getPseudoWeather("magicroom") && ability.inSlot === "Item")
-          continue;
+        if (this.field.getPseudoWeather("magicroom") && ability.inSlot === "Item") continue;
         const effect = "ability:" + this.toID(ability.thing);
         pokemon.volatiles[effect] = this.initEffectState({ id: effect, target: pokemon });
         pokemon.volatiles[effect].inSlot = ability.inSlot;
       }
       for (const item of pokemon.m.scrambled.items) {
-        if (ngas && item.inSlot === "Ability")
-          continue;
+        if (ngas && item.inSlot === "Ability") continue;
         const effect = "item:" + this.toID(item.thing);
         pokemon.volatiles[effect] = this.initEffectState({ id: effect, target: pokemon });
         pokemon.volatiles[effect].inSlot = item.inSlot;
@@ -2386,16 +2365,14 @@ const Formats = [
         if (pokemon.m.scrambled.moves.findIndex((e) => e.inSlot === "Ability") >= 0) {
           const isMove = pokemon.m.scrambled.moves.findIndex((e) => e.inSlot === "Ability");
           const indexOfMove = pokemon.moveSlots.findIndex((m) => this.toID(pokemon.m.scrambled.moves[isMove].thing) === m.id);
-          if (indexOfMove >= 0)
-            pokemon.moveSlots.splice(indexOfMove, 1);
+          if (indexOfMove >= 0) pokemon.moveSlots.splice(indexOfMove, 1);
         }
       }
       if (this.field.getPseudoWeather("magicroom")) {
         if (pokemon.m.scrambled.moves.findIndex((e) => e.inSlot === "Item") >= 0) {
           const isMove = pokemon.m.scrambled.moves.findIndex((e) => e.inSlot === "Item");
           const indexOfMove = pokemon.moveSlots.findIndex((m) => this.toID(pokemon.m.scrambled.moves[isMove].thing) === m.id);
-          if (indexOfMove >= 0)
-            pokemon.moveSlots.splice(indexOfMove, 1);
+          if (indexOfMove >= 0) pokemon.moveSlots.splice(indexOfMove, 1);
         }
       }
     },
@@ -2417,8 +2394,7 @@ const Formats = [
           pokemon.m.scrambled.moves.push({ thing: this.dex.moves.get(pokemon.set.item).name, inSlot: "Item" });
         }
         for (const move of pokemon.set.moves) {
-          if (this.dex.moves.get(move).id === "metronome")
-            continue;
+          if (this.dex.moves.get(move).id === "metronome") continue;
           if (this.dex.abilities.get(move).exists) {
             pokemon.m.scrambled.abilities.push({ thing: this.dex.abilities.get(move).name, inSlot: "Move" });
           } else if (this.dex.items.get(move).exists) {
@@ -2437,8 +2413,7 @@ const Formats = [
             }
             continue;
           }
-          if (!this.dex.moves.get(moveSlot.id).exists)
-            continue;
+          if (!this.dex.moves.get(moveSlot.id).exists) continue;
           newMoveSlots.push(moveSlot);
         }
         pokemon.baseMoveSlots = newMoveSlots;
@@ -2734,8 +2709,7 @@ const Formats = [
             `(You have more than one Pok\xE9mon named after a form of '${species.name}')`
           ];
         }
-        if (species.exists && species.name !== set.species)
-          nums.add(species.num);
+        if (species.exists && species.name !== set.species) nums.add(species.num);
       }
       if (!nums.size) {
         return [
@@ -2749,31 +2723,24 @@ const Formats = [
         return this.checkCanLearn(move, species, lsetData, set);
       }
       const problem = this.checkCanLearn(move, set.sp);
-      if (!problem)
-        return null;
-      if (this.checkCanLearn(move, set.crossSpecies))
-        return problem;
+      if (!problem) return null;
+      if (this.checkCanLearn(move, set.crossSpecies)) return problem;
       return null;
     },
     validateSet(set, teamHas) {
       const crossSpecies = this.dex.species.get(set.name);
       let problems = this.dex.formats.get("Obtainable Misc").onChangeSet?.call(this, set, this.format) || null;
-      if (Array.isArray(problems) && problems.length)
-        return problems;
+      if (Array.isArray(problems) && problems.length) return problems;
       const crossNonstandard = !this.ruleTable.has("natdexmod") && crossSpecies.isNonstandard === "Past" || crossSpecies.isNonstandard === "Future";
       const crossIsCap = !this.ruleTable.has("+pokemontag:cap") && crossSpecies.isNonstandard === "CAP";
-      if (!crossSpecies.exists || crossNonstandard || crossIsCap)
-        return this.validateSet(set, teamHas);
+      if (!crossSpecies.exists || crossNonstandard || crossIsCap) return this.validateSet(set, teamHas);
       const species = this.dex.species.get(set.species);
       const check = this.checkSpecies(set, species, species, {});
-      if (check)
-        return [check];
+      if (check) return [check];
       const nonstandard = !this.ruleTable.has("natdexmod") && species.isNonstandard === "Past";
       const isCap = !this.ruleTable.has("+pokemontag:cap") && species.isNonstandard === "CAP";
-      if (!species.exists || nonstandard || isCap || species === crossSpecies)
-        return this.validateSet(set, teamHas);
-      if (!species.nfe)
-        return [`${species.name} cannot cross evolve because it doesn't evolve.`];
+      if (!species.exists || nonstandard || isCap || species === crossSpecies) return this.validateSet(set, teamHas);
+      if (!species.nfe) return [`${species.name} cannot cross evolve because it doesn't evolve.`];
       const crossIsUnreleased = crossSpecies.tier === "Unreleased" && crossSpecies.isNonstandard === "Unobtainable" && !this.ruleTable.has("+unobtainable");
       if (crossSpecies.battleOnly || crossIsUnreleased || !crossSpecies.prevo) {
         return [`${species.name} cannot cross evolve into ${crossSpecies.name} because it isn't an evolution.`];
@@ -2805,23 +2772,16 @@ const Formats = [
       return problems;
     },
     onModifySpecies(species, target, source, effect) {
-      if (!target)
-        return;
-      if (effect && ["imposter", "transform"].includes(effect.id))
-        return;
-      if (target.set.name === target.set.species)
-        return;
+      if (!target) return;
+      if (effect && ["imposter", "transform"].includes(effect.id)) return;
+      if (target.set.name === target.set.species) return;
       const crossSpecies = this.dex.species.get(target.set.name);
-      if (!crossSpecies.exists)
-        return;
-      if (species.battleOnly || !species.nfe)
-        return;
+      if (!crossSpecies.exists) return;
+      if (species.battleOnly || !species.nfe) return;
       const crossIsUnreleased = crossSpecies.tier === "Unreleased" && crossSpecies.isNonstandard === "Unobtainable" && !this.ruleTable.has("+unobtainable");
-      if (crossSpecies.battleOnly || crossIsUnreleased || !crossSpecies.prevo)
-        return;
+      if (crossSpecies.battleOnly || crossIsUnreleased || !crossSpecies.prevo) return;
       const crossPrevoSpecies = this.dex.species.get(crossSpecies.prevo);
-      if (!crossPrevoSpecies.prevo !== !species.prevo)
-        return;
+      if (!crossPrevoSpecies.prevo !== !species.prevo) return;
       const mixedSpecies = this.dex.deepClone(species);
       mixedSpecies.weightkg = Math.max(0.1, species.weightkg + crossSpecies.weightkg - crossPrevoSpecies.weightkg).toFixed(1);
       mixedSpecies.nfe = false;
@@ -2835,13 +2795,11 @@ const Formats = [
         mixedSpecies.baseStats[i] = this.clampIntRange(species.baseStats[i] + statChange, 1, 255);
         mixedSpecies.bst += mixedSpecies.baseStats[i];
       }
-      if (crossSpecies.types[0] !== crossPrevoSpecies.types[0])
-        mixedSpecies.types[0] = crossSpecies.types[0];
+      if (crossSpecies.types[0] !== crossPrevoSpecies.types[0]) mixedSpecies.types[0] = crossSpecies.types[0];
       if (crossSpecies.types[1] !== crossPrevoSpecies.types[1]) {
         mixedSpecies.types[1] = crossSpecies.types[1] || crossSpecies.types[0];
       }
-      if (mixedSpecies.types[0] === mixedSpecies.types[1])
-        mixedSpecies.types = [mixedSpecies.types[0]];
+      if (mixedSpecies.types[0] === mixedSpecies.types[1]) mixedSpecies.types = [mixedSpecies.types[0]];
       return mixedSpecies;
     },
     onBegin() {
@@ -3065,8 +3023,7 @@ const Formats = [
           const moveData = this.dex.getActiveMove(move.id);
           moveData.flags["futuremove"] = 1;
           delete moveData.flags["protect"];
-          if (moveData.id === "beatup")
-            this.singleEvent("ModifyMove", moveData, null, pokemon, null, null, moveData);
+          if (moveData.id === "beatup") this.singleEvent("ModifyMove", moveData, null, pokemon, null, null, moveData);
           Object.assign(t.side.slotConditions[t.position]["futuremove"], {
             duration: 3,
             move: moveData.id,
@@ -3101,8 +3058,7 @@ const Formats = [
     banlist: ["Calyrex-Shadow", "Gengar-Mega", "Miraidon", "Moody", "King's Rock", "Razor Fang", "Baton Pass"],
     onValidateSet(set, format, setHas, teamHas) {
       const species = this.dex.species.get(set.species);
-      if (this.dex.species.get(species.baseSpecies).isNonstandard)
-        return [`${species.name} does not exist in Gen 9.`];
+      if (this.dex.species.get(species.baseSpecies).isNonstandard) return [`${species.name} does not exist in Gen 9.`];
       if (species.name !== species.baseSpecies && species.baseSpecies === "Arceus" && this.dex.items.get(set.item).onPlate !== species.types[0]) {
         return [`${species.name} is required to hold the ${species.requiredItems[0]}.`];
       }
@@ -3220,8 +3176,7 @@ const Formats = [
       const itemTable = /* @__PURE__ */ new Set();
       for (const set of team) {
         const forte = this.toID(set.item);
-        if (!forte)
-          continue;
+        if (!forte) continue;
         const move = this.dex.moves.get(forte);
         if (move.exists && move.id !== "metronome") {
           if (itemTable.has(forte)) {
@@ -3278,8 +3233,7 @@ const Formats = [
         if (forte.self) {
           if (forte.self.onHit && move.self?.onHit) {
             for (const i in forte.self) {
-              if (i.startsWith("onHit"))
-                continue;
+              if (i.startsWith("onHit")) continue;
               move.self[i] = forte.self[i];
             }
           } else {
@@ -3287,12 +3241,10 @@ const Formats = [
           }
         }
         if (forte.selfBoost?.boosts) {
-          if (!move.selfBoost?.boosts)
-            move.selfBoost = { boosts: {} };
+          if (!move.selfBoost?.boosts) move.selfBoost = { boosts: {} };
           let boostid;
           for (boostid in forte.selfBoost.boosts) {
-            if (!move.selfBoost.boosts[boostid])
-              move.selfBoost.boosts[boostid] = 0;
+            if (!move.selfBoost.boosts[boostid]) move.selfBoost.boosts[boostid] = 0;
             move.selfBoost.boosts[boostid] += forte.selfBoost.boosts[boostid];
           }
         }
@@ -3366,8 +3318,7 @@ const Formats = [
       const forte = source.m.forte;
       if (move?.category !== "Status" && forte) {
         this.singleEvent("Hit", forte, {}, target, source, move);
-        if (forte.self)
-          this.singleEvent("Hit", forte.self, {}, source, source, move);
+        if (forte.self) this.singleEvent("Hit", forte.self, {}, source, source, move);
         this.singleEvent("AfterHit", forte, {}, target, source, move);
       }
     },
@@ -3378,8 +3329,7 @@ const Formats = [
       }
     },
     onModifySecondaries(secondaries, target, source, move) {
-      if (secondaries.some((s) => !!s.self))
-        move.selfDropped = false;
+      if (secondaries.some((s) => !!s.self)) move.selfDropped = false;
     },
     onAfterMoveSecondaryPriority: 1,
     onAfterMoveSecondarySelf(source, target, move) {
@@ -3398,8 +3348,7 @@ const Formats = [
     pokemon: {
       getItem() {
         const move = this.battle.dex.moves.get(this.m.forte);
-        if (!move.exists)
-          return Object.getPrototypeOf(this).getItem.call(this);
+        if (!move.exists) return Object.getPrototypeOf(this).getItem.call(this);
         return {
           ...this.battle.dex.items.get("mail"),
           name: move.name,
@@ -3689,8 +3638,7 @@ const Formats = [
       let species = Dex.species.get(speciesid);
       while (species.prevo) {
         const prevoSpecies = Dex.species.get(species.prevo);
-        if (prevoSpecies.evos.length > 1)
-          break;
+        if (prevoSpecies.evos.length > 1) break;
         species = prevoSpecies;
       }
       return species.id;
@@ -3699,12 +3647,9 @@ const Formats = [
       if (!teamHas.abilityMap) {
         teamHas.abilityMap = /* @__PURE__ */ Object.create(null);
         for (const pokemon of Dex.species.all()) {
-          if (pokemon.isNonstandard && !this.ruleTable.has(`+pokemontag:${this.toID(pokemon.isNonstandard)}`))
-            continue;
-          if (pokemon.battleOnly)
-            continue;
-          if (this.ruleTable.isBannedSpecies(pokemon))
-            continue;
+          if (pokemon.isNonstandard && !this.ruleTable.has(`+pokemontag:${this.toID(pokemon.isNonstandard)}`)) continue;
+          if (pokemon.battleOnly) continue;
+          if (this.ruleTable.isBannedSpecies(pokemon)) continue;
           for (const key of Object.values(pokemon.abilities)) {
             const abilityId = this.dex.toID(key);
             if (abilityId in teamHas.abilityMap) {
@@ -3716,11 +3661,9 @@ const Formats = [
         }
       }
       const problem = this.validateForme(set);
-      if (problem.length)
-        return problem;
+      if (problem.length) return problem;
       const species = this.dex.species.get(set.species);
-      if (!species.exists || species.num < 1)
-        return [`The Pok\xE9mon "${set.species}" does not exist.`];
+      if (!species.exists || species.num < 1) return [`The Pok\xE9mon "${set.species}" does not exist.`];
       if (species.isNonstandard && !this.ruleTable.has(`+pokemontag:${this.toID(species.isNonstandard)}`)) {
         return [`${species.name} is not obtainable in Generation ${this.dex.gen}.`];
       }
@@ -3729,33 +3672,27 @@ const Formats = [
         return this.validateSet(set, teamHas);
       }
       const ability = this.dex.abilities.get(set.ability);
-      if (!ability.exists || ability.isNonstandard)
-        return [`${name} needs to have a valid ability.`];
+      if (!ability.exists || ability.isNonstandard) return [`${name} needs to have a valid ability.`];
       const pokemonWithAbility = teamHas.abilityMap[ability.id];
-      if (!pokemonWithAbility)
-        return [`${ability.name} is not available on a legal Pok\xE9mon.`];
+      if (!pokemonWithAbility) return [`${ability.name} is not available on a legal Pok\xE9mon.`];
       this.format.debug = true;
-      if (!teamHas.abilitySources)
-        teamHas.abilitySources = /* @__PURE__ */ Object.create(null);
+      if (!teamHas.abilitySources) teamHas.abilitySources = /* @__PURE__ */ Object.create(null);
       const validSources = teamHas.abilitySources[this.toID(set.species)] = [];
       let canonicalSource = "";
       const hpType = set.hpType;
       for (const donor of pokemonWithAbility) {
         const donorSpecies = this.dex.species.get(donor);
         let format = this.format;
-        if (!format.getEvoFamily)
-          format = this.dex.formats.get("gen9inheritance");
+        if (!format.getEvoFamily) format = this.dex.formats.get("gen9inheritance");
         const evoFamily = format.getEvoFamily(donorSpecies.id);
-        if (validSources.includes(evoFamily))
-          continue;
+        if (validSources.includes(evoFamily)) continue;
         set.species = donorSpecies.name;
         set.name = donorSpecies.baseSpecies;
         const min20IVs = ["Iron Boulder", "Gouging Fire", "Iron Crown", "Raging Bolt"];
         if (min20IVs.includes(donorSpecies.name)) {
           let iv;
           for (iv in set.ivs) {
-            if (set.ivs[iv] < 20)
-              set.ivs[iv] = 20;
+            if (set.ivs[iv] < 20) set.ivs[iv] = 20;
           }
         }
         const problems = this.validateSet(set, teamHas);
@@ -3763,16 +3700,14 @@ const Formats = [
           validSources.push(evoFamily);
           canonicalSource = donorSpecies.name;
         }
-        if (validSources.length > 1)
-          break;
+        if (validSources.length > 1) break;
       }
       this.format.debug = false;
       set.name = name;
       set.species = species.name;
       set.hpType = hpType;
       if (!validSources.length) {
-        if (pokemonWithAbility.length > 1)
-          return [`${name}'s set is illegal.`];
+        if (pokemonWithAbility.length > 1) return [`${name}'s set is illegal.`];
         return [`${name} has an illegal set with an ability from ${this.dex.species.get(pokemonWithAbility[0]).name}.`];
       }
       set.pokeball = `${set.pokeball}0${canonicalSource}`;
@@ -3804,10 +3739,8 @@ const Formats = [
         const num = parseInt(this.ruleTable.valueRules.get("abilityclause"));
         for (const set of team) {
           let ability = this.toID(set.ability.split("0")[0]);
-          if (!ability)
-            continue;
-          if (ability in base)
-            ability = base[ability];
+          if (!ability) continue;
+          if (ability in base) ability = base[ability];
           if (abilityTable.get(ability) >= num) {
             return [
               `You are limited to ${num} of each ability by ${num} Ability Clause.`,
@@ -3820,17 +3753,14 @@ const Formats = [
       const evoFamilyLists = [];
       for (const set of team) {
         const abilitySources = teamHas.abilitySources?.[this.toID(set.species)];
-        if (!abilitySources)
-          continue;
+        if (!abilitySources) continue;
         let format = this.format;
-        if (!format.getEvoFamily)
-          format = this.dex.formats.get("gen9inheritance");
+        if (!format.getEvoFamily) format = this.dex.formats.get("gen9inheritance");
         evoFamilyLists.push(abilitySources.map(format.getEvoFamily));
       }
       const requiredFamilies = /* @__PURE__ */ Object.create(null);
       for (const evoFamilies of evoFamilyLists) {
-        if (evoFamilies.length !== 1)
-          continue;
+        if (evoFamilies.length !== 1) continue;
         const [familyId] = evoFamilies;
         if (!(familyId in requiredFamilies)) {
           requiredFamilies[familyId] = 1;
@@ -3855,11 +3785,9 @@ const Formats = [
       }
     },
     onSwitchIn(pokemon) {
-      if (!pokemon.m.donor)
-        return;
+      if (!pokemon.m.donor) return;
       const donorTemplate = this.dex.species.get(pokemon.m.donor);
-      if (!donorTemplate.exists)
-        return;
+      if (!donorTemplate.exists) return;
       this.add("-start", pokemon, donorTemplate.name, "[silent]");
     }
   },
@@ -4319,8 +4247,7 @@ const Formats = [
     onBeforeSwitchIn(pokemon) {
       if (pokemon.m.innates) {
         for (const innate of pokemon.m.innates) {
-          if (pokemon.hasAbility(innate))
-            continue;
+          if (pokemon.hasAbility(innate)) continue;
           const effect = "ability:" + this.toID(innate);
           pokemon.volatiles[effect] = this.initEffectState({ id: effect, target: pokemon });
         }
@@ -4542,8 +4469,7 @@ const Formats = [
       }
     },
     onSwitchIn(pokemon) {
-      if (!pokemon.m.pokemoves?.length)
-        return;
+      if (!pokemon.m.pokemoves?.length) return;
       for (const pokemove of pokemon.m.pokemoves) {
         this.add("-start", pokemon, pokemove.name, "[silent]");
       }
@@ -4559,11 +4485,9 @@ const Formats = [
         move.flags["protect"] = 1;
         move.category = species.baseStats["spa"] > species.baseStats["atk"] ? "Special" : species.baseStats["spa"] < species.baseStats["atk"] ? "Physical" : pokemon.getStat("atk", false, true) > pokemon.getStat("spa", false, true) ? "Physical" : "Special";
         move.onAfterHit = function(t, s, m) {
-          if (s.getAbility().name === species.abilities["0"])
-            return;
+          if (s.getAbility().name === species.abilities["0"]) return;
           const effect = "ability:" + this.toID(species.abilities["0"]);
-          if (s.volatiles[effect])
-            return;
+          if (s.volatiles[effect]) return;
           s.addVolatile(effect);
           if (s.volatiles[effect]) {
             s.volatiles[effect].id = this.toID(effect);
@@ -4571,11 +4495,9 @@ const Formats = [
           }
         };
         move.onAfterSubDamage = function(d, t, s, m) {
-          if (s.getAbility().name === species.abilities["0"])
-            return;
+          if (s.getAbility().name === species.abilities["0"]) return;
           const effect = "ability:" + this.toID(species.abilities["0"]);
-          if (s.volatiles[effect])
-            return;
+          if (s.volatiles[effect]) return;
           s.addVolatile(effect);
           if (s.volatiles[effect]) {
             s.volatiles[effect].id = this.toID(effect);
@@ -4693,8 +4615,7 @@ const Formats = [
               switchCopyFlag = sourceEffect.selfSwitch;
             }
           } else {
-            if (!isDrag && !sourceEffect)
-              switchCopyFlag = "copyvolatile";
+            if (!isDrag && !sourceEffect) switchCopyFlag = "copyvolatile";
           }
           if (!oldActive.skipBeforeSwitchOutEventFlag && !isDrag) {
             this.battle.runEvent("BeforeSwitchOut", oldActive);
@@ -4720,8 +4641,7 @@ const Formats = [
           if (switchCopyFlag) {
             pokemon.copyVolatileFrom(oldActive, switchCopyFlag);
           }
-          if (newMove)
-            pokemon.lastMove = newMove;
+          if (newMove) pokemon.lastMove = newMove;
           oldActive.clearVolatile();
         }
         if (oldActive) {
@@ -4731,8 +4651,7 @@ const Formats = [
           oldActive.statsRaisedThisTurn = false;
           oldActive.statsLoweredThisTurn = false;
           oldActive.position = pokemon.position;
-          if (oldActive.fainted)
-            oldActive.status = "";
+          if (oldActive.fainted) oldActive.status = "";
           pokemon.position = pos;
           side.pokemon[pokemon.position] = pokemon;
           side.pokemon[oldActive.position] = oldActive;
@@ -4752,8 +4671,7 @@ const Formats = [
         } else {
           this.battle.add(isDrag ? "drag" : "switch", pokemon, pokemon.getFullDetails);
         }
-        if (isDrag && this.battle.gen === 2)
-          pokemon.draggedIn = this.battle.turn;
+        if (isDrag && this.battle.gen === 2) pokemon.draggedIn = this.battle.turn;
         pokemon.previouslySwitchedIn++;
         if (isDrag && this.battle.gen >= 5) {
           this.runSwitch(pokemon);
@@ -4920,8 +4838,7 @@ const Formats = [
     getSharedItems(pokemon) {
       const items = /* @__PURE__ */ new Set();
       for (const ally of pokemon.side.pokemon) {
-        if (!ally.item || ally.fainted)
-          continue;
+        if (!ally.item || ally.fainted) continue;
         items.add(ally.item);
       }
       items.delete(pokemon.item);
@@ -4929,13 +4846,10 @@ const Formats = [
     },
     onBeforeSwitchIn(pokemon) {
       let format = this.format;
-      if (!format.getSharedItems)
-        format = this.dex.formats.get("gen9sharingiscaring");
-      if (!pokemon.m.sharedItemsUsed)
-        pokemon.m.sharedItemsUsed = [];
+      if (!format.getSharedItems) format = this.dex.formats.get("gen9sharingiscaring");
+      if (!pokemon.m.sharedItemsUsed) pokemon.m.sharedItemsUsed = [];
       for (const item of format.getSharedItems(pokemon)) {
-        if (pokemon.m.sharedItemsUsed.includes(item))
-          continue;
+        if (pokemon.m.sharedItemsUsed.includes(item)) continue;
         const effect = "item:" + this.toID(item);
         pokemon.volatiles[effect] = this.initEffectState({ id: effect, target: pokemon });
       }
@@ -5062,8 +4976,7 @@ const Formats = [
     actions: {
       modifyDamage(baseDamage, pokemon, target, move, suppressMessages) {
         const tr = this.battle.trunc;
-        if (!move.type)
-          move.type = "???";
+        if (!move.type) move.type = "???";
         const type = move.type;
         baseDamage += 2;
         if (move.spreadHit) {
@@ -5106,35 +5019,30 @@ const Formats = [
         typeMod = this.battle.clampIntRange(typeMod, -6, 6);
         target.getMoveHitData(move).typeMod = typeMod;
         if (typeMod > 0) {
-          if (!suppressMessages)
-            this.battle.add("-supereffective", target);
+          if (!suppressMessages) this.battle.add("-supereffective", target);
           for (let i = 0; i < typeMod; i++) {
             baseDamage *= 2;
           }
         }
         if (typeMod < 0) {
-          if (!suppressMessages)
-            this.battle.add("-resisted", target);
+          if (!suppressMessages) this.battle.add("-resisted", target);
           for (let i = 0; i > typeMod; i--) {
             baseDamage = tr(baseDamage / 2);
           }
         }
-        if (isCrit && !suppressMessages)
-          this.battle.add("-crit", target);
+        if (isCrit && !suppressMessages) this.battle.add("-crit", target);
         if (pokemon.status === "brn" && move.category === "Physical" && !pokemon.hasAbility("guts")) {
           if (this.battle.gen < 6 || move.id !== "facade") {
             baseDamage = this.battle.modify(baseDamage, 0.5);
           }
         }
-        if (this.battle.gen === 5 && !baseDamage)
-          baseDamage = 1;
+        if (this.battle.gen === 5 && !baseDamage) baseDamage = 1;
         baseDamage = this.battle.runEvent("ModifyDamage", pokemon, target, move, baseDamage);
         if (move.isZOrMaxPowered && target.getMoveHitData(move).zBrokeProtect) {
           baseDamage = this.battle.modify(baseDamage, 0.25);
           this.battle.add("-zbroken", target);
         }
-        if (this.battle.gen !== 5 && !baseDamage)
-          return 1;
+        if (this.battle.gen !== 5 && !baseDamage) return 1;
         return tr(baseDamage, 16);
       }
     },
@@ -5144,18 +5052,14 @@ const Formats = [
           return [this.terastallized];
         }
         const types = this.battle.runEvent("Type", this, null, null, this.types);
-        if (!types.length)
-          types.push(this.battle.gen >= 5 ? "Normal" : "???");
-        if (!excludeAdded && this.addedType)
-          return types.concat(this.addedType);
+        if (!types.length) types.push(this.battle.gen >= 5 ? "Normal" : "???");
+        if (!excludeAdded && this.addedType) return types.concat(this.addedType);
         const addTeraType = this.m.thirdType;
-        if (addTeraType)
-          return Array.from(/* @__PURE__ */ new Set([...types, addTeraType]));
+        if (addTeraType) return Array.from(/* @__PURE__ */ new Set([...types, addTeraType]));
         return types;
       },
       runEffectiveness(move) {
-        if ((this.terastallized || this.m.thirdType) && move.type === "Stellar")
-          return 1;
+        if ((this.terastallized || this.m.thirdType) && move.type === "Stellar") return 1;
         let totalTypeMod = 0;
         for (const type of this.getTypes()) {
           let typeMod = this.battle.dex.getEffectiveness(move, type);
@@ -5359,8 +5263,7 @@ const Formats = [
     },
     battle: {
       tiebreak() {
-        if (this.ended)
-          return false;
+        if (this.ended) return false;
         this.inputLog.push(`>tiebreak`);
         this.add("message", "Time's up! Going to tiebreaker...");
         const notFainted = this.sides.map((side) => side.pokemon.filter((pokemon) => !pokemon.fainted).length);
@@ -5552,8 +5455,7 @@ const Formats = [
     ],
     onValidateTeam(team, format, teamHas) {
       const problems = [];
-      if (!teamHas.trademarks)
-        return;
+      if (!teamHas.trademarks) return;
       for (const trademark of teamHas.trademarks.keys()) {
         if (teamHas.trademarks.get(trademark) > 1) {
           problems.push(`You are limited to 1 of each Trademark.`, `(You have ${teamHas.trademarks.get(trademark)} Pok\xE9mon with ${trademark} as a Trademark.)`);
@@ -5577,24 +5479,20 @@ const Formats = [
         return [`${set.name} may not use ${ability.name} as both a trademark and one of its moves simultaneously.`];
       }
       const customRules = this.format.customRules || [];
-      if (!customRules.includes("!obtainableabilities"))
-        customRules.push("!obtainableabilities");
-      if (!customRules.includes("+noability"))
-        customRules.push("+noability");
+      if (!customRules.includes("!obtainableabilities")) customRules.push("!obtainableabilities");
+      if (!customRules.includes("+noability")) customRules.push("+noability");
       const TeamValidator = require("../sim/team-validator").TeamValidator;
       const validator = new TeamValidator(dex.formats.get(`${this.format.id}@@@${customRules.join(",")}`));
       const moves = set.moves;
       set.moves = [ability.id];
       set.ability = "No Ability";
       let problems = validator.validateSet(set, {}) || [];
-      if (problems.length)
-        return problems;
+      if (problems.length) return problems;
       set.moves = moves;
       set.ability = "No Ability";
       problems = problems.concat(validator.validateSet(set, teamHas) || []);
       set.ability = ability.id;
-      if (!teamHas.trademarks)
-        teamHas.trademarks = new this.dex.Multiset();
+      if (!teamHas.trademarks) teamHas.trademarks = new this.dex.Multiset();
       teamHas.trademarks.add(ability.name);
       return problems.length ? problems : null;
     }
@@ -5713,8 +5611,7 @@ const Formats = [
     ],
     onModifyMovePriority: -1e3,
     onModifyMove(move, pokemon, target) {
-      if (move.category === "Status")
-        return;
+      if (move.category === "Status") return;
       const specialTypes = ["Dark", "Dragon", "Electric", "Fairy", "Fire", "Grass", "Ice", "Psychic", "Water"];
       if (specialTypes.includes(move.type)) {
         move.category = "Special";
@@ -5848,11 +5745,9 @@ const Formats = [
       const itemTable = /* @__PURE__ */ new Set();
       for (const set of team) {
         const item = this.dex.items.get(set.item);
-        if (!(item.forcedForme && !item.zMove) && !item.megaStone && !item.isPrimalOrb && !item.name.startsWith("Rusted"))
-          continue;
+        if (!(item.forcedForme && !item.zMove) && !item.megaStone && !item.isPrimalOrb && !item.name.startsWith("Rusted")) continue;
         const natdex = this.ruleTable.has("natdexmod");
-        if (natdex && item.id !== "ultranecroziumz")
-          continue;
+        if (natdex && item.id !== "ultranecroziumz") continue;
         const species = this.dex.species.get(set.species);
         if (species.isNonstandard && !this.ruleTable.has(`+pokemontag:${this.toID(species.isNonstandard)}`)) {
           return [`${species.baseSpecies} does not exist in gen 9.`];
@@ -5953,8 +5848,7 @@ const Formats = [
       const itemTable = /* @__PURE__ */ new Set();
       for (const set of team) {
         const item = this.dex.items.get(set.item);
-        if (!item.megaStone)
-          continue;
+        if (!item.megaStone) continue;
         const species = this.dex.species.get(set.species);
         const ability = this.dex.abilities.get(set.ability);
         if (this.ruleTable.isRestricted(`item:${item.id}`) || this.ruleTable.isRestricted(`ability:${ability.id}`)) {
@@ -6043,8 +5937,7 @@ const Formats = [
       const itemTable = /* @__PURE__ */ new Set();
       for (const set of team) {
         const item = this.dex.items.get(set.item);
-        if (!item.megaStone && !item.isPrimalOrb && item.id !== "ultranecroziumz")
-          continue;
+        if (!item.megaStone && !item.isPrimalOrb && item.id !== "ultranecroziumz") continue;
         const species = this.dex.species.get(set.species);
         const ability = this.dex.abilities.get(set.ability);
         if ((this.ruleTable.isRestrictedSpecies(species) || this.ruleTable.isRestricted(`item:${item.id}`) || this.ruleTable.isRestricted(`ability:${ability.id}`)) && !((item.megaStone || item.isPrimalOrb) && item.itemUser?.includes(species.baseSpecies) || item.id === "ultranecroziumz" && species.name.startsWith("Necrozma-"))) {
@@ -6125,8 +6018,7 @@ const Formats = [
       const itemTable = /* @__PURE__ */ new Set();
       for (const set of team) {
         const item = this.dex.items.get(set.item);
-        if (!item.megaStone && !item.isPrimalOrb)
-          continue;
+        if (!item.megaStone && !item.isPrimalOrb) continue;
         const species = this.dex.species.get(set.species);
         if ((this.ruleTable.isRestrictedSpecies(species) || this.ruleTable.isRestricted(`item:${item.id}`)) && !((item.megaStone || item.isPrimalOrb) && item.itemUser?.includes(species.baseSpecies))) {
           return [`${species.name} is not allowed to hold ${item.name}.`];
@@ -6840,8 +6732,7 @@ const Formats = [
       const restrictedPokemonCount = new this.dex.Multiset();
       for (const set of team) {
         const species = this.dex.species.get(set.species);
-        if (!this.ruleTable.isRestrictedSpecies(species))
-          continue;
+        if (!this.ruleTable.isRestrictedSpecies(species)) continue;
         restrictedPokemonCount.add(species.baseSpecies);
       }
       for (const [baseSpecies, count] of restrictedPokemonCount) {
@@ -7343,15 +7234,12 @@ const Formats = [
     },
     onBeforeSwitchIn(pokemon) {
       let format = this.format;
-      if (!format.getSharedPower)
-        format = this.dex.formats.get("gen9sharedpower");
+      if (!format.getSharedPower) format = this.dex.formats.get("gen9sharedpower");
       for (const ability of format.getSharedPower(pokemon)) {
         const effect = "ability:" + this.toID(ability);
         pokemon.volatiles[effect] = this.initEffectState({ id: effect, target: pokemon });
-        if (!pokemon.m.abils)
-          pokemon.m.abils = [];
-        if (!pokemon.m.abils.includes(effect))
-          pokemon.m.abils.push(effect);
+        if (!pokemon.m.abils) pokemon.m.abils = [];
+        if (!pokemon.m.abils.includes(effect)) pokemon.m.abils.push(effect);
       }
     }
   },
@@ -7369,15 +7257,12 @@ const Formats = [
     },
     onBeforeSwitchIn(pokemon) {
       let format = this.format;
-      if (!format.getSharedPower)
-        format = this.dex.formats.get("gen9sharedpower");
+      if (!format.getSharedPower) format = this.dex.formats.get("gen9sharedpower");
       for (const ability of format.getSharedPower(pokemon)) {
         const effect = "ability:" + this.toID(ability);
         pokemon.volatiles[effect] = this.initEffectState({ id: effect, target: pokemon });
-        if (!pokemon.m.abils)
-          pokemon.m.abils = [];
-        if (!pokemon.m.abils.includes(effect))
-          pokemon.m.abils.push(effect);
+        if (!pokemon.m.abils) pokemon.m.abils = [];
+        if (!pokemon.m.abils.includes(effect)) pokemon.m.abils.push(effect);
       }
     }
   },
@@ -7420,8 +7305,7 @@ const Formats = [
     ruleset: ["Standard Draft", "!Team Preview"],
     onBegin() {
       for (const pokemon of this.getAllPokemon()) {
-        if (!pokemon.set.teraCaptain)
-          pokemon.canTerastallize = null;
+        if (!pokemon.set.teraCaptain) pokemon.canTerastallize = null;
       }
       this.add("rule", "Tera Captain Clause: Only Tera Captains can Terastallize");
     },
@@ -7435,8 +7319,7 @@ const Formats = [
       for (const side of this.sides) {
         let buf = ``;
         for (const pokemon of side.pokemon) {
-          if (!pokemon.set.teraCaptain)
-            continue;
+          if (!pokemon.set.teraCaptain) continue;
           buf += buf ? ` / ` : `raw|${side.name}'s Tera Captains:<br />`;
           buf += `<psicon pokemon="${pokemon.species.id}" /><psicon type="${pokemon.teraType}" />`;
         }
@@ -8667,15 +8550,13 @@ const Formats = [
     ruleset: ["HP Percentage Mod", "Cancel Mod", "Desync Clause Mod", "Sleep Clause Mod", "Freeze Clause Mod", "Team Type Preview"],
     banlist: ["Nonexistent"],
     onModifySpecies(species, target, source, effect) {
-      if (!target)
-        return;
+      if (!target) return;
       return { ...species, ...target.set.hc };
     },
     onSwitchIn(pokemon) {
       this.add("-start", pokemon, "typechange", pokemon.getTypes(true).join("/"), "[silent]");
       for (const i in pokemon.species.baseStats) {
-        if (i === "spd")
-          continue;
+        if (i === "spd") continue;
         this.add("-start", pokemon, `${pokemon.species.baseStats[i]}${i === "spa" ? "spc" : i}`, "[silent]");
       }
     }
@@ -10240,8 +10121,7 @@ const Formats = [
         for (let i = 0; i < pokemon.length; i++) {
           if (this.ruleTable.isRestrictedSpecies(pokemon[i].species)) {
             restrictedCount2++;
-            if (restrictedCount2 > 2)
-              continue;
+            if (restrictedCount2 > 2) continue;
           }
           positions.push(i);
         }

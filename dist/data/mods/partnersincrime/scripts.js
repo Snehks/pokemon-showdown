@@ -38,13 +38,11 @@ const Scripts = {
         handlers = handlers.concat(this.findSideEventHandlers(side, `onSide${eventid}`, getKey));
       }
       for (const active of side.active) {
-        if (!active)
-          continue;
+        if (!active) continue;
         if (eventid === "SwitchIn") {
           handlers = handlers.concat(this.findPokemonEventHandlers(active, `onAny${eventid}`));
         }
-        if (targets && !targets.includes(active))
-          continue;
+        if (targets && !targets.includes(active)) continue;
         const ally = active.side.active.find((mon) => mon && mon !== active && !mon.fainted);
         if (eventid === "SwitchIn" && ally?.m.innate && targets && !targets.includes(ally)) {
           const volatileState = ally.volatiles[ally.m.innate];
@@ -84,15 +82,13 @@ const Scripts = {
       const handler = handlers[0];
       handlers.shift();
       const effect = handler.effect;
-      if (handler.effectHolder.fainted || handler.state?.pic?.fainted)
-        continue;
+      if (handler.effectHolder.fainted || handler.state?.pic?.fainted) continue;
       if (eventid === "Residual" && handler.end && handler.state?.duration) {
         handler.state.duration--;
         if (!handler.state.duration) {
           const endCallArgs = handler.endCallArgs || [handler.effectHolder, effect.id];
           handler.end.call(...endCallArgs);
-          if (this.ended)
-            return;
+          if (this.ended) return;
           continue;
         }
       }
@@ -128,16 +124,13 @@ const Scripts = {
         }
       }
       let handlerEventid = eventid;
-      if (handler.effectHolder.sideConditions)
-        handlerEventid = `Side${eventid}`;
-      if (handler.effectHolder.pseudoWeather)
-        handlerEventid = `Field${eventid}`;
+      if (handler.effectHolder.sideConditions) handlerEventid = `Side${eventid}`;
+      if (handler.effectHolder.pseudoWeather) handlerEventid = `Field${eventid}`;
       if (handler.callback) {
         this.singleEvent(handlerEventid, effect, handler.state, handler.effectHolder, null, null, void 0, handler.callback);
       }
       this.faintMessages();
-      if (this.ended)
-        return;
+      if (this.ended) return;
     }
   },
   endTurn() {
@@ -193,8 +186,7 @@ const Scripts = {
       let sideTrapped = true;
       let sideStaleness;
       for (const pokemon of side.active) {
-        if (!pokemon)
-          continue;
+        if (!pokemon) continue;
         pokemon.moveThisTurn = "";
         pokemon.newlySwitched = false;
         pokemon.moveLastTurnResult = pokemon.moveThisTurnResult;
@@ -225,8 +217,7 @@ const Scripts = {
             pokemon.disableMove(pokemon.lastMove.id);
           }
         }
-        if (pokemon.getLastAttackedBy() && this.gen >= 7)
-          pokemon.knownType = true;
+        if (pokemon.getLastAttackedBy() && this.gen >= 7) pokemon.knownType = true;
         for (let i = pokemon.attackedBy.length - 1; i >= 0; i--) {
           const attack = pokemon.attackedBy[i];
           if (attack.source.isActive) {
@@ -254,8 +245,7 @@ const Scripts = {
         if (this.gen > 2) {
           for (const source of pokemon.foes()) {
             const species = (source.illusion || source).species;
-            if (!species.abilities)
-              continue;
+            if (!species.abilities) continue;
             for (const abilitySlot in species.abilities) {
               const abilityName = species.abilities[abilitySlot];
               if (abilityName === source.ability) {
@@ -268,20 +258,16 @@ const Scripts = {
                 continue;
               }
               const ability = this.dex.abilities.get(abilityName);
-              if (ruleTable.has("-ability:" + ability.id))
-                continue;
-              if (pokemon.knownType && !this.dex.getImmunity("trapped", pokemon))
-                continue;
+              if (ruleTable.has("-ability:" + ability.id)) continue;
+              if (pokemon.knownType && !this.dex.getImmunity("trapped", pokemon)) continue;
               this.singleEvent("FoeMaybeTrapPokemon", ability, {}, pokemon, source);
             }
           }
         }
-        if (pokemon.fainted)
-          continue;
+        if (pokemon.fainted) continue;
         sideTrapped = sideTrapped && pokemon.trapped;
         const staleness = pokemon.volatileStaleness || pokemon.staleness;
-        if (staleness)
-          sideStaleness = sideStaleness === "external" ? sideStaleness : staleness;
+        if (staleness) sideStaleness = sideStaleness === "external" ? sideStaleness : staleness;
         pokemon.activeTurns++;
       }
       trappedBySide.push(sideTrapped);
@@ -289,8 +275,7 @@ const Scripts = {
       side.faintedLastTurn = side.faintedThisTurn;
       side.faintedThisTurn = null;
     }
-    if (this.maybeTriggerEndlessBattleClause(trappedBySide, stalenessBySide))
-      return;
+    if (this.maybeTriggerEndlessBattleClause(trappedBySide, stalenessBySide)) return;
     if (this.gameType === "triples" && this.sides.every((side) => side.pokemonLeft === 1)) {
       const actives = this.getAllActive();
       if (actives.length > 1 && !actives[0].isAdjacent(actives[1])) {
@@ -311,30 +296,23 @@ const Scripts = {
         }
       }
     }
-    if (this.gen === 2)
-      this.quickClawRoll = this.randomChance(60, 256);
-    if (this.gen === 3)
-      this.quickClawRoll = this.randomChance(1, 5);
+    if (this.gen === 2) this.quickClawRoll = this.randomChance(60, 256);
+    if (this.gen === 3) this.quickClawRoll = this.randomChance(1, 5);
     this.makeRequest("move");
   },
   pokemon: {
     setAbility(ability, source, sourceEffect, isFromFormeChange, isTransform) {
-      if (!this.hp)
-        return false;
+      if (!this.hp) return false;
       const BAD_ABILITIES = ["trace", "imposter", "neutralizinggas", "illusion", "wanderingspirit"];
-      if (typeof ability === "string")
-        ability = this.battle.dex.abilities.get(ability);
-      if (!sourceEffect && this.battle.effect)
-        sourceEffect = this.battle.effect;
+      if (typeof ability === "string") ability = this.battle.dex.abilities.get(ability);
+      if (!sourceEffect && this.battle.effect) sourceEffect = this.battle.effect;
       const oldAbility = this.battle.dex.abilities.get(this.ability);
       if (!isFromFormeChange) {
-        if (ability.flags["cantsuppress"] || this.getAbility().flags["cantsuppress"])
-          return false;
+        if (ability.flags["cantsuppress"] || this.getAbility().flags["cantsuppress"]) return false;
       }
       if (!isFromFormeChange && !isTransform) {
         const setAbilityEvent = this.battle.runEvent("SetAbility", this, source, sourceEffect, ability);
-        if (!setAbilityEvent)
-          return setAbilityEvent;
+        if (!setAbilityEvent) return setAbilityEvent;
       }
       this.battle.singleEvent("End", oldAbility, this.abilityState, this, source);
       const ally = this.side.active.find((mon) => mon && mon !== this && !mon.fainted);
@@ -367,14 +345,12 @@ const Scripts = {
       return oldAbility.id;
     },
     hasAbility(ability) {
-      if (this.ignoringAbility())
-        return false;
+      if (this.ignoringAbility()) return false;
       const ownAbility = this.ability;
       const ally = this.side.active.find((mon) => mon && mon !== this && !mon.fainted);
       const allyAbility = ally ? ally.ability : "";
       if (!Array.isArray(ability)) {
-        if (ownAbility === this.battle.toID(ability) || allyAbility === this.battle.toID(ability))
-          return true;
+        if (ownAbility === this.battle.toID(ability) || allyAbility === this.battle.toID(ability)) return true;
       } else {
         if (ability.map(this.battle.toID).includes(ownAbility) || ability.map(this.battle.toID).includes(allyAbility)) {
           return true;
@@ -390,8 +366,7 @@ const Scripts = {
       if (this.battle.dex.currentMod === "gen1stadium" && (species.name === "Ditto" || this.species.name === "Ditto" && pokemon.moves.includes("transform"))) {
         return false;
       }
-      if (!this.setSpecies(species, effect, true))
-        return false;
+      if (!this.setSpecies(species, effect, true)) return false;
       this.transformed = true;
       this.weighthg = pokemon.weighthg;
       const types = pokemon.getTypes(true, true);
@@ -402,8 +377,7 @@ const Scripts = {
       let statName;
       for (statName in this.storedStats) {
         this.storedStats[statName] = pokemon.storedStats[statName];
-        if (this.modifiedStats)
-          this.modifiedStats[statName] = pokemon.modifiedStats[statName];
+        if (this.modifiedStats) this.modifiedStats[statName] = pokemon.modifiedStats[statName];
       }
       this.moveSlots = [];
       this.hpType = this.battle.gen >= 5 ? this.hpType : pokemon.hpType;
@@ -411,8 +385,7 @@ const Scripts = {
       this.timesAttacked = pokemon.timesAttacked;
       for (const moveSlot of pokemon.moveSlots) {
         let moveName = moveSlot.move;
-        if (!pokemon.m.curMoves.includes(moveSlot.id))
-          continue;
+        if (!pokemon.m.curMoves.includes(moveSlot.id)) continue;
         if (moveSlot.id === "hiddenpower") {
           moveName = "Hidden Power " + this.hpType;
         }
@@ -434,15 +407,12 @@ const Scripts = {
       }
       if (this.battle.gen >= 6) {
         const volatilesToCopy = ["dragoncheer", "focusenergy", "gmaxchistrike", "laserfocus"];
-        for (const volatile of volatilesToCopy)
-          this.removeVolatile(volatile);
+        for (const volatile of volatilesToCopy) this.removeVolatile(volatile);
         for (const volatile of volatilesToCopy) {
           if (pokemon.volatiles[volatile]) {
             this.addVolatile(volatile);
-            if (volatile === "gmaxchistrike")
-              this.volatiles[volatile].layers = pokemon.volatiles[volatile].layers;
-            if (volatile === "dragoncheer")
-              this.volatiles[volatile].hasDragonType = pokemon.volatiles[volatile].hasDragonType;
+            if (volatile === "gmaxchistrike") this.volatiles[volatile].layers = pokemon.volatiles[volatile].layers;
+            if (volatile === "dragoncheer") this.volatiles[volatile].hasDragonType = pokemon.volatiles[volatile].hasDragonType;
           }
         }
       }
@@ -455,8 +425,7 @@ const Scripts = {
         this.knownType = true;
         this.apparentType = this.terastallized;
       }
-      if (this.battle.gen > 2)
-        this.setAbility(pokemon.ability, this, null, true, true);
+      if (this.battle.gen > 2) this.setAbility(pokemon.ability, this, null, true, true);
       if (this.battle.gen === 4) {
         if (this.species.num === 487) {
           if (this.species.name === "Giratina" && this.item === "griseousorb") {
@@ -473,23 +442,18 @@ const Scripts = {
           }
         }
       }
-      if (this.species.baseSpecies === "Ogerpon" && this.canTerastallize)
-        this.canTerastallize = false;
-      if (this.species.baseSpecies === "Terapagos" && this.canTerastallize)
-        this.canTerastallize = false;
+      if (this.species.baseSpecies === "Ogerpon" && this.canTerastallize) this.canTerastallize = false;
+      if (this.species.baseSpecies === "Terapagos" && this.canTerastallize) this.canTerastallize = false;
       return true;
     },
     deductPP(move, amount, target) {
       const gen = this.battle.gen;
       move = this.battle.dex.moves.get(move);
       const ppData = this.getMoveData(move);
-      if (!ppData)
-        return 0;
+      if (!ppData) return 0;
       ppData.used = true;
-      if (!ppData.pp && gen > 1)
-        return 0;
-      if (!amount)
-        amount = 1;
+      if (!ppData.pp && gen > 1) return 0;
+      if (!amount) amount = 1;
       ppData.pp -= amount;
       if (ppData.pp < 0 && gen > 1) {
         amount += ppData.pp;

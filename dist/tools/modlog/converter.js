@@ -74,8 +74,7 @@ function parseBrackets(line, openingBracket, greedy) {
   };
   const bracketOpenIndex = line.indexOf(openingBracket);
   const bracketCloseIndex = greedy ? line.lastIndexOf(brackets[openingBracket]) : line.indexOf(brackets[openingBracket]);
-  if (bracketCloseIndex < 0 || bracketOpenIndex < 0)
-    return "";
+  if (bracketCloseIndex < 0 || bracketOpenIndex < 0) return "";
   return line.slice(bracketOpenIndex + 1, bracketCloseIndex);
 }
 function toID(text) {
@@ -83,21 +82,17 @@ function toID(text) {
 }
 function modernizeLog(line, nextLine) {
   const prefix = /\[.+?\] \(.+?\) /i.exec(line)?.[0];
-  if (!prefix)
-    return;
-  if (ALTS_REGEX.test(line) || AUTOCONFIRMED_REGEX.test(line))
-    return;
+  if (!prefix) return;
+  if (ALTS_REGEX.test(line) || AUTOCONFIRMED_REGEX.test(line)) return;
   line = line.replace(prefix, "");
-  if (line.startsWith("("))
-    line = line.replace(/\([a-z0-9-]*\) /, "");
+  if (line.startsWith("(")) line = line.replace(/\([a-z0-9-]*\) /, "");
   if (line.startsWith("(") && line.endsWith(")")) {
     line = line.slice(1, -1);
   }
   const getAlts = () => {
     let alts = "";
     nextLine?.replace(ALTS_REGEX, (_a, _b, rawAlts) => {
-      if (rawAlts)
-        alts = `alts: [${rawAlts.split(",").map(toID).join("], [")}] `;
+      if (rawAlts) alts = `alts: [${rawAlts.split(",").map(toID).join("], [")}] `;
       return "";
     });
     return alts;
@@ -105,8 +100,7 @@ function modernizeLog(line, nextLine) {
   const getAutoconfirmed = () => {
     let autoconfirmed = "";
     nextLine?.replace(AUTOCONFIRMED_REGEX, (_a, rawAutoconfirmed) => {
-      if (rawAutoconfirmed)
-        autoconfirmed = `ac: [${toID(rawAutoconfirmed)}] `;
+      if (rawAutoconfirmed) autoconfirmed = `ac: [${toID(rawAutoconfirmed)}] `;
       return "";
     });
     return autoconfirmed;
@@ -235,8 +229,7 @@ function modernizeLog(line, nextLine) {
       let reason, ip;
       if (/\(.*\)/.test(log)) {
         reason = parseBrackets(log, "(");
-        if (/\[.*\]/.test(log))
-          ip = parseBrackets(log, "[");
+        if (/\[.*\]/.test(log)) ip = parseBrackets(log, "[");
         log = log.slice(0, log.indexOf("("));
       }
       const actionTaker = toID(log);
@@ -249,8 +242,7 @@ function modernizeLog(line, nextLine) {
       let reason, ip;
       if (/\(.*\)/.test(log)) {
         reason = parseBrackets(log, "(");
-        if (/\[.*\]/.test(log))
-          ip = parseBrackets(log, "[");
+        if (/\[.*\]/.test(log)) ip = parseBrackets(log, "[");
         log = log.slice(0, log.indexOf("("));
       }
       const actionTaker = toID(log);
@@ -264,8 +256,7 @@ function modernizeLog(line, nextLine) {
       let reason, ip;
       if (/\(.*\)/.test(log)) {
         reason = parseBrackets(log, "(");
-        if (/\[.*\]/.test(log))
-          ip = parseBrackets(log, "[");
+        if (/\[.*\]/.test(log)) ip = parseBrackets(log, "[");
         log = log.slice(0, log.indexOf("("));
       }
       let actionTaker = toID(log);
@@ -282,23 +273,20 @@ function modernizeLog(line, nextLine) {
       let reason, ip;
       if (/\(.*\)/.test(log)) {
         reason = parseBrackets(log, "(");
-        if (/\[.*\]/.test(log))
-          ip = parseBrackets(log, "[");
+        if (/\[.*\]/.test(log)) ip = parseBrackets(log, "[");
         log = log.slice(0, log.indexOf("("));
       }
       const actionTaker = toID(log);
       return `${isWeek ? "WEEK" : ""}LOCK: [${locked}] ${getAutoconfirmed()}${getAlts()}${ip ? `[${ip}] ` : ``}by ${actionTaker}${reason ? `: ${reason}` : ``}`;
     },
     " was banned ": (log) => {
-      if (log.includes(" was banned from room "))
-        return modernizerTransformations[" was banned from room "](log);
+      if (log.includes(" was banned from room ")) return modernizerTransformations[" was banned from room "](log);
       const banned = toID(log.slice(0, log.indexOf(" was banned ")));
       log = log.slice(log.indexOf(" by ") + " by ".length);
       let reason, ip;
       if (/\(.*\)/.test(log)) {
         reason = parseBrackets(log, "(");
-        if (/\[.*\]/.test(log))
-          ip = parseBrackets(log, "[");
+        if (/\[.*\]/.test(log)) ip = parseBrackets(log, "[");
         log = log.slice(0, log.indexOf("("));
       }
       const actionTaker = toID(log);
@@ -314,8 +302,7 @@ function modernizeLog(line, nextLine) {
       log = log.slice(`was ${isDemotion ? "demoted" : "promoted"} to `.length);
       let rank = log.slice(0, log.indexOf(" by")).replace(/ /, "").toUpperCase();
       log = log.slice(`${rank} by `.length);
-      if (!rank.startsWith("ROOM"))
-        rank = `GLOBAL ${rank}`;
+      if (!rank.startsWith("ROOM")) rank = `GLOBAL ${rank}`;
       const actionTaker = parseBrackets(log, "[");
       return `${rank}: [${userid}] by ${actionTaker}${isDemotion ? ": (demote)" : ""}`;
     },
@@ -406,8 +393,7 @@ function modernizeLog(line, nextLine) {
       try {
         return prefix + modernizerTransformations[oldAction](line);
       } catch (err) {
-        if (Config.nofswriting)
-          throw err;
+        if (Config.nofswriting) throw err;
         process.stderr.write(`${err.message}
 `);
       }
@@ -417,8 +403,7 @@ function modernizeLog(line, nextLine) {
 }
 function parseModlog(raw, nextLine, isGlobal = false) {
   let line = modernizeLog(raw);
-  if (!line)
-    return;
+  if (!line) return;
   const timestamp = parseBrackets(line, "[");
   line = line.slice(timestamp.length + 3);
   const [roomID, ...bonus] = parseBrackets(line, "(").split(" ");
@@ -435,8 +420,7 @@ function parseModlog(raw, nextLine, isGlobal = false) {
     note: "",
     time: Math.floor(new Date(timestamp).getTime()) || 0
   };
-  if (bonus.length)
-    log.visualRoomID = `${log.roomID} ${bonus.join(" ")}`;
+  if (bonus.length) log.visualRoomID = `${log.roomID} ${bonus.join(" ")}`;
   line = line.slice((log.visualRoomID || log.roomID).length + 3);
   const actionColonIndex = line.indexOf(":");
   const action = line.slice(0, actionColonIndex);
@@ -475,15 +459,12 @@ function parseModlog(raw, nextLine, isGlobal = false) {
               alts.add(toID(trueAlt));
             }
             line = line.slice(line.indexOf(`[${alt}],`) + `[${alt}],`.length).trim();
-            if (!line.startsWith("["))
-              line = `[${line}`;
+            if (!line.startsWith("[")) line = `[${line}`;
           } else {
-            if (import_ip_tools.IPTools.ipRegex.test(alt))
-              break;
+            if (import_ip_tools.IPTools.ipRegex.test(alt)) break;
             alts.add(toID(alt));
             line = line.slice(line.indexOf(`[${alt}],`) + `[${alt}],`.length).trim();
-            if (alt.includes("[") && !line.startsWith("["))
-              line = `[${line}`;
+            if (alt.includes("[") && !line.startsWith("[")) line = `[${line}`;
           }
           alt = parseBrackets(line, "[");
         } while (alt);
@@ -506,32 +487,24 @@ function parseModlog(raw, nextLine, isGlobal = false) {
     const actionTaker = line.slice(actionTakerIndex + 3, colonIndex > actionTakerIndex ? colonIndex : void 0);
     if (toID(actionTaker).length < 19) {
       log.loggedBy = toID(actionTaker) || null;
-      if (colonIndex > actionTakerIndex)
-        line = line.slice(colonIndex);
+      if (colonIndex > actionTakerIndex) line = line.slice(colonIndex);
       line = line.replace(regex, " ");
     }
   }
-  if (line)
-    log.note = line.replace(/^\s?:\s?/, "").trim();
+  if (line) log.note = line.replace(/^\s?:\s?/, "").trim();
   return log;
 }
 function rawifyLog(log) {
   let result = `[${new Date(log.time || Date.now()).toJSON()}] (${(log.visualRoomID || log.roomID || "global").replace(/^global-/, "")}) ${log.action}`;
-  if (log.userid)
-    result += `: [${log.userid}]`;
-  if (log.autoconfirmedID)
-    result += ` ac: [${log.autoconfirmedID}]`;
-  if (log.alts.length)
-    result += ` alts: [${log.alts.join("], [")}]`;
+  if (log.userid) result += `: [${log.userid}]`;
+  if (log.autoconfirmedID) result += ` ac: [${log.autoconfirmedID}]`;
+  if (log.alts.length) result += ` alts: [${log.alts.join("], [")}]`;
   if (log.ip) {
-    if (!log.userid)
-      result += `:`;
+    if (!log.userid) result += `:`;
     result += ` [${log.ip}]`;
   }
-  if (log.loggedBy)
-    result += `${result.endsWith("]") ? "" : ":"} by ${log.loggedBy}`;
-  if (log.note)
-    result += `: ${log.note}`;
+  if (log.loggedBy) result += `${result.endsWith("]") ? "" : ":"} by ${log.loggedBy}`;
+  if (log.note) result += `: ${log.note}`;
   return result + `
 `;
 }
@@ -550,8 +523,7 @@ class ModlogConverterSQLite {
     const roomids = database.prepare("SELECT DISTINCT roomid FROM modlog").all();
     const globalEntries = [];
     for (const { roomid } of roomids) {
-      if (!Config.nofswriting)
-        console.log(`Reading ${roomid}...`);
+      if (!Config.nofswriting) console.log(`Reading ${roomid}...`);
       const results = database.prepare(
         `SELECT *, (SELECT group_concat(userid, ',') FROM alts WHERE alts.modlog_id = modlog.modlog_id) as alts FROM modlog WHERE roomid = ? ORDER BY timestamp ASC`
       ).all(roomid);
@@ -559,8 +531,7 @@ class ModlogConverterSQLite {
       let entriesLogged = 0;
       let entries = [];
       const insertEntries = async () => {
-        if (roomid === "global")
-          return;
+        if (roomid === "global") return;
         entriesLogged += entries.length;
         if (!Config.nofswriting && (entriesLogged % ENTRIES_TO_BUFFER === 0 || entriesLogged < ENTRIES_TO_BUFFER)) {
           process.stdout.clearLine(0);
@@ -571,8 +542,7 @@ class ModlogConverterSQLite {
         entries = [];
       };
       for (const result of results) {
-        if (this.newestAllowedTimestamp && result.timestamp > this.newestAllowedTimestamp)
-          break;
+        if (this.newestAllowedTimestamp && result.timestamp > this.newestAllowedTimestamp) break;
         const entry = {
           action: result.action,
           roomID: result.roomid?.replace(/^global-/, ""),
@@ -591,15 +561,12 @@ class ModlogConverterSQLite {
         if (entry.isGlobal) {
           globalEntries.push(rawLog);
         }
-        if (entries.length === ENTRIES_TO_BUFFER)
-          await insertEntries();
+        if (entries.length === ENTRIES_TO_BUFFER) await insertEntries();
       }
       await insertEntries();
-      if (entriesLogged)
-        process.stdout.write("\n");
+      if (entriesLogged) process.stdout.write("\n");
     }
-    if (!Config.nofswriting)
-      console.log(`Writing the global modlog...`);
+    if (!Config.nofswriting) console.log(`Writing the global modlog...`);
     await this.writeFile(`${this.textLogDir}/modlog_global.txt`, globalEntries.join(""));
   }
   async writeFile(path, text) {
@@ -637,8 +604,7 @@ class ModlogConverterTxt {
     }
     const globalEntries = {};
     for (const file of files) {
-      if (file === "README.md")
-        continue;
+      if (file === "README.md") continue;
       const roomid = file.slice(7, -4);
       const lines = this.isTesting ? this.isTesting.files.get(file)?.split("\n") || [] : (0, import_lib.FS)(`${this.textLogDir}/${file}`).createReadStream().byLine();
       let entriesLogged = 0;
@@ -657,26 +623,21 @@ class ModlogConverterTxt {
       for await (const line of lines) {
         const entry = parseModlog(line, lastLine, roomid === "global");
         lastLine = line;
-        if (!entry)
-          continue;
-        if (this.newestAllowedTimestamp && entry.time > this.newestAllowedTimestamp)
-          break;
+        if (!entry) continue;
+        if (this.newestAllowedTimestamp && entry.time > this.newestAllowedTimestamp) break;
         if (roomid !== "global" && globalEntries[entry.roomID]?.includes(line)) {
           continue;
         }
         if (entry.isGlobal) {
-          if (!globalEntries[entry.roomID])
-            globalEntries[entry.roomID] = [];
+          if (!globalEntries[entry.roomID]) globalEntries[entry.roomID] = [];
           globalEntries[entry.roomID].push(line);
         }
         entries.push(entry);
-        if (entries.length === ENTRIES_TO_BUFFER)
-          await insertEntries();
+        if (entries.length === ENTRIES_TO_BUFFER) await insertEntries();
       }
       delete globalEntries[roomid];
       await insertEntries();
-      if (entriesLogged)
-        process.stdout.write("\n");
+      if (entriesLogged) process.stdout.write("\n");
     }
     return this.modlog.database;
   }
@@ -694,15 +655,13 @@ class ModlogConverterTest {
     }
     const globalEntries = [];
     for (const file of files) {
-      if (file === "README.md")
-        continue;
+      if (file === "README.md") continue;
       const roomid = file.slice(7, -4);
       let entriesLogged = 0;
       let lastLine = void 0;
       let entries = [];
       const insertEntries = async () => {
-        if (roomid === "global")
-          return;
+        if (roomid === "global") return;
         entriesLogged += entries.length;
         if (!Config.nofswriting && (entriesLogged % ENTRIES_TO_BUFFER === 0 || entriesLogged < ENTRIES_TO_BUFFER)) {
           process.stdout.clearLine(0);
@@ -716,23 +675,18 @@ class ModlogConverterTest {
       for await (const line of readStream.byLine()) {
         const entry = parseModlog(line, lastLine, roomid === "global");
         lastLine = line;
-        if (!entry)
-          continue;
+        if (!entry) continue;
         const rawLog = rawifyLog(entry);
-        if (roomid !== "global")
-          entries.push(rawLog);
+        if (roomid !== "global") entries.push(rawLog);
         if (entry.isGlobal) {
           globalEntries.push(rawLog);
         }
-        if (entries.length === ENTRIES_TO_BUFFER)
-          await insertEntries();
+        if (entries.length === ENTRIES_TO_BUFFER) await insertEntries();
       }
       await insertEntries();
-      if (entriesLogged)
-        process.stdout.write("\n");
+      if (entriesLogged) process.stdout.write("\n");
     }
-    if (!Config.nofswriting)
-      console.log(`Writing the global modlog...`);
+    if (!Config.nofswriting) console.log(`Writing the global modlog...`);
     await (0, import_lib.FS)(`${this.outputDir}/modlog_global.txt`).append(globalEntries.join(""));
   }
 }

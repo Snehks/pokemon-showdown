@@ -30,15 +30,12 @@ const SUFFIX_ALIASES = {
 };
 const WHITELISTED_USERIDS = [];
 function checkCanPerform(context, user, permission = "lockdown") {
-  if (!WHITELISTED_USERIDS.includes(user.id))
-    context.checkCan(permission);
+  if (!WHITELISTED_USERIDS.includes(user.id)) context.checkCan(permission);
 }
 function getHostType(type) {
   type = toID(type);
-  if (HOST_SUFFIXES.includes(type))
-    return type;
-  if (SUFFIX_ALIASES[type])
-    return SUFFIX_ALIASES[type];
+  if (HOST_SUFFIXES.includes(type)) return type;
+  if (SUFFIX_ALIASES[type]) return SUFFIX_ALIASES[type];
   throw new Chat.ErrorMessage(`'${type}' is not a valid host type. Please specify one of ${HOST_SUFFIXES.join(", ")}.`);
 }
 function visualizeRangeList(ranges) {
@@ -57,8 +54,7 @@ function formatRange(range, includeModlogBrackets) {
   const endBracket = includeModlogBrackets ? "]" : "";
   let result = `${startBracket}${IPTools.numberToIP(range.minIP)}${endBracket}`;
   result += `-${startBracket}${IPTools.numberToIP(range.maxIP)}${endBracket}`;
-  if (range.host)
-    result += ` (${range.host})`;
+  if (range.host) result += ` (${range.host})`;
   return result;
 }
 const pages = {
@@ -229,8 +225,7 @@ const commands = {
     widen: "add",
     add(target, room, user, connection, cmd) {
       checkCanPerform(this, user, "globalban");
-      if (!target)
-        return this.parse("/help ipranges add");
+      if (!target) return this.parse("/help ipranges add");
       const widen = cmd.includes("widen");
       const [typeString, stringRange, host] = target.split(",").map((part) => part.trim());
       if (!host || !IPTools.hostRegex.test(host)) {
@@ -238,8 +233,7 @@ const commands = {
       }
       const type = getHostType(typeString);
       const range = IPTools.stringToRange(stringRange);
-      if (!range)
-        throw new Chat.ErrorMessage(`Couldn't parse IP range '${stringRange}'.`);
+      if (!range) throw new Chat.ErrorMessage(`Couldn't parse IP range '${stringRange}'.`);
       range.host = `${IPTools.urlToHost(host)}?/${type}`;
       IPTools.sortRanges();
       let result;
@@ -267,13 +261,10 @@ const commands = {
     ],
     remove(target, room, user) {
       checkCanPerform(this, user);
-      if (!target)
-        return this.parse("/help ipranges remove");
+      if (!target) return this.parse("/help ipranges remove");
       const range = IPTools.stringToRange(target);
-      if (!range)
-        throw new Chat.ErrorMessage(`Couldn't parse the IP range '${target}'.`);
-      if (!IPTools.getRange(range.minIP, range.maxIP))
-        throw new Chat.ErrorMessage(`No IP range found at '${target}'.`);
+      if (!range) throw new Chat.ErrorMessage(`Couldn't parse the IP range '${target}'.`);
+      if (!IPTools.getRange(range.minIP, range.maxIP)) throw new Chat.ErrorMessage(`No IP range found at '${target}'.`);
       void IPTools.removeRange(range.minIP, range.maxIP);
       (Rooms.get("upperstaff") || Rooms.get("staff"))?.addByUser(
         user,
@@ -288,18 +279,15 @@ const commands = {
     ],
     rename(target, room, user) {
       checkCanPerform(this, user);
-      if (!target)
-        return this.parse("/help ipranges rename");
+      if (!target) return this.parse("/help ipranges rename");
       const [type, rangeString, url] = target.split(",").map((part) => part.trim());
       if (!url) {
         return this.parse("/help ipranges rename");
       }
       const toRename = IPTools.stringToRange(rangeString);
-      if (!toRename)
-        throw new Chat.ErrorMessage(`Couldn't parse IP range '${rangeString}'.`);
+      if (!toRename) throw new Chat.ErrorMessage(`Couldn't parse IP range '${rangeString}'.`);
       const exists = IPTools.getRange(toRename.minIP, toRename.maxIP);
-      if (!exists)
-        throw new Chat.ErrorMessage(`No IP range found at '${rangeString}'.`);
+      if (!exists) throw new Chat.ErrorMessage(`No IP range found at '${rangeString}'.`);
       const range = {
         minIP: toRename.minIP,
         maxIP: toRename.maxIP,
@@ -353,13 +341,11 @@ const commands = {
     let [type, ...hosts] = target.split(",");
     type = toID(type);
     hosts = hosts.map((host) => host.trim());
-    if (!hosts.length)
-      return this.parse("/help addhosts");
+    if (!hosts.length) return this.parse("/help addhosts");
     switch (type) {
       case "openproxy":
         for (const host of hosts) {
-          if (!IPTools.ipRegex.test(host))
-            throw new Chat.ErrorMessage(`'${host}' is not a valid IP address.`);
+          if (!IPTools.ipRegex.test(host)) throw new Chat.ErrorMessage(`'${host}' is not a valid IP address.`);
           if (removing !== IPTools.singleIPOpenProxies.has(host)) {
             throw new Chat.ErrorMessage(`'${host}' is ${removing ? "not" : "already"} in the list of proxy IPs.`);
           }
@@ -372,8 +358,7 @@ const commands = {
         break;
       case "proxy":
         for (const host of hosts) {
-          if (!IPTools.hostRegex.test(host))
-            throw new Chat.ErrorMessage(`'${host}' is not a valid host.`);
+          if (!IPTools.hostRegex.test(host)) throw new Chat.ErrorMessage(`'${host}' is not a valid host.`);
           if (removing !== IPTools.proxyHosts.has(host)) {
             throw new Chat.ErrorMessage(`'${host}' is ${removing ? "not" : "already"} in the list of proxy hosts.`);
           }
@@ -386,8 +371,7 @@ const commands = {
         break;
       case "residential":
         for (const host of hosts) {
-          if (!IPTools.hostRegex.test(host))
-            throw new Chat.ErrorMessage(`'${host}' is not a valid host.`);
+          if (!IPTools.hostRegex.test(host)) throw new Chat.ErrorMessage(`'${host}' is not a valid host.`);
           if (removing !== IPTools.residentialHosts.has(host)) {
             throw new Chat.ErrorMessage(`'${host}' is ${removing ? "not" : "already"} in the list of residential hosts.`);
           }
@@ -400,8 +384,7 @@ const commands = {
         break;
       case "mobile":
         for (const host of hosts) {
-          if (!IPTools.hostRegex.test(host))
-            throw new Chat.ErrorMessage(`'${host}' is not a valid host.`);
+          if (!IPTools.hostRegex.test(host)) throw new Chat.ErrorMessage(`'${host}' is not a valid host.`);
           if (removing !== IPTools.mobileHosts.has(host)) {
             throw new Chat.ErrorMessage(`'${host}' is ${removing ? "not" : "already"} in the list of mobile hosts.`);
           }
@@ -433,8 +416,7 @@ const commands = {
     `/viewproxies - View the list of proxies. Requires: hosts manager @ ~`
   ],
   markshared(target, room, user) {
-    if (!target)
-      return this.parse("/help markshared");
+    if (!target) return this.parse("/help markshared");
     checkCanPerform(this, user, "globalban");
     const [ip, note] = this.splitOne(target);
     if (!IPTools.ipRegex.test(ip)) {
@@ -453,8 +435,7 @@ const commands = {
         }
       }
     }
-    if (Punishments.isSharedIp(ip))
-      throw new Chat.ErrorMessage("This IP is already marked as shared.");
+    if (Punishments.isSharedIp(ip)) throw new Chat.ErrorMessage("This IP is already marked as shared.");
     if (Punishments.isBlacklistedSharedIp(ip)) {
       throw new Chat.ErrorMessage(`This IP is blacklisted from being marked as shared.`);
     }
@@ -472,13 +453,11 @@ const commands = {
     `Note: the owner/organization (i.e., University of Minnesota) of the shared IP is required. Requires @ ~`
   ],
   unmarkshared(target, room, user) {
-    if (!target)
-      return this.parse("/help unmarkshared");
+    if (!target) return this.parse("/help unmarkshared");
     checkCanPerform(this, user, "globalban");
     target = target.trim();
     const pattern = IPTools.stringToRange(target);
-    if (!pattern)
-      throw new Chat.ErrorMessage("Please enter a valid IP address.");
+    if (!pattern) throw new Chat.ErrorMessage("Please enter a valid IP address.");
     if (pattern.minIP !== pattern.maxIP && !user.can("rangeban")) {
       throw new Chat.ErrorMessage(`Only administrators can unmarkshare ranges.`);
     }
@@ -486,14 +465,12 @@ const commands = {
     if (pattern.minIP !== pattern.maxIP) {
       for (const range of Punishments.sharedRanges.keys()) {
         shared = range.minIP === pattern.minIP && range.maxIP === pattern.maxIP;
-        if (shared)
-          break;
+        if (shared) break;
       }
     } else {
       shared = Punishments.sharedIps.has(target);
     }
-    if (!shared)
-      throw new Chat.ErrorMessage(`That IP/range isn't marked as shared.`);
+    if (!shared) throw new Chat.ErrorMessage(`That IP/range isn't marked as shared.`);
     Punishments.removeSharedIp(target);
     this.privateGlobalModAction(`The IP '${target}' was unmarked as shared by ${user.name}.`);
     this.globalModlog("UNSHAREDIP", null, null, target);
@@ -503,12 +480,10 @@ const commands = {
   marksharedbl: "nomarkshared",
   nomarkshared: {
     add(target, room, user) {
-      if (!target)
-        return this.parse(`/help nomarkshared`);
+      if (!target) return this.parse(`/help nomarkshared`);
       checkCanPerform(this, user, "globalban");
       const [ip, ...reasonArr] = target.split(",");
-      if (!IPTools.ipRangeRegex.test(ip))
-        throw new Chat.ErrorMessage(`Please enter a valid IP address or range.`);
+      if (!IPTools.ipRangeRegex.test(ip)) throw new Chat.ErrorMessage(`Please enter a valid IP address or range.`);
       if (!reasonArr?.length) {
         this.errorReply(`A reason is required.`);
         this.parse(`/help nomarkshared`);
@@ -528,8 +503,7 @@ const commands = {
           throw new Chat.ErrorMessage(`Only Administrators can add ranges.`);
         }
         const range = IPTools.stringToRange(ip);
-        if (!range)
-          throw new Chat.ErrorMessage(`Invalid IP range.`);
+        if (!range) throw new Chat.ErrorMessage(`Invalid IP range.`);
         for (const sharedIp of Punishments.sharedIps.keys()) {
           const ipNum = IPTools.ipToNumber(sharedIp);
           if (IPTools.checkPattern([range], ipNum)) {
@@ -537,8 +511,7 @@ const commands = {
           }
         }
       } else {
-        if (Punishments.isSharedIp(ip))
-          this.parse(`/unmarkshared ${ip}`);
+        if (Punishments.isSharedIp(ip)) this.parse(`/unmarkshared ${ip}`);
       }
       const reason = reasonArr.join(",");
       Punishments.addBlacklistedSharedIp(ip, reason);
@@ -546,11 +519,9 @@ const commands = {
       this.globalModlog("SHAREDIP BLACKLIST", null, reason.trim(), ip);
     },
     remove(target, room, user) {
-      if (!target)
-        return this.parse(`/help nomarkshared`);
+      if (!target) return this.parse(`/help nomarkshared`);
       checkCanPerform(this, user);
-      if (!IPTools.ipRangeRegex.test(target))
-        throw new Chat.ErrorMessage(`Please enter a valid IP address or range.`);
+      if (!IPTools.ipRangeRegex.test(target)) throw new Chat.ErrorMessage(`Please enter a valid IP address or range.`);
       if (!Punishments.sharedIpBlacklist.has(target)) {
         throw new Chat.ErrorMessage(`This IP is not blacklisted from being marked as shared.`);
       }

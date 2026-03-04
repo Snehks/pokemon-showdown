@@ -38,23 +38,17 @@ const DEFAULT_IMAGES = [
 ];
 const lastfm = JSON.parse((0, import_lib.FS)(LASTFM_DB).readIfExistsSync() || "{}");
 const recommendations = JSON.parse((0, import_lib.FS)(RECOMMENDATIONS).readIfExistsSync() || "{}");
-if (!recommendations.saved)
-  recommendations.saved = [];
-if (!recommendations.suggested)
-  recommendations.suggested = [];
+if (!recommendations.saved) recommendations.saved = [];
+if (!recommendations.suggested) recommendations.suggested = [];
 saveRecommendations();
 function updateRecTags() {
   for (const rec of recommendations.saved) {
-    if (!rec.tags.map(toID).includes(toID(rec.artist)))
-      rec.tags.push(rec.artist);
-    if (!rec.tags.map(toID).includes(toID(rec.userData.name)))
-      rec.tags.push(rec.userData.name);
+    if (!rec.tags.map(toID).includes(toID(rec.artist))) rec.tags.push(rec.artist);
+    if (!rec.tags.map(toID).includes(toID(rec.userData.name))) rec.tags.push(rec.userData.name);
   }
   for (const rec of recommendations.suggested) {
-    if (!rec.tags.map(toID).includes(toID(rec.artist)))
-      rec.tags.push(rec.artist);
-    if (!rec.tags.map(toID).includes(toID(rec.userData.name)))
-      rec.tags.push(rec.userData.name);
+    if (!rec.tags.map(toID).includes(toID(rec.artist))) rec.tags.push(rec.artist);
+    if (!rec.tags.map(toID).includes(toID(rec.userData.name))) rec.tags.push(rec.userData.name);
   }
   saveRecommendations();
 }
@@ -87,8 +81,7 @@ class LastFMInterface {
     if (res.error) {
       throw new Chat.ErrorMessage(`${res.message}.`);
     }
-    if (!res?.recenttracks?.track?.length)
-      throw new Chat.ErrorMessage(`last.fm account not found.`);
+    if (!res?.recenttracks?.track?.length) throw new Chat.ErrorMessage(`last.fm account not found.`);
     const track = res.recenttracks.track[0];
     let buf = `<table><tr>`;
     if (track.image?.length) {
@@ -146,8 +139,7 @@ class LastFMInterface {
     return true;
   }
   getAccountName(username) {
-    if (lastfm[toID(username)])
-      return lastfm[toID(username)];
+    if (lastfm[toID(username)]) return lastfm[toID(username)];
     return username.trim().replace(/ /g, "_").replace(/[^-_a-zA-Z0-9]/g, "");
   }
   async tryGetTrackData(track, artist) {
@@ -159,8 +151,7 @@ class LastFMInterface {
       track,
       format: "json"
     };
-    if (artist)
-      query.artist = artist;
+    if (artist) query.artist = artist;
     let raw;
     try {
       raw = await (0, import_lib.Net)(API_ROOT).get({ query });
@@ -228,16 +219,14 @@ class RecommendationsInterface {
     if (this.get(artist, title)) {
       throw new Chat.ErrorMessage(`The song titled '${title}' by ${artist} is already recommended.`);
     }
-    if (!/^https?:\/\//.test(url))
-      url = `https://${url}`;
+    if (!/^https?:\/\//.test(url)) url = `https://${url}`;
     if (!import_youtube.YouTube.linkRegex.test(url)) {
       throw new Chat.ErrorMessage(`Please provide a valid YouTube link.`);
     }
     url = url.split("~")[0];
     const videoInfo = await import_youtube.YouTube.getVideoData(url);
     this.checkTags(tags);
-    if (!recommendations.saved)
-      recommendations.saved = [];
+    if (!recommendations.saved) recommendations.saved = [];
     const rec = {
       artist,
       title,
@@ -248,12 +237,9 @@ class RecommendationsInterface {
       userData: { name: username },
       likes: 0
     };
-    if (!rec.tags.map(toID).includes(toID(username)))
-      rec.tags.push(username);
-    if (!rec.tags.map(toID).includes(toID(artist)))
-      rec.tags.push(artist);
-    if (avatar)
-      rec.userData.avatar = avatar;
+    if (!rec.tags.map(toID).includes(toID(username))) rec.tags.push(username);
+    if (!rec.tags.map(toID).includes(toID(artist))) rec.tags.push(artist);
+    if (avatar) rec.userData.avatar = avatar;
     recommendations.saved.push(rec);
     saveRecommendations();
   }
@@ -279,8 +265,7 @@ class RecommendationsInterface {
     if (this.get(artist, title, null, true)) {
       throw new Chat.ErrorMessage(`The song titled '${title}' by ${artist} is already suggested.`);
     }
-    if (!/^https?:\/\//.test(url))
-      url = `https://${url}`;
+    if (!/^https?:\/\//.test(url)) url = `https://${url}`;
     if (!import_youtube.YouTube.linkRegex.test(url)) {
       throw new Chat.ErrorMessage(`Please provide a valid YouTube link.`);
     }
@@ -297,12 +282,9 @@ class RecommendationsInterface {
       userData: { name: username },
       likes: 0
     };
-    if (!rec.tags.map(toID).includes(toID(username)))
-      rec.tags.push(username);
-    if (!rec.tags.map(toID).includes(toID(artist)))
-      rec.tags.push(artist);
-    if (avatar)
-      rec.userData.avatar = avatar;
+    if (!rec.tags.map(toID).includes(toID(username))) rec.tags.push(username);
+    if (!rec.tags.map(toID).includes(toID(artist))) rec.tags.push(artist);
+    if (avatar) rec.userData.avatar = avatar;
     recommendations.suggested.push(rec);
     saveRecommendations();
   }
@@ -313,8 +295,7 @@ class RecommendationsInterface {
     if (!rec) {
       throw new Chat.ErrorMessage(`There is no song titled '${title}' by ${artist} suggested from ${submitter.trim()}.`);
     }
-    if (!recommendations.saved)
-      recommendations.saved = [];
+    if (!recommendations.saved) recommendations.saved = [];
     recommendations.saved.push(rec);
     recommendations.suggested.splice(recommendations.suggested.indexOf(rec), 1);
     saveRecommendations();
@@ -396,21 +377,18 @@ class RecommendationsInterface {
   }
   get(artist, title, submitter = null, fromSuggestions = false) {
     let recs = recommendations.saved;
-    if (fromSuggestions)
-      recs = recommendations.suggested;
+    if (fromSuggestions) recs = recommendations.suggested;
     return recs.find((x) => toID(x.artist) === toID(artist) && toID(x.title) === toID(title) && (!submitter || toID(x.userData.name) === toID(submitter)));
   }
   getIndex(artist, title, submitter = null, fromSuggestions = false) {
     let recs = recommendations.saved;
-    if (fromSuggestions)
-      recs = recommendations.suggested;
+    if (fromSuggestions) recs = recommendations.suggested;
     return recs.findIndex((x) => toID(x.artist) === toID(artist) && toID(x.title) === toID(title) && (!submitter || toID(x.userData.name) === toID(submitter)));
   }
   checkTags(tags) {
     const cleansedTags = /* @__PURE__ */ new Set();
     for (const tag of tags) {
-      if (!toID(tag))
-        throw new Chat.ErrorMessage(`Empty tag detected.`);
+      if (!toID(tag)) throw new Chat.ErrorMessage(`Empty tag detected.`);
       if (cleansedTags.has(toID(tag))) {
         throw new Chat.ErrorMessage(`Duplicate tag: ${tag.trim()}`);
       }
@@ -449,8 +427,7 @@ const commands = {
     "/lastfmyoutubesearch [enable|disable] - Enables/disables the YouTube API for Last.fm commands. Requires: ~"
   ],
   registerlastfm(target, room, user) {
-    if (!target)
-      return this.parse(`/help registerlastfm`);
+    if (!target) return this.parse(`/help registerlastfm`);
     this.checkChat(target);
     target = this.filter(target) || "";
     if (!target) {
@@ -465,8 +442,7 @@ const commands = {
   ],
   async lastfm(target, room, user) {
     this.checkChat();
-    if (!user.autoconfirmed)
-      throw new Chat.ErrorMessage(`You cannot use this command while not autoconfirmed.`);
+    if (!user.autoconfirmed) throw new Chat.ErrorMessage(`You cannot use this command while not autoconfirmed.`);
     this.runBroadcast(true);
     const targetUsername = this.splitUser(target).targetUsername || (user.named ? user.name : "");
     const username = LastFM.getAccountName(targetUsername);
@@ -477,14 +453,11 @@ const commands = {
     `To link up your last.fm account, check out "/help registerlastfm".`
   ],
   async track(target, room, user) {
-    if (!target)
-      return this.parse("/help track");
+    if (!target) return this.parse("/help track");
     this.checkChat();
-    if (!user.autoconfirmed)
-      throw new Chat.ErrorMessage(`You cannot use this command while not autoconfirmed.`);
+    if (!user.autoconfirmed) throw new Chat.ErrorMessage(`You cannot use this command while not autoconfirmed.`);
     const [track, artist] = this.splitOne(target);
-    if (!track)
-      return this.parse("/help track");
+    if (!track) return this.parse("/help track");
     this.runBroadcast(true);
     this.sendReplyBox(await LastFM.tryGetTrackData(track, artist || void 0));
   },
@@ -511,11 +484,9 @@ const commands = {
   removerecommendation(target, room, user) {
     room = this.requireRoom("thestudio");
     const [artist, title] = target.split(`|`).map((x) => x.trim());
-    if (!(artist && title))
-      return this.parse(`/help removerecommendation`);
+    if (!(artist && title)) return this.parse(`/help removerecommendation`);
     const rec = Recs.get(artist, title);
-    if (!rec)
-      throw new Chat.ErrorMessage(`Recommendation not found.`);
+    if (!rec) throw new Chat.ErrorMessage(`Recommendation not found.`);
     if (toID(rec.userData.name) !== user.id) {
       this.checkCan("mute", null, room);
     }
@@ -534,8 +505,7 @@ const commands = {
       return this.parse("/help suggestrecommendation");
     }
     this.checkChat(target);
-    if (!user.autoconfirmed)
-      throw new Chat.ErrorMessage(`You cannot use this command while not autoconfirmed.`);
+    if (!user.autoconfirmed) throw new Chat.ErrorMessage(`You cannot use this command while not autoconfirmed.`);
     const [artist, title, url, description, ...tags] = target.split("|").map((x) => x.trim());
     if (!(artist && title && url && description && tags?.length)) {
       return this.parse(`/help suggestrecommendation`);
@@ -562,8 +532,7 @@ const commands = {
     room = this.requireRoom("thestudio");
     this.checkCan("mute", null, room);
     const [submitter, artist, title] = target.split("|").map((x) => x.trim());
-    if (!(submitter && artist && title))
-      return this.parse(`/help approvesuggestion`);
+    if (!(submitter && artist && title)) return this.parse(`/help approvesuggestion`);
     Recs.approveSuggestion(submitter, artist, title);
     this.privateModAction(`${user.name} approved a suggested recommendation from ${submitter} for '${title}' by ${artist}.`);
     this.modlog(`RECOMMENDATION`, null, `approve: '${toID(title)}' by ${toID(artist)} from ${submitter}`);
@@ -575,8 +544,7 @@ const commands = {
     room = this.requireRoom("thestudio");
     this.checkCan("mute", null, room);
     const [submitter, artist, title] = target.split("|").map((x) => x.trim());
-    if (!(submitter && artist && title))
-      return this.parse(`/help approvesuggestion`);
+    if (!(submitter && artist && title)) return this.parse(`/help approvesuggestion`);
     Recs.denySuggestion(submitter, artist, title);
     this.privateModAction(`${user.name} denied a suggested recommendation from ${submitter} for '${title}' by ${artist}.`);
     this.modlog(`RECOMMENDATION`, null, `deny: '${toID(title)}' by ${toID(artist)} from ${submitter}`);
@@ -604,8 +572,7 @@ const commands = {
     target = target.slice(0, 300);
     const args = target.split(",");
     for (const rec of recommendations.saved) {
-      if (!args.every((x) => rec.tags.map(toID).includes(toID(x))))
-        continue;
+      if (!args.every((x) => rec.tags.map(toID).includes(toID(x)))) continue;
       matches.push(rec);
     }
     if (!matches.length) {
@@ -626,8 +593,7 @@ const commands = {
   likerecommendation(target, room, user, connection) {
     room = this.requireRoom("thestudio");
     const [artist, title] = target.split("|").map((x) => x.trim());
-    if (!(artist && title))
-      return this.parse(`/help likerecommendation`);
+    if (!(artist && title)) return this.parse(`/help likerecommendation`);
     Recs.likeRecommendation(artist, title, user);
     this.sendReply(`You liked '${title}' by ${artist}.`);
   },
@@ -656,8 +622,7 @@ const pages = {
   async recommendations(query, user, connection) {
     const room = this.requireRoom();
     this.checkCan("mute", null, room);
-    if (!user.inRooms.has(room.roomid))
-      throw new Chat.ErrorMessage(`You must be in ${room.title} to view this page.`);
+    if (!user.inRooms.has(room.roomid)) throw new Chat.ErrorMessage(`You must be in ${room.title} to view this page.`);
     this.title = "Recommendations";
     let buf = `<div class="pad">`;
     buf += `<button style="float:right" class="button" name="send" value="/j view-recommendations-${room.roomid}"><i class="fa fa-refresh"></i> Refresh</button>`;
@@ -679,8 +644,7 @@ const pages = {
   async suggestedrecommendations(query, user, connection) {
     const room = this.requireRoom();
     this.checkCan("mute", null, room);
-    if (!user.inRooms.has(room.roomid))
-      throw new Chat.ErrorMessage(`You must be in ${room.title} to view this page.`);
+    if (!user.inRooms.has(room.roomid)) throw new Chat.ErrorMessage(`You must be in ${room.title} to view this page.`);
     this.title = "Suggested Recommendations";
     let buf = `<div class="pad">`;
     buf += `<button style="float:right" class="button" name="send" value="/j view-suggestedrecommendations-${room.roomid}"><i class="fa fa-refresh"></i> Refresh</button>`;

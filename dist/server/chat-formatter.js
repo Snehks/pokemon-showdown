@@ -36,23 +36,18 @@ class TextFormatter {
   constructor(str, isTrusted = false, replaceLinebreaks = false, showSyntax = false) {
     str = `${str}`.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
     str = str.replace(linkRegex, (uri) => {
-      if (showSyntax)
-        return `<u>${uri}</u>`;
+      if (showSyntax) return `<u>${uri}</u>`;
       let fulluri;
       if (/^[a-z0-9.]+@/ig.test(uri)) {
         fulluri = "mailto:" + uri;
       } else {
         fulluri = uri.replace(/^([a-z]*[^a-z:])/g, "http://$1");
         if (uri.substr(0, 24) === "https://docs.google.com/" || uri.substr(0, 16) === "docs.google.com/") {
-          if (uri.startsWith("https"))
-            uri = uri.slice(8);
-          if (uri.substr(-12) === "?usp=sharing" || uri.substr(-12) === "&usp=sharing")
-            uri = uri.slice(0, -12);
-          if (uri.substr(-6) === "#gid=0")
-            uri = uri.slice(0, -6);
+          if (uri.startsWith("https")) uri = uri.slice(8);
+          if (uri.substr(-12) === "?usp=sharing" || uri.substr(-12) === "&usp=sharing") uri = uri.slice(0, -12);
+          if (uri.substr(-6) === "#gid=0") uri = uri.slice(0, -6);
           let slashIndex = uri.lastIndexOf("/");
-          if (uri.length - slashIndex > 18)
-            slashIndex = uri.length;
+          if (uri.length - slashIndex > 18) slashIndex = uri.length;
           if (slashIndex - 4 > 19 + 3) {
             uri = `${uri.slice(0, 19)}<small class="message-overflow">${uri.slice(19, slashIndex - 4)}</small>${uri.slice(slashIndex - 4)}`;
           }
@@ -104,14 +99,11 @@ class TextFormatter {
         stackPosition = i;
         break;
       }
-      if (span[0] !== "spoiler")
-        break;
+      if (span[0] !== "spoiler") break;
     }
-    if (stackPosition === -1)
-      return false;
+    if (stackPosition === -1) return false;
     this.pushSlice(start);
-    while (this.stack.length > stackPosition)
-      this.popSpan(start);
+    while (this.stack.length > stackPosition) this.popSpan(start);
     this.offset = start;
     return true;
   }
@@ -128,11 +120,9 @@ class TextFormatter {
         break;
       }
     }
-    if (stackPosition === -1)
-      return false;
+    if (stackPosition === -1) return false;
     this.pushSlice(start);
-    while (this.stack.length > stackPosition + 1)
-      this.popSpan(start);
+    while (this.stack.length > stackPosition + 1) this.popSpan(start);
     const span = this.stack.pop();
     const startIndex = span[1];
     let tagName = "";
@@ -173,8 +163,7 @@ class TextFormatter {
    */
   popSpan(end) {
     const span = this.stack.pop();
-    if (!span)
-      return false;
+    if (!span) return false;
     this.pushSlice(end);
     switch (span[0]) {
       case "spoiler":
@@ -191,8 +180,7 @@ class TextFormatter {
     return true;
   }
   popAllSpans(end) {
-    while (this.stack.length)
-      this.popSpan(end);
+    while (this.stack.length) this.popSpan(end);
     this.pushSlice(end);
   }
   toUriComponent(html) {
@@ -215,19 +203,16 @@ class TextFormatter {
           let curDelimLength = 0;
           while (i < this.str.length) {
             const char = this.at(i);
-            if (char === "\n")
-              break;
+            if (char === "\n") break;
             if (char === "`") {
               curDelimLength++;
             } else {
-              if (curDelimLength === delimLength)
-                break;
+              if (curDelimLength === delimLength) break;
               curDelimLength = 0;
             }
             i++;
           }
-          if (curDelimLength !== delimLength)
-            return false;
+          if (curDelimLength !== delimLength) return false;
           const end = i;
           this.pushSlice(start);
           let innerStart = start + delimLength;
@@ -241,35 +226,28 @@ class TextFormatter {
           } else if (this.at(innerEnd - 1) === " " && this.at(innerEnd - 2) === "`") {
             innerEnd--;
           }
-          if (this.showSyntax)
-            this.buffers.push(`<tt>${this.slice(start, innerStart)}</tt>`);
+          if (this.showSyntax) this.buffers.push(`<tt>${this.slice(start, innerStart)}</tt>`);
           this.buffers.push(`<code>`);
           this.buffers.push(this.slice(innerStart, innerEnd));
           this.buffers.push(`</code>`);
-          if (this.showSyntax)
-            this.buffers.push(`<tt>${this.slice(innerEnd, end)}</tt>`);
+          if (this.showSyntax) this.buffers.push(`<tt>${this.slice(innerEnd, end)}</tt>`);
           this.offset = end;
         }
         return true;
       case "[":
         {
-          if (this.slice(start, start + 2) !== "[[")
-            return false;
+          if (this.slice(start, start + 2) !== "[[") return false;
           let i = start + 2;
           let colonPos = -1;
           let anglePos = -1;
           while (i < this.str.length) {
             const char = this.at(i);
-            if (char === "]" || char === "\n")
-              break;
-            if (char === ":" && colonPos < 0)
-              colonPos = i;
-            if (char === "&" && this.slice(i, i + 4) === "&lt;")
-              anglePos = i;
+            if (char === "]" || char === "\n") break;
+            if (char === ":" && colonPos < 0) colonPos = i;
+            if (char === "&" && this.slice(i, i + 4) === "&lt;") anglePos = i;
             i++;
           }
-          if (this.slice(i, i + 2) !== "]]")
-            return false;
+          if (this.slice(i, i + 2) !== "]]") return false;
           this.pushSlice(start);
           this.offset = i + 2;
           let termEnd = i;
@@ -277,8 +255,7 @@ class TextFormatter {
           if (anglePos >= 0 && this.slice(i - 4, i) === "&gt;") {
             uri = this.slice(anglePos + 4, i - 4);
             termEnd = anglePos;
-            if (this.at(termEnd - 1) === " ")
-              termEnd--;
+            if (this.at(termEnd - 1) === " ") termEnd--;
             uri = encodeURI(uri.replace(/^([a-z]*[^a-z:])/g, "http://$1"));
           }
           let term = this.slice(start + 2, termEnd).replace(/<\/?[au](?: [^>]+)?>/g, "");
@@ -294,8 +271,7 @@ class TextFormatter {
             switch (key) {
               case "w":
               case "wiki":
-                if (this.showSyntax)
-                  break;
+                if (this.showSyntax) break;
                 term = term.slice(term.charAt(key.length + 1) === " " ? key.length + 2 : key.length + 1);
                 uri = `//en.wikipedia.org/w/index.php?title=Special:Search&search=${this.toUriComponent(term)}`;
                 term = `wiki: ${term}`;
@@ -316,10 +292,8 @@ class TextFormatter {
                   display = `[${term}]`;
                 }
                 let dir = key;
-                if (key === "item")
-                  dir += "s";
-                if (key === "category")
-                  dir = "categories";
+                if (key === "item") dir += "s";
+                if (key === "category") dir = "categories";
                 uri = `//dex.pokemonshowdown.com/${dir}/${toID(term)}`;
                 term = display;
             }
@@ -336,13 +310,10 @@ class TextFormatter {
         return true;
       case "<":
         {
-          if (this.slice(start, start + 8) !== "&lt;&lt;")
-            return false;
+          if (this.slice(start, start + 8) !== "&lt;&lt;") return false;
           let i = start + 8;
-          while (/[a-z0-9-]/.test(this.at(i)))
-            i++;
-          if (this.slice(i, i + 8) !== "&gt;&gt;")
-            return false;
+          while (/[a-z0-9-]/.test(this.at(i))) i++;
+          if (this.slice(i, i + 8) !== "&gt;&gt;") return false;
           this.pushSlice(start);
           const roomid = this.slice(start + 8, i);
           if (this.showSyntax) {
@@ -383,16 +354,14 @@ class TextFormatter {
         case "|":
           if (this.at(i + 1) === char && this.at(i + 2) !== char) {
             if (!(this.at(i - 1) !== " " && this.closeSpan(char, i, i + 2))) {
-              if (this.at(i + 2) !== " ")
-                this.pushSpan(char, i, i + 2);
+              if (this.at(i + 2) !== " ") this.pushSpan(char, i, i + 2);
             }
             if (i < this.offset) {
               i = this.offset - 1;
               break;
             }
           }
-          while (this.at(i + 1) === char)
-            i++;
+          while (this.at(i + 1) === char) i++;
           break;
         case "(":
           this.stack.push(["(", -1]);
@@ -405,14 +374,12 @@ class TextFormatter {
           }
           break;
         case "`":
-          if (this.at(i + 1) === "`")
-            this.runLookahead("`", i);
+          if (this.at(i + 1) === "`") this.runLookahead("`", i);
           if (i < this.offset) {
             i = this.offset - 1;
             break;
           }
-          while (this.at(i + 1) === "`")
-            i++;
+          while (this.at(i + 1) === "`") i++;
           break;
         case "[":
           this.runLookahead("[", i);
@@ -420,15 +387,12 @@ class TextFormatter {
             i = this.offset - 1;
             break;
           }
-          while (this.at(i + 1) === "[")
-            i++;
+          while (this.at(i + 1) === "[") i++;
           break;
         case ":":
-          if (i < 7)
-            break;
+          if (i < 7) break;
           if (this.slice(i - 7, i + 1).toLowerCase() === "spoiler:" || this.slice(i - 8, i + 1).toLowerCase() === "spoilers:") {
-            if (this.at(i + 1) === " ")
-              i++;
+            if (this.at(i + 1) === " ") i++;
             this.pushSpan("spoiler", i + 1, i + 1);
           }
           break;
@@ -444,8 +408,7 @@ class TextFormatter {
             i = this.offset - 1;
             break;
           }
-          while (this.slice(i + 1, i + 5) === "lt;&")
-            i += 4;
+          while (this.slice(i + 1, i + 5) === "lt;&") i += 4;
           break;
         case "<":
           this.runLookahead("a", i);

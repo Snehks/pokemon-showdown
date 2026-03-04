@@ -34,8 +34,7 @@ const Abilities = {
   baddreams: {
     inherit: true,
     onResidual(pokemon) {
-      if (!pokemon.hp)
-        return;
+      if (!pokemon.hp) return;
       for (const target of pokemon.foes()) {
         if (target.status === "slp" || target.hasAbility("comatose")) {
           const calc = calculate(this, pokemon, target);
@@ -47,12 +46,10 @@ const Abilities = {
   gulpmissile: {
     inherit: true,
     onDamagingHit(damage, target, source, move) {
-      if (!source.hp || !source.isActive || target.isSemiInvulnerable())
-        return;
+      if (!source.hp || !source.isActive || target.isSemiInvulnerable()) return;
       if (["cramorantgulping", "cramorantgorging"].includes(target.species.id)) {
         const calc = calculate(this, target, source);
-        if (calc)
-          this.damage(calc * source.baseMaxhp / 4, source, target);
+        if (calc) this.damage(calc * source.baseMaxhp / 4, source, target);
         if (target.species.id === "cramorantgulping") {
           this.boost({ def: -1 }, source, target, null, true);
         } else {
@@ -85,8 +82,7 @@ function calculate(battle, source, pokemon) {
   const move = battle.dex.getActiveMove("tackle");
   move.type = source.getTypes()[0];
   const typeMod = 2 ** battle.clampIntRange(pokemon.runEffectiveness(move), -6, 6);
-  if (!pokemon.runImmunity(move))
-    return 0;
+  if (!pokemon.runImmunity(move)) return 0;
   return typeMod;
 }
 //# sourceMappingURL=abilities.js.map

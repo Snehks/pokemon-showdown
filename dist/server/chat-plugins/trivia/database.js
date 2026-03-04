@@ -74,14 +74,12 @@ class TriviaSQLiteDatabase {
    * Methods for adding data *
    ***************************/
   async updateLeaderboardForUser(userid, additions) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't update the leaderboard for ${userid} because SQLite is not enabled.`);
     }
     for (const [lb, discrim] of Object.entries(LEADERBOARD_ENUM)) {
-      if (!additions[lb])
-        continue;
+      if (!additions[lb]) continue;
       await this.leaderboardChangeQuery.run({
         score: additions[lb].score,
         totalPoints: additions[lb].totalPoints,
@@ -92,8 +90,7 @@ class TriviaSQLiteDatabase {
     }
   }
   async addHistory(history) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't add a Trivia game to the history because SQLite is not enabled.`);
     }
@@ -102,12 +99,10 @@ class TriviaSQLiteDatabase {
       gameHistoryInsertion: this.gameHistoryInsertion.toString(),
       scoreHistoryInsertion: this.scoreHistoryInsertion.toString()
     });
-    if (!res)
-      throw new Error(`Error updating Trivia history.`);
+    if (!res) throw new Error(`Error updating Trivia history.`);
   }
   async addQuestions(questions) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't add a Trivia question because SQLite is not enabled.`);
     }
@@ -117,12 +112,10 @@ class TriviaSQLiteDatabase {
       answerInsertion: this.answerInsertion.toString(),
       isSubmission: false
     });
-    if (!res)
-      throw new Chat.ErrorMessage(`Error adding Trivia questions.`);
+    if (!res) throw new Chat.ErrorMessage(`Error adding Trivia questions.`);
   }
   async addQuestionSubmissions(questions) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't submit a Trivia question for review because SQLite is not enabled.`);
     }
@@ -132,12 +125,10 @@ class TriviaSQLiteDatabase {
       answerInsertion: this.answerInsertion.toString(),
       isSubmission: true
     });
-    if (!res)
-      throw new Chat.ErrorMessage(`Error adding Trivia questions for review.`);
+    if (!res) throw new Chat.ErrorMessage(`Error adding Trivia questions for review.`);
   }
   async setShouldMoveEventQuestions(shouldMove) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't enable/disable moving event questions because SQLite is not enabled.`);
     }
@@ -147,8 +138,7 @@ class TriviaSQLiteDatabase {
    * Methods for modifying data *
    ******************************/
   async mergeLeaderboardEntries(from, to) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't merge ${from} and ${to}'s Trivia leaderboard entries because SQLite is not enabled.`);
     }
@@ -174,24 +164,21 @@ class TriviaSQLiteDatabase {
     }
   }
   async shouldMoveEventQuestions() {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't find out if we are moving event questions because SQLite is not enabled.`);
     }
     return (await this.eventQuestionQuery.get([]) || { value: false }).value;
   }
   async moveQuestionToCategory(question, newCategory) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't move question category because SQLite is not enabled.`);
     }
     await this.categoryChangeQuery.run([newCategory, question]);
   }
   async migrateCategory(sourceCategory, targetCategory) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't migrate categories because SQLite is not enabled.`);
     }
@@ -199,8 +186,7 @@ class TriviaSQLiteDatabase {
     return changes;
   }
   async acceptSubmissions(submissions) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't accept Trivia question submissions because SQLite is not enabled.`);
     }
@@ -210,8 +196,7 @@ class TriviaSQLiteDatabase {
     );
   }
   async editQuestion(oldQuestionText, newQuestionText, newAnswers) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't edit Trivia question because SQLite is not enabled.`);
     }
@@ -225,8 +210,7 @@ class TriviaSQLiteDatabase {
    * Methods for fetching data *
    *****************************/
   async getHistory(numberOfLines = 10) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't get Trivia game history because SQLite is not enabled.`);
     }
@@ -241,8 +225,7 @@ class TriviaSQLiteDatabase {
     }));
   }
   async getScoresForLastGame() {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't get Trivia game scores because SQLite is not enabled.`);
     }
@@ -254,10 +237,8 @@ class TriviaSQLiteDatabase {
     return results;
   }
   async getQuestions(categories, limit, options) {
-    if (this.readyPromise)
-      await this.readyPromise;
-    if (!Config.usesqlite)
-      throw new Chat.ErrorMessage(`Can't get Trivia questions because SQLite is not enabled.`);
+    if (this.readyPromise) await this.readyPromise;
+    if (!Config.usesqlite) throw new Chat.ErrorMessage(`Can't get Trivia questions because SQLite is not enabled.`);
     let query;
     let args;
     if (categories === "all") {
@@ -273,20 +254,17 @@ class TriviaSQLiteDatabase {
       query = `SELECT * FROM trivia_questions WHERE category IN (${(0, import_utils.formatSQLArray)(categories)}) AND is_submission = 0 ORDER BY ${options.order === "random" ? "RANDOM()" : `added_at ${options.order === "oldestfirst" ? "ASC" : "DESC"}`} LIMIT ?`;
       args = [...categories, limit];
     }
-    if (!query)
-      throw new Error(`Couldn't prepare query`);
+    if (!query) throw new Error(`Couldn't prepare query`);
     const rows = await Chat.database.all(query, args);
     return Promise.all(rows.map((row) => this.rowToQuestion(row)));
   }
   async getLeaderboardEntry(id, leaderboard) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't find out if user ${id} has a Trivia leaderboard entry because SQLite is not enabled.`);
     }
     const row = await this.leaderboardByUserQuery.get([id, LEADERBOARD_ENUM[leaderboard]]);
-    if (!row)
-      return null;
+    if (!row) return null;
     return {
       score: row.score,
       totalPoints: row.total_points,
@@ -294,8 +272,7 @@ class TriviaSQLiteDatabase {
     };
   }
   async getLeaderboards() {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't get the Trivia leaderboard scores because SQLite is not enabled.`);
     }
@@ -313,24 +290,20 @@ class TriviaSQLiteDatabase {
       };
       let leaderboard = null;
       for (const [lb, discrim] of Object.entries(LEADERBOARD_ENUM)) {
-        if (discrim === row.leaderboard)
-          leaderboard = lb;
+        if (discrim === row.leaderboard) leaderboard = lb;
       }
-      if (leaderboard === null)
-        throw new Error(`Invalid leaderboard value ${row.leaderboard}`);
+      if (leaderboard === null) throw new Error(`Invalid leaderboard value ${row.leaderboard}`);
       result[leaderboard][row.userid] = entry;
     }
     return result;
   }
   async getQuestion(questionText) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't check if a Trivia question already exists because SQLite is not enabled.`);
     }
     const row = await this.questionExistsQuery.get([questionText]);
-    if (!row)
-      return null;
+    if (!row) return null;
     return this.rowToQuestion(row);
   }
   async ensureQuestionExists(questionText) {
@@ -346,8 +319,7 @@ class TriviaSQLiteDatabase {
     }
   }
   async getSubmissions() {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't retrieve the Trivia question submissions because SQLite is not enabled.`);
     }
@@ -355,8 +327,7 @@ class TriviaSQLiteDatabase {
     return Promise.all(rows.map((row) => this.rowToQuestion(row)));
   }
   async getQuestionCounts() {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't retrieve the Trivia question counts because SQLite is not enabled.`);
     }
@@ -369,64 +340,55 @@ class TriviaSQLiteDatabase {
     return result;
   }
   async searchQuestions(search, options) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't search Trivia questions because SQLite is not enabled.`);
     }
-    if (options.caseSensitive)
-      await Chat.database.exec(`PRAGMA case_sensitive_like = true;`);
+    if (options.caseSensitive) await Chat.database.exec(`PRAGMA case_sensitive_like = true;`);
     const rows = await this.questionSearchQuery.all([`%${search}%`, Number(options.searchSubmissions)]);
-    if (options.caseSensitive)
-      await Chat.database.exec(`PRAGMA case_sensitive_like = false;`);
+    if (options.caseSensitive) await Chat.database.exec(`PRAGMA case_sensitive_like = false;`);
     return Promise.all(rows.map((row) => this.rowToQuestion(row)));
   }
   /*****************************
    * Methods for deleting data *
    * ***************************/
   async clearSubmissions() {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't clear the Trivia question submissions because SQLite is not enabled.`);
     }
     await Chat.database.run(this.clearAllSubmissionsQuery, []);
   }
   async clearCategory(category) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't clear the Trivia questions in category "${category}" because SQLite is not enabled.`);
     }
     await Chat.database.run(this.clearCategoryQuery, [category]);
   }
   async clearCycleLeaderboard() {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't clear the cycle leaderboard because SQLite is not enabled.`);
     }
     await Chat.database.run(this.clearCycleLeaderboardQuery);
   }
   async deleteQuestion(questionText) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't delete the Trivia question because SQLite is not enabled.`);
     }
     await Chat.database.run(this.deleteQuestionQuery, [questionText]);
   }
   async deleteLeaderboardEntry(userid, leaderboard) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't delete leaderboard entries because SQLite is not enabled.`);
     }
     await this.leaderboardDeletionQuery.run([userid, LEADERBOARD_ENUM[leaderboard]]);
   }
   async deleteSubmissions(submissions) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!Config.usesqlite) {
       throw new Chat.ErrorMessage(`Can't delete Trivia question submissions because SQLite is not enabled.`);
     }
@@ -440,10 +402,8 @@ class TriviaSQLiteDatabase {
    * These are not part of the public API *
    ****************************************/
   async prepareStatements() {
-    if (!Config.usesqlite)
-      return;
-    if (Chat.databaseReadyPromise)
-      await Chat.databaseReadyPromise;
+    if (!Config.usesqlite) return;
+    if (Chat.databaseReadyPromise) await Chat.databaseReadyPromise;
     this.leaderboardInsertion = await Chat.database.prepare(
       `INSERT OR REPLACE INTO trivia_leaderboard (userid, score, total_points, total_correct_answers, leaderboard) VALUES (?, ?, ?, ?, ?) `
     );
@@ -536,15 +496,12 @@ class TriviaSQLiteDatabase {
     await Chat.database.loadExtension("server/chat-plugins/trivia/transactions.js");
   }
   async convertLegacyJSON() {
-    if (!Config.usesqlite || !this.legacyJSONPath)
-      return;
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (!Config.usesqlite || !this.legacyJSONPath) return;
+    if (this.readyPromise) await this.readyPromise;
     let triviaData;
     try {
       triviaData = JSON.parse((0, import_lib.FS)(this.legacyJSONPath).readIfExistsSync() || "{}");
-      if (!triviaData)
-        throw new Error(`no JSON`);
+      if (!triviaData) throw new Error(`no JSON`);
     } catch {
       return;
     }
@@ -552,8 +509,7 @@ class TriviaSQLiteDatabase {
       const oldSubmissions = triviaData.submissions;
       triviaData.submissions = {};
       for (const question of oldSubmissions) {
-        if (!(question.category in triviaData.submissions))
-          triviaData.submissions[question.category] = [];
+        if (!(question.category in triviaData.submissions)) triviaData.submissions[question.category] = [];
         triviaData.submissions[question.category].push(question);
       }
     }
@@ -561,8 +517,7 @@ class TriviaSQLiteDatabase {
       const oldSubmissions = triviaData.questions;
       triviaData.questions = {};
       for (const question of oldSubmissions) {
-        if (!(question.category in triviaData.questions))
-          triviaData.questions[question.category] = [];
+        if (!(question.category in triviaData.questions)) triviaData.questions[question.category] = [];
         triviaData.questions[question.category].push(question);
       }
     }
@@ -588,10 +543,8 @@ class TriviaSQLiteDatabase {
     if (typeof triviaData.questions === "object") {
       for (const category in triviaData.questions) {
         for (const question of triviaData.questions[category]) {
-          if (!question.addedAt)
-            question.addedAt = addedAt;
-          if (!question.user)
-            question.user = "unknown user";
+          if (!question.addedAt) question.addedAt = addedAt;
+          if (!question.user) question.user = "unknown user";
           question.question = question.question.trim();
           await this.addQuestions([question]);
         }
@@ -600,10 +553,8 @@ class TriviaSQLiteDatabase {
     if (typeof triviaData.submissions === "object") {
       for (const category in triviaData.submissions) {
         for (const question of triviaData.submissions[category]) {
-          if (!question.addedAt)
-            question.addedAt = addedAt;
-          if (!question.user)
-            question.user = "unknown user";
+          if (!question.addedAt) question.addedAt = addedAt;
+          if (!question.user) question.user = "unknown user";
           question.question = question.question.trim();
           await this.addQuestionSubmissions([question]);
         }
@@ -612,8 +563,7 @@ class TriviaSQLiteDatabase {
     if (Array.isArray(triviaData.history)) {
       const now = Date.now();
       for (const game of triviaData.history) {
-        if (!game.startTime)
-          game.startTime = now;
+        if (!game.startTime) game.startTime = now;
         await this.addHistory([game]);
       }
     }

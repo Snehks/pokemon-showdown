@@ -36,12 +36,10 @@ class ElimNode {
   }
   setChildren(children) {
     if (this.children) {
-      for (const child of this.children)
-        child.parent = null;
+      for (const child of this.children) child.parent = null;
     }
     if (children) {
-      for (const child of children)
-        child.parent = this;
+      for (const child of children) child.parent = this;
     }
     this.children = children;
   }
@@ -50,8 +48,7 @@ class ElimNode {
     let node;
     while (node = queue.shift()) {
       multiCallback(node);
-      if (node.children)
-        queue.push(...node.children);
+      if (node.children) queue.push(...node.children);
     }
   }
   find(multiCallback) {
@@ -62,16 +59,14 @@ class ElimNode {
       if (value) {
         return value;
       }
-      if (node.children)
-        queue.push(...node.children);
+      if (node.children) queue.push(...node.children);
     }
     return void 0;
   }
   [Symbol.iterator]() {
     const results = [this];
     for (const result of results) {
-      if (result.children)
-        results.push(...result.children);
+      if (result.children) results.push(...result.children);
     }
     return results[Symbol.iterator]();
   }
@@ -113,8 +108,7 @@ class Elimination {
     } else if (typeof maxSubtrees !== "number") {
       maxSubtrees = parseInt(maxSubtrees);
     }
-    if (!maxSubtrees || maxSubtrees < 1)
-      maxSubtrees = 1;
+    if (!maxSubtrees || maxSubtrees < 1) maxSubtrees = 1;
     this.maxSubtrees = maxSubtrees;
     this.treeRoot = null;
     if (nameMap[maxSubtrees]) {
@@ -138,8 +132,7 @@ class Elimination {
     };
   }
   freezeBracket(players) {
-    if (!players.length)
-      throw new Error(`No players in tournament`);
+    if (!players.length) throw new Error(`No players in tournament`);
     this.players = players;
     this.isBracketFrozen = true;
     let tree = null;
@@ -154,8 +147,7 @@ class Elimination {
         continue;
       }
       const targetNode = tree.currentLayerLeafNodes.shift();
-      if (!targetNode)
-        throw new Error(`TypeScript bug: no ! in checkJs`);
+      if (!targetNode) throw new Error(`TypeScript bug: no ! in checkJs`);
       const newLeftChild = new ElimNode({ user: targetNode.user });
       tree.nextLayerLeafNodes.push(newLeftChild);
       const newRightChild = new ElimNode({ user });
@@ -173,10 +165,8 @@ class Elimination {
       const queue = [{ node: tree.root, depth: 0 }];
       let frame;
       while (frame = queue.shift()) {
-        if (!frame.node.children || frame.node.losersBracketNode)
-          continue;
-        if (!matchesByDepth[frame.depth])
-          matchesByDepth[frame.depth] = [];
+        if (!frame.node.children || frame.node.losersBracketNode) continue;
+        if (!matchesByDepth[frame.depth]) matchesByDepth[frame.depth] = [];
         matchesByDepth[frame.depth].push(frame.node);
         queue.push({ node: frame.node.children[0], depth: frame.depth + 1 });
         queue.push({ node: frame.node.children[1], depth: frame.depth + 1 });
@@ -188,14 +178,12 @@ class Elimination {
       };
       newTree.currentLayerLeafNodes.push(newTree.root);
       for (const depth in matchesByDepth) {
-        if (depth === "0")
-          continue;
+        if (depth === "0") continue;
         const matchesThisDepth = matchesByDepth[depth];
         let n = 0;
         for (; n < matchesThisDepth.length - 1; n += 2) {
           const oldLeaf = newTree.currentLayerLeafNodes.shift();
-          if (!oldLeaf)
-            throw new Error(`TypeScript bug: no ! in checkJs`);
+          if (!oldLeaf) throw new Error(`TypeScript bug: no ! in checkJs`);
           const oldLeafFromNode = oldLeaf.fromNode;
           oldLeaf.fromNode = null;
           const newBranch = new ElimNode({ losersBracketIndex });
@@ -235,12 +223,10 @@ class Elimination {
     this.treeRoot = tree.root;
   }
   disqualifyUser(user) {
-    if (!this.isBracketFrozen)
-      return "BracketNotFrozen";
+    if (!this.isBracketFrozen) return "BracketNotFrozen";
     const found = this.treeRoot.find((node) => {
       if (node.state === "available") {
-        if (!node.children)
-          throw new Error(`no children`);
+        if (!node.children) throw new Error(`no children`);
         if (node.children[0].user === user) {
           return {
             match: [user, node.children[1].user],
@@ -266,12 +252,10 @@ class Elimination {
     user.game.setPlayerUser(user, null);
   }
   getAvailableMatches() {
-    if (!this.isBracketFrozen)
-      return "BracketNotFrozen";
+    if (!this.isBracketFrozen) return "BracketNotFrozen";
     const matches = [];
     this.treeRoot.traverse((node) => {
-      if (node.state !== "available")
-        return;
+      if (node.state !== "available") return;
       const p1 = node.children[0].user;
       const p2 = node.children[1].user;
       if (!p1.isBusy && !p2.isBusy) {
@@ -281,30 +265,24 @@ class Elimination {
     return matches;
   }
   setMatchResult([p1, p2], result, score) {
-    if (!this.isBracketFrozen)
-      return "BracketNotFrozen";
-    if (!["win", "loss"].includes(result))
-      return "InvalidMatchResult";
-    if (!this.players.includes(p1) || !this.players.includes(p2))
-      return "UserNotAdded";
+    if (!this.isBracketFrozen) return "BracketNotFrozen";
+    if (!["win", "loss"].includes(result)) return "InvalidMatchResult";
+    if (!this.players.includes(p1) || !this.players.includes(p2)) return "UserNotAdded";
     const targetNode = this.treeRoot.find((node) => {
       if (node.state === "available" && (node.children[0].user === p1 && node.children[1].user === p2)) {
         return node;
       }
       return void 0;
     });
-    if (!targetNode)
-      return "InvalidMatch";
-    if (!targetNode.children)
-      throw new Error(`invalid available state`);
+    if (!targetNode) return "InvalidMatch";
+    if (!targetNode.children) throw new Error(`invalid available state`);
     targetNode.state = "finished";
     targetNode.result = result;
     targetNode.score = score.slice();
     const winner = targetNode.children[result === "win" ? 0 : 1].user;
     const loser = targetNode.children[result === "loss" ? 0 : 1].user;
     targetNode.user = winner;
-    if (!winner || !loser)
-      throw new Error(`invalid available state`);
+    if (!winner || !loser) throw new Error(`invalid available state`);
     if (loser.losses === this.maxSubtrees) {
       loser.isEliminated = true;
       loser.sendRoom(`|tournament|update|{"isJoined":false}`);
@@ -359,17 +337,14 @@ class Elimination {
     return this.treeRoot.state === "finished";
   }
   getResults() {
-    if (!this.isTournamentEnded())
-      return "TournamentNotEnded";
+    if (!this.isTournamentEnded()) return "TournamentNotEnded";
     const results = [];
     let currentNode = this.treeRoot;
     for (let n = 0; n < this.maxSubtrees; ++n) {
       results.push([currentNode.user]);
-      if (!currentNode.children)
-        break;
+      if (!currentNode.children) break;
       currentNode = currentNode.children[currentNode.result === "loss" ? 0 : 1];
-      if (!currentNode)
-        break;
+      if (!currentNode) break;
     }
     if (this.players.length - 1 === this.maxSubtrees && currentNode) {
       results.push([currentNode.user]);

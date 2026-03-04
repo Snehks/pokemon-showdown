@@ -35,18 +35,14 @@ const Scripts = {
     this.teamGenerator = import_teams.Teams.getGenerator(format);
     this.actions.battle = this;
     this.actions.dex = this.dex;
-    if (this.actions.dex.data.Scripts.actions)
-      Object.assign(this.actions, this.actions.dex.data.Scripts.actions);
-    if (format.actions)
-      Object.assign(this.actions, format.actions);
+    if (this.actions.dex.data.Scripts.actions) Object.assign(this.actions, this.actions.dex.data.Scripts.actions);
+    if (format.actions) Object.assign(this.actions, format.actions);
     for (const i in this.dex.data.Scripts) {
       const entry = this.dex.data.Scripts[i];
-      if (typeof entry === "function")
-        this[i] = entry;
+      if (typeof entry === "function") this[i] = entry;
     }
     for (const rule of this.ruleTable.keys()) {
-      if ("+*-!".includes(rule.charAt(0)))
-        continue;
+      if ("+*-!".includes(rule.charAt(0))) continue;
       const subFormat = this.dex.formats.get(rule);
       if (subFormat.exists) {
         const hasEventHandler = Object.keys(subFormat).some(
@@ -61,8 +57,7 @@ const Scripts = {
             "onValidateSet"
           ].includes(val)
         );
-        if (hasEventHandler)
-          this.field.addPseudoWeather(rule);
+        if (hasEventHandler) this.field.addPseudoWeather(rule);
       }
     }
     for (const side of this.sides) {
@@ -76,12 +71,9 @@ const Scripts = {
       }
       side.dynamaxUsed = this.gen !== 8;
     }
-    if (this.deserialized)
-      return;
-    if (!this.sides.every((side) => !!side))
-      throw new Error(`Missing sides: ${this.sides}`);
-    if (this.started)
-      throw new Error(`Battle already started`);
+    if (this.deserialized) return;
+    if (!this.sides.every((side) => !!side)) throw new Error(`Missing sides: ${this.sides}`);
+    if (this.started) throw new Error(`Battle already started`);
     this.started = true;
     if (this.gameType === "multi") {
       this.sides[1].foe = this.sides[2];
@@ -105,14 +97,12 @@ const Scripts = {
     this.add("gen", this.gen);
     this.add("tier", format.name);
     if (this.rated) {
-      if (this.rated === "Rated battle")
-        this.rated = true;
+      if (this.rated === "Rated battle") this.rated = true;
       this.add("rated", typeof this.rated === "string" ? this.rated : "");
     }
     this.format.onBegin?.call(this);
     for (const rule of this.ruleTable.keys()) {
-      if ("+*-!".includes(rule.charAt(0)))
-        continue;
+      if ("+*-!".includes(rule.charAt(0))) continue;
       const subFormat = this.dex.formats.get(rule);
       subFormat.onBegin?.call(this);
     }
@@ -130,8 +120,7 @@ const Scripts = {
     this.runPickTeam();
     this.queue.addChoice({ choice: "start" });
     this.midTurn = true;
-    if (!this.requestState)
-      this.turnLoop();
+    if (!this.requestState) this.turnLoop();
   }
 };
 //# sourceMappingURL=scripts.js.map

@@ -27,8 +27,7 @@ const Scripts = {
   init() {
     for (const i in this.data.Items) {
       const item = this.data.Items[i];
-      if (!item.megaStone || item.isNonstandard !== "Past")
-        continue;
+      if (!item.megaStone || item.isNonstandard !== "Past") continue;
       this.modData("Items", i).onTakeItem = false;
       this.modData("Items", i).isNonstandard = null;
       if (item.megaStone) {
@@ -40,16 +39,13 @@ const Scripts = {
   },
   actions: {
     canMegaEvo(pokemon) {
-      if (pokemon.species.isMega)
-        return null;
+      if (pokemon.species.isMega) return null;
       const item = pokemon.getItem();
-      if (!item.megaStone)
-        return null;
+      if (!item.megaStone) return null;
       return Object.values(item.megaStone)[0];
     },
     runMegaEvo(pokemon) {
-      if (pokemon.species.isMega)
-        return false;
+      if (pokemon.species.isMega) return false;
       const species = this.getMixedSpecies(pokemon.m.originalSpecies, pokemon.canMegaEvo, pokemon);
       const oSpecies = this.dex.species.get(pokemon.m.originalSpecies);
       const oMegaSpecies = this.dex.species.get(species.originalSpecies);
@@ -96,8 +92,7 @@ const Scripts = {
       return deltas;
     },
     mutateOriginalSpecies(speciesOrForme, deltas) {
-      if (!deltas)
-        throw new TypeError("Must specify deltas!");
+      if (!deltas) throw new TypeError("Must specify deltas!");
       const species = this.dex.deepClone(this.dex.species.get(speciesOrForme));
       species.abilities = { "0": deltas.ability };
       if (species.types[0] === deltas.type) {
@@ -115,8 +110,7 @@ const Scripts = {
       species.heightm = Math.max(0.1, (species.heightm * 10 + deltas.heightm * 10) / 10);
       species.originalSpecies = deltas.originalSpecies;
       species.requiredItem = deltas.requiredItem;
-      if (deltas.isMega)
-        species.isMega = true;
+      if (deltas.isMega) species.isMega = true;
       return species;
     }
   }

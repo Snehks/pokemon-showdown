@@ -27,8 +27,7 @@ const Rulesets = {
     onBattleStart() {
       const formesToLeak = ["zaciancrowned", "zamazentacrowned", "xerneas"];
       for (const pokemon of this.getAllPokemon()) {
-        if (!formesToLeak.includes(pokemon.baseSpecies.id))
-          continue;
+        if (!formesToLeak.includes(pokemon.baseSpecies.id)) continue;
         const newDetails = pokemon.details.replace(", shiny", "");
         this.add("updatepoke", pokemon, newDetails);
       }

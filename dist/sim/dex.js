@@ -147,26 +147,21 @@ class ModdedDex {
     return dexes;
   }
   mod(mod) {
-    if (!dexes["base"].modsLoaded)
-      dexes["base"].includeMods();
+    if (!dexes["base"].modsLoaded) dexes["base"].includeMods();
     return dexes[mod || "base"].includeData();
   }
   forGen(gen) {
-    if (!gen)
-      return this;
+    if (!gen) return this;
     return this.mod(`gen${gen}`);
   }
   forFormat(format) {
-    if (!this.modsLoaded)
-      this.includeMods();
+    if (!this.modsLoaded) this.includeMods();
     const mod = this.formats.get(format).mod;
     return dexes[mod || BASE_MOD].includeData();
   }
   modData(dataType, id) {
-    if (this.isBase)
-      return this.data[dataType][id];
-    if (this.data[dataType][id] !== dexes[this.parentMod].data[dataType][id])
-      return this.data[dataType][id];
+    if (this.isBase) return this.data[dataType][id];
+    if (this.data[dataType][id] !== dexes[this.parentMod].data[dataType][id]) return this.data[dataType][id];
     return this.data[dataType][id] = import_utils.Utils.deepClone(this.data[dataType][id]);
   }
   effectToString() {
@@ -194,11 +189,9 @@ class ModdedDex {
    * safety.
    */
   getName(name) {
-    if (typeof name !== "string" && typeof name !== "number")
-      return "";
+    if (typeof name !== "string" && typeof name !== "number") return "";
     name = `${name}`.replace(/[|\s[\],\u202e]+/g, " ").trim();
-    if (name.length > 18)
-      name = name.substr(0, 18).trim();
+    if (name.length > 18) name = name.substr(0, 18).trim();
     name = name.replace(
       /[\u0300-\u036f\u0483-\u0489\u0610-\u0615\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06ED\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]{3,}/g,
       ""
@@ -215,14 +208,12 @@ class ModdedDex {
     const targetTyping = target.getTypes?.() || target.types || target;
     if (Array.isArray(targetTyping)) {
       for (const type of targetTyping) {
-        if (!this.getImmunity(sourceType, type))
-          return false;
+        if (!this.getImmunity(sourceType, type)) return false;
       }
       return true;
     }
     const typeData = this.types.get(targetTyping);
-    if (typeData && typeData.damageTaken[sourceType] === 3)
-      return false;
+    if (typeData && typeData.damageTaken[sourceType] === 3) return false;
     return true;
   }
   getEffectiveness(source, target) {
@@ -236,13 +227,15 @@ class ModdedDex {
       return totalTypeMod;
     }
     const typeData = this.types.get(targetTyping);
-    if (!typeData)
-      return 0;
+    if (!typeData) return 0;
     switch (typeData.damageTaken[sourceType]) {
       case 1:
         return 1;
+      // super-effective
       case 2:
         return -1;
+      // resist
+      // in case of weird situations like Gravity, immunity is handled elsewhere
       default:
         return 0;
     }
@@ -255,8 +248,7 @@ class ModdedDex {
       };
     }
     const entry = this.loadTextData()[table][id];
-    if (!entry)
-      return null;
+    if (!entry) return null;
     const descs = {
       desc: "",
       shortDesc: ""
@@ -270,13 +262,10 @@ class ModdedDex {
       if (!descs.shortDesc && curShortDesc) {
         descs.shortDesc = curShortDesc;
       }
-      if (descs.desc && descs.shortDesc)
-        break;
+      if (descs.desc && descs.shortDesc) break;
     }
-    if (!descs.shortDesc)
-      descs.shortDesc = entry.shortDesc || "";
-    if (!descs.desc)
-      descs.desc = entry.desc || descs.shortDesc;
+    if (!descs.shortDesc) descs.shortDesc = entry.shortDesc || "";
+    if (!descs.desc) descs.desc = entry.desc || descs.shortDesc;
     return descs;
   }
   /**
@@ -289,8 +278,7 @@ class ModdedDex {
    *     moveCopyCopy = Dex.getActiveMove(moveCopy.id)
    */
   getActiveMove(move) {
-    if (move && typeof move.hit === "number")
-      return move;
+    if (move && typeof move.hit === "number") return move;
     move = this.moves.get(move);
     const moveCopy = this.deepClone(move);
     moveCopy.hit = 0;
@@ -349,13 +337,11 @@ class ModdedDex {
    * compatibility with the cartridge games' math systems.
    */
   trunc(num, bits = 0) {
-    if (bits)
-      return (num >>> 0) % 2 ** bits;
+    if (bits) return (num >>> 0) % 2 ** bits;
     return num >>> 0;
   }
   dataSearch(target, searchIn, isInexact) {
-    if (!target)
-      return null;
+    if (!target) return null;
     searchIn = searchIn || ["Pokedex", "Moves", "Abilities", "Items", "Natures"];
     const searchObjects = {
       Pokedex: "species",
@@ -384,10 +370,8 @@ class ModdedDex {
         });
       }
     }
-    if (searchResults.length)
-      return searchResults;
-    if (isInexact)
-      return null;
+    if (searchResults.length) return searchResults;
+    if (isInexact) return null;
     this.loadAliases();
     const fuzzyAliases = Dex.fuzzyAliases.get(toID(target));
     if (fuzzyAliases) {
@@ -404,8 +388,7 @@ class ModdedDex {
         }
       }
     }
-    if (searchResults.length)
-      return searchResults;
+    if (searchResults.length) return searchResults;
     const cmpTarget = toID(target);
     let maxLd = 3;
     if (cmpTarget.length <= 1) {
@@ -418,8 +401,7 @@ class ModdedDex {
     searchResults = null;
     for (const table of searchIn) {
       const searchObj = this.data[table];
-      if (!searchObj)
-        continue;
+      if (!searchObj) continue;
       for (const j in searchObj) {
         const ld = import_utils.Utils.levenshtein(cmpTarget, j, maxLd);
         if (ld <= maxLd) {
@@ -455,10 +437,8 @@ class ModdedDex {
     return require(`${DATA_DIR}/text/${name}`)[exportName];
   }
   includeMods() {
-    if (!this.isBase)
-      throw new Error(`This must be called on the base Dex`);
-    if (this.modsLoaded)
-      return this;
+    if (!this.isBase) throw new Error(`This must be called on the base Dex`);
+    if (this.modsLoaded) return this;
     for (const mod of fs.readdirSync(MODS_DIR)) {
       dexes[mod] = new ModdedDex(mod);
     }
@@ -476,8 +456,7 @@ class ModdedDex {
     return this;
   }
   loadTextData() {
-    if (dexes["base"].textCache)
-      return dexes["base"].textCache;
+    if (dexes["base"].textCache) return dexes["base"].textCache;
     dexes["base"].textCache = {
       Pokedex: this.loadTextFile("pokedex", "PokedexText"),
       Moves: this.loadTextFile("moves", "MovesText"),
@@ -491,10 +470,8 @@ class ModdedDex {
     return this.loadAliases().get(id);
   }
   loadAliases() {
-    if (!this.isBase)
-      return Dex.loadAliases();
-    if (this.aliases)
-      return this.aliases;
+    if (!this.isBase) return Dex.loadAliases();
+    if (this.aliases) return this.aliases;
     const exported = require(path.resolve(DATA_DIR, "aliases"));
     const aliases = /* @__PURE__ */ new Map();
     for (const [alias, target] of Object.entries(exported.Aliases)) {
@@ -506,35 +483,24 @@ class ModdedDex {
     }
     const fuzzyAliases = /* @__PURE__ */ new Map();
     const addFuzzy = (alias, target) => {
-      if (alias === target)
-        return;
-      if (alias.length < 2)
-        return;
+      if (alias === target) return;
+      if (alias.length < 2) return;
       const prev = fuzzyAliases.get(alias) || [];
-      if (!prev.includes(target))
-        prev.push(target);
+      if (!prev.includes(target)) prev.push(target);
       fuzzyAliases.set(alias, prev);
     };
     const addFuzzyForme = (alias, target, forme, formeLetter) => {
       addFuzzy(`${alias}${forme}`, target);
-      if (!forme)
-        return;
+      if (!forme) return;
       addFuzzy(`${alias}${formeLetter}`, target);
       addFuzzy(`${formeLetter}${alias}`, target);
-      if (forme === "alola")
-        addFuzzy(`alolan${alias}`, target);
-      else if (forme === "galar")
-        addFuzzy(`galarian${alias}`, target);
-      else if (forme === "hisui")
-        addFuzzy(`hisuian${alias}`, target);
-      else if (forme === "paldea")
-        addFuzzy(`paldean${alias}`, target);
-      else if (forme === "megax")
-        addFuzzy(`mega${alias}x`, target);
-      else if (forme === "megay")
-        addFuzzy(`mega${alias}y`, target);
-      else
-        addFuzzy(`${forme}${alias}`, target);
+      if (forme === "alola") addFuzzy(`alolan${alias}`, target);
+      else if (forme === "galar") addFuzzy(`galarian${alias}`, target);
+      else if (forme === "hisui") addFuzzy(`hisuian${alias}`, target);
+      else if (forme === "paldea") addFuzzy(`paldean${alias}`, target);
+      else if (forme === "megax") addFuzzy(`mega${alias}x`, target);
+      else if (forme === "megay") addFuzzy(`mega${alias}y`, target);
+      else addFuzzy(`${forme}${alias}`, target);
       if (forme === "megax" || forme === "megay") {
         addFuzzy(`mega${alias}`, target);
         addFuzzy(`${alias}mega`, target);
@@ -569,22 +535,19 @@ class ModdedDex {
         }
         addFuzzyForme(toID(name), id, forme, formeLetter);
         const fullSplit = name.split(/ |-/).map(toID);
-        if (fullSplit.length < 2)
-          continue;
+        if (fullSplit.length < 2) continue;
         const fullAcronym = fullSplit.map((x) => x.charAt(0)).join("");
         addFuzzyForme(fullAcronym, id, forme, formeLetter);
         const fullAcronymWord = fullAcronym + fullSplit[fullSplit.length - 1].slice(1);
         addFuzzyForme(fullAcronymWord, id, forme, formeLetter);
-        for (const wordPart of fullSplit)
-          addFuzzyForme(wordPart, id, forme, formeLetter);
+        for (const wordPart of fullSplit) addFuzzyForme(wordPart, id, forme, formeLetter);
         const spaceSplit = name.split(" ").map(toID);
         if (spaceSplit.length !== fullSplit.length) {
           const spaceAcronym = spaceSplit.map((x) => x.charAt(0)).join("");
           addFuzzyForme(spaceAcronym, id, forme, formeLetter);
           const spaceAcronymWord = spaceAcronym + spaceSplit[spaceSplit.length - 1].slice(1);
           addFuzzyForme(spaceAcronymWord, id, forme, formeLetter);
-          for (const word of fullSplit)
-            addFuzzyForme(word, id, forme, formeLetter);
+          for (const word of fullSplit) addFuzzyForme(word, id, forme, formeLetter);
         }
       }
     }
@@ -593,8 +556,7 @@ class ModdedDex {
     return this.aliases;
   }
   loadData() {
-    if (this.dataCache)
-      return this.dataCache;
+    if (this.dataCache) return this.dataCache;
     dexes["base"].includeMods();
     const dataCache = {};
     const basePath = this.dataDir + "/";
@@ -642,11 +604,9 @@ class ModdedDex {
       }
     }
     this.gen = dataCache.Scripts.gen;
-    if (!this.gen)
-      throw new Error(`Mod ${this.currentMod} needs a generation number in scripts.js`);
+    if (!this.gen) throw new Error(`Mod ${this.currentMod} needs a generation number in scripts.js`);
     this.dataCache = dataCache;
-    if (init)
-      init.call(this);
+    if (init) init.call(this);
     return this.dataCache;
   }
   includeFormats() {

@@ -67,8 +67,7 @@ const Scripts = {
       let sideTrapped = true;
       let sideStaleness;
       for (const pokemon of side.active) {
-        if (!pokemon)
-          continue;
+        if (!pokemon) continue;
         pokemon.moveThisTurn = "";
         pokemon.newlySwitched = false;
         pokemon.moveLastTurnResult = pokemon.moveThisTurnResult;
@@ -93,8 +92,7 @@ const Scripts = {
             pokemon.disableMove(pokemon.lastMove.id);
           }
         }
-        if (pokemon.getLastAttackedBy() && this.gen >= 7)
-          pokemon.knownType = true;
+        if (pokemon.getLastAttackedBy() && this.gen >= 7) pokemon.knownType = true;
         for (let i = pokemon.attackedBy.length - 1; i >= 0; i--) {
           const attack = pokemon.attackedBy[i];
           if (attack.source.isActive) {
@@ -122,8 +120,7 @@ const Scripts = {
         if (this.gen > 2) {
           for (const source of pokemon.foes()) {
             const species = (source.illusion || source).species;
-            if (!species.abilities)
-              continue;
+            if (!species.abilities) continue;
             for (const abilitySlot in species.abilities) {
               const abilityName = species.abilities[abilitySlot];
               if (abilityName === source.ability) {
@@ -136,20 +133,16 @@ const Scripts = {
                 continue;
               }
               const ability = this.dex.abilities.get(abilityName);
-              if (ruleTable.has("-ability:" + ability.id))
-                continue;
-              if (pokemon.knownType && !this.dex.getImmunity("trapped", pokemon))
-                continue;
+              if (ruleTable.has("-ability:" + ability.id)) continue;
+              if (pokemon.knownType && !this.dex.getImmunity("trapped", pokemon)) continue;
               this.singleEvent("FoeMaybeTrapPokemon", ability, {}, pokemon, source);
             }
           }
         }
-        if (pokemon.fainted)
-          continue;
+        if (pokemon.fainted) continue;
         sideTrapped = sideTrapped && pokemon.trapped;
         const staleness = pokemon.volatileStaleness || pokemon.staleness;
-        if (staleness)
-          sideStaleness = sideStaleness === "external" ? sideStaleness : staleness;
+        if (staleness) sideStaleness = sideStaleness === "external" ? sideStaleness : staleness;
         pokemon.activeTurns++;
       }
       trappedBySide.push(sideTrapped);
@@ -157,8 +150,7 @@ const Scripts = {
       side.faintedLastTurn = side.faintedThisTurn;
       side.faintedThisTurn = null;
     }
-    if (this.maybeTriggerEndlessBattleClause(trappedBySide, stalenessBySide))
-      return;
+    if (this.maybeTriggerEndlessBattleClause(trappedBySide, stalenessBySide)) return;
     if (this.gameType === "triples" && this.sides.every((side) => side.pokemonLeft === 1)) {
       const actives = this.getAllActive();
       if (actives.length > 1 && !actives[0].isAdjacent(actives[1])) {
@@ -179,17 +171,14 @@ const Scripts = {
         }
       }
     }
-    if (this.gen === 2)
-      this.quickClawRoll = this.randomChance(60, 256);
-    if (this.gen === 3)
-      this.quickClawRoll = this.randomChance(1, 5);
+    if (this.gen === 2) this.quickClawRoll = this.randomChance(60, 256);
+    if (this.gen === 3) this.quickClawRoll = this.randomChance(1, 5);
     this.makeRequest("move");
   },
   pokemon: {
     getAbility() {
       const move = this.battle.dex.moves.get(this.battle.toID(this.ability));
-      if (!move.exists)
-        return Object.getPrototypeOf(this).getAbility.call(this);
+      if (!move.exists) return Object.getPrototypeOf(this).getAbility.call(this);
       return {
         id: move.id,
         name: move.name,
@@ -225,8 +214,7 @@ const Scripts = {
       if (this.battle.dex.currentMod === "gen1stadium" && (species.name === "Ditto" || this.species.name === "Ditto" && pokemon.moves.includes("transform"))) {
         return false;
       }
-      if (!this.setSpecies(species, effect, true))
-        return false;
+      if (!this.setSpecies(species, effect, true)) return false;
       this.transformed = true;
       this.weighthg = pokemon.weighthg;
       const types = pokemon.getTypes(true, true);
@@ -237,8 +225,7 @@ const Scripts = {
       let statName;
       for (statName in this.storedStats) {
         this.storedStats[statName] = pokemon.storedStats[statName];
-        if (this.modifiedStats)
-          this.modifiedStats[statName] = pokemon.modifiedStats[statName];
+        if (this.modifiedStats) this.modifiedStats[statName] = pokemon.modifiedStats[statName];
       }
       this.moveSlots = [];
       this.hpType = this.battle.gen >= 5 ? this.hpType : pokemon.hpType;
@@ -266,15 +253,12 @@ const Scripts = {
       }
       if (this.battle.gen >= 6) {
         const volatilesToCopy = ["dragoncheer", "focusenergy", "gmaxchistrike", "laserfocus"];
-        for (const volatile of volatilesToCopy)
-          this.removeVolatile(volatile);
+        for (const volatile of volatilesToCopy) this.removeVolatile(volatile);
         for (const volatile of volatilesToCopy) {
           if (pokemon.volatiles[volatile]) {
             this.addVolatile(volatile);
-            if (volatile === "gmaxchistrike")
-              this.volatiles[volatile].layers = pokemon.volatiles[volatile].layers;
-            if (volatile === "dragoncheer")
-              this.volatiles[volatile].hasDragonType = pokemon.volatiles[volatile].hasDragonType;
+            if (volatile === "gmaxchistrike") this.volatiles[volatile].layers = pokemon.volatiles[volatile].layers;
+            if (volatile === "dragoncheer") this.volatiles[volatile].hasDragonType = pokemon.volatiles[volatile].hasDragonType;
           }
         }
       }
@@ -287,8 +271,7 @@ const Scripts = {
         this.knownType = true;
         this.apparentType = this.terastallized;
       }
-      if (this.battle.gen > 2)
-        this.setAbility(pokemon.getAbility(), this, null, true, true);
+      if (this.battle.gen > 2) this.setAbility(pokemon.getAbility(), this, null, true, true);
       if (this.battle.gen === 4) {
         if (this.species.num === 487) {
           if (this.species.name === "Giratina" && this.item === "griseousorb") {
@@ -305,10 +288,8 @@ const Scripts = {
           }
         }
       }
-      if (this.species.baseSpecies === "Ogerpon" && this.canTerastallize)
-        this.canTerastallize = false;
-      if (this.species.baseSpecies === "Terapagos" && this.canTerastallize)
-        this.canTerastallize = false;
+      if (this.species.baseSpecies === "Ogerpon" && this.canTerastallize) this.canTerastallize = false;
+      if (this.species.baseSpecies === "Terapagos" && this.canTerastallize) this.canTerastallize = false;
       return true;
     }
   }

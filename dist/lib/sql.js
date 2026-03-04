@@ -66,8 +66,7 @@ class SQLDatabaseManager extends import_process_manager.QueryProcessManager {
       try {
         switch (query.type) {
           case "load-extension": {
-            if (!this.database)
-              return null;
+            if (!this.database) return null;
             this.loadExtensionFile(query.data);
             return true;
           }
@@ -83,8 +82,7 @@ class SQLDatabaseManager extends import_process_manager.QueryProcessManager {
             return transaction(query.data, env) || null;
           }
           case "exec": {
-            if (!this.database)
-              return { changes: 0 };
+            if (!this.database) return { changes: 0 };
             this.database.exec(query.data);
             return true;
           }
@@ -124,15 +122,13 @@ class SQLDatabaseManager extends import_process_manager.QueryProcessManager {
       transactions: /* @__PURE__ */ new Map(),
       statements: /* @__PURE__ */ new Map()
     };
-    if (!this.isParentProcess)
-      this.setupDatabase();
+    if (!this.isParentProcess) this.setupDatabase();
   }
   onError(err, query) {
     err.message += ` [process ${process.pid}]`;
     if (this.options.onError) {
       const result = this.options.onError(err, query, false);
-      if (result)
-        return result;
+      if (result) return result;
     }
     return {
       queryError: {
@@ -157,26 +153,22 @@ class SQLDatabaseManager extends import_process_manager.QueryProcessManager {
   extractStatement(query) {
     query.statement = query.statement.trim();
     const statement = query.noPrepare ? this.state.statements.get(query.statement) : this.cacheStatement(query.statement);
-    if (!statement)
-      throw new Error(`Missing cached statement "${query.statement}" where required`);
+    if (!statement) throw new Error(`Missing cached statement "${query.statement}" where required`);
     return statement;
   }
   setupDatabase() {
-    if (this.dbReady)
-      return;
+    if (this.dbReady) return;
     this.dbReady = true;
     const { file, extension } = this.options;
     const Database = getModule();
     this.database = Database ? new Database(file) : null;
-    if (extension)
-      this.loadExtensionFile(extension);
+    if (extension) this.loadExtensionFile(extension);
   }
   loadExtensionFile(extension) {
     return this.handleExtensions(require("../" + extension));
   }
   handleExtensions(imports) {
-    if (!this.database)
-      return;
+    if (!this.database) return;
     const {
       functions,
       transactions: storedTransactions,
@@ -211,26 +203,22 @@ class SQLDatabaseManager extends import_process_manager.QueryProcessManager {
       err.stack = result.queryError.stack;
       if (this.options.onError) {
         const errResult = this.options.onError(err, result.queryError.query, true);
-        if (errResult)
-          return errResult;
+        if (errResult) return errResult;
       }
       throw err;
     }
     return result;
   }
   all(statement, data = [], noPrepare) {
-    if (typeof statement !== "string")
-      statement = statement.toString();
+    if (typeof statement !== "string") statement = statement.toString();
     return this.query({ type: "all", statement, data, noPrepare });
   }
   get(statement, data = [], noPrepare) {
-    if (typeof statement !== "string")
-      statement = statement.toString();
+    if (typeof statement !== "string") statement = statement.toString();
     return this.query({ type: "get", statement, data, noPrepare });
   }
   run(statement, data = [], noPrepare) {
-    if (typeof statement !== "string")
-      statement = statement.toString();
+    if (typeof statement !== "string") statement = statement.toString();
     return this.query({ type: "run", statement, data, noPrepare });
   }
   transaction(name, data = []) {
@@ -238,8 +226,7 @@ class SQLDatabaseManager extends import_process_manager.QueryProcessManager {
   }
   async prepare(statement) {
     const source = await this.query({ type: "prepare", data: statement });
-    if (!source)
-      return null;
+    if (!source) return null;
     return new Statement(source, this);
   }
   exec(data) {
@@ -274,8 +261,7 @@ class DatabaseTable {
     } else {
       for (let i = 0; i < entries.length; i++) {
         query.append(entries[i]);
-        if (typeof entries[i + 1] !== "undefined")
-          query.append(", ");
+        if (typeof entries[i + 1] !== "undefined") query.append(", ");
       }
       query.append(" ");
     }
@@ -308,8 +294,7 @@ class DatabaseTable {
       query.append(` WHERE `);
       query.append(where);
     }
-    if (limit)
-      query.append(SQL.SQL` LIMIT ${limit}`);
+    if (limit) query.append(SQL.SQL` LIMIT ${limit}`);
     return this.run(query);
   }
   updateOne(to, where) {
@@ -342,19 +327,16 @@ class DatabaseTable {
     const keys = Object.keys(colMap);
     for (let i = 0; i < keys.length; i++) {
       query.append(keys[i]);
-      if (typeof keys[i + 1] !== "undefined")
-        query.append(", ");
+      if (typeof keys[i + 1] !== "undefined") query.append(", ");
     }
     query.append(") VALUES (");
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       query.append(SQL.SQL`${colMap[key]}`);
-      if (typeof keys[i + 1] !== "undefined")
-        query.append(", ");
+      if (typeof keys[i + 1] !== "undefined") query.append(", ");
     }
     query.append(") ");
-    if (rest)
-      query.append(rest);
+    if (rest) query.append(rest);
     return this.database.run(query.sql, query.values);
   }
   replace(cols, rest) {
@@ -375,10 +357,8 @@ class DatabaseTable {
   }
 }
 function getSQL(id, module2, input) {
-  if (typeof input === "undefined")
-    throw new Error(`SQLDatabaseManager factory requires 3 arguments.`);
-  if ("processes" in input)
-    throw new Error(`Passing process count to SQLDatabaseManager factory no longer supported.`);
+  if (typeof input === "undefined") throw new Error(`SQLDatabaseManager factory requires 3 arguments.`);
+  if ("processes" in input) throw new Error(`Passing process count to SQLDatabaseManager factory no longer supported.`);
   return new SQLDatabaseManager(id, module2, input);
 }
 const SQL = Object.assign(getSQL, {

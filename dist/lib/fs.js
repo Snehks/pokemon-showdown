@@ -110,8 +110,7 @@ class FSPath {
   readIfExists() {
     return new Promise((resolve, reject) => {
       fs.readFile(this.path, "utf8", (err, data) => {
-        if (err && err.code === "ENOENT")
-          return resolve("");
+        if (err && err.code === "ENOENT") return resolve("");
         err ? reject(err) : resolve(data);
       });
     });
@@ -120,14 +119,12 @@ class FSPath {
     try {
       return fs.readFileSync(this.path, "utf8");
     } catch (err) {
-      if (err.code !== "ENOENT")
-        throw err;
+      if (err.code !== "ENOENT") throw err;
     }
     return "";
   }
   write(data, options = {}) {
-    if (global.Config?.nofswriting)
-      return Promise.resolve();
+    if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.writeFile(this.path, data, options, (err) => {
         err ? reject(err) : resolve();
@@ -135,8 +132,7 @@ class FSPath {
     });
   }
   writeSync(data, options = {}) {
-    if (global.Config?.nofswriting)
-      return;
+    if (global.Config?.nofswriting) return;
     return fs.writeFileSync(this.path, data, options);
   }
   /**
@@ -166,8 +162,7 @@ class FSPath {
    * with synchronous code; just use `safeWriteSync`.
    */
   writeUpdate(dataFetcher, options = {}) {
-    if (global.Config?.nofswriting)
-      return;
+    if (global.Config?.nofswriting) return;
     const pendingUpdate = __fsState.pendingUpdates.get(this.path);
     const throttleTime = options.throttle ? Date.now() + options.throttle : 0;
     if (pendingUpdate) {
@@ -207,10 +202,8 @@ class FSPath {
   }
   checkNextUpdate() {
     const pendingUpdate = __fsState.pendingUpdates.get(this.path);
-    if (!pendingUpdate)
-      throw new Error(`FS: Pending update not found`);
-    if (pendingUpdate.isWriting)
-      throw new Error(`FS: Conflicting update`);
+    if (!pendingUpdate) throw new Error(`FS: Pending update not found`);
+    if (pendingUpdate.isWriting) throw new Error(`FS: Conflicting update`);
     const { pendingDataFetcher: dataFetcher, pendingOptions: options } = pendingUpdate;
     if (!dataFetcher || !options) {
       __fsState.pendingUpdates.delete(this.path);
@@ -220,10 +213,8 @@ class FSPath {
   }
   finishUpdate() {
     const pendingUpdate = __fsState.pendingUpdates.get(this.path);
-    if (!pendingUpdate)
-      throw new Error(`FS: Pending update not found`);
-    if (!pendingUpdate.isWriting)
-      throw new Error(`FS: Conflicting update`);
+    if (!pendingUpdate) throw new Error(`FS: Pending update not found`);
+    if (!pendingUpdate.isWriting) throw new Error(`FS: Conflicting update`);
     pendingUpdate.isWriting = false;
     const throttleTime = pendingUpdate.throttleTime;
     if (!throttleTime || throttleTime < Date.now()) {
@@ -233,8 +224,7 @@ class FSPath {
     pendingUpdate.throttleTimer = setTimeout(() => this.checkNextUpdate(), throttleTime - Date.now());
   }
   append(data, options = {}) {
-    if (global.Config?.nofswriting)
-      return Promise.resolve();
+    if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.appendFile(this.path, data, options, (err) => {
         err ? reject(err) : resolve();
@@ -242,13 +232,11 @@ class FSPath {
     });
   }
   appendSync(data, options = {}) {
-    if (global.Config?.nofswriting)
-      return;
+    if (global.Config?.nofswriting) return;
     return fs.appendFileSync(this.path, data, options);
   }
   symlinkTo(target) {
-    if (global.Config?.nofswriting)
-      return Promise.resolve();
+    if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.symlink(target, this.path, (err) => {
         err ? reject(err) : resolve();
@@ -256,13 +244,11 @@ class FSPath {
     });
   }
   symlinkToSync(target) {
-    if (global.Config?.nofswriting)
-      return;
+    if (global.Config?.nofswriting) return;
     return fs.symlinkSync(target, this.path);
   }
   copyFile(dest) {
-    if (global.Config?.nofswriting)
-      return Promise.resolve();
+    if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.copyFile(this.path, dest, (err) => {
         err ? reject(err) : resolve();
@@ -270,8 +256,7 @@ class FSPath {
     });
   }
   rename(target) {
-    if (global.Config?.nofswriting)
-      return Promise.resolve();
+    if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.rename(this.path, target, (err) => {
         err ? reject(err) : resolve();
@@ -279,8 +264,7 @@ class FSPath {
     });
   }
   renameSync(target) {
-    if (global.Config?.nofswriting)
-      return;
+    if (global.Config?.nofswriting) return;
     return fs.renameSync(this.path, target);
   }
   readdir() {
@@ -294,13 +278,11 @@ class FSPath {
     return fs.readdirSync(this.path);
   }
   async readdirIfExists() {
-    if (await this.exists())
-      return this.readdir();
+    if (await this.exists()) return this.readdir();
     return Promise.resolve([]);
   }
   readdirIfExistsSync() {
-    if (this.existsSync())
-      return this.readdirSync();
+    if (this.existsSync()) return this.readdirSync();
     return [];
   }
   createReadStream() {
@@ -322,29 +304,24 @@ class FSPath {
     return new import_streams.WriteStream(fs.createWriteStream(this.path, options));
   }
   unlinkIfExists() {
-    if (global.Config?.nofswriting)
-      return Promise.resolve();
+    if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.unlink(this.path, (err) => {
-        if (err && err.code === "ENOENT")
-          return resolve();
+        if (err && err.code === "ENOENT") return resolve();
         err ? reject(err) : resolve();
       });
     });
   }
   unlinkIfExistsSync() {
-    if (global.Config?.nofswriting)
-      return;
+    if (global.Config?.nofswriting) return;
     try {
       fs.unlinkSync(this.path);
     } catch (err) {
-      if (err.code !== "ENOENT")
-        throw err;
+      if (err.code !== "ENOENT") throw err;
     }
   }
   async rmdir(recursive) {
-    if (global.Config?.nofswriting)
-      return Promise.resolve();
+    if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.rmdir(this.path, { recursive }, (err) => {
         err ? reject(err) : resolve();
@@ -352,13 +329,11 @@ class FSPath {
     });
   }
   rmdirSync(recursive) {
-    if (global.Config?.nofswriting)
-      return;
+    if (global.Config?.nofswriting) return;
     return fs.rmdirSync(this.path, { recursive });
   }
   mkdir(mode = 493) {
-    if (global.Config?.nofswriting)
-      return Promise.resolve();
+    if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.mkdir(this.path, mode, (err) => {
         err ? reject(err) : resolve();
@@ -366,29 +341,24 @@ class FSPath {
     });
   }
   mkdirSync(mode = 493) {
-    if (global.Config?.nofswriting)
-      return;
+    if (global.Config?.nofswriting) return;
     return fs.mkdirSync(this.path, mode);
   }
   mkdirIfNonexistent(mode = 493) {
-    if (global.Config?.nofswriting)
-      return Promise.resolve();
+    if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.mkdir(this.path, mode, (err) => {
-        if (err && err.code === "EEXIST")
-          return resolve();
+        if (err && err.code === "EEXIST") return resolve();
         err ? reject(err) : resolve();
       });
     });
   }
   mkdirIfNonexistentSync(mode = 493) {
-    if (global.Config?.nofswriting)
-      return;
+    if (global.Config?.nofswriting) return;
     try {
       fs.mkdirSync(this.path, mode);
     } catch (err) {
-      if (err.code !== "EEXIST")
-        throw err;
+      if (err.code !== "EEXIST") throw err;
     }
   }
   /**
@@ -399,8 +369,7 @@ class FSPath {
     try {
       await this.mkdirIfNonexistent(mode);
     } catch (err) {
-      if (err.code !== "ENOENT")
-        throw err;
+      if (err.code !== "ENOENT") throw err;
       await this.parentDir().mkdirp(mode);
       await this.mkdirIfNonexistent(mode);
     }
@@ -413,8 +382,7 @@ class FSPath {
     try {
       this.mkdirIfNonexistentSync(mode);
     } catch (err) {
-      if (err.code !== "ENOENT")
-        throw err;
+      if (err.code !== "ENOENT") throw err;
       this.parentDir().mkdirpSync(mode);
       this.mkdirIfNonexistentSync(mode);
     }
@@ -422,8 +390,7 @@ class FSPath {
   /** Calls the callback if the file is modified. */
   onModify(callback) {
     fs.watchFile(this.path, (curr, prev) => {
-      if (curr.mtime > prev.mtime)
-        return callback();
+      if (curr.mtime > prev.mtime) return callback();
     });
   }
   /** Clears callbacks added with onModify(). */
@@ -471,13 +438,11 @@ class FileReadStream extends import_streams.ReadStream {
   }
   _read(size = 16384) {
     return new Promise((resolve, reject) => {
-      if (this.atEOF)
-        return void resolve();
+      if (this.atEOF) return void resolve();
       this.ensureCapacity(size);
       void this.fd.then((fd) => {
         fs.read(fd, this.buf, this.bufEnd, size, null, (err, bytesRead, buf) => {
-          if (err)
-            return reject(err);
+          if (err) return reject(err);
           if (!bytesRead) {
             this.atEOF = true;
             this.resolvePush();

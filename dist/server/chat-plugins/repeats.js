@@ -32,8 +32,7 @@ const Repeats = new class {
     /** room:identifier:phrase:timeout map */
     this.repeats = /* @__PURE__ */ new Map();
     for (const room of Rooms.rooms.values()) {
-      if (!room.settings?.repeats?.length)
-        continue;
+      if (!room.settings?.repeats?.length) continue;
       for (const repeat of room.settings.repeats) {
         this.runRepeat(room, repeat);
       }
@@ -51,30 +50,25 @@ const Repeats = new class {
   }
   addRepeat(room, repeat) {
     this.runRepeat(room, repeat);
-    if (!room.settings.repeats)
-      room.settings.repeats = [];
+    if (!room.settings.repeats) room.settings.repeats = [];
     room.settings.repeats.push(repeat);
     room.saveSettings();
   }
   removeRepeat(room, id) {
-    if (!room.settings.repeats)
-      return;
+    if (!room.settings.repeats) return;
     const phrase = room.settings.repeats.find((x) => x.id === id)?.phrase;
     room.settings.repeats = room.settings.repeats.filter((repeat) => repeat.id !== id);
-    if (!room.settings.repeats.length)
-      delete room.settings.repeats;
+    if (!room.settings.repeats.length) delete room.settings.repeats;
     room.saveSettings();
     const roomRepeats = this.repeats.get(room);
-    if (!roomRepeats)
-      return;
+    if (!roomRepeats) return;
     const oldInterval = roomRepeats.get(id)?.get(phrase);
     this.removeRepeatHandler(room, oldInterval);
     roomRepeats.delete(id);
   }
   clearRepeats(room) {
     const roomRepeats = this.repeats.get(room);
-    if (!roomRepeats)
-      return;
+    if (!roomRepeats) return;
     for (const ids of roomRepeats.values()) {
       for (const interval of ids.values()) {
         this.removeRepeatHandler(room, interval);
@@ -157,13 +151,11 @@ const commands = {
     const isHTML = cmd.includes("html");
     const isByMessages = cmd.includes("bymessages");
     room = this.requireRoom();
-    if (room.settings.isPersonal)
-      throw new Chat.ErrorMessage(`Personal rooms do not support repeated messages.`);
+    if (room.settings.isPersonal) throw new Chat.ErrorMessage(`Personal rooms do not support repeated messages.`);
     this.checkCan(isHTML ? "addhtml" : "mute", null, room);
     const [intervalString, name, ...messageArray] = target.split(",");
     const id = toID(name);
-    if (!id)
-      throw new Chat.ErrorMessage(this.tr`Repeat names must include at least one alphanumeric character.`);
+    if (!id) throw new Chat.ErrorMessage(this.tr`Repeat names must include at least one alphanumeric character.`);
     const phrase = messageArray.join(",").trim();
     const interval = parseInt(intervalString);
     if (isNaN(interval) || !/[0-9]{1,}/.test(intervalString) || interval < 1 || interval > 24 * 60) {
@@ -172,8 +164,7 @@ const commands = {
     if (Repeats.hasRepeat(room, id)) {
       throw new Chat.ErrorMessage(this.tr`The phrase labeled with "${id}" is already being repeated in this room.`);
     }
-    if (isHTML)
-      this.checkHTML(phrase);
+    if (isHTML) this.checkHTML(phrase);
     Repeats.addRepeat(room, {
       id,
       phrase,
@@ -197,8 +188,7 @@ const commands = {
   repeatfaq(target, room, user, connection, cmd) {
     room = this.requireRoom();
     this.checkCan("mute", null, room);
-    if (room.settings.isPersonal)
-      throw new Chat.ErrorMessage(`Personal rooms do not support repeated messages.`);
+    if (room.settings.isPersonal) throw new Chat.ErrorMessage(`Personal rooms do not support repeated messages.`);
     const isByMessages = cmd.includes("bymessages");
     let [intervalString, topic] = target.split(",");
     const interval = parseInt(intervalString);
@@ -262,8 +252,7 @@ const commands = {
   repeats: "viewrepeats",
   viewrepeats(target, room, user) {
     const roomid = toID(target) || room?.roomid;
-    if (!roomid)
-      throw new Chat.ErrorMessage(this.tr`You must specify a room when using this command in PMs.`);
+    if (!roomid) throw new Chat.ErrorMessage(this.tr`You must specify a room when using this command in PMs.`);
     this.parse(`/j view-repeats-${roomid}`);
   }
 };

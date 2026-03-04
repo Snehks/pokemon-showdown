@@ -29,8 +29,7 @@ const Items = {
         this.heal(pokemon.baseMaxhp / 16);
       } else {
         const calc = calculate(this, pokemon, pokemon);
-        if (calc)
-          this.damage(calc * pokemon.baseMaxhp / 8);
+        if (calc) this.damage(calc * pokemon.baseMaxhp / 8);
       }
     }
   },
@@ -40,8 +39,7 @@ const Items = {
       if (move.category === "Physical" && source.hp && source.isActive && !source.hasAbility("magicguard")) {
         if (target.eatItem()) {
           const calc = calculate(this, target, source);
-          if (calc)
-            this.damage(calc * source.baseMaxhp / (target.hasAbility("ripen") ? 4 : 8), source, target);
+          if (calc) this.damage(calc * source.baseMaxhp / (target.hasAbility("ripen") ? 4 : 8), source, target);
         }
       }
     }
@@ -51,8 +49,7 @@ const Items = {
     onAfterMoveSecondarySelf(source, target, move) {
       if (source && source !== target && move && move.category !== "Status" && !source.forceSwitchFlag) {
         const calc = calculate(this, source, source);
-        if (calc)
-          this.damage(calc * source.baseMaxhp / 10, source, source, this.dex.items.get("lifeorb"));
+        if (calc) this.damage(calc * source.baseMaxhp / 10, source, source, this.dex.items.get("lifeorb"));
       }
     }
   },
@@ -61,8 +58,7 @@ const Items = {
     onDamagingHit(damage, target, source, move) {
       if (this.checkMoveMakesContact(move, source, target)) {
         const calc = calculate(this, target, source);
-        if (calc)
-          this.damage(calc * source.baseMaxhp / 6, source, target);
+        if (calc) this.damage(calc * source.baseMaxhp / 6, source, target);
       }
     }
   },
@@ -72,8 +68,7 @@ const Items = {
       if (move.category === "Special" && source.hp && source.isActive && !source.hasAbility("magicguard")) {
         if (target.eatItem()) {
           const calc = calculate(this, target, source);
-          if (calc)
-            this.damage(calc * source.baseMaxhp / (target.hasAbility("ripen") ? 4 : 8), source, target);
+          if (calc) this.damage(calc * source.baseMaxhp / (target.hasAbility("ripen") ? 4 : 8), source, target);
         }
       }
     }
@@ -82,8 +77,7 @@ const Items = {
     inherit: true,
     onResidual(pokemon) {
       const calc = calculate(this, pokemon, pokemon);
-      if (calc)
-        this.damage(calc * pokemon.baseMaxhp / 8);
+      if (calc) this.damage(calc * pokemon.baseMaxhp / 8);
     }
   }
 };
@@ -91,8 +85,7 @@ function calculate(battle, source, pokemon) {
   const move = battle.dex.getActiveMove("tackle");
   move.type = source.getTypes()[0];
   const typeMod = 2 ** battle.clampIntRange(pokemon.runEffectiveness(move), -6, 6);
-  if (!pokemon.runImmunity(move))
-    return 0;
+  if (!pokemon.runImmunity(move)) return 0;
   return typeMod;
 }
 //# sourceMappingURL=items.js.map

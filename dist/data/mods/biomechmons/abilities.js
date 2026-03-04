@@ -25,15 +25,13 @@ const Abilities = {
   magician: {
     inherit: true,
     onAfterMoveSecondarySelf(source, target, move) {
-      if (!move || source.switchFlag === true || !move.hitTargets || source.item || source.volatiles["gem"] || move.id === "fling" || move.category === "Status")
-        return;
+      if (!move || source.switchFlag === true || !move.hitTargets || source.item || source.volatiles["gem"] || move.id === "fling" || move.category === "Status") return;
       const hitTargets = move.hitTargets;
       this.speedSort(hitTargets);
       for (const pokemon of hitTargets) {
         if (pokemon !== source) {
           const yourItem = pokemon.takeItem(source);
-          if (!yourItem)
-            continue;
+          if (!yourItem) continue;
           if (!source.setItem(yourItem)) {
             if (!this.dex.items.get(yourItem.id).exists) {
               pokemon.setItem(yourItem.id);
@@ -79,32 +77,27 @@ const Abilities = {
           } else if (target.m.scrambled.moves.findIndex((e) => e.inSlot === "Ability") >= 0) {
             const isMove = target.m.scrambled.moves.findIndex((e) => e.inSlot === "Ability");
             const indexOfMove = target.moveSlots.findIndex((m) => this.toID(target.m.scrambled.moves[isMove].thing) === m.id);
-            if (indexOfMove >= 0)
-              target.moveSlots.splice(indexOfMove, 1);
+            if (indexOfMove >= 0) target.moveSlots.splice(indexOfMove, 1);
           }
         }
       }
     },
     onEnd(source) {
-      if (source.transformed)
-        return;
+      if (source.transformed) return;
       for (const pokemon of this.getAllActive()) {
         if (pokemon !== source && pokemon.hasAbility("Neutralizing Gas")) {
           return;
         }
       }
       this.add("-end", source, "ability: Neutralizing Gas");
-      if (source.abilityState.ending)
-        return;
+      if (source.abilityState.ending) return;
       source.abilityState.ending = true;
       const sortedActive = this.getAllActive();
       this.speedSort(sortedActive);
       for (const pokemon of sortedActive) {
         if (pokemon !== source) {
-          if (pokemon.getAbility().flags["cantsuppress"])
-            continue;
-          if (pokemon.hasItem("abilityshield"))
-            continue;
+          if (pokemon.getAbility().flags["cantsuppress"]) continue;
+          if (pokemon.hasItem("abilityshield")) continue;
           this.singleEvent("Start", pokemon.getAbility(), pokemon.abilityState, pokemon);
           if (pokemon.ability === "gluttony") {
             pokemon.abilityState.gluttony = false;
@@ -163,13 +156,11 @@ const Abilities = {
       }
     },
     onUpdate(pokemon) {
-      if (!this.effectState.seek)
-        return;
+      if (!this.effectState.seek) return;
       const possibleTargets = pokemon.adjacentFoes().filter(
         (target2) => !target2.getAbility().flags["notrace"] && target2.ability !== "noability"
       );
-      if (!possibleTargets.length)
-        return;
+      if (!possibleTargets.length) return;
       const target = this.sample(possibleTargets);
       const ability = target.getAbility();
       if (this.toID(pokemon.item) === "trace") {

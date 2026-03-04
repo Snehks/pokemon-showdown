@@ -105,20 +105,16 @@ class BasicRoom {
     this.batchJoins = 0;
     this.reportJoinsInterval = null;
     options.title = this.title;
-    if (options.isHelp)
-      options.noAutoTruncate = true;
+    if (options.isHelp) options.noAutoTruncate = true;
     this.reportJoins = !!(Config.reportjoins || options.isPersonal);
     this.batchJoins = options.isPersonal ? 0 : Config.reportjoinsperiod || 0;
-    if (!options.auth)
-      options.auth = {};
+    if (!options.auth) options.auth = {};
     this.log = import_roomlogs.Roomlogs.create(this, options);
     this.banwordRegex = null;
     this.settings = options;
-    if (!this.settings.creationTime)
-      this.settings.creationTime = Date.now();
+    if (!this.settings.creationTime) this.settings.creationTime = Date.now();
     this.auth.load();
-    if (!options.isPersonal)
-      this.persist = true;
+    if (!options.isPersonal) this.persist = true;
     this.minorActivity = null;
     this.minorActivityQueue = null;
     if (options.parentid) {
@@ -156,18 +152,15 @@ class BasicRoom {
    * in the scrollback log.
    */
   send(message) {
-    if (this.roomid !== "lobby")
-      message = ">" + this.roomid + "\n" + message;
-    if (this.userCount)
-      Sockets.roomBroadcast(this.roomid, message);
+    if (this.roomid !== "lobby") message = ">" + this.roomid + "\n" + message;
+    if (this.userCount) Sockets.roomBroadcast(this.roomid, message);
   }
   sendMods(data) {
     this.sendRankedUsers(data, "*");
   }
   sendRankedUsers(data, minRank = "+") {
     if (this.settings.staffRoom) {
-      if (!this.log)
-        throw new Error(`Staff room ${this.roomid} has no log`);
+      if (!this.log) throw new Error(`Staff room ${this.roomid} has no log`);
       this.log.add(data);
       return;
     }
@@ -245,8 +238,7 @@ class BasicRoom {
     this.sendMods("|c|" + user.getIdentity(this) + "|/log " + text);
   }
   update() {
-    if (!this.log.broadcastBuffer.length)
-      return;
+    if (!this.log.broadcastBuffer.length) return;
     if (this.reportJoinsInterval) {
       clearInterval(this.reportJoinsInterval);
       this.reportJoinsInterval = null;
@@ -282,8 +274,7 @@ class BasicRoom {
       clearTimeout(this.muteTimer);
       this.muteTimer = null;
     }
-    if (this.muteTimer || this.muteQueue.length === 0)
-      return;
+    if (this.muteTimer || this.muteQueue.length === 0) return;
     const timeUntilExpire = this.muteQueue[0].time - Date.now();
     if (timeUntilExpire <= 1e3) {
       this.unmute(this.muteQueue[0].userid, "Your mute in '" + this.title + "' has expired.");
@@ -295,8 +286,7 @@ class BasicRoom {
     }, timeUntilExpire);
   }
   isMuted(user) {
-    if (!user)
-      return;
+    if (!user) return;
     if (this.muteQueue) {
       for (const entry of this.muteQueue) {
         if (user.id === entry.userid || user.guestNum === entry.guestNum || user.autoconfirmed && user.autoconfirmed === entry.autoconfirmed) {
@@ -309,48 +299,39 @@ class BasicRoom {
         }
       }
     }
-    if (this.parent)
-      return this.parent.isMuted(user);
+    if (this.parent) return this.parent.isMuted(user);
   }
   getMuteTime(user) {
     const userid = this.isMuted(user);
-    if (!userid)
-      return;
+    if (!userid) return;
     for (const entry of this.muteQueue) {
       if (userid === entry.userid) {
         return entry.time - Date.now();
       }
     }
-    if (this.parent)
-      return this.parent.getMuteTime(user);
+    if (this.parent) return this.parent.getMuteTime(user);
   }
   getGame(constructor, subGame = false) {
-    if (subGame && this.subGame && this.subGame.constructor.name === constructor.name)
-      return this.subGame;
-    if (this.game && this.game.constructor.name === constructor.name)
-      return this.game;
+    if (subGame && this.subGame && this.subGame.constructor.name === constructor.name) return this.subGame;
+    if (this.game && this.game.constructor.name === constructor.name) return this.game;
     return null;
   }
   getMinorActivity(constructor) {
-    if (this.minorActivity?.constructor.name === constructor.name)
-      return this.minorActivity;
+    if (this.minorActivity?.constructor.name === constructor.name) return this.minorActivity;
     return null;
   }
   getMinorActivityQueue(settings = false) {
     const usedQueue = settings ? this.settings.minorActivityQueue : this.minorActivityQueue;
-    if (!usedQueue?.length)
-      return null;
+    if (!usedQueue?.length) return null;
     return usedQueue;
   }
   queueMinorActivity(activity) {
-    if (!this.minorActivityQueue)
-      this.minorActivityQueue = [];
+    if (!this.minorActivityQueue) this.minorActivityQueue = [];
     this.minorActivityQueue.push(activity);
     this.settings.minorActivityQueue = this.minorActivityQueue;
   }
   clearMinorActivityQueue(slot, depth = 1) {
-    if (!this.minorActivityQueue)
-      return;
+    if (!this.minorActivityQueue) return;
     if (slot === void 0) {
       this.minorActivityQueue = null;
       delete this.settings.minorActivityQueue;
@@ -359,8 +340,7 @@ class BasicRoom {
       this.minorActivityQueue.splice(slot, depth);
       this.settings.minorActivityQueue = this.minorActivityQueue;
       this.saveSettings();
-      if (!this.minorActivityQueue.length)
-        this.clearMinorActivityQueue();
+      if (!this.minorActivityQueue.length) this.clearMinorActivityQueue();
     }
   }
   setMinorActivity(activity, noDisplay = false) {
@@ -368,30 +348,23 @@ class BasicRoom {
     this.minorActivity = activity;
     if (this.minorActivity) {
       this.minorActivity.save();
-      if (!noDisplay)
-        this.minorActivity.display();
+      if (!noDisplay) this.minorActivity.display();
     } else {
       delete this.settings.minorActivity;
       this.saveSettings();
     }
   }
   saveSettings() {
-    if (!this.persist)
-      return;
-    if (!Rooms.global)
-      return;
+    if (!this.persist) return;
+    if (!Rooms.global) return;
     Rooms.global.writeChatRoomData();
   }
   checkModjoin(user) {
-    if (user.id in this.users)
-      return true;
-    if (!this.settings.modjoin)
-      return true;
-    if (this.auth.has(user.id))
-      return true;
+    if (user.id in this.users) return true;
+    if (!this.settings.modjoin) return true;
+    if (this.auth.has(user.id)) return true;
     const modjoinSetting = this.settings.modjoin !== true ? this.settings.modjoin : this.settings.modchat;
-    if (!modjoinSetting)
-      return true;
+    if (!modjoinSetting) return true;
     if (!Users.Auth.isAuthLevel(modjoinSetting)) {
       Monitor.error(`Invalid modjoin setting in ${this.roomid}: ${modjoinSetting}`);
     }
@@ -399,12 +372,9 @@ class BasicRoom {
   }
   mute(user, setTime) {
     const userid = user.id;
-    if (!setTime)
-      setTime = 7 * 6e4;
-    if (setTime > 90 * 6e4)
-      setTime = 90 * 6e4;
-    if (this.isMuted(user))
-      this.unmute(userid);
+    if (!setTime) setTime = 7 * 6e4;
+    if (setTime > 90 * 6e4) setTime = 90 * 6e4;
+    if (this.isMuted(user)) this.unmute(userid);
     for (let i = 0; i <= this.muteQueue.length; i++) {
       const time = Date.now() + setTime;
       if (i === this.muteQueue.length || time < this.muteQueue[i].time) {
@@ -451,8 +421,7 @@ class BasicRoom {
     }
     if (user && successUserid && userid in this.users) {
       user.updateIdentity();
-      if (notifyText)
-        user.popup(notifyText);
+      if (notifyText) user.popup(notifyText);
     }
     return successUserid;
   }
@@ -478,8 +447,7 @@ class BasicRoom {
     this.roomlog(entry);
   }
   pokeExpireTimer() {
-    if (this.expireTimer)
-      clearTimeout(this.expireTimer);
+    if (this.expireTimer) clearTimeout(this.expireTimer);
     if (this.settings.isPersonal) {
       this.expireTimer = setTimeout(() => this.expire(), TIMEOUT_INACTIVE_DEALLOCATE);
     } else {
@@ -540,14 +508,12 @@ class BasicRoom {
 |raw|<div class="infobox infobox-roomintro"><div ${this.settings.section !== "official" ? 'class="infobox-limited"' : ""}>` + this.settings.introMessage.replace(/\n/g, "") + `</div></div>`;
     }
     const staffIntro = this.getStaffIntroMessage(user);
-    if (staffIntro)
-      message += `
+    if (staffIntro) message += `
 ${staffIntro}`;
     return message;
   }
   getStaffIntroMessage(user) {
-    if (!user.can("mute", null, this))
-      return ``;
+    if (!user.can("mute", null, this)) return ``;
     const messages = [];
     if (this.settings.staffMessage) {
       messages.push(`|raw|<div class="infobox">(Staff intro:)<br /><div>` + this.settings.staffMessage.replace(/\n/g, "") + `</div>`);
@@ -561,8 +527,7 @@ ${staffIntro}`;
         if (entry.dimensions) {
           const [width, height, resized] = entry.dimensions;
           message += `<strong>Link:</strong><br /> <img src="${entry.link}" width="${width}" height="${height}"><br />`;
-          if (resized)
-            message += `(Resized)<br />`;
+          if (resized) message += `(Resized)<br />`;
         } else {
           message += `<strong>Link:</strong><br /> <a href="${entry.link}"">Link</a><br />`;
         }
@@ -579,29 +544,24 @@ ${staffIntro}`;
     return messages.join("\n");
   }
   getSubRooms(includeSecret = false) {
-    if (!this.subRooms)
-      return [];
+    if (!this.subRooms) return [];
     return [...this.subRooms.values()].filter(
       (room) => includeSecret ? true : !room.settings.isPrivate && !room.settings.isPersonal
     );
   }
   validateTitle(newTitle, newID, oldID) {
-    if (!newID)
-      newID = toID(newTitle);
+    if (!newID) newID = toID(newTitle);
     if (newTitle.includes(",") || newTitle.includes("|")) {
       throw new Chat.ErrorMessage(`Room title "${newTitle}" can't contain any of: ,|`);
     }
     if ((!newID.includes("-") || newID.startsWith("groupchat-")) && newTitle.includes("-")) {
       throw new Chat.ErrorMessage(`Room title "${newTitle}" can't contain -`);
     }
-    if (newID.length > MAX_CHATROOM_ID_LENGTH)
-      throw new Chat.ErrorMessage("The given room title is too long.");
-    if (newID !== oldID && Rooms.search(newTitle))
-      throw new Chat.ErrorMessage(`The room '${newTitle}' already exists.`);
+    if (newID.length > MAX_CHATROOM_ID_LENGTH) throw new Chat.ErrorMessage("The given room title is too long.");
+    if (newID !== oldID && Rooms.search(newTitle)) throw new Chat.ErrorMessage(`The room '${newTitle}' already exists.`);
   }
   setParent(room) {
-    if (this.parent === room)
-      return;
+    if (this.parent === room) return;
     if (this.parent) {
       this.parent.subRooms.delete(this.roomid);
       if (!this.parent.subRooms.size) {
@@ -624,8 +584,7 @@ ${staffIntro}`;
     }
   }
   clearSubRooms() {
-    if (!this.subRooms)
-      return;
+    if (!this.subRooms) return;
     for (const room of this.subRooms.values()) {
       room.parent = null;
     }
@@ -644,18 +603,14 @@ ${staffIntro}`;
     }
     if (this.battle || this.bestOf) {
       if (privacy) {
-        if (this.roomid.endsWith("pw"))
-          return true;
+        if (this.roomid.endsWith("pw")) return true;
         let password = "";
-        for (let i = 0; i < 31; i++)
-          password += ALPHABET[crypto.randomInt(0, ALPHABET.length - 1)];
+        for (let i = 0; i < 31; i++) password += ALPHABET[crypto.randomInt(0, ALPHABET.length - 1)];
         this.rename(this.title, `${this.roomid}-${password}pw`, true);
       } else {
-        if (!this.roomid.endsWith("pw"))
-          return true;
+        if (!this.roomid.endsWith("pw")) return true;
         const lastDashIndex = this.roomid.lastIndexOf("-");
-        if (lastDashIndex < 0)
-          throw new Error(`invalid battle ID ${this.roomid}`);
+        if (lastDashIndex < 0) throw new Error(`invalid battle ID ${this.roomid}`);
         this.rename(this.title, this.roomid.slice(0, lastDashIndex));
       }
     }
@@ -710,8 +665,7 @@ ${staffIntro}`;
    * @param noAlias Set this param to true to not redirect aliases and the room's old name to its new name.
    */
   rename(newTitle, newID, noAlias) {
-    if (!newID)
-      newID = toID(newTitle);
+    if (!newID) newID = toID(newTitle);
     const oldID = this.roomid;
     this.validateTitle(newTitle, newID, oldID);
     if (this.type === "chat" && this.game) {
@@ -732,8 +686,7 @@ ${staffIntro}`;
       for (const player of this.battle.players) {
         if (player.invite) {
           const chall = Ladders.challenges.searchByRoom(player.invite, oldID);
-          if (chall)
-            chall.roomid = this.roomid;
+          if (chall) chall.roomid = this.roomid;
         }
       }
     }
@@ -749,10 +702,8 @@ ${staffIntro}`;
         }
       }
       Rooms.aliases.set(oldID, newID);
-      if (!this.settings.aliases)
-        this.settings.aliases = [];
-      if (!this.settings.aliases.includes(oldID))
-        this.settings.aliases.push(oldID);
+      if (!this.settings.aliases) this.settings.aliases = [];
+      if (!this.settings.aliases.includes(oldID)) this.settings.aliases.push(oldID);
     } else {
       for (const [alias, roomid] of Rooms.aliases.entries()) {
         if (roomid === oldID) {
@@ -791,17 +742,14 @@ ${staffIntro}`;
     this.game?.onConnect?.(user, connection);
   }
   onJoin(user, connection) {
-    if (!user)
-      return false;
-    if (this.users[user.id])
-      return false;
+    if (!user) return false;
+    if (this.users[user.id]) return false;
     Chat.runHandlers("onBeforeRoomJoin", this, user, connection);
     if (user.named) {
       this.reportJoin("j", user.getIdentityWithStatus(this), user);
     }
     const staffIntro = this.getStaffIntroMessage(user);
-    if (staffIntro)
-      this.sendUser(user, staffIntro);
+    if (staffIntro) this.sendUser(user, staffIntro);
     this.users[user.id] = user;
     this.userCount++;
     this.checkAutoModchat(user);
@@ -824,8 +772,7 @@ ${staffIntro}`;
     if (joining) {
       this.reportJoin("j", user.getIdentityWithStatus(this), user);
       const staffIntro = this.getStaffIntroMessage(user);
-      if (staffIntro)
-        this.sendUser(user, staffIntro);
+      if (staffIntro) this.sendUser(user, staffIntro);
     } else if (!user.named) {
       this.reportJoin("l", " " + oldid, user);
     } else {
@@ -840,8 +787,7 @@ ${staffIntro}`;
    */
   onUpdateIdentity(user) {
     if (user?.connected) {
-      if (!this.users[user.id])
-        return false;
+      if (!this.users[user.id]) return false;
       if (user.named) {
         this.reportJoin("n", user.getIdentityWithStatus(this) + "|" + user.id, user);
       }
@@ -849,8 +795,7 @@ ${staffIntro}`;
     return true;
   }
   onLeave(user) {
-    if (!user)
-      return false;
+    if (!user) return false;
     if (!(user.id in this.users)) {
       Monitor.crashlog(new Error(`user ${user.id} already left`));
       return false;
@@ -865,19 +810,16 @@ ${staffIntro}`;
     return true;
   }
   runAutoModchat() {
-    if (!this.settings.autoModchat || this.settings.autoModchat.active)
-      return;
+    if (!this.settings.autoModchat || this.settings.autoModchat.active) return;
     const staff = Object.values(this.users).filter((u) => this.auth.atLeast(u, "%") && u.statusType === "online");
     if (!staff.length) {
       const { time } = this.settings.autoModchat;
       if (!time || time < 5) {
         throw new Error(`Invalid time setting for automodchat (${import_lib.Utils.visualize(this.settings.autoModchat)})`);
       }
-      if (this.modchatTimer)
-        return;
+      if (this.modchatTimer) return;
       this.modchatTimer = setTimeout(() => {
-        if (!this.settings.autoModchat)
-          return;
+        if (!this.settings.autoModchat) return;
         const { rank } = this.settings.autoModchat;
         const oldSetting = this.settings.modchat;
         this.settings.modchat = rank;
@@ -952,8 +894,7 @@ ${staffIntro}`;
     this.logUserStatsInterval = null;
     void this.log.destroy();
     Rooms.rooms.delete(this.roomid);
-    if (this.roomid === "lobby")
-      Rooms.lobby = null;
+    if (this.roomid === "lobby") Rooms.lobby = null;
   }
   tr(strings, ...keys) {
     return Chat.tr(this.settings.language || "english", strings, ...keys);
@@ -965,8 +906,7 @@ class GlobalRoomState {
     this.settingsList = [];
     try {
       this.settingsList = require((0, import_lib.FS)("config/chatrooms.json").path);
-      if (!Array.isArray(this.settingsList))
-        this.settingsList = [];
+      if (!Array.isArray(this.settingsList)) this.settingsList = [];
     } catch {
     }
     if (!this.settingsList.length) {
@@ -996,10 +936,8 @@ class GlobalRoomState {
       if (settings.staffAutojoin) {
         delete settings.staffAutojoin;
         settings.autojoin = true;
-        if (!settings.modjoin)
-          settings.modjoin = "%";
-        if (settings.isPrivate === true)
-          settings.isPrivate = "hidden";
+        if (!settings.modjoin) settings.modjoin = "%";
+        if (settings.isPrivate === true) settings.isPrivate = "hidden";
       }
       const id = toID(settings.title);
       Monitor.notice("RESTORE CHATROOM: " + id);
@@ -1049,15 +987,12 @@ class GlobalRoomState {
     (0, import_room_battle.start)(processCount);
   }
   async serializeBattleRoom(room) {
-    if (!room.battle || room.battle.ended)
-      return null;
-    if (room.battle.gameid === "bestof")
-      return null;
+    if (!room.battle || room.battle.ended) return null;
+    if (room.battle.gameid === "bestof") return null;
     room.battle.frozen = true;
     const inputLog = await room.battle.getInputLog();
     const players = room.battle.players.map((p) => p.id).filter(Boolean);
-    if (!players.length || !inputLog?.length)
-      return null;
+    if (!players.length || !inputLog?.length) return null;
     return {
       roomid: room.roomid,
       inputLog: inputLog.join("\n"),
@@ -1084,8 +1019,7 @@ class GlobalRoomState {
       isBestOfSubBattle: true
       // not technically true but prevents a crash
     });
-    if (!room?.battle)
-      return false;
+    if (!room?.battle) return false;
     if (timer) {
       Object.assign(room.battle.timer.settings, timer);
     }
@@ -1105,13 +1039,11 @@ class GlobalRoomState {
     let count = 0;
     const out = Monitor.logPath("battles.jsonl.progress").createAppendStream();
     for (const room of Rooms.rooms.values()) {
-      if (!room.battle || room.battle.ended)
-        continue;
+      if (!room.battle || room.battle.ended) continue;
       room.battle.frozen = true;
       room.battle.timer.stop();
       const b = await this.serializeBattleRoom(room);
-      if (!b)
-        continue;
+      if (!b) continue;
       await out.writeLine(JSON.stringify(b));
       count++;
     }
@@ -1132,10 +1064,8 @@ class GlobalRoomState {
       return;
     }
     for await (const line of input) {
-      if (!line)
-        continue;
-      if (this.deserializeBattleRoom(JSON.parse(line)))
-        count++;
+      if (!line) continue;
+      if (this.deserializeBattleRoom(JSON.parse(line))) count++;
     }
     for (const u of Users.users.values()) {
       u.send(`|pm|~|${u.getIdentity()}|/uhtmlchange restartmsg,`);
@@ -1147,10 +1077,8 @@ class GlobalRoomState {
   rejoinGames(user) {
     for (const room of Rooms.rooms.values()) {
       const player = room.game && !room.game.ended && room.game.playerTable[user.id];
-      if (!player)
-        continue;
-      if (player.completed)
-        continue;
+      if (!player) continue;
+      if (player.completed) continue;
       user.games.add(room.roomid);
       player.name = user.name;
       user.joinRoom(room.roomid);
@@ -1164,12 +1092,10 @@ class GlobalRoomState {
   }
   writeNumRooms() {
     if (this.lockdown) {
-      if (this.lastBattle === this.lastWrittenBattle)
-        return;
+      if (this.lastBattle === this.lastWrittenBattle) return;
       this.lastWrittenBattle = this.lastBattle;
     } else {
-      if (this.lastBattle < this.lastWrittenBattle)
-        return;
+      if (this.lastBattle < this.lastWrittenBattle) return;
       this.lastWrittenBattle = this.lastBattle + LAST_BATTLE_WRITE_THROTTLE;
     }
     Monitor.logPath("lastbattle.txt").writeUpdate(
@@ -1198,50 +1124,37 @@ class GlobalRoomState {
     let prevSection = "";
     let curColumn = 1;
     for (const format of Dex.formats.all()) {
-      if (format.section)
-        section = format.section;
-      if (format.column)
-        curColumn = format.column;
-      if (!format.name)
-        continue;
-      if (!format.challengeShow && !format.searchShow && !format.tournamentShow)
-        continue;
+      if (format.section) section = format.section;
+      if (format.column) curColumn = format.column;
+      if (!format.name) continue;
+      if (!format.challengeShow && !format.searchShow && !format.tournamentShow) continue;
       if (section !== prevSection) {
         prevSection = section;
         this.formatList += `|,${curColumn}|${section}`;
       }
       this.formatList += `|${format.name}`;
       let displayCode = 0;
-      if (format.team)
-        displayCode |= 1;
-      if (format.searchShow)
-        displayCode |= 2;
-      if (format.challengeShow)
-        displayCode |= 4;
-      if (format.tournamentShow)
-        displayCode |= 8;
+      if (format.team) displayCode |= 1;
+      if (format.searchShow) displayCode |= 2;
+      if (format.challengeShow) displayCode |= 4;
+      if (format.tournamentShow) displayCode |= 8;
       const ruleTable = Dex.formats.getRuleTable(format);
       const level = ruleTable.adjustLevel || ruleTable.adjustLevelDown || ruleTable.maxLevel;
-      if (level === 50)
-        displayCode |= 16;
-      if (format.bestOfDefault)
-        displayCode |= 64;
-      if (format.teraPreviewDefault)
-        displayCode |= 128;
+      if (level === 50) displayCode |= 16;
+      if (format.bestOfDefault) displayCode |= 64;
+      if (format.teraPreviewDefault) displayCode |= 128;
       this.formatList += "," + displayCode.toString(16);
     }
     return this.formatList;
   }
   get configRankList() {
-    if (Config.nocustomgrouplist)
-      return "";
+    if (Config.nocustomgrouplist) return "";
     if (Config.rankList) {
       return Config.rankList;
     }
     const rankList = [];
     for (const rank in Config.groups) {
-      if (!Config.groups[rank] || !rank)
-        continue;
+      if (!Config.groups[rank] || !rank) continue;
       const tarGroup = Config.groups[rank];
       const groupType = tarGroup.id === "bot" || !tarGroup.mute && !tarGroup.root ? "normal" : tarGroup.root || tarGroup.declare ? "leadership" : "staff";
       rankList.push({
@@ -1266,21 +1179,15 @@ class GlobalRoomState {
     const [formatFilter, eloFilterString, usernameFilter] = filter.split(",");
     const eloFilter = +eloFilterString;
     for (const room of Rooms.rooms.values()) {
-      if (!room?.active || room.settings.isPrivate)
-        continue;
-      if (room.type !== "battle")
-        continue;
-      if (formatFilter && formatFilter !== room.format)
-        continue;
-      if (eloFilter && (!room.rated || room.rated < eloFilter))
-        continue;
+      if (!room?.active || room.settings.isPrivate) continue;
+      if (room.type !== "battle") continue;
+      if (formatFilter && formatFilter !== room.format) continue;
+      if (eloFilter && (!room.rated || room.rated < eloFilter)) continue;
       if (usernameFilter && room.battle) {
         const p1userid = room.battle.p1.id;
         const p2userid = room.battle.p2.id;
-        if (!p1userid || !p2userid)
-          continue;
-        if (!p1userid.startsWith(usernameFilter) && !p2userid.startsWith(usernameFilter))
-          continue;
+        if (!p1userid || !p2userid) continue;
+        if (!p1userid.startsWith(usernameFilter) && !p2userid.startsWith(usernameFilter)) continue;
       }
       rooms.push(room);
     }
@@ -1289,17 +1196,12 @@ class GlobalRoomState {
       const room = rooms[i];
       const roomData = {};
       if (room.active && room.battle) {
-        if (room.battle.p1)
-          roomData.p1 = room.battle.p1.name;
-        if (room.battle.p2)
-          roomData.p2 = room.battle.p2.name;
-        if (room.tour)
-          roomData.minElo = "tour";
-        if (room.rated)
-          roomData.minElo = Math.floor(room.rated);
+        if (room.battle.p1) roomData.p1 = room.battle.p1.name;
+        if (room.battle.p2) roomData.p2 = room.battle.p2.name;
+        if (room.tour) roomData.minElo = "tour";
+        if (room.rated) roomData.minElo = Math.floor(room.rated);
       }
-      if (!roomData.p1 || !roomData.p2)
-        continue;
+      if (!roomData.p1 || !roomData.p2) continue;
       roomTable[room.roomid] = roomData;
     }
     return roomTable;
@@ -1312,12 +1214,9 @@ class GlobalRoomState {
       battleCount: this.battleCount
     };
     for (const room of this.chatRooms) {
-      if (!room)
-        continue;
-      if (room.parent)
-        continue;
-      if (room.settings.modjoin || room.settings.isPrivate && !["hidden", "voice"].includes(room.settings.isPrivate) || room.settings.isPrivate === "voice" && user.tempGroup === " ")
-        continue;
+      if (!room) continue;
+      if (room.parent) continue;
+      if (room.settings.modjoin || room.settings.isPrivate && !["hidden", "voice"].includes(room.settings.isPrivate) || room.settings.isPrivate === "voice" && user.tempGroup === " ") continue;
       const roomData = {
         title: room.title,
         desc: room.settings.desc || "",
@@ -1326,10 +1225,8 @@ class GlobalRoomState {
         privacy: !room.settings.isPrivate ? void 0 : room.settings.isPrivate
       };
       const subrooms = room.getSubRooms().map((r) => r.title);
-      if (subrooms.length)
-        roomData.subRooms = subrooms;
-      if (room.settings.spotlight)
-        roomData.spotlight = room.settings.spotlight;
+      if (subrooms.length) roomData.subRooms = subrooms;
+      if (room.settings.spotlight) roomData.spotlight = room.settings.spotlight;
       roomsData.chat.push(roomData);
     }
     return roomsData;
@@ -1342,16 +1239,14 @@ class GlobalRoomState {
     if (["battles", "rooms", "ladder", "teambuilder", "home", "all", "public"].includes(id)) {
       return false;
     }
-    if (Rooms.rooms.has(id))
-      return false;
+    if (Rooms.rooms.has(id)) return false;
     const settings = {
       title,
       auth: {},
       creationTime: Date.now()
     };
     const room = Rooms.createChatRoom(id, title, settings);
-    if (id === "lobby")
-      Rooms.lobby = room;
+    if (id === "lobby") Rooms.lobby = room;
     this.settingsList.push(settings);
     this.chatRooms.push(room);
     this.writeChatRoomData();
@@ -1401,10 +1296,8 @@ class GlobalRoomState {
   deregisterChatRoom(id) {
     id = toID(id);
     const room = Rooms.get(id);
-    if (!room)
-      return false;
-    if (!room.persist)
-      return false;
+    if (!room) return false;
+    if (!room.persist) return false;
     for (let i = this.settingsList.length - 1; i >= 0; i--) {
       if (id === toID(this.settingsList[i].title)) {
         this.settingsList.splice(i, 1);
@@ -1417,8 +1310,7 @@ class GlobalRoomState {
   }
   delistChatRoom(id) {
     id = toID(id);
-    if (!Rooms.rooms.has(id))
-      return false;
+    if (!Rooms.rooms.has(id)) return false;
     for (let i = this.chatRooms.length - 1; i >= 0; i--) {
       if (id === this.chatRooms[i].roomid) {
         this.chatRooms.splice(i, 1);
@@ -1429,8 +1321,7 @@ class GlobalRoomState {
   removeChatRoom(id) {
     id = toID(id);
     const room = Rooms.get(id);
-    if (!room)
-      return false;
+    if (!room) return false;
     room.destroy();
     return true;
   }
@@ -1438,16 +1329,13 @@ class GlobalRoomState {
     let includesLobby = false;
     for (const roomName of this.autojoinList) {
       user.joinRoom(roomName, connection);
-      if (roomName === "lobby")
-        includesLobby = true;
+      if (roomName === "lobby") includesLobby = true;
     }
-    if (!includesLobby && Config.serverid !== "showdown")
-      user.send(`>lobby
+    if (!includesLobby && Config.serverid !== "showdown") user.send(`>lobby
 |deinit`);
   }
   checkAutojoin(user, connection) {
-    if (!user.named)
-      return;
+    if (!user.named) return;
     for (let [i, roomid] of this.modjoinedAutojoinList.entries()) {
       const room = Rooms.get(roomid);
       if (!room) {
@@ -1477,8 +1365,7 @@ class GlobalRoomState {
     }
   }
   startLockdown(err = null, slow = false) {
-    if (this.lockdown && err)
-      return;
+    if (this.lockdown && err) return;
     const devRoom = Rooms.get("development");
     const stack = err ? import_lib.Utils.escapeHTML(err.stack).split(`
 `).slice(0, 2).join(`<br />`) : ``;
@@ -1512,8 +1399,7 @@ class GlobalRoomState {
   }
   automaticKillRequest() {
     const notifyPlaces = ["development", "staff", "upperstaff"];
-    if (Config.autolockdown === void 0)
-      Config.autolockdown = true;
+    if (Config.autolockdown === void 0) Config.autolockdown = true;
     if (Config.autolockdown && Rooms.global.lockdown === true && Rooms.global.battleCount === 0) {
       if (Monitor.updateServerLock) {
         this.notifyRooms(
@@ -1539,12 +1425,10 @@ class GlobalRoomState {
     }
   }
   notifyRooms(rooms, message) {
-    if (!rooms || !message)
-      return;
+    if (!rooms || !message) return;
     for (const roomid of rooms) {
       const curRoom = Rooms.get(roomid);
-      if (curRoom)
-        curRoom.add(message).update();
+      if (curRoom) curRoom.add(message).update();
     }
   }
   reportCrash(err, crasher = "The server") {
@@ -1556,8 +1440,7 @@ class GlobalRoomState {
     const stack = typeof err === "string" ? err : err?.stack || err?.message || err?.name || "";
     const [stackFirst, stackRest] = import_lib.Utils.splitFirst(import_lib.Utils.escapeHTML(stack), `<br />`);
     let fullStack = `<b>${crasher} crashed:</b> ` + stackFirst;
-    if (stackRest)
-      fullStack = `<details class="readmore"><summary>${fullStack}</summary>${stackRest}</details>`;
+    if (stackRest) fullStack = `<details class="readmore"><summary>${fullStack}</summary>${stackRest}</details>`;
     let crashMessage = `|html|<div class="broadcast-red">${fullStack}</div>`;
     let privateCrashMessage = null;
     const upperStaffRoom = Rooms.get("upperstaff");
@@ -1602,8 +1485,7 @@ class GlobalRoomState {
         }
         if (curRoom.auth.has(userid)) {
           let oldGroup = curRoom.auth.get(userid);
-          if (oldGroup === " ")
-            oldGroup = "whitelist in ";
+          if (oldGroup === " ") oldGroup = "whitelist in ";
           roomauth.push(`${oldGroup}${id}`);
         }
       }
@@ -1653,13 +1535,11 @@ class GameRoom extends BasicRoom {
     return this.log.getScrollback(channel);
   }
   getLogForUser(user) {
-    if (!(user.id in this.game.playerTable))
-      return this.getLog();
+    if (!(user.id in this.game.playerTable)) return this.getLog();
     return this.getLog(this.game.playerTable[user.id].num);
   }
   update(excludeUser = null) {
-    if (!this.log.broadcastBuffer.length)
-      return;
+    if (!this.log.broadcastBuffer.length) return;
     if (this.userCount) {
       Sockets.channelBroadcast(this.roomid, `>${this.roomid}
 ${this.log.broadcastBuffer.join("\n")}`);
@@ -1669,12 +1549,10 @@ ${this.log.broadcastBuffer.join("\n")}`);
   }
   pokeExpireTimer() {
     if (!this.userCount) {
-      if (this.expireTimer)
-        clearTimeout(this.expireTimer);
+      if (this.expireTimer) clearTimeout(this.expireTimer);
       this.expireTimer = setTimeout(() => this.expire(), TIMEOUT_EMPTY_DEALLOCATE);
     } else {
-      if (this.expireTimer)
-        clearTimeout(this.expireTimer);
+      if (this.expireTimer) clearTimeout(this.expireTimer);
       this.expireTimer = setTimeout(() => this.expire(), TIMEOUT_INACTIVE_DEALLOCATE);
     }
   }
@@ -1692,10 +1570,8 @@ ${this.log.broadcastBuffer.join("\n")}`);
     this.game?.onConnect?.(user, connection);
   }
   onJoin(user, connection) {
-    if (!user)
-      return false;
-    if (this.users[user.id])
-      return false;
+    if (!user) return false;
+    if (this.users[user.id]) return false;
     Chat.runHandlers("onBeforeRoomJoin", this, user, connection);
     if (user.named) {
       this.reportJoin("j", user.getIdentityWithStatus(this), user);
@@ -1721,26 +1597,21 @@ ${this.log.broadcastBuffer.join("\n")}`);
    */
   async uploadReplay(user, connection, options) {
     const battle = this.battle;
-    if (!battle)
-      return;
+    if (!battle) return;
     const format = Dex.formats.get(this.format, true);
     let hideDetails = !format.id.includes("customgame");
-    if (format.team && battle.ended)
-      hideDetails = false;
+    if (format.team && battle.ended) hideDetails = false;
     const log = this.getLog(hideDetails ? 0 : -1);
     let rating;
-    if (battle.ended && this.rated)
-      rating = this.rated;
+    if (battle.ended && this.rated) rating = this.rated;
     let { id, password } = this.getReplayData();
-    if (password)
-      password = battle.password || (battle.password = password);
+    if (password) password = battle.password ||= password;
     const silent = options === "forpunishment" || options === "silent" || options === "auto";
-    if (silent)
-      connection = void 0;
+    if (silent) connection = void 0;
     const isPrivate = this.settings.isPrivate || this.hideReplay;
     const hidden = options === "auto" ? 10 : options === "forpunishment" || this.unlistReplay ? 2 : isPrivate ? 1 : 0;
     if (isPrivate && hidden === 10) {
-      password = battle.password || (battle.password = import_replays.Replays.generatePassword());
+      password = battle.password ||= import_replays.Replays.generatePassword();
     }
     if (battle.replaySaved !== true && hidden === 10) {
       battle.replaySaved = "auto";
@@ -1793,8 +1664,7 @@ ${this.log.broadcastBuffer.join("\n")}`);
     );
   }
   getReplayData() {
-    if (!this.roomid.endsWith("pw"))
-      return { id: this.roomid.slice(7), password: null };
+    if (!this.roomid.endsWith("pw")) return { id: this.roomid.slice(7), password: null };
     const end = this.roomid.length - 2;
     const lastHyphen = this.roomid.lastIndexOf("-", end);
     return { id: this.roomid.slice(7, lastHyphen), password: this.roomid.slice(lastHyphen + 1, end) };
@@ -1804,8 +1674,7 @@ function getRoom(roomid) {
   if (typeof roomid === "string") {
     if ((roomid.startsWith("battle-") || roomid.startsWith("game-bestof")) && roomid.endsWith("pw")) {
       const room = Rooms.rooms.get(roomid.slice(0, roomid.lastIndexOf("-")));
-      if (room)
-        return room;
+      if (room) return room;
     }
     return Rooms.rooms.get(roomid);
   }
@@ -1825,16 +1694,14 @@ const Rooms = {
     return getRoom(name) || getRoom(toID(name)) || getRoom(Rooms.aliases.get(toID(name)));
   },
   createGameRoom(roomid, title, options) {
-    if (Rooms.rooms.has(roomid))
-      throw new Error(`Room ${roomid} already exists`);
+    if (Rooms.rooms.has(roomid)) throw new Error(`Room ${roomid} already exists`);
     Monitor.debug("NEW BATTLE ROOM: " + roomid);
     const room = new GameRoom(roomid, title, options);
     Rooms.rooms.set(roomid, room);
     return room;
   },
   createChatRoom(roomid, title, options) {
-    if (Rooms.rooms.has(roomid))
-      throw new Error(`Room ${roomid} already exists`);
+    if (Rooms.rooms.has(roomid)) throw new Error(`Room ${roomid} already exists`);
     const room = new BasicRoom(roomid, title, options);
     Rooms.rooms.set(roomid, room);
     return room;
@@ -1897,13 +1764,13 @@ const Rooms = {
       roomTitle = `${p1name} and friends`;
     } else if (isBestOf && !options.isBestOfSubBattle) {
       roomTitle = `${p1name} vs. ${p2name}`;
-      roomid || (roomid = `game-bestof${isBestOf}-${format.id}-${++Rooms.global.lastBattle}`);
+      roomid ||= `game-bestof${isBestOf}-${format.id}-${++Rooms.global.lastBattle}`;
     } else if (options.title) {
       roomTitle = options.title;
     } else {
       roomTitle = `${p1name} vs. ${p2name}`;
     }
-    roomid || (roomid = Rooms.global.prepBattleRoom(options.format));
+    roomid ||= Rooms.global.prepBattleRoom(options.format);
     options.isPersonal = true;
     if (Rooms.rooms.has(roomid)) {
       return Rooms.rooms.get(roomid);

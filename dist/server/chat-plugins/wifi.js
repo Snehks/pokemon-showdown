@@ -51,8 +51,7 @@ let wifiData = (() => {
   try {
     return JSON.parse((0, import_lib.FS)(DATA_FILE).readSync());
   } catch (e) {
-    if (e.code !== "ENOENT")
-      throw e;
+    if (e.code !== "ENOENT") throw e;
     return defaults;
   }
 })();
@@ -64,8 +63,7 @@ if (!wifiData.stats && !wifiData.storedGiveaways && !wifiData.submittedGiveaways
   wifiData = { ...defaults, stats };
   saveData();
 }
-if (!wifiData.whitelist)
-  wifiData.whitelist = [];
+if (!wifiData.whitelist) wifiData.whitelist = [];
 const statNames = ["HP", "Atk", "Def", "SpA", "SpD", "Spe"];
 const gameName = {
   SwSh: "Sword/Shield",
@@ -108,12 +106,9 @@ class Giveaway extends Rooms.SimpleRoomGame {
   }
   getStyle() {
     const css = { class: "broadcast-blue" };
-    if (this.game === "BDSP")
-      css.style = { background: "#aa66a9", color: "#fff" };
-    if (this.game === "SV")
-      css.style = { background: "#CD5C5C", color: "#fff" };
-    if (this.game === "Z-A")
-      css.style = { background: "#10a14f", color: "#fff" };
+    if (this.game === "BDSP") css.style = { background: "#aa66a9", color: "#fff" };
+    if (this.game === "SV") css.style = { background: "#CD5C5C", color: "#fff" };
+    if (this.game === "Z-A") css.style = { background: "#10a14f", color: "#fff" };
     return css;
   }
   sendToUser(user, content) {
@@ -124,8 +119,7 @@ class Giveaway extends Rooms.SimpleRoomGame {
   }
   send(content, isStart = false) {
     this.room.add(Chat.html`|uhtml|giveaway${this.gaNumber}${this.phase}|${/* @__PURE__ */ Chat.h("div", { ...this.getStyle() }, content)}`);
-    if (isStart)
-      this.room.add(`|c:|${Math.floor(Date.now() / 1e3)}|~|It's ${this.game} giveaway time!`);
+    if (isStart) this.room.add(`|c:|${Math.floor(Date.now() / 1e3)}|~|It's ${this.game} giveaway time!`);
     this.room.update();
   }
   changeUhtml(content) {
@@ -140,10 +134,8 @@ class Giveaway extends Rooms.SimpleRoomGame {
   }
   checkJoined(user) {
     for (const [ip, id] of this.joined) {
-      if (user.latestIp === ip && !Config.noipchecks)
-        return ip;
-      if (user.previousIDs.includes(id))
-        return id;
+      if (user.latestIp === ip && !Config.noipchecks) return ip;
+      if (user.previousIDs.includes(id)) return id;
     }
     return false;
   }
@@ -296,8 +288,7 @@ class Giveaway extends Rooms.SimpleRoomGame {
       "xatu",
       "zubat"
     ];
-    if (set.gender === "F" && validFemale.includes(species.id))
-      spriteid += "-f";
+    if (set.gender === "F" && validFemale.includes(species.id)) spriteid += "-f";
     return [
       species.id,
       /* @__PURE__ */ Chat.h("img", { src: `/sprites/ani${shiny}/${spriteid}.gif` })
@@ -305,8 +296,7 @@ class Giveaway extends Rooms.SimpleRoomGame {
   }
   static updateStats(pokemonIDs) {
     for (const mon of pokemonIDs) {
-      if (!wifiData.stats[mon])
-        wifiData.stats[mon] = [];
+      if (!wifiData.stats[mon]) wifiData.stats[mon] = [];
       wifiData.stats[mon].push(Date.now());
     }
     saveData();
@@ -378,28 +368,23 @@ class QuestionGiveaway extends Giveaway {
       throw new Chat.Interruption();
     }
     const targetUser = Users.get(giver);
-    if (!targetUser?.connected)
-      throw new Chat.ErrorMessage(`User '${giver}' is not online.`);
+    if (!targetUser?.connected) throw new Chat.ErrorMessage(`User '${giver}' is not online.`);
     Giveaway.checkCanCreate(context, targetUser, type);
     if (!!ivs && ivs.split("/").length !== 6) {
       throw new Chat.ErrorMessage(`If you provide IVs, they must be provided for all stats.`);
     }
-    if (!game)
-      game = "Z-A";
+    if (!game) game = "Z-A";
     game = gameidToGame[toID(game)] || game;
     if (!game || !["SV", "BDSP", "SwSh", "Z-A"].includes(game)) {
       throw new Chat.ErrorMessage(`The game must be "SV," "BDSP," "SwSh," or "Z-A".`);
     }
-    if (!ball)
-      ball = "pokeball";
-    if (!toID(ball).endsWith("ball"))
-      ball = toID(ball) + "ball";
+    if (!ball) ball = "pokeball";
+    if (!toID(ball).endsWith("ball")) ball = toID(ball) + "ball";
     if (!Dex.items.get(ball).isPokeball) {
       throw new Chat.ErrorMessage(`${Dex.items.get(ball).name} is not a Pok\xE9 Ball.`);
     }
     tid = toID(tid);
-    if (isNaN(parseInt(tid)) || tid.length < 5 || tid.length > 6)
-      throw new Chat.ErrorMessage("Invalid TID");
+    if (isNaN(parseInt(tid)) || tid.length < 5 || tid.length > 6) throw new Chat.ErrorMessage("Invalid TID");
     if (!targetUser.autoconfirmed) {
       throw new Chat.ErrorMessage(`User '${targetUser.name}' needs to be autoconfirmed to give something away.`);
     }
@@ -429,15 +414,12 @@ class QuestionGiveaway extends Giveaway {
     this.timer = setTimeout(() => this.end(false), 1e3 * 60 * 5);
   }
   choose(user, guess) {
-    if (this.phase !== "started")
-      return user.sendTo(this.room, "The giveaway has not started yet.");
+    if (this.phase !== "started") return user.sendTo(this.room, "The giveaway has not started yet.");
     if (this.checkJoined(user) && ![...this.joined.values()].includes(user.id)) {
       return user.sendTo(this.room, "You have already joined the giveaway.");
     }
-    if (Giveaway.checkBanned(this.room, user))
-      return user.sendTo(this.room, "You are banned from entering giveaways.");
-    if (this.checkExcluded(user))
-      return user.sendTo(this.room, "You are disallowed from entering the giveaway.");
+    if (Giveaway.checkBanned(this.room, user)) return user.sendTo(this.room, "You are banned from entering giveaways.");
+    if (this.checkExcluded(user)) return user.sendTo(this.room, "You are disallowed from entering the giveaway.");
     if (this.answered.get(user.id) >= 3) {
       return user.sendTo(
         this.room,
@@ -464,8 +446,7 @@ class QuestionGiveaway extends Giveaway {
     }
   }
   change(value, user, answer = false) {
-    if (user.id !== this.host.id)
-      return user.sendTo(this.room, "Only the host can edit the giveaway.");
+    if (user.id !== this.host.id) return user.sendTo(this.room, "Only the host can edit the giveaway.");
     if (this.phase !== "pending") {
       return user.sendTo(this.room, "You cannot change the question or answer once the giveaway has started.");
     }
@@ -507,8 +488,7 @@ class QuestionGiveaway extends Giveaway {
         if (this.winner.connected) {
           this.winner.popup(`You have won the giveaway. PM **${this.giver.name}** to claim your prize!`);
         }
-        if (this.giver.connected)
-          this.giver.popup(`${this.winner.name} has won your question giveaway!`);
+        if (this.giver.connected) this.giver.popup(`${this.winner.name} has won your question giveaway!`);
         Giveaway.updateStats(/* @__PURE__ */ new Set([this.pokemonID]));
       }
     }
@@ -525,12 +505,9 @@ class QuestionGiveaway extends Giveaway {
     );
   }
   checkExcluded(user) {
-    if (user === this.host)
-      return true;
-    if (this.host.ips.includes(user.latestIp) && !Config.noipchecks)
-      return true;
-    if (this.host.previousIDs.includes(toID(user)))
-      return true;
+    if (user === this.host) return true;
+    if (this.host.ips.includes(user.latestIp) && !Config.noipchecks) return true;
+    if (this.host.previousIDs.includes(toID(user))) return true;
     return super.checkExcluded(user);
   }
 }
@@ -551,28 +528,23 @@ class LotteryGiveaway extends Giveaway {
       throw new Chat.Interruption();
     }
     const targetUser = Users.get(giver);
-    if (!targetUser?.connected)
-      throw new Chat.ErrorMessage(`User '${giver}' is not online.`);
+    if (!targetUser?.connected) throw new Chat.ErrorMessage(`User '${giver}' is not online.`);
     Giveaway.checkCanCreate(context, user, type);
     if (!!ivs && ivs.split("/").length !== 6) {
       throw new Chat.ErrorMessage(`If you provide IVs, they must be provided for all stats.`);
     }
-    if (!game)
-      game = "Z-A";
+    if (!game) game = "Z-A";
     game = gameidToGame[toID(game)] || game;
     if (!game || !["SV", "BDSP", "SwSh", "Z-A"].includes(game)) {
       throw new Chat.ErrorMessage(`The game must be "SV," "BDSP," "SwSh," or "Z-A".`);
     }
-    if (!ball)
-      ball = "pokeball";
-    if (!toID(ball).endsWith("ball"))
-      ball = toID(ball) + "ball";
+    if (!ball) ball = "pokeball";
+    if (!toID(ball).endsWith("ball")) ball = toID(ball) + "ball";
     if (!Dex.items.get(ball).isPokeball) {
       throw new Chat.ErrorMessage(`${Dex.items.get(ball).name} is not a Pok\xE9 Ball.`);
     }
     tid = toID(tid);
-    if (isNaN(parseInt(tid)) || tid.length < 5 || tid.length > 6)
-      throw new Chat.ErrorMessage("Invalid TID");
+    if (isNaN(parseInt(tid)) || tid.length < 5 || tid.length > 6) throw new Chat.ErrorMessage("Invalid TID");
     if (!targetUser.autoconfirmed) {
       throw new Chat.ErrorMessage(`User '${targetUser.name}' needs to be autoconfirmed to give something away.`);
     }
@@ -615,25 +587,18 @@ class LotteryGiveaway extends Giveaway {
     }
   }
   addUser(user) {
-    if (this.phase !== "pending")
-      return user.sendTo(this.room, "The join phase of the lottery giveaway has ended.");
-    if (!user.named)
-      return user.sendTo(this.room, "You need to choose a name before joining a lottery giveaway.");
-    if (this.checkJoined(user))
-      return user.sendTo(this.room, "You have already joined the giveaway.");
-    if (Giveaway.checkBanned(this.room, user))
-      return user.sendTo(this.room, "You are banned from entering giveaways.");
-    if (this.checkExcluded(user))
-      return user.sendTo(this.room, "You are disallowed from entering the giveaway.");
+    if (this.phase !== "pending") return user.sendTo(this.room, "The join phase of the lottery giveaway has ended.");
+    if (!user.named) return user.sendTo(this.room, "You need to choose a name before joining a lottery giveaway.");
+    if (this.checkJoined(user)) return user.sendTo(this.room, "You have already joined the giveaway.");
+    if (Giveaway.checkBanned(this.room, user)) return user.sendTo(this.room, "You are banned from entering giveaways.");
+    if (this.checkExcluded(user)) return user.sendTo(this.room, "You are disallowed from entering the giveaway.");
     this.joined.set(user.latestIp, user.id);
     this.sendToUser(user, this.generateReminder(true));
     user.sendTo(this.room, "You have successfully joined the lottery giveaway.");
   }
   removeUser(user) {
-    if (this.phase !== "pending")
-      return user.sendTo(this.room, "The join phase of the lottery giveaway has ended.");
-    if (!this.checkJoined(user))
-      return user.sendTo(this.room, "You have not joined the lottery giveaway.");
+    if (this.phase !== "pending") return user.sendTo(this.room, "The join phase of the lottery giveaway has ended.");
+    if (!this.checkJoined(user)) return user.sendTo(this.room, "You have not joined the lottery giveaway.");
     for (const [ip, id] of this.joined) {
       if (ip === user.latestIp && !Config.noipchecks || id === user.id) {
         this.joined.delete(ip);
@@ -652,8 +617,7 @@ class LotteryGiveaway extends Giveaway {
     }
     while (this.winners.length < this.maxWinners && userlist.length > 0) {
       const winner = Users.get(userlist.splice(Math.floor(Math.random() * userlist.length), 1)[0]);
-      if (!winner)
-        continue;
+      if (!winner) continue;
       this.winners.push(winner);
     }
     this.end();
@@ -683,8 +647,7 @@ class LotteryGiveaway extends Giveaway {
           winner.popup(`You have won the lottery giveaway! PM **${this.giver.name}** to claim your prize!`);
         }
       }
-      if (this.giver.connected)
-        this.giver.popup(`The following users have won your lottery giveaway:
+      if (this.giver.connected) this.giver.popup(`The following users have won your lottery giveaway:
 ${winnerNames}`);
       Giveaway.updateStats(/* @__PURE__ */ new Set([this.pokemonID]));
     }
@@ -729,17 +692,14 @@ class GTS extends Rooms.SimpleRoomGame {
   }
   updateLeft(num) {
     this.left = num;
-    if (this.left < 1)
-      return this.end();
+    if (this.left < 1) return this.end();
     this.changeUhtml(this.generateWindow());
   }
   updateSent(ign) {
     this.left--;
-    if (this.left < 1)
-      return this.end();
+    if (this.left < 1) return this.end();
     this.sent.push(ign);
-    if (this.sent.length > 5)
-      this.sent.shift();
+    if (this.sent.length > 5) this.sent.shift();
     this.changeUhtml(this.generateWindow());
   }
   stopDeposits() {
@@ -835,15 +795,12 @@ const commands = {
       if (!target) {
         this.runBroadcast();
         let output = `The GTS giveaway from ${game.giver} has ${game.left} Pok\xE9mon remaining!`;
-        if (game.sent.length)
-          output += `Last winners: ${game.sent.join(", ")}`;
+        if (game.sent.length) output += `Last winners: ${game.sent.join(", ")}`;
         return this.sendReply(output);
       }
       const newamount = parseInt(target);
-      if (isNaN(newamount))
-        throw new Chat.ErrorMessage("Please enter a valid amount.");
-      if (newamount > game.left)
-        throw new Chat.ErrorMessage("The new amount must be lower than the old amount.");
+      if (isNaN(newamount)) throw new Chat.ErrorMessage("Please enter a valid amount.");
+      if (newamount > game.left) throw new Chat.ErrorMessage("The new amount must be lower than the old amount.");
       if (newamount < game.left - 1) {
         this.modlog(`GTS GIVEAWAY`, null, `set from ${game.left} to ${newamount} left`);
       }
@@ -855,8 +812,7 @@ const commands = {
       if (!user.can("warn", null, room) && user !== game.giver) {
         throw new Chat.ErrorMessage("Only the host or a staff member can update GTS giveaways.");
       }
-      if (!target || target.length > 12)
-        throw new Chat.ErrorMessage("Please enter a valid IGN.");
+      if (!target || target.length > 12) throw new Chat.ErrorMessage("Please enter a valid IGN.");
       game.updateSent(target);
     },
     full(target, room, user) {
@@ -865,8 +821,7 @@ const commands = {
       if (!user.can("warn", null, room) && user !== game.giver) {
         throw new Chat.ErrorMessage("Only the host or a staff member can update GTS giveaways.");
       }
-      if (game.noDeposits)
-        throw new Chat.ErrorMessage("The GTS giveaway was already set to not accept deposits.");
+      if (game.noDeposits) throw new Chat.ErrorMessage("The GTS giveaway was already set to not accept deposits.");
       game.stopDeposits();
     },
     end(target, room, user) {
@@ -877,8 +832,7 @@ const commands = {
         throw new Chat.ErrorMessage("The reason is too long. It cannot exceed 300 characters.");
       }
       const amount = game.end(true);
-      if (target)
-        target = `: ${target}`;
+      if (target) target = `: ${target}`;
       this.modlog("GTS END", null, `with ${amount} left${target}`);
       this.privateModAction(`The giveaway was forcibly ended by ${user.name} with ${amount} left${target}`);
     }
@@ -896,22 +850,19 @@ const commands = {
     view: {
       ""(target, room, user) {
         this.room = room = Rooms.search("wifi") || null;
-        if (!room)
-          throw new Chat.ErrorMessage(`The Wi-Fi room doesn't exist on this server.`);
+        if (!room) throw new Chat.ErrorMessage(`The Wi-Fi room doesn't exist on this server.`);
         this.checkCan("warn", null, room);
         this.parse(`/j view-giveaways-default`);
       },
       stored(target, room, user) {
         this.room = room = Rooms.search("wifi") || null;
-        if (!room)
-          throw new Chat.ErrorMessage(`The Wi-Fi room doesn't exist on this server.`);
+        if (!room) throw new Chat.ErrorMessage(`The Wi-Fi room doesn't exist on this server.`);
         this.checkCan("warn", null, room);
         this.parse(`/j view-giveaways-stored`);
       },
       submitted(target, room, user) {
         this.room = room = Rooms.search("wifi") || null;
-        if (!room)
-          throw new Chat.ErrorMessage(`The Wi-Fi room doesn't exist on this server.`);
+        if (!room) throw new Chat.ErrorMessage(`The Wi-Fi room doesn't exist on this server.`);
         this.checkCan("warn", null, room);
         this.parse(`/j view-giveaways-submitted`);
       }
@@ -940,8 +891,7 @@ const commands = {
     join(target, room, user, conn, cmd) {
       room = this.requireRoom("wifi");
       this.checkChat();
-      if (user.semilocked)
-        return;
+      if (user.semilocked) return;
       const giveaway = this.requireGame(LotteryGiveaway);
       if (cmd.includes("join")) {
         giveaway.addUser(user);
@@ -952,8 +902,7 @@ const commands = {
     monthban: "ban",
     permaban: "ban",
     ban(target, room, user, connection, cmd) {
-      if (!target)
-        return false;
+      if (!target) return false;
       room = this.requireRoom("wifi");
       this.checkCan("warn", null, room);
       const { targetUser, rest: reason } = this.requireUser(target, { allowOffline: true });
@@ -973,8 +922,7 @@ const commands = {
       this.privateModAction(`${targetUser.name} was banned from entering giveaways${durationMsg} by ${user.name}.${reasonMessage}`);
     },
     unban(target, room, user) {
-      if (!target)
-        return false;
+      if (!target) return false;
       room = this.requireRoom("wifi");
       this.checkCan("warn", null, room);
       const { targetUser } = this.requireUser(target, { allowOffline: true });
@@ -990,8 +938,7 @@ const commands = {
     create: {
       ""(target, room, user) {
         room = this.requireRoom("wifi");
-        if (!user.can("show", null, room))
-          this.checkCan("warn", null, room);
+        if (!user.can("show", null, room)) this.checkCan("warn", null, room);
         this.parse("/j view-giveaways-create");
       },
       question(target, room, user) {
@@ -1015,8 +962,7 @@ const commands = {
           prize
         } = QuestionGiveaway.splitTarget(target, "|", this, user, "create");
         const set = Teams.import(prize)?.[0];
-        if (!set)
-          throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
+        if (!set) throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
         room.game = new QuestionGiveaway(user, targetUser, room, ot, tid, game, ivs, set, question, answers, ball, extraInfo);
         this.privateModAction(`${user.name} started a question giveaway for ${targetUser.name}.`);
         this.modlog("QUESTION GIVEAWAY", null, `for ${targetUser.getLastId()} (OT: ${ot} TID: ${tid} Nature: ${room.game.prize.nature} Ball: ${ball}${extraInfo ? ` Other box info: ${extraInfo}` : ""})`);
@@ -1026,8 +972,7 @@ const commands = {
         if (!room) {
           throw new Chat.ErrorMessage(`This command must be used in the Wi-Fi room.`);
         }
-        if (room.game)
-          throw new Chat.ErrorMessage(`There is already a room game (${room.game.constructor.name}) going on.`);
+        if (room.game) throw new Chat.ErrorMessage(`There is already a room game (${room.game.constructor.name}) going on.`);
         const {
           targetUser,
           ot,
@@ -1040,8 +985,7 @@ const commands = {
           extraInfo
         } = LotteryGiveaway.splitTarget(target, "|", this, user, "create");
         const set = Teams.import(prize)?.[0];
-        if (!set)
-          throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
+        if (!set) throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
         room.game = new LotteryGiveaway(user, targetUser, room, ot, tid, ivs, game, set, winners, ball, extraInfo);
         this.privateModAction(`${user.name} started a lottery giveaway for ${targetUser.name}.`);
         this.modlog("LOTTERY GIVEAWAY", null, `for ${targetUser.getLastId()} (OT: ${ot} TID: ${tid} Nature: ${room.game.prize.nature} Ball: ${ball}${extraInfo ? ` Other box info: ${extraInfo}` : ""})`);
@@ -1054,15 +998,13 @@ const commands = {
         throw new Chat.ErrorMessage(`There is no giveaway going on at the moment.`);
       }
       const game = room.game;
-      if (user.id !== game.host.id)
-        this.checkCan("warn", null, room);
+      if (user.id !== game.host.id) this.checkCan("warn", null, room);
       if (target && target.length > 300) {
         throw new Chat.ErrorMessage("The reason is too long. It cannot exceed 300 characters.");
       }
       game.end(true);
       this.modlog("GIVEAWAY END", null, target);
-      if (target)
-        target = `: ${target}`;
+      if (target) target = `: ${target}`;
       this.privateModAction(`The giveaway was forcibly ended by ${user.name}${target}`);
     },
     guess(target, room, user) {
@@ -1073,16 +1015,14 @@ const commands = {
       room = this.requireRoom("wifi");
       const giveaway = this.requireGame(QuestionGiveaway);
       target = target.trim();
-      if (!target)
-        throw new Chat.ErrorMessage("You must include a question or an answer.");
+      if (!target) throw new Chat.ErrorMessage("You must include a question or an answer.");
       giveaway.change(target, user, cmd.includes("answer"));
     },
     showanswer: "viewanswer",
     viewanswer(target, room, user) {
       room = this.requireRoom("wifi");
       const giveaway = this.requireGame(QuestionGiveaway);
-      if (user.id !== giveaway.host.id && user.id !== giveaway.giver.id)
-        return;
+      if (user.id !== giveaway.host.id && user.id !== giveaway.giver.id) return;
       this.sendReply(`The giveaway question is ${giveaway.question}.
 The answer${Chat.plural(giveaway.answers, "s are", " is")} ${giveaway.answers.join(", ")}.`);
     },
@@ -1111,10 +1051,8 @@ The answer${Chat.plural(giveaway.answers, "s are", " is")} ${giveaway.answers.jo
           ivs
         } = QuestionGiveaway.splitTarget(target, "|", this, user, "store");
         const set = Teams.import(prize)?.[0];
-        if (!set)
-          throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
-        if (!wifiData.storedGiveaways.question)
-          wifiData.storedGiveaways.question = [];
+        if (!set) throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
+        if (!wifiData.storedGiveaways.question) wifiData.storedGiveaways.question = [];
         const data = { targetUserID: targetUser.id, ot, tid, game, prize: set, question, answers, ivs, ball, extraInfo };
         wifiData.storedGiveaways.question.push(data);
         saveData();
@@ -1138,10 +1076,8 @@ The answer${Chat.plural(giveaway.answers, "s are", " is")} ${giveaway.answers.jo
           ivs
         } = LotteryGiveaway.splitTarget(target, "|", this, user, "store");
         const set = Teams.import(prize)?.[0];
-        if (!set)
-          throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
-        if (!wifiData.storedGiveaways.lottery)
-          wifiData.storedGiveaways.lottery = [];
+        if (!set) throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
+        if (!wifiData.storedGiveaways.lottery) wifiData.storedGiveaways.lottery = [];
         const data = { targetUserID: targetUser.id, ot, tid, game, prize: set, winners, ball, extraInfo, ivs };
         wifiData.storedGiveaways.lottery.push(data);
         saveData();
@@ -1173,10 +1109,8 @@ The answer${Chat.plural(giveaway.answers, "s are", " is")} ${giveaway.answers.jo
           ivs
         } = QuestionGiveaway.splitTarget(target, "|", this, user, "submit");
         const set = Teams.import(prize)?.[0];
-        if (!set)
-          throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
-        if (!wifiData.submittedGiveaways.question)
-          wifiData.submittedGiveaways.question = [];
+        if (!set) throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
+        if (!wifiData.submittedGiveaways.question) wifiData.submittedGiveaways.question = [];
         const data = { targetUserID: targetUser.id, ot, tid, game, prize: set, question, answers, ball, extraInfo, ivs };
         wifiData.submittedGiveaways.question.push(data);
         saveData();
@@ -1204,10 +1138,8 @@ The answer${Chat.plural(giveaway.answers, "s are", " is")} ${giveaway.answers.jo
           ivs
         } = LotteryGiveaway.splitTarget(target, "|", this, user, "submit");
         const set = Teams.import(prize)?.[0];
-        if (!set)
-          throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
-        if (!wifiData.submittedGiveaways.lottery)
-          wifiData.submittedGiveaways.lottery = [];
+        if (!set) throw new Chat.ErrorMessage(`Please submit the prize in the form of a PS set importable.`);
+        if (!wifiData.submittedGiveaways.lottery) wifiData.submittedGiveaways.lottery = [];
         const data = { targetUserID: targetUser.id, ot, tid, game, prize: set, winners, ball, extraInfo, ivs };
         wifiData.submittedGiveaways.lottery.push(data);
         saveData();
@@ -1253,8 +1185,7 @@ The answer${Chat.plural(giveaway.answers, "s are", " is")} ${giveaway.answers.jo
       if (!room) {
         throw new Chat.ErrorMessage(`This command must be used in the Wi-Fi room.`);
       }
-      if (!target)
-        return this.parse("/help giveaway");
+      if (!target) return this.parse("/help giveaway");
       const del = cmd === "delete";
       if (del) {
         const [type, indexStr] = target.split(",");
@@ -1296,8 +1227,7 @@ The answer${Chat.plural(giveaway.answers, "s are", " is")} ${giveaway.answers.jo
       room = this.requireRoom("wifi");
       this.checkCan("warn", null, room);
       const targetId = toID(target);
-      if (!targetId)
-        return this.parse(`/help giveaway whitelist`);
+      if (!targetId) return this.parse(`/help giveaway whitelist`);
       if (cmd.includes("un")) {
         const idx = wifiData.whitelist.indexOf(targetId);
         if (idx < 0) {
@@ -1342,8 +1272,7 @@ The answer${Chat.plural(giveaway.answers, "s are", " is")} ${giveaway.answers.jo
         throw new Chat.ErrorMessage(`${targetUser?.name || toID(target)} doesn't have any submitted giveaways.`);
       }
       const giveaway = wifiData.submittedGiveaways[hasGiveaway.type][hasGiveaway.index];
-      if (giveaway.claimed)
-        throw new Chat.ErrorMessage(`That giveaway is already claimed by ${giveaway.claimed}.`);
+      if (giveaway.claimed) throw new Chat.ErrorMessage(`That giveaway is already claimed by ${giveaway.claimed}.`);
       giveaway.claimed = user.id;
       Chat.refreshPageFor("giveaways-submitted", room);
       this.privateModAction(`${user.name} claimed ${targetUser.name}'s giveaway`);
@@ -1359,8 +1288,7 @@ The answer${Chat.plural(giveaway.answers, "s are", " is")} ${giveaway.answers.jo
         throw new Chat.ErrorMessage(`${targetUser?.name || toID(target)} doesn't have any submitted giveaways.`);
       }
       const giveaway = wifiData.submittedGiveaways[hasGiveaway.type][hasGiveaway.index];
-      if (!giveaway.claimed)
-        throw new Chat.ErrorMessage(`That giveaway is not claimed.`);
+      if (!giveaway.claimed) throw new Chat.ErrorMessage(`That giveaway is not claimed.`);
       delete giveaway.claimed;
       Chat.refreshPageFor("giveaways-submitted", room);
       saveData();
@@ -1373,8 +1301,7 @@ The answer${Chat.plural(giveaway.answers, "s are", " is")} ${giveaway.answers.jo
       target = Dex.species.get(target).id;
       this.runBroadcast();
       const count = wifiData.stats[target];
-      if (!count)
-        return this.sendReplyBox("This Pok\xE9mon has never been given away.");
+      if (!count) return this.sendReplyBox("This Pok\xE9mon has never been given away.");
       const recent = count.filter((val) => val + RECENT_THRESHOLD > Date.now()).length;
       this.sendReplyBox(`This Pok\xE9mon has been given away ${Chat.count(count, "times")}, a total of ${Chat.count(recent, "times")} in the past month.`);
     }
@@ -1421,8 +1348,7 @@ function makePageHeader(user, pageid) {
   const urls = [];
   const room = Rooms.get("wifi");
   for (const i in titles) {
-    if (urls.length)
-      urls.push(" / ");
+    if (urls.length) urls.push(" / ");
     if (!user.can("mute", null, room) && i !== "submitted-add") {
       continue;
     }
@@ -1452,16 +1378,14 @@ const pages = {
   giveaways: {
     ""() {
       this.title = `[Giveaways]`;
-      if (!Rooms.search("wifi"))
-        return /* @__PURE__ */ Chat.h("h1", null, "There is no Wi-Fi room on this server.");
+      if (!Rooms.search("wifi")) return /* @__PURE__ */ Chat.h("h1", null, "There is no Wi-Fi room on this server.");
       this.checkCan("warn", null, Rooms.search("wifi"));
       return /* @__PURE__ */ Chat.h("div", { class: "pad" }, makePageHeader(this.user));
     },
     create(args, user) {
       this.title = `[Create Giveaways]`;
       const wifi = Rooms.search("wifi");
-      if (!wifi)
-        return /* @__PURE__ */ Chat.h("h1", null, "There is no Wi-Fi room on this server.");
+      if (!wifi) return /* @__PURE__ */ Chat.h("h1", null, "There is no Wi-Fi room on this server.");
       if (!(user.can("show", null, wifi) || wifiData.whitelist.includes(user.id))) {
         this.checkCan("warn", null, wifi);
       }
@@ -1525,8 +1449,7 @@ const pages = {
     },
     stored(args, user) {
       this.title = `[Stored Giveaways]`;
-      if (!Rooms.search("wifi"))
-        return /* @__PURE__ */ Chat.h("h1", null, "There is no Wi-Fi room on this server.");
+      if (!Rooms.search("wifi")) return /* @__PURE__ */ Chat.h("h1", null, "There is no Wi-Fi room on this server.");
       this.checkCan("warn", null, Rooms.search("wifi"));
       const [add, type] = args;
       const giveaways = [
@@ -1650,12 +1573,10 @@ const pages = {
     },
     submitted(args, user) {
       this.title = `[Submitted Giveaways]`;
-      if (!Rooms.search("wifi"))
-        return /* @__PURE__ */ Chat.h("h1", null, "There is no Wi-Fi room on this server.");
+      if (!Rooms.search("wifi")) return /* @__PURE__ */ Chat.h("h1", null, "There is no Wi-Fi room on this server.");
       const [add, type] = args;
       const adding = add === "add";
-      if (!adding)
-        this.checkCan("warn", null, Rooms.get("wifi"));
+      if (!adding) this.checkCan("warn", null, Rooms.get("wifi"));
       const giveaways = [
         ...wifiData.submittedGiveaways?.lottery || [],
         ...wifiData.submittedGiveaways?.question || []

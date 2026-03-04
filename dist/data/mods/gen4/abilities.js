@@ -33,8 +33,7 @@ const Abilities = {
   angerpoint: {
     inherit: true,
     onAfterSubDamage(damage, target, source, move) {
-      if (!target.hp)
-        return;
+      if (!target.hp) return;
       if (move && move.effectType === "Move" && target.getMoveHitData(move).crit) {
         target.setBoost({ atk: 6 });
         this.add("-setboost", target, "atk", 12, "[from] ability: Anger Point");
@@ -70,12 +69,10 @@ const Abilities = {
   colorchange: {
     inherit: true,
     onDamagingHit(damage, target, source, move) {
-      if (!damage || !target.hp)
-        return;
+      if (!damage || !target.hp) return;
       const type = move.type;
       if (target.isActive && move.category !== "Status" && type !== "???" && !target.hasType(type)) {
-        if (!target.setType(type))
-          return false;
+        if (!target.setType(type)) return false;
         this.add("-start", target, "typechange", type, "[from] ability: Color Change");
       }
     },
@@ -85,8 +82,7 @@ const Abilities = {
   compoundeyes: {
     onSourceModifyAccuracyPriority: 9,
     onSourceModifyAccuracy(accuracy) {
-      if (typeof accuracy !== "number")
-        return;
+      if (typeof accuracy !== "number") return;
       this.debug("compoundeyes - enhancing accuracy");
       return accuracy * 1.3;
     },
@@ -108,8 +104,7 @@ const Abilities = {
       let totaldef = 0;
       let totalspd = 0;
       for (const target of pokemon.foes()) {
-        if (target.volatiles.substitute)
-          continue;
+        if (target.volatiles.substitute) continue;
         totaldef += target.getStat("def", false, true);
         totalspd += target.getStat("spd", false, true);
       }
@@ -202,12 +197,9 @@ const Abilities = {
         for (const moveSlot of target.moveSlots) {
           const move = this.dex.moves.get(moveSlot.move);
           let bp = move.basePower;
-          if (move.ohko)
-            bp = 160;
-          if (move.id === "counter" || move.id === "metalburst" || move.id === "mirrorcoat")
-            bp = 120;
-          if (!bp && move.category !== "Status")
-            bp = 80;
+          if (move.ohko) bp = 160;
+          if (move.id === "counter" || move.id === "metalburst" || move.id === "mirrorcoat") bp = 120;
+          if (!bp && move.category !== "Status") bp = 80;
           if (bp > warnBp) {
             warnMoves = [move];
             warnBp = bp;
@@ -216,8 +208,7 @@ const Abilities = {
           }
         }
       }
-      if (!warnMoves.length)
-        return;
+      if (!warnMoves.length) return;
       const warnMove = this.sample(warnMoves);
       this.add("-activate", pokemon, "ability: Forewarn", warnMove);
     }
@@ -333,8 +324,7 @@ const Abilities = {
     onCheckShow(pokemon) {
     },
     onSwitchOut(pokemon) {
-      if (!pokemon.status || pokemon.status === "fnt")
-        return;
+      if (!pokemon.status || pokemon.status === "fnt") return;
       this.add("-curestatus", pokemon, pokemon.status, "[from] ability: Natural Cure");
       pokemon.clearStatus();
     }
@@ -391,8 +381,7 @@ const Abilities = {
       this.add("-ability", pokemon, "Pressure");
     },
     onDeductPP(target, source) {
-      if (target === source)
-        return;
+      if (target === source) return;
       return 1;
     },
     name: "Pressure",
@@ -411,8 +400,7 @@ const Abilities = {
     inherit: true,
     onModifyAccuracyPriority: 8,
     onModifyAccuracy(accuracy) {
-      if (typeof accuracy !== "number")
-        return;
+      if (typeof accuracy !== "number") return;
       if (this.field.isWeather("sandstorm")) {
         this.debug("Sand Veil - decreasing accuracy");
         return accuracy * 0.8;
@@ -425,8 +413,7 @@ const Abilities = {
       if (move.secondaries && move.id !== "chatter") {
         this.debug("doubling secondary chance");
         for (const secondary of move.secondaries) {
-          if (secondary.chance)
-            secondary.chance *= 2;
+          if (secondary.chance) secondary.chance *= 2;
         }
       }
     }
@@ -452,8 +439,7 @@ const Abilities = {
     inherit: true,
     onModifyAccuracyPriority: 8,
     onModifyAccuracy(accuracy) {
-      if (typeof accuracy !== "number")
-        return;
+      if (typeof accuracy !== "number") return;
       if (this.field.isWeather("hail")) {
         this.debug("Snow Cloak - decreasing accuracy");
         return accuracy * 0.8;
@@ -516,15 +502,11 @@ const Abilities = {
   synchronize: {
     inherit: true,
     onAfterSetStatus(status, target, source, effect) {
-      if (!source || source === target)
-        return;
-      if (effect && effect.id === "toxicspikes")
-        return;
+      if (!source || source === target) return;
+      if (effect && effect.id === "toxicspikes") return;
       let id = status.id;
-      if (id === "slp" || id === "frz")
-        return;
-      if (id === "tox")
-        id = "psn";
+      if (id === "slp" || id === "frz") return;
+      if (id === "tox") id = "psn";
       source.trySetStatus(id, target);
     }
   },
@@ -532,8 +514,7 @@ const Abilities = {
     inherit: true,
     onModifyAccuracyPriority: 6,
     onModifyAccuracy(accuracy, target) {
-      if (typeof accuracy !== "number")
-        return;
+      if (typeof accuracy !== "number") return;
       if (target?.volatiles["confusion"]) {
         this.debug("Tangled Feet - decreasing accuracy");
         return accuracy * 0.5;
@@ -567,11 +548,9 @@ const Abilities = {
   trace: {
     inherit: true,
     onUpdate(pokemon) {
-      if (!this.effectState.seek)
-        return;
+      if (!this.effectState.seek) return;
       const target = pokemon.side.randomFoe();
-      if (!target || target.fainted)
-        return;
+      if (!target || target.fainted) return;
       const ability = target.getAbility();
       const bannedAbilities = ["forecast", "multitype", "trace"];
       if (bannedAbilities.includes(target.ability)) {
@@ -592,8 +571,7 @@ const Abilities = {
         this.hint("In Gen 4, Fire Fang is always able to hit through Wonder Guard.", true, target.side);
         return;
       }
-      if (target === source || move.category === "Status" || move.type === "???")
-        return;
+      if (target === source || move.category === "Status" || move.type === "???") return;
       this.debug("Wonder Guard immunity: " + move.id);
       if (target.runEffectiveness(move) <= 0 || !target.runImmunity(move)) {
         this.add("-immune", target, "[from] ability: Wonder Guard");

@@ -25,34 +25,23 @@ var import_pokemon = require("../../../sim/pokemon");
 const Scripts = {
   pokemon: {
     isGrounded(negateImmunity) {
-      if ("gravity" in this.battle.field.pseudoWeather)
-        return true;
-      if ("ingrain" in this.volatiles && this.battle.gen >= 4)
-        return true;
-      if ("smackdown" in this.volatiles)
-        return true;
+      if ("gravity" in this.battle.field.pseudoWeather) return true;
+      if ("ingrain" in this.volatiles && this.battle.gen >= 4) return true;
+      if ("smackdown" in this.volatiles) return true;
       const item = this.ignoringItem() ? "" : this.item;
-      if (item === "ironball" || this.volatiles["item:ironball"] && !this.ignoringItem())
-        return true;
-      if (!negateImmunity && this.hasType("Flying") && !(this.hasType("???") && "roost" in this.volatiles))
-        return false;
-      if (this.hasAbility("levitate") && !this.battle.suppressingAbility(this))
-        return null;
-      if ("magnetrise" in this.volatiles)
-        return false;
-      if ("telekinesis" in this.volatiles)
-        return false;
-      if (item === "airballoon" || this.volatiles["item:airballoon"] && !this.ignoringItem())
-        return false;
+      if (item === "ironball" || this.volatiles["item:ironball"] && !this.ignoringItem()) return true;
+      if (!negateImmunity && this.hasType("Flying") && !(this.hasType("???") && "roost" in this.volatiles)) return false;
+      if (this.hasAbility("levitate") && !this.battle.suppressingAbility(this)) return null;
+      if ("magnetrise" in this.volatiles) return false;
+      if ("telekinesis" in this.volatiles) return false;
+      if (item === "airballoon" || this.volatiles["item:airballoon"] && !this.ignoringItem()) return false;
       return true;
     },
     getAbility() {
       const ability = this.battle.dex.abilities.getByID(this.ability);
-      if (ability.exists)
-        return ability;
+      if (ability.exists) return ability;
       let abil = this.battle.dex.items.getByID(this.ability);
-      if (!abil.exists)
-        abil = this.battle.dex.moves.getByID(this.ability);
+      if (!abil.exists) abil = this.battle.dex.moves.getByID(this.ability);
       return {
         id: this.ability,
         name: abil.name || this.ability,
@@ -64,10 +53,8 @@ const Scripts = {
       };
     },
     hasAbility(ability) {
-      if (this.ignoringAbility())
-        return false;
-      if (Array.isArray(ability))
-        return ability.some((abil) => this.hasAbility(abil));
+      if (this.ignoringAbility()) return false;
+      if (Array.isArray(ability)) return ability.some((abil) => this.hasAbility(abil));
       const abilityid = this.battle.toID(ability);
       return this.ability === abilityid || !!this.volatiles["ability:" + abilityid];
     },
@@ -94,16 +81,14 @@ const Scripts = {
       ].map(this.battle.toID));
       let isBMMAbil = false;
       let isOldBMMAbil = false;
-      if (!this.hp)
-        return false;
+      if (!this.hp) return false;
       if (typeof ability === "string") {
         if (this.battle.dex.abilities.get(ability).exists) {
           ability = this.battle.dex.abilities.get(ability);
         } else {
           const abilString = ability;
           let abil = this.battle.dex.items.get(abilString);
-          if (!abil.exists)
-            abil = this.battle.dex.moves.get(abilString);
+          if (!abil.exists) abil = this.battle.dex.moves.get(abilString);
           ability = {
             id: abil.id || abilString,
             name: abil.name || abilString,
@@ -115,10 +100,8 @@ const Scripts = {
           };
         }
       }
-      if (ability.name.length && !this.battle.dex.abilities.get(ability).exists)
-        isBMMAbil = true;
-      if (!sourceEffect && this.battle.effect)
-        sourceEffect = this.battle.effect;
+      if (ability.name.length && !this.battle.dex.abilities.get(ability).exists) isBMMAbil = true;
+      if (!sourceEffect && this.battle.effect) sourceEffect = this.battle.effect;
       let oldAbility;
       if (this.battle.dex.abilities.get(this.ability).exists) {
         oldAbility = this.battle.dex.abilities.get(this.ability);
@@ -127,8 +110,7 @@ const Scripts = {
         if (!abil.exists) {
           abil = this.battle.dex.moves.getByID(this.ability);
         } else {
-          if (!this.battle.runEvent("TakeItem", this, source, null, abil))
-            return false;
+          if (!this.battle.runEvent("TakeItem", this, source, null, abil)) return false;
         }
         oldAbility = {
           id: this.ability,
@@ -141,16 +123,13 @@ const Scripts = {
         };
         isOldBMMAbil = true;
       }
-      if (allThings.has(ability.id))
-        return false;
+      if (allThings.has(ability.id)) return false;
       if (!isFromFormeChange) {
-        if (ability.flags["cantsuppress"] || this.getAbility().flags["cantsuppress"])
-          return false;
+        if (ability.flags["cantsuppress"] || this.getAbility().flags["cantsuppress"]) return false;
       }
       if (!isFromFormeChange && !isTransform) {
         const setAbilityEvent = this.battle.runEvent("SetAbility", this, source, sourceEffect, ability);
-        if (!setAbilityEvent)
-          return setAbilityEvent;
+        if (!setAbilityEvent) return setAbilityEvent;
       }
       this.battle.singleEvent("End", oldAbility, this.abilityState, this, source);
       if (isOldBMMAbil) {
@@ -162,20 +141,17 @@ const Scripts = {
           const isMove = this.m.scrambled.moves.findIndex((e) => e.inSlot === "Ability");
           if (!isTransform) {
             let indexOfMove = this.baseMoveSlots.findIndex((m) => this.battle.toID(this.m.scrambled.moves[isMove].thing) === m.id);
-            if (indexOfMove >= 0)
-              this.baseMoveSlots.splice(indexOfMove, 1);
+            if (indexOfMove >= 0) this.baseMoveSlots.splice(indexOfMove, 1);
             if (oldAbility.id !== "mimic") {
               indexOfMove = this.moveSlots.findIndex((m) => this.battle.toID(this.m.scrambled.moves[isMove].thing) === m.id);
             }
-            if (indexOfMove >= 0)
-              this.moveSlots.splice(indexOfMove, 1);
+            if (indexOfMove >= 0) this.moveSlots.splice(indexOfMove, 1);
           }
           this.m.scrambled.moves.splice(isMove, 1);
         }
       }
       this.ability = ability.id;
-      if (!isTransform && !this.transformed)
-        this.baseAbility = ability.id;
+      if (!isTransform && !this.transformed) this.baseAbility = ability.id;
       this.abilityState = this.battle.initEffectState({ id: ability.id, target: this });
       if (sourceEffect && !isFromFormeChange && !isTransform) {
         if (source) {
@@ -215,11 +191,9 @@ const Scripts = {
     },
     getItem() {
       const item = this.battle.dex.items.getByID(this.item);
-      if (item.exists)
-        return item;
+      if (item.exists) return item;
       let bmmItem = this.battle.dex.abilities.getByID(this.item);
-      if (!bmmItem.exists)
-        bmmItem = this.battle.dex.moves.getByID(this.item);
+      if (!bmmItem.exists) bmmItem = this.battle.dex.moves.getByID(this.item);
       return {
         id: this.item,
         name: bmmItem.name || this.name,
@@ -230,21 +204,16 @@ const Scripts = {
       };
     },
     hasItem(item) {
-      if (this.ignoringItem())
-        return false;
-      if (Array.isArray(item))
-        return item.some((i) => this.hasItem(i));
+      if (this.ignoringItem()) return false;
+      if (Array.isArray(item)) return item.some((i) => this.hasItem(i));
       const itemId = this.battle.toID(item);
       return this.item === itemId || !!this.volatiles["item:" + itemId];
     },
     takeItem(source) {
-      if (!this.item)
-        return false;
-      if (!source)
-        source = this;
+      if (!this.item) return false;
+      if (!source) source = this;
       if (this.battle.gen <= 4) {
-        if (source.itemKnockedOff)
-          return false;
+        if (source.itemKnockedOff) return false;
         if (this.battle.toID(this.ability) === "multitype" || this.m.scrambled.abilities.findIndex((e) => this.battle.toID(e.thing) === "multitype") >= 0) {
           return false;
         }
@@ -258,20 +227,17 @@ const Scripts = {
         let wrongSlot = this.m.scrambled.abilities.findIndex((e) => e.inSlot === "Item");
         if (wrongSlot >= 0) {
           const dexAbil = this.battle.dex.abilities.get(this.m.scrambled.abilities[wrongSlot].thing);
-          if (dexAbil.flags["failskillswap"])
-            return false;
+          if (dexAbil.flags["failskillswap"]) return false;
           this.removeVolatile("ability:" + this.battle.toID(this.m.scrambled.abilities[wrongSlot].thing));
           this.m.scrambled.abilities.splice(wrongSlot, 1);
         } else if (this.m.scrambled.moves.findIndex((e) => e.inSlot === "Item") >= 0) {
           wrongSlot = this.m.scrambled.moves.findIndex((e) => e.inSlot === "Item");
           let indexOfMove = this.baseMoveSlots.findIndex((m) => this.battle.toID(this.m.scrambled.moves[wrongSlot].thing) === m.id);
-          if (indexOfMove >= 0)
-            this.baseMoveSlots.splice(indexOfMove, 1);
+          if (indexOfMove >= 0) this.baseMoveSlots.splice(indexOfMove, 1);
           if (item.id !== "mimic") {
             indexOfMove = this.moveSlots.findIndex((m) => this.battle.toID(this.m.scrambled.moves[wrongSlot].thing) === m.id);
           }
-          if (indexOfMove >= 0)
-            this.moveSlots.splice(indexOfMove, 1);
+          if (indexOfMove >= 0) this.moveSlots.splice(indexOfMove, 1);
           this.m.scrambled.moves.splice(wrongSlot, 1);
         }
         const oldItemState = this.itemState;
@@ -294,8 +260,7 @@ const Scripts = {
       ].map(this.battle.toID));
       let isBMMItem = false;
       let isOldBMMItem = false;
-      if (!this.hp || !this.isActive)
-        return false;
+      if (!this.hp || !this.isActive) return false;
       if (typeof item === "string") {
         if (!item.length || this.battle.dex.items.get(item).exists) {
           item = this.battle.dex.items.get(item);
@@ -305,8 +270,7 @@ const Scripts = {
           if (!newData.exists) {
             newData = this.battle.dex.moves.get(itemString);
           } else {
-            if (newData.flags["failskillswap"])
-              return false;
+            if (newData.flags["failskillswap"]) return false;
           }
           item = {
             id: newData.id || itemString,
@@ -318,10 +282,8 @@ const Scripts = {
           };
         }
       }
-      if (item.name.length && !this.battle.dex.items.get(item).exists)
-        isBMMItem = true;
-      if (allThings.has(item.id))
-        return false;
+      if (item.name.length && !this.battle.dex.items.get(item).exists) isBMMItem = true;
+      if (allThings.has(item.id)) return false;
       const effectid = this.battle.effect ? this.battle.effect.id : "";
       if (import_pokemon.RESTORATIVE_BERRIES.has("leppaberry")) {
         const inflicted = ["trick", "switcheroo"].includes(effectid);
@@ -331,13 +293,11 @@ const Scripts = {
         this.pendingStaleness = void 0;
       }
       const oldItem = this.getItem();
-      if (!this.battle.dex.items.get(oldItem).exists)
-        isOldBMMItem = true;
+      if (!this.battle.dex.items.get(oldItem).exists) isOldBMMItem = true;
       const oldItemState = this.itemState;
       this.item = item.id;
       this.itemState = this.battle.initEffectState({ id: item.id, target: this });
-      if (oldItem.exists)
-        this.battle.singleEvent("End", oldItem, oldItemState, this);
+      if (oldItem.exists) this.battle.singleEvent("End", oldItem, oldItemState, this);
       if (isOldBMMItem) {
         const isAbil = this.m.scrambled.abilities.findIndex((e) => e.inSlot === "Item");
         if (isAbil >= 0) {
@@ -346,13 +306,11 @@ const Scripts = {
         } else if (this.m.scrambled.moves.findIndex((e) => e.inSlot === "Item") >= 0) {
           const isMove = this.m.scrambled.moves.findIndex((e) => e.inSlot === "Item");
           let indexOfMove = this.baseMoveSlots.findIndex((m) => this.battle.toID(this.m.scrambled.moves[isMove].thing) === m.id);
-          if (indexOfMove >= 0)
-            this.baseMoveSlots.splice(indexOfMove, 1);
+          if (indexOfMove >= 0) this.baseMoveSlots.splice(indexOfMove, 1);
           if (oldItem.id !== "mimic") {
             indexOfMove = this.moveSlots.findIndex((m) => this.battle.toID(this.m.scrambled.moves[isMove].thing) === m.id);
           }
-          if (indexOfMove >= 0)
-            this.moveSlots.splice(indexOfMove, 1);
+          if (indexOfMove >= 0) this.moveSlots.splice(indexOfMove, 1);
           this.m.scrambled.moves.splice(isMove, 1);
         }
       }
@@ -385,14 +343,10 @@ const Scripts = {
     },
     eatItem(force, source, sourceEffect) {
       const item = sourceEffect?.effectType === "Item" ? sourceEffect : this.battle.effect.effectType === "Item" ? this.battle.effect : this.getItem();
-      if (!item)
-        return false;
-      if (!this.hp && this.battle.toID(item.name) !== "jabocaberry" && this.battle.toID(item.name) !== "rowapberry" || !this.isActive)
-        return false;
-      if (!sourceEffect && this.battle.effect)
-        sourceEffect = this.battle.effect;
-      if (!source && this.battle.event?.target)
-        source = this.battle.event.target;
+      if (!item) return false;
+      if (!this.hp && this.battle.toID(item.name) !== "jabocaberry" && this.battle.toID(item.name) !== "rowapberry" || !this.isActive) return false;
+      if (!sourceEffect && this.battle.effect) sourceEffect = this.battle.effect;
+      if (!source && this.battle.event?.target) source = this.battle.event.target;
       if (this.battle.runEvent("UseItem", this, null, null, Dex.items.get(item.name)) && (force || this.battle.runEvent("TryEatItem", this, null, null, Dex.items.get(item.name)))) {
         this.battle.add("-enditem", this, Dex.items.get(item.name), "[eat]");
         this.battle.singleEvent("Eat", Dex.items.get(item.name), this.itemState, this, source, sourceEffect);
@@ -400,8 +354,7 @@ const Scripts = {
         if (import_pokemon.RESTORATIVE_BERRIES.has(item.id)) {
           switch (this.pendingStaleness) {
             case "internal":
-              if (this.staleness !== "external")
-                this.staleness = "internal";
+              if (this.staleness !== "external") this.staleness = "internal";
               break;
             case "external":
               this.staleness = "external";
@@ -414,10 +367,8 @@ const Scripts = {
           const dexItem = this.battle.dex.items.get(item.name);
           this.removeVolatile(item.id);
           const itemIndex = this.m.scrambled.items.findIndex((e) => this.battle.toID(e.thing) === dexItem.id && e.inSlot === isBMM);
-          if (itemIndex >= 0)
-            this.m.scrambled.items.splice(itemIndex, 1);
-          if (isBMM === "Ability")
-            this.setAbility("No Ability");
+          if (itemIndex >= 0) this.m.scrambled.items.splice(itemIndex, 1);
+          if (isBMM === "Ability") this.setAbility("No Ability");
         } else {
           this.lastItem = this.item;
           this.item = "";
@@ -432,14 +383,10 @@ const Scripts = {
     },
     useItem(source, sourceEffect) {
       const item = sourceEffect?.effectType === "Item" ? sourceEffect : this.battle.effect.effectType === "Item" ? this.battle.effect : this.getItem();
-      if (!this.hp && !item.isGem || !this.isActive)
-        return false;
-      if (!item)
-        return false;
-      if (!sourceEffect && this.battle.effect)
-        sourceEffect = this.battle.effect;
-      if (!source && this.battle.event?.target)
-        source = this.battle.event.target;
+      if (!this.hp && !item.isGem || !this.isActive) return false;
+      if (!item) return false;
+      if (!sourceEffect && this.battle.effect) sourceEffect = this.battle.effect;
+      if (!source && this.battle.event?.target) source = this.battle.event.target;
       if (this.battle.runEvent("UseItem", this, null, null, Dex.items.get(item.name))) {
         switch (item.id) {
           case "redcard":
@@ -462,10 +409,8 @@ const Scripts = {
           const dexItem = this.battle.dex.items.get(item.name);
           this.removeVolatile(item.id);
           const itemIndex = this.m.scrambled.items.findIndex((e) => this.battle.toID(e.thing) === dexItem.id && e.inSlot === isBMM);
-          if (itemIndex >= 0)
-            this.m.scrambled.items.splice(itemIndex, 1);
-          if (isBMM === "Ability")
-            this.setAbility("No Ability");
+          if (itemIndex >= 0) this.m.scrambled.items.splice(itemIndex, 1);
+          if (isBMM === "Ability") this.setAbility("No Ability");
         } else {
           this.lastItem = this.item;
           this.item = "";
@@ -485,8 +430,7 @@ const Scripts = {
       if (this.battle.dex.currentMod === "gen1stadium" && (species.name === "Ditto" || this.species.name === "Ditto" && pokemon.moves.includes("transform"))) {
         return false;
       }
-      if (!this.setSpecies(species, effect, true))
-        return false;
+      if (!this.setSpecies(species, effect, true)) return false;
       this.transformed = true;
       this.weighthg = pokemon.weighthg;
       const types = pokemon.getTypes(true, true);
@@ -497,8 +441,7 @@ const Scripts = {
       let statName;
       for (statName in this.storedStats) {
         this.storedStats[statName] = pokemon.storedStats[statName];
-        if (this.modifiedStats)
-          this.modifiedStats[statName] = pokemon.modifiedStats[statName];
+        if (this.modifiedStats) this.modifiedStats[statName] = pokemon.modifiedStats[statName];
       }
       this.moveSlots = [];
       this.hpType = this.battle.gen >= 5 ? this.hpType : pokemon.hpType;
@@ -526,15 +469,12 @@ const Scripts = {
       }
       if (this.battle.gen >= 6) {
         const volatilesToCopy = ["dragoncheer", "focusenergy", "gmaxchistrike", "laserfocus"];
-        for (const volatile of volatilesToCopy)
-          this.removeVolatile(volatile);
+        for (const volatile of volatilesToCopy) this.removeVolatile(volatile);
         for (const volatile of volatilesToCopy) {
           if (pokemon.volatiles[volatile]) {
             this.addVolatile(volatile);
-            if (volatile === "gmaxchistrike")
-              this.volatiles[volatile].layers = pokemon.volatiles[volatile].layers;
-            if (volatile === "dragoncheer")
-              this.volatiles[volatile].hasDragonType = pokemon.volatiles[volatile].hasDragonType;
+            if (volatile === "gmaxchistrike") this.volatiles[volatile].layers = pokemon.volatiles[volatile].layers;
+            if (volatile === "dragoncheer") this.volatiles[volatile].hasDragonType = pokemon.volatiles[volatile].hasDragonType;
           }
         }
       }
@@ -547,8 +487,7 @@ const Scripts = {
         this.knownType = true;
         this.apparentType = this.terastallized;
       }
-      if (this.battle.gen > 2)
-        this.setAbility(pokemon.ability, this, null, true, true);
+      if (this.battle.gen > 2) this.setAbility(pokemon.ability, this, null, true, true);
       if (this.battle.gen === 4) {
         if (this.species.num === 487) {
           if (this.species.name === "Giratina" && this.item === "griseousorb") {
@@ -565,8 +504,7 @@ const Scripts = {
           }
         }
       }
-      if (["Ogerpon", "Terapagos"].includes(this.species.baseSpecies) && this.canTerastallize)
-        this.canTerastallize = false;
+      if (["Ogerpon", "Terapagos"].includes(this.species.baseSpecies) && this.canTerastallize) this.canTerastallize = false;
       for (const volatile in this.volatiles) {
         if (this.volatiles[volatile].inSlot && this.volatiles[volatile].inSlot === "Move") {
           this.removeVolatile(volatile);

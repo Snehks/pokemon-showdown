@@ -166,19 +166,16 @@ class ServerStream extends import_lib.Streams.ObjectReadWriteStream {
       "!"(data2) {
         const socketid = data2.substr(1);
         const socket = this.sockets.get(socketid);
-        if (!socket)
-          return;
+        if (!socket) return;
         socket.destroy();
         this.sockets.delete(socketid);
         for (const [curRoomid, curRoom] of this.rooms) {
           curRoom.delete(socketid);
           const roomChannel = this.roomChannels.get(curRoomid);
-          if (roomChannel)
-            roomChannel.delete(socketid);
+          if (roomChannel) roomChannel.delete(socketid);
           if (!curRoom.size) {
             this.rooms.delete(curRoomid);
-            if (roomChannel)
-              this.roomChannels.delete(curRoomid);
+            if (roomChannel) this.roomChannels.delete(curRoomid);
           }
         }
       },
@@ -186,8 +183,7 @@ class ServerStream extends import_lib.Streams.ObjectReadWriteStream {
         const nlLoc = data2.indexOf("\n");
         const socketid = data2.substr(1, nlLoc - 1);
         const socket = this.sockets.get(socketid);
-        if (!socket)
-          return;
+        if (!socket) return;
         const message = data2.substr(nlLoc + 1);
         socket.write(message);
       },
@@ -195,18 +191,15 @@ class ServerStream extends import_lib.Streams.ObjectReadWriteStream {
         const nlLoc = data2.indexOf("\n");
         const roomid = data2.substr(1, nlLoc - 1);
         const room = roomid ? this.rooms.get(roomid) : this.sockets;
-        if (!room)
-          return;
+        if (!room) return;
         const message = data2.substr(nlLoc + 1);
-        for (const curSocket of room.values())
-          curSocket.write(message);
+        for (const curSocket of room.values()) curSocket.write(message);
       },
       "+"(data2) {
         const nlLoc = data2.indexOf("\n");
         const socketid = data2.substr(nlLoc + 1);
         const socket = this.sockets.get(socketid);
-        if (!socket)
-          return;
+        if (!socket) return;
         const roomid = data2.substr(1, nlLoc - 1);
         let room = this.rooms.get(roomid);
         if (!room) {
@@ -219,17 +212,14 @@ class ServerStream extends import_lib.Streams.ObjectReadWriteStream {
         const nlLoc = data2.indexOf("\n");
         const roomid = data2.slice(1, nlLoc);
         const room = this.rooms.get(roomid);
-        if (!room)
-          return;
+        if (!room) return;
         const socketid = data2.slice(nlLoc + 1);
         room.delete(socketid);
         const roomChannel = this.roomChannels.get(roomid);
-        if (roomChannel)
-          roomChannel.delete(socketid);
+        if (roomChannel) roomChannel.delete(socketid);
         if (!room.size) {
           this.rooms.delete(roomid);
-          if (roomChannel)
-            this.roomChannels.delete(roomid);
+          if (roomChannel) this.roomChannels.delete(roomid);
         }
       },
       "."(data2) {
@@ -253,8 +243,7 @@ class ServerStream extends import_lib.Streams.ObjectReadWriteStream {
         const nlLoc = data2.indexOf("\n");
         const roomid = data2.slice(1, nlLoc);
         const room = this.rooms.get(roomid);
-        if (!room)
-          return;
+        if (!room) return;
         const messages = [
           null,
           null,
@@ -267,14 +256,12 @@ class ServerStream extends import_lib.Streams.ObjectReadWriteStream {
         const roomChannel = this.roomChannels.get(roomid);
         for (const [curSocketid, curSocket] of room) {
           const channelid = roomChannel?.get(curSocketid) || 0;
-          if (!messages[channelid])
-            messages[channelid] = channelMessages[channelid].join("\n");
+          if (!messages[channelid]) messages[channelid] = channelMessages[channelid].join("\n");
           curSocket.write(messages[channelid]);
         }
       }
     };
-    if (!config.bindaddress)
-      config.bindaddress = "0.0.0.0";
+    if (!config.bindaddress) config.bindaddress = "0.0.0.0";
     this.isTrustedProxyIp = config.proxyip ? import_ip_tools.IPTools.checker(config.proxyip) : () => false;
     this.server = http.createServer();
     this.serverSsl = null;
@@ -282,8 +269,7 @@ class ServerStream extends import_lib.Streams.ObjectReadWriteStream {
       let key;
       try {
         key = path.resolve(__dirname, config.ssl.options.key);
-        if (!fs.statSync(key).isFile())
-          throw new Error();
+        if (!fs.statSync(key).isFile()) throw new Error();
         try {
           key = fs.readFileSync(key);
         } catch (e) {
@@ -300,8 +286,7 @@ ${e.stack}`),
       let cert;
       try {
         cert = path.resolve(__dirname, config.ssl.options.cert);
-        if (!fs.statSync(cert).isFile())
-          throw new Error();
+        if (!fs.statSync(cert).isFile()) throw new Error();
         try {
           cert = fs.readFileSync(cert);
         } catch (e) {
@@ -355,8 +340,7 @@ ${e.stack}`), `Socket process ${process.pid}`);
         });
       };
       this.server.on("request", staticRequestHandler);
-      if (this.serverSsl)
-        this.serverSsl.on("request", staticRequestHandler);
+      if (this.serverSsl) this.serverSsl.on("request", staticRequestHandler);
     } catch {
       console.log("Could not start static server");
     }
@@ -365,8 +349,7 @@ ${e.stack}`), `Socket process ${process.pid}`);
       sockjs_url: `//play.pokemonshowdown.com/js/lib/sockjs-1.4.0-nwjsfix.min.js`,
       prefix: "/showdown",
       log(severity, message) {
-        if (severity === "error")
-          console.log(`ERROR: ${message}`);
+        if (severity === "error") console.log(`ERROR: ${message}`);
       }
     };
     if (config.wsdeflate !== null) {
@@ -410,13 +393,11 @@ ${e.stack}`), `Socket process ${process.pid}`);
     this.rooms.clear();
     this.roomChannels.clear();
     this.server.close();
-    if (this.serverSsl)
-      this.serverSsl.close();
+    if (this.serverSsl) this.serverSsl.close();
     setImmediate(() => process.exit(0));
   }
   onConnection(socket) {
-    if (!socket)
-      return;
+    if (!socket) return;
     if (!socket.remoteAddress) {
       try {
         socket.destroy();
@@ -441,33 +422,28 @@ ${e.stack}`), `Socket process ${process.pid}`);
 ${socketip}
 ${socket.protocol}`);
     socket.on("data", (message) => {
-      if (!message)
-        return;
+      if (!message) return;
       if (message.length > 100 * 1024) {
         socket.write(`|popup|Your message must be below 100KB`);
         console.log(`Dropping client message ${message.length / 1024} KB...`);
         console.log(message.slice(0, 160));
         return;
       }
-      if (typeof message !== "string" || message.startsWith("{"))
-        return;
+      if (typeof message !== "string" || message.startsWith("{")) return;
       const pipeIndex = message.indexOf("|");
-      if (pipeIndex < 0 || pipeIndex === message.length - 1)
-        return;
+      if (pipeIndex < 0 || pipeIndex === message.length - 1) return;
       this.push(`<${socketid}
 ${message}`);
     });
     socket.once("close", () => {
       this.push(`!${socketid}`);
       this.sockets.delete(socketid);
-      for (const room of this.rooms.values())
-        room.delete(socketid);
+      for (const room of this.rooms.values()) room.delete(socketid);
     });
   }
   _write(data2) {
     const receiver = this.receivers[data2.charAt(0)];
-    if (receiver)
-      receiver.call(this, data2);
+    if (receiver) receiver.call(this, data2);
   }
 }
 const PM = new import_lib.ProcessManager.RawProcessManager({
@@ -490,8 +466,7 @@ if (!PM.isParentProcess) {
     try {
       require.resolve("node-oom-heapdump");
     } catch (e) {
-      if (e.code !== "MODULE_NOT_FOUND")
-        throw e;
+      if (e.code !== "MODULE_NOT_FOUND") throw e;
       throw new Error(
         "node-oom-heapdump is not installed, but it is a required dependency if Config.ofesockets is set to true! Run npm install node-oom-heapdump and restart the server."
       );
@@ -500,12 +475,9 @@ if (!PM.isParentProcess) {
       addTimestamp: true
     });
   }
-  if (process.env.PSPORT)
-    Config.port = +process.env.PSPORT;
-  if (process.env.PSBINDADDR)
-    Config.bindaddress = process.env.PSBINDADDR;
-  if (process.env.PSNOSSL && parseInt(process.env.PSNOSSL))
-    Config.ssl = null;
+  if (process.env.PSPORT) Config.port = +process.env.PSPORT;
+  if (process.env.PSBINDADDR) Config.bindaddress = process.env.PSBINDADDR;
+  if (process.env.PSNOSSL && parseInt(process.env.PSNOSSL)) Config.ssl = null;
   PM.startRepl({ filename: `sockets-${PM.workerid}-${process.pid}`, eval: (cmd) => eval(cmd) });
 }
 function start(processCount) {

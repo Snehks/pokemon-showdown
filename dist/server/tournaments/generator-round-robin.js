@@ -32,8 +32,7 @@ class RoundRobin {
     this.matches = [];
     this.totalPendingMatches = -1;
     this.perPlayerPendingMatches = -1;
-    if (isDoubles)
-      this.name = "Double " + this.name;
+    if (isDoubles) this.name = "Double " + this.name;
   }
   getPendingBracketData(players) {
     return {
@@ -44,10 +43,8 @@ class RoundRobin {
       },
       tableContents: players.map(
         (p1, row) => players.map((p2, col) => {
-          if (!this.isDoubles && col >= row)
-            return null;
-          if (p1 === p2)
-            return null;
+          if (!this.isDoubles && col >= row) return null;
+          if (p1 === p2) return null;
           return {
             state: "unavailable"
           };
@@ -66,13 +63,10 @@ class RoundRobin {
       },
       tableContents: players.map(
         (p1, row) => players.map((p2, col) => {
-          if (!this.isDoubles && col >= row)
-            return null;
-          if (p1 === p2)
-            return null;
+          if (!this.isDoubles && col >= row) return null;
+          if (p1 === p2) return null;
           const match = this.matches[row][col];
-          if (!match)
-            return null;
+          if (!match) return null;
           const cell = {
             state: match.state
           };
@@ -91,10 +85,8 @@ class RoundRobin {
     this.isBracketFrozen = true;
     this.matches = players.map(
       (p1, row) => players.map((p2, col) => {
-        if (!this.isDoubles && col >= row)
-          return null;
-        if (p1 === p2)
-          return null;
+        if (!this.isDoubles && col >= row) return null;
+        if (p1 === p2) return null;
         return { state: "available" };
       })
     );
@@ -106,12 +98,10 @@ class RoundRobin {
     }
   }
   disqualifyUser(user) {
-    if (!this.isBracketFrozen)
-      return "BracketNotFrozen";
+    if (!this.isBracketFrozen) return "BracketNotFrozen";
     const playerIndex = this.players.indexOf(user);
     for (const [col, match] of this.matches[playerIndex].entries()) {
-      if (!match || match.state !== "available")
-        continue;
+      if (!match || match.state !== "available") continue;
       const p2 = this.players[col];
       match.state = "finished";
       match.result = "loss";
@@ -126,8 +116,7 @@ class RoundRobin {
     }
     for (const [row, challenges] of this.matches.entries()) {
       const match = challenges[playerIndex];
-      if (!match || match.state !== "available")
-        continue;
+      if (!match || match.state !== "available") continue;
       const p1 = this.players[row];
       match.state = "finished";
       match.result = "win";
@@ -143,15 +132,13 @@ class RoundRobin {
     user.game.updatePlayer(user, null);
   }
   getAvailableMatches() {
-    if (!this.isBracketFrozen)
-      return "BracketNotFrozen";
+    if (!this.isBracketFrozen) return "BracketNotFrozen";
     const matches = [];
     for (const [row, challenges] of this.matches.entries()) {
       const p1 = this.players[row];
       for (const [col, match] of challenges.entries()) {
         const p2 = this.players[col];
-        if (!match)
-          continue;
+        if (!match) continue;
         if (match.state === "available" && !p1.isBusy && !p2.isBusy) {
           matches.push([p1, p2]);
         }
@@ -160,17 +147,13 @@ class RoundRobin {
     return matches;
   }
   setMatchResult([p1, p2], result, score) {
-    if (!this.isBracketFrozen)
-      return "BracketNotFrozen";
-    if (!["win", "loss", "draw"].includes(result))
-      return "InvalidMatchResult";
+    if (!this.isBracketFrozen) return "BracketNotFrozen";
+    if (!["win", "loss", "draw"].includes(result)) return "InvalidMatchResult";
     const row = this.players.indexOf(p1);
     const col = this.players.indexOf(p2);
-    if (row < 0 || col < 0)
-      return "UserNotAdded";
+    if (row < 0 || col < 0) return "UserNotAdded";
     const match = this.matches[row][col];
-    if (!match || match.state !== "available")
-      return "InvalidMatch";
+    if (!match || match.state !== "available") return "InvalidMatch";
     match.state = "finished";
     match.result = result;
     match.score = score.slice(0);
@@ -190,8 +173,7 @@ class RoundRobin {
     return this.isBracketFrozen && this.totalPendingMatches === 0;
   }
   getResults() {
-    if (!this.isTournamentEnded())
-      return "TournamentNotEnded";
+    if (!this.isTournamentEnded()) return "TournamentNotEnded";
     const sortedScores = import_utils.Utils.sortBy([...this.players], (p) => -p.score);
     const results = [];
     let currentScore = sortedScores[0].score;

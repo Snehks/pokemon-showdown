@@ -74,8 +74,7 @@ class Species extends import_dex_data.BasicEffect {
     this.cannotDynamax = !!data.cannotDynamax;
     this.battleOnly = data.battleOnly || (this.isMega || this.isPrimal ? this.baseSpecies : void 0);
     this.changesFrom = data.changesFrom || (this.battleOnly !== this.baseSpecies ? this.battleOnly : this.baseSpecies);
-    if (Array.isArray(this.changesFrom))
-      this.changesFrom = this.changesFrom[0];
+    if (Array.isArray(this.changesFrom)) this.changesFrom = this.changesFrom[0];
     this.pokemonGoData = data.pokemonGoData || void 0;
     if (!this.gen && this.num >= 1) {
       if (this.num >= 906 || this.forme.includes("Paldea")) {
@@ -129,8 +128,7 @@ class Learnset {
         }
       }
     }
-    if (update)
-      this.eventData = import_utils.Utils.deepFreeze(eventData);
+    if (update) this.eventData = import_utils.Utils.deepFreeze(eventData);
   }
 }
 class DexSpecies {
@@ -141,8 +139,7 @@ class DexSpecies {
     this.dex = dex;
   }
   get(name) {
-    if (name && typeof name !== "string")
-      return name;
+    if (name && typeof name !== "string") return name;
     let id = "";
     if (name) {
       name = name.trim();
@@ -156,11 +153,9 @@ class DexSpecies {
     return this.getByID(id);
   }
   getByID(id) {
-    if (id === "" || id === "constructor")
-      return EMPTY_SPECIES;
+    if (id === "" || id === "constructor") return EMPTY_SPECIES;
     let species = this.speciesCache.get(id);
-    if (species)
-      return species;
+    if (species) return species;
     const alias = this.dex.getAlias(id);
     if (alias) {
       if (this.dex.data.FormatsData.hasOwnProperty(id)) {
@@ -186,8 +181,7 @@ class DexSpecies {
         }
         if (species.cosmeticFormes) {
           for (const forme of species.cosmeticFormes) {
-            if (this.dex.data.Pokedex.hasOwnProperty((0, import_dex_data.toID)(forme)))
-              continue;
+            if (this.dex.data.Pokedex.hasOwnProperty((0, import_dex_data.toID)(forme))) continue;
             if ((0, import_dex_data.toID)(forme) === id) {
               species = new Species({
                 ...species,
@@ -279,12 +273,9 @@ class DexSpecies {
           species.natDexTier = baseFormatsData.natDexTier || species.tier;
         }
       }
-      if (!species.tier)
-        species.tier = "Illegal";
-      if (!species.doublesTier)
-        species.doublesTier = species.tier;
-      if (!species.natDexTier)
-        species.natDexTier = species.tier;
+      if (!species.tier) species.tier = "Illegal";
+      if (!species.doublesTier) species.doublesTier = species.tier;
+      if (!species.natDexTier) species.natDexTier = species.tier;
       if (species.gen > this.dex.gen) {
         species.tier = "Illegal";
         species.doublesTier = "Illegal";
@@ -293,8 +284,7 @@ class DexSpecies {
       }
       if (this.dex.currentMod === "gen7letsgo" && !species.isNonstandard) {
         const isLetsGo = species.gen <= 7 && (species.num <= 151 || ["Meltan", "Melmetal"].includes(species.name)) && (!species.forme || species.isMega || ["Alola", "Starter"].includes(species.forme) && species.name !== "Pikachu-Alola");
-        if (!isLetsGo)
-          species.isNonstandard = "Past";
+        if (!isLetsGo) species.isNonstandard = "Past";
       }
       if (this.dex.currentMod === "gen8bdsp" && (!species.isNonstandard || ["Gigantamax", "CAP"].includes(species.isNonstandard))) {
         if (species.gen > 4 || species.num < 1 && species.isNonstandard !== "CAP" || species.id === "pichuspikyeared") {
@@ -308,14 +298,12 @@ class DexSpecies {
         evoSpecies.isNonstandard === "Unobtainable";
       });
       species.canHatch = species.canHatch || !["Ditto", "Undiscovered"].includes(species.eggGroups[0]) && !species.prevo && species.name !== "Manaphy";
-      if (this.dex.gen === 1)
-        species.bst -= species.baseStats.spd;
+      if (this.dex.gen === 1) species.bst -= species.baseStats.spd;
       if (this.dex.gen < 5) {
         species.abilities = this.dex.deepClone(species.abilities);
         delete species.abilities["H"];
       }
-      if (this.dex.gen === 3 && this.dex.abilities.get(species.abilities["1"]).gen === 4)
-        delete species.abilities["1"];
+      if (this.dex.gen === 3 && this.dex.abilities.get(species.abilities["1"]).gen === 4) delete species.abilities["1"];
       if (this.dex.parentMod) {
         const parentMod = this.dex.mod(this.dex.parentMod);
         if (this.dex.data.Pokedex[id] === parentMod.data.Pokedex[id]) {
@@ -336,8 +324,7 @@ class DexSpecies {
         isNonstandard: "Custom"
       });
     }
-    if (species.exists)
-      this.speciesCache.set(id, this.dex.deepFreeze(species));
+    if (species.exists) this.speciesCache.set(id, this.dex.deepFreeze(species));
     return species;
   }
   /**
@@ -355,13 +342,11 @@ class DexSpecies {
     const gen4HMMoves = ["cut", "fly", "surf", "strength", "rocksmash", "waterfall", "rockclimb"];
     const movePool = /* @__PURE__ */ new Set();
     for (const { species, learnset } of this.getFullLearnset(id)) {
-      if (!eggMovesOnly)
-        eggMovesOnly = this.eggMovesOnly(species, this.get(id));
+      if (!eggMovesOnly) eggMovesOnly = this.eggMovesOnly(species, this.get(id));
       for (const moveid in learnset) {
         if (species.isNonstandard !== "CAP") {
           if (gen4HMMoves.includes(moveid) && this.dex.gen >= 5) {
-            if (!learnset[moveid].some((source) => parseInt(source.charAt(0)) >= 5 && parseInt(source.charAt(0)) <= this.dex.gen))
-              continue;
+            if (!learnset[moveid].some((source) => parseInt(source.charAt(0)) >= 5 && parseInt(source.charAt(0)) <= this.dex.gen)) continue;
           } else if (gen3HMMoves.includes(moveid) && this.dex.gen >= 4 && !learnset[moveid].some(
             (source) => parseInt(source.charAt(0)) >= 4 && parseInt(source.charAt(0)) <= this.dex.gen
           )) {
@@ -393,10 +378,8 @@ class DexSpecies {
         }
       }
       if (species.evoRegion) {
-        if (this.dex.gen >= 9)
-          eggMovesOnly = true;
-        if (this.dex.gen === 8 && species.evoRegion === "Alola")
-          maxGen = 7;
+        if (this.dex.gen >= 9) eggMovesOnly = true;
+        if (this.dex.gen === 8 && species.evoRegion === "Alola") maxGen = 7;
       }
     }
     return movePool;
@@ -434,8 +417,7 @@ class DexSpecies {
       return this.get(species.changesFrom || species.baseSpecies);
     } else if (species.prevo) {
       species = this.get(species.prevo);
-      if (species.gen > Math.max(2, this.dex.gen))
-        return null;
+      if (species.gen > Math.max(2, this.dex.gen)) return null;
       return species;
     } else if (species.changesFrom && species.baseSpecies !== "Kyurem") {
       return this.get(species.changesFrom);
@@ -456,8 +438,7 @@ class DexSpecies {
    */
   getLearnsetData(id) {
     let learnsetData = this.learnsetCache.get(id);
-    if (learnsetData)
-      return learnsetData;
+    if (learnsetData) return learnsetData;
     if (!this.dex.data.Learnsets.hasOwnProperty(id)) {
       return new Learnset({ exists: false }, this.get(id));
     }
@@ -469,8 +450,7 @@ class DexSpecies {
     return this.dex.data.PokemonGoData[id];
   }
   all() {
-    if (this.allCache)
-      return this.allCache;
+    if (this.allCache) return this.allCache;
     const species = [];
     for (const id in this.dex.data.Pokedex) {
       species.push(this.getByID(id));
@@ -479,11 +459,9 @@ class DexSpecies {
     return this.allCache;
   }
   eggMovesOnly(child, father) {
-    if (child.baseSpecies === father?.baseSpecies)
-      return false;
+    if (child.baseSpecies === father?.baseSpecies) return false;
     while (father) {
-      if (father.name === child.name)
-        return false;
+      if (father.name === child.name) return false;
       father = this.learnsetParent(father);
     }
     return true;

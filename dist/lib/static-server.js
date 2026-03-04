@@ -95,14 +95,13 @@ class StaticServer {
     this.defaultHeaders = {};
     /** Contains the `.`, unlike options.defaultExtension */
     this.defaultExtension = "";
-    var _a;
     if (root && typeof root === "object") {
       options = root;
       root = null;
     }
     this.root = import_node_path.default.normalize(import_node_path.default.resolve(root || "."));
     this.options = options || {};
-    (_a = this.options).indexFile || (_a.indexFile = "index.html");
+    this.options.indexFile ||= "index.html";
     if (this.options.cacheTime !== void 0) {
       this.cacheTime = this.options.cacheTime;
     }
@@ -140,7 +139,7 @@ class StaticServer {
   }
   getResult(status, headers = {}, alreadySent = false) {
     if (this.defaultHeaders["server"]) {
-      headers["server"] || (headers["server"] = this.defaultHeaders["server"]);
+      headers["server"] ||= this.defaultHeaders["server"];
     }
     return {
       status,
@@ -252,12 +251,10 @@ class StaticServer {
         if (!isNaN(byteRange.from) && !isNaN(byteRange.to) && 0 <= byteRange.from && byteRange.from <= byteRange.to) {
           byteRange.valid = true;
         } else {
-          if (DEBUG)
-            console.warn("Request contains invalid range header: ", splitRangeHeader);
+          if (DEBUG) console.warn("Request contains invalid range header: ", splitRangeHeader);
         }
       } else {
-        if (DEBUG)
-          console.warn("Request contains unsupported range header: ", rangeHeader);
+        if (DEBUG) console.warn("Request contains unsupported range header: ", rangeHeader);
       }
     }
     return byteRange;
@@ -284,13 +281,11 @@ class StaticServer {
       }
     }
     if (!byteRange.valid && req.headers["range"]) {
-      if (DEBUG)
-        console.error(new Error("Range request present but invalid, might serve whole file instead"));
+      if (DEBUG) console.error(new Error("Range request present but invalid, might serve whole file instead"));
     }
-    for (const k in this.defaultHeaders)
-      headers[k] = this.defaultHeaders[k];
+    for (const k in this.defaultHeaders) headers[k] = this.defaultHeaders[k];
     headers["Etag"] = JSON.stringify([stat.ino, stat.size, mtime].join("-"));
-    headers["Date"] = new Date().toUTCString();
+    headers["Date"] = (/* @__PURE__ */ new Date()).toUTCString();
     headers["Last-Modified"] = new Date(stat.mtime).toUTCString();
     headers["Content-Type"] = contentType;
     headers["Content-Length"] = length;

@@ -84,8 +84,7 @@ const Rulesets = {
     inherit: true,
     desc: `Pok&eacute;mon below OU get their stats, excluding HP, boosted. UU/RUBL get +10, RU/NUBL get +20, NU/PUBL get +30, and PU or lower get +40.`,
     onModifySpecies(species, target, source, effect) {
-      if (!species.baseStats)
-        return;
+      if (!species.baseStats) return;
       const boosts = {
         uu: 10,
         rubl: 10,
@@ -100,21 +99,17 @@ const Rulesets = {
         lc: 40
       };
       let tier = this.toID(species.tier);
-      if (!(tier in boosts))
-        return;
+      if (!(tier in boosts)) return;
       if (target) {
-        if (target.set.item === "lightclay")
-          return;
-        if (["drizzle", "drought", "slushrush"].includes(target.set.ability) && boosts[tier] > 20)
-          tier = "nubl";
+        if (target.set.item === "lightclay") return;
+        if (["drizzle", "drought", "slushrush"].includes(target.set.ability) && boosts[tier] > 20) tier = "nubl";
       }
       const pokemon = this.dex.deepClone(species);
       pokemon.bst = pokemon.baseStats["hp"];
       const boost = boosts[tier];
       let statName;
       for (statName in pokemon.baseStats) {
-        if (statName === "hp")
-          continue;
+        if (statName === "hp") continue;
         pokemon.baseStats[statName] = this.clampIntRange(pokemon.baseStats[statName] + boost, 1, 255);
         pokemon.bst += pokemon.baseStats[statName];
       }
@@ -128,14 +123,11 @@ const Rulesets = {
       this.add("rule", "Bonus Type Mod: Pok\xE9mon can be nicknamed the name of a type to have that type added onto their current ones.");
     },
     onModifySpecies(species, target, source, effect) {
-      if (!target)
-        return;
-      if (effect && ["imposter", "transform"].includes(effect.id))
-        return;
+      if (!target) return;
+      if (effect && ["imposter", "transform"].includes(effect.id)) return;
       const typesSet = new Set(species.types);
       const bonusType = this.dex.types.get(target.set.name);
-      if (bonusType.exists)
-        typesSet.add(bonusType.name);
+      if (bonusType.exists) typesSet.add(bonusType.name);
       return { ...species, types: [...typesSet] };
     }
   },
@@ -145,8 +137,7 @@ const Rulesets = {
       const gods = /* @__PURE__ */ new Set();
       for (const set of team) {
         let species = this.dex.species.get(set.species);
-        if (typeof species.battleOnly === "string")
-          species = this.dex.species.get(species.battleOnly);
+        if (typeof species.battleOnly === "string") species = this.dex.species.get(species.battleOnly);
         if (["Zacian", "Zamazenta"].includes(species.baseSpecies) && this.toID(set.item).startsWith("rusted")) {
           species = this.dex.species.get(set.species + "-Crowned");
         }
@@ -166,8 +157,7 @@ const Rulesets = {
     },
     onModifySpeciesPriority: 3,
     onModifySpecies(species, target, source) {
-      if (source || !target?.side)
-        return;
+      if (source || !target?.side) return;
       const god = target.side.team.find((set) => {
         let godSpecies2 = this.dex.species.get(set.species);
         const isNatDex = this.format.ruleTable?.has("natdexmod");

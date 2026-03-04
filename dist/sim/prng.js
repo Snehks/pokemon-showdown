@@ -41,8 +41,7 @@ var import_utils = require("../lib/utils");
 class PRNG {
   /** Creates a new source of randomness for the given seed. */
   constructor(seed = null, initialSeed) {
-    if (!seed)
-      seed = PRNG.generateSeed();
+    if (!seed) seed = PRNG.generateSeed();
     if (Array.isArray(seed)) {
       seed = seed.join(",");
     }
@@ -85,10 +84,8 @@ class PRNG {
    */
   random(from, to) {
     const result = this.rng.next();
-    if (from)
-      from = Math.floor(from);
-    if (to)
-      to = Math.floor(to);
+    if (from) from = Math.floor(from);
+    if (to) to = Math.floor(to);
     if (from === void 0) {
       return result / 2 ** 32;
     } else if (!to) {
@@ -159,7 +156,12 @@ class PRNG {
     return prng && typeof prng !== "string" && !Array.isArray(prng) ? prng : new PRNG(prng);
   }
 }
-const _SodiumRNG = class {
+class SodiumRNG {
+  static {
+    // nonce chosen to be compatible with libsodium's randombytes_buf_deterministic
+    // https://github.com/jedisct1/libsodium/blob/ce07d6c82c0e6c75031cf627913bf4f9d3f1e754/src/libsodium/randombytes/randombytes.c#L178
+    this.NONCE = Uint8Array.from([..."LibsodiumDRG"].map((c) => c.charCodeAt(0)));
+  }
   /** Creates a new source of randomness for the given seed. */
   constructor(seed) {
     this.setSeed(seed);
@@ -174,14 +176,13 @@ const _SodiumRNG = class {
   }
   next() {
     const zeroBuf = new Uint8Array(36);
-    const buf = new import_ts_chacha20.Chacha20(this.seed, _SodiumRNG.NONCE).encrypt(zeroBuf);
+    const buf = new import_ts_chacha20.Chacha20(this.seed, SodiumRNG.NONCE).encrypt(zeroBuf);
     this.seed = buf.slice(0, 32);
     return buf.slice(32, 36).reduce((a, b) => a * 256 + b);
   }
   static generateSeed() {
     const seed = new Uint32Array(4);
-    if (typeof crypto === "undefined")
-      globalThis.crypto = require("node:crypto");
+    if (typeof crypto === "undefined") globalThis.crypto = require("node:crypto");
     crypto.getRandomValues(seed);
     const strSeed = seed[0].toString(16).padStart(8, "0") + seed[1].toString(16).padStart(8, "0") + seed[2].toString(16).padStart(8, "0") + seed[3].toString(16).padStart(8, "0");
     return [
@@ -189,11 +190,7 @@ const _SodiumRNG = class {
       strSeed
     ];
   }
-};
-let SodiumRNG = _SodiumRNG;
-// nonce chosen to be compatible with libsodium's randombytes_buf_deterministic
-// https://github.com/jedisct1/libsodium/blob/ce07d6c82c0e6c75031cf627913bf4f9d3f1e754/src/libsodium/randombytes/randombytes.c#L178
-SodiumRNG.NONCE = Uint8Array.from([..."LibsodiumDRG"].map((c) => c.charCodeAt(0)));
+}
 class Gen5RNG {
   /** Creates a new source of randomness for the given seed. */
   constructor(seed = null) {

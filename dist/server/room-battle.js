@@ -67,8 +67,7 @@ const LOCKDOWN_PERIOD = 30 * 60 * 1e3;
 class RoomBattlePlayer extends import_room_game.RoomGamePlayer {
   constructor(user, game, num) {
     super(user, game, num);
-    if (typeof user === "string")
-      user = null;
+    if (typeof user === "string") user = null;
     this.slot = `p${num}`;
     this.channelIndex = game.gameType === "multi" && num > 2 ? num - 2 : num;
     this.request = { rqid: 0, request: "", isWait: "cantUndo", choice: "" };
@@ -128,8 +127,7 @@ class RoomBattleTimer {
     const ruleTable = Dex.formats.getRuleTable(format);
     const timerSettings = ruleTable.timer?.[0];
     for (const k in timerSettings) {
-      if (timerSettings[k] === void 0)
-        delete timerSettings[k];
+      if (timerSettings[k] === void 0) delete timerSettings[k];
     }
     this.settings = {
       dcTimer: !isChallenge,
@@ -143,8 +141,7 @@ class RoomBattleTimer {
       accelerate: !timerSettings && !isChallenge,
       ...timerSettings
     };
-    if (this.settings.maxPerTurn <= 0)
-      this.settings.maxPerTurn = Infinity;
+    if (this.settings.maxPerTurn <= 0) this.settings.maxPerTurn = Infinity;
     for (const player of this.battle.players) {
       player.secondsLeft = this.settings.starting + this.settings.grace;
       player.turnSecondsLeft = player.secondsLeft;
@@ -153,8 +150,7 @@ class RoomBattleTimer {
   }
   start(requester) {
     const userid = requester ? requester.id : "staff";
-    if (this.timerRequesters.has(userid))
-      return false;
+    if (this.timerRequesters.has(userid)) return false;
     if (this.battle.ended) {
       requester?.sendTo(this.battle.roomid, `|inactiveoff|The timer can't be enabled after a battle has ended.`);
       return false;
@@ -177,14 +173,12 @@ class RoomBattleTimer {
     const requestedBy = requester ? ` (requested by ${requester.name})` : ``;
     this.battle.room.add(`|inactive|Battle timer is ON: inactive players will automatically lose when time's up.${requestedBy}`).update();
     this.checkActivity();
-    for (const player of this.battle.players)
-      this.nextRequest(player);
+    for (const player of this.battle.players) this.nextRequest(player);
     return true;
   }
   stop(requester) {
     if (requester) {
-      if (!this.timerRequesters.has(requester.id))
-        return false;
+      if (!this.timerRequesters.has(requester.id)) return false;
       this.timerRequesters.delete(requester.id);
       this.lastDisabledByUser = requester.id;
       this.lastDisabledTime = Date.now();
@@ -203,8 +197,7 @@ class RoomBattleTimer {
   }
   end() {
     this.timerRequesters.clear();
-    if (!this.timer)
-      return false;
+    if (!this.timer) return false;
     clearTimeout(this.timer);
     this.timer = null;
     return true;
@@ -241,8 +234,7 @@ class RoomBattleTimer {
     }
   }
   nextRequest(player) {
-    if (player.secondsLeft <= 0)
-      return;
+    if (player.secondsLeft <= 0) return;
     if (player.request.isWait) {
       player.turnSecondsLeft = this.settings.maxPerTurn;
       return;
@@ -251,18 +243,15 @@ class RoomBattleTimer {
       clearTimeout(this.timer);
       this.timer = null;
     }
-    if (this.battle.ended || !this.timerRequesters.size)
-      return;
-    if (this.battle.players.filter((p) => p.secondsLeft > 0).length <= 1)
-      return;
+    if (this.battle.ended || !this.timerRequesters.size) return;
+    if (this.battle.players.filter((p) => p.secondsLeft > 0).length <= 1) return;
     const room = this.battle.room;
     this.updateTurn();
     const maxTurnTime = (this.isFirstRequest ? this.settings.maxFirstTurn : 0) || this.settings.maxPerTurn;
     player.turnSecondsLeft = Math.min(player.secondsLeft, maxTurnTime);
     const secondsLeft = player.turnSecondsLeft;
     let grace = player.secondsLeft - this.settings.starting;
-    if (grace < 0)
-      grace = 0;
+    if (grace < 0) grace = 0;
     player.sendRoom(`|inactive|Time left: ${secondsLeft} sec this turn | ${player.secondsLeft - grace} sec total` + (grace ? ` | ${grace} sec grace` : ``));
     if (secondsLeft <= 30 && secondsLeft < this.settings.starting) {
       room.add(`|inactive|${player.name} has ${secondsLeft} seconds left this turn.`);
@@ -275,16 +264,12 @@ class RoomBattleTimer {
     this.timer = setTimeout(() => this.nextTick(), TICK_TIME * SECONDS);
   }
   nextTick() {
-    if (this.timer)
-      clearTimeout(this.timer);
-    if (this.battle.ended || !this.timerRequesters.size)
-      return;
-    if (this.battle.players.every((p) => p.request.isWait === "cantUndo"))
-      return;
+    if (this.timer) clearTimeout(this.timer);
+    if (this.battle.ended || !this.timerRequesters.size) return;
+    if (this.battle.players.every((p) => p.request.isWait === "cantUndo")) return;
     const room = this.battle.room;
     for (const player of this.battle.players) {
-      if (player.request.isWait)
-        continue;
+      if (player.request.isWait) continue;
       if (player.knownActive) {
         player.secondsLeft -= TICK_TIME;
         player.turnSecondsLeft -= TICK_TIME;
@@ -300,8 +285,7 @@ class RoomBattleTimer {
         player.turnSecondsLeft = 0;
       }
       const secondsLeft = player.turnSecondsLeft;
-      if (!secondsLeft)
-        continue;
+      if (!secondsLeft) continue;
       if (!player.knownActive && (dcSecondsLeft <= secondsLeft || this.settings.dcTimerBank)) {
         if (dcSecondsLeft % 30 === 0 || dcSecondsLeft <= 20) {
           room.add(`|inactive|${player.name} has ${dcSecondsLeft} seconds to reconnect!`);
@@ -321,12 +305,10 @@ class RoomBattleTimer {
     }
   }
   checkActivity() {
-    if (this.battle.ended)
-      return;
+    if (this.battle.ended) return;
     for (const player of this.battle.players) {
       const isActive = !!player.active;
-      if (isActive === player.knownActive)
-        continue;
+      if (isActive === player.knownActive) continue;
       if (!isActive) {
         player.knownActive = false;
         if (!this.settings.dcTimerBank) {
@@ -373,10 +355,8 @@ class RoomBattleTimer {
     }
     let didSomething = false;
     for (const player of players) {
-      if (player.eliminated)
-        continue;
-      if (player.turnSecondsLeft > 0)
-        continue;
+      if (player.eliminated) continue;
+      if (player.turnSecondsLeft > 0) continue;
       if (this.settings.timeoutAutoChoose && player.secondsLeft > 0 && player.knownActive) {
         void this.battle.stream.write(`>${player.slot} default`);
         didSomething = true;
@@ -419,8 +399,7 @@ class RoomBattle extends import_room_game.RoomGame {
     const format = Dex.formats.get(options.format, true);
     this.title = format.name;
     this.options = options;
-    if (!this.title.endsWith(" Battle"))
-      this.title += " Battle";
+    if (!this.title.endsWith(" Battle")) this.title += " Battle";
     this.allowRenames = options.allowRenames !== void 0 ? !!options.allowRenames : !options.rated && !options.tour;
     this.format = options.format;
     this.gameType = format.gameType;
@@ -454,16 +433,14 @@ class RoomBattle extends import_room_game.RoomGame {
     for (let i = 0; i < this.playerCap; i++) {
       const p = options.players[i];
       const player = this.addPlayer(p?.user || null, p || null);
-      if (!player)
-        throw new Error(`failed to create player ${i + 1} in ${room.roomid}`);
+      if (!player) throw new Error(`failed to create player ${i + 1} in ${room.roomid}`);
     }
     if (options.inputLog) {
       let scanIndex = 0;
       for (const player of this.players) {
         const nameIndex1 = options.inputLog.indexOf(`"name":"`, scanIndex);
         const nameIndex2 = options.inputLog.indexOf(`"`, nameIndex1 + 8);
-        if (nameIndex1 < 0 || nameIndex2 < 0)
-          break;
+        if (nameIndex1 < 0 || nameIndex2 < 0) break;
         scanIndex = nameIndex2 + 1;
         const name = options.inputLog.slice(nameIndex1 + 8, nameIndex2);
         player.name = name;
@@ -471,8 +448,7 @@ class RoomBattle extends import_room_game.RoomGame {
       }
     }
     this.timer = new RoomBattleTimer(this);
-    if (Config.forcetimer || this.format.includes("blitz"))
-      this.timer.start();
+    if (Config.forcetimer || this.format.includes("blitz")) this.timer.start();
     this.start();
   }
   checkActive() {
@@ -480,8 +456,7 @@ class RoomBattle extends import_room_game.RoomGame {
     Rooms.global.battleCount += (active ? 1 : 0) - (this.active ? 1 : 0);
     this.room.active = active;
     this.active = active;
-    if (Rooms.global.battleCount === 0)
-      Rooms.global.automaticKillRequest();
+    if (Rooms.global.battleCount === 0) Rooms.global.automaticKillRequest();
   }
   choose(user, data) {
     if (this.frozen) {
@@ -490,15 +465,15 @@ class RoomBattle extends import_room_game.RoomGame {
     }
     const player = this.playerTable[user.id];
     const [choice, rqid] = data.split("|", 2);
-    if (!player)
-      return;
+    if (!player) return;
     const request = player.request;
     if (request.isWait !== false && request.isWait !== true) {
       player.sendRoom(`|error|[Invalid choice] There's nothing to choose`);
       return;
     }
     const allPlayersWait = this.players.every((p) => !!p.request.isWait);
-    if (allPlayersWait || rqid && rqid !== `${request.rqid}`) {
+    if (allPlayersWait || // too late
+    rqid && rqid !== `${request.rqid}`) {
       player.sendRoom(`|error|[Invalid choice] Sorry, too late to make a different move; the next turn has already started`);
       return;
     }
@@ -509,15 +484,15 @@ class RoomBattle extends import_room_game.RoomGame {
   undo(user, data) {
     const player = this.playerTable[user.id];
     const [, rqid] = data.split("|", 2);
-    if (!player)
-      return;
+    if (!player) return;
     const request = player.request;
     if (request.isWait !== true) {
       player.sendRoom(`|error|[Invalid choice] There's nothing to cancel`);
       return;
     }
     const allPlayersWait = this.players.every((p) => !!p.request.isWait);
-    if (allPlayersWait || rqid && rqid !== `${request.rqid}`) {
+    if (allPlayersWait || // too late
+    rqid && rqid !== `${request.rqid}`) {
       player.sendRoom(`|error|[Invalid choice] Sorry, too late to cancel; the next turn has already started`);
       return;
     }
@@ -538,12 +513,12 @@ class RoomBattle extends import_room_game.RoomGame {
       user.popup(`This battle already has ${this.playerCap} players.`);
       return false;
     }
-    slot ?? (slot = this.players.find((player) => player.invite === user.id)?.slot);
+    slot ??= this.players.find((player) => player.invite === user.id)?.slot;
     if (!slot && validSlots.length > 1) {
       user.popup(`Which slot would you like to join into? Use something like \`/joingame ${validSlots[0]}\``);
       return false;
     }
-    slot ?? (slot = validSlots[0]);
+    slot ??= validSlots[0];
     if (this[slot].invite === user.id) {
       this.room.auth.set(user.id, Users.PLAYER_SYMBOL);
     } else if (!user.can("joinbattle", null, this.room)) {
@@ -559,14 +534,12 @@ class RoomBattle extends import_room_game.RoomGame {
     } else if (!this.started && this.invitesFull()) {
       this.sendInviteForm(true);
     }
-    if (user.inRooms.has(this.roomid))
-      this.onConnect(user);
+    if (user.inRooms.has(this.roomid)) this.onConnect(user);
     this.room.update();
     return true;
   }
   leaveGame(user) {
-    if (!user)
-      return false;
+    if (!user) return false;
     if (this.room.rated || this.room.tour) {
       user.popup(`Players can't be swapped out in a ${this.room.tour ? "tournament" : "rated"} battle.`);
       return false;
@@ -588,8 +561,7 @@ class RoomBattle extends import_room_game.RoomGame {
     let disconnected = false;
     try {
       for await (const next of this.stream) {
-        if (!this.room)
-          return;
+        if (!this.room) return;
         this.receive(next.split("\n"));
       }
     } catch (err) {
@@ -601,8 +573,7 @@ class RoomBattle extends import_room_game.RoomGame {
     }
     if (!this.ended) {
       this.room.add(`|bigerror|The simulator process crashed. We've been notified and will fix this ASAP.`);
-      if (!disconnected)
-        Monitor.crashlog(new Error(`Sim stream interrupted`), `A sim stream`);
+      if (!disconnected) Monitor.crashlog(new Error(`Sim stream interrupted`), `A sim stream`);
       this.setEnded();
     }
   }
@@ -616,8 +587,7 @@ class RoomBattle extends import_room_game.RoomGame {
     this.checkActive();
   }
   receive(lines) {
-    for (const player of this.players)
-      player.wantsTie = false;
+    for (const player of this.players) player.wantsTie = false;
     switch (lines[0]) {
       case "requesteddata":
         lines = lines.slice(1);
@@ -659,8 +629,7 @@ class RoomBattle extends import_room_game.RoomGame {
           };
           this.requestCount++;
           player?.sendRoom(`|request|${requestJSON}`);
-          if (!request.update)
-            this.timer.nextRequest(player);
+          if (!request.update) this.timer.nextRequest(player);
           break;
         }
         player?.sendRoom(lines[2]);
@@ -684,8 +653,7 @@ class RoomBattle extends import_room_game.RoomGame {
     }
   }
   end(winnerName) {
-    if (this.ended)
-      return;
+    if (this.ended) return;
     this.setEnded();
     let p1score = 0.5;
     const winnerid = toID(winnerName);
@@ -734,11 +702,9 @@ class RoomBattle extends import_room_game.RoomGame {
     Chat.runHandlers("onBattleRanked", this, winnerid, [p1rating, p2rating], [p1, p2].map(toID));
   }
   async logBattle(p1score, p1rating = null, p2rating = null, p3rating = null, p4rating = null) {
-    if (Dex.formats.get(this.format, true).noLog)
-      return;
+    if (Dex.formats.get(this.format, true).noLog) return;
     const logData = this.logData;
-    if (!logData)
-      return;
+    if (!logData) return;
     this.logData = null;
     logData.log = this.room.getLog(-1).split("\n");
     for (const rating of [p1rating, p2rating, p3rating, p4rating]) {
@@ -750,17 +716,15 @@ class RoomBattle extends import_room_game.RoomGame {
       }
     }
     logData.p1rating = p1rating;
-    if (this.replaySaved)
-      logData.replaySaved = this.replaySaved;
+    if (this.replaySaved) logData.replaySaved = this.replaySaved;
     logData.p2rating = p2rating;
     if (this.playerCap > 2) {
       logData.p3rating = p3rating;
       logData.p4rating = p4rating;
     }
     logData.endType = this.endType;
-    if (!p1rating)
-      logData.ladderError = true;
-    const date = new Date();
+    if (!p1rating) logData.ladderError = true;
+    const date = /* @__PURE__ */ new Date();
     logData.timestamp = `${date}`;
     logData.roomid = this.room.roomid;
     logData.format = this.room.format;
@@ -777,26 +741,22 @@ class RoomBattle extends import_room_game.RoomGame {
       parentGame.playerTable[user.id]?.updateReadyButton();
     }
     const player = this.playerTable[user.id];
-    if (!player)
-      return;
+    if (!player) return;
     player.updateChannel(connection || user);
     const request = player.request;
     if (request.request) {
       let data = `|request|${request.request}`;
-      if (request.choice)
-        data += `
+      if (request.choice) data += `
 |sentchoice|${request.choice}`;
       (connection || user).sendTo(this.roomid, data);
     }
     if (!this.started) {
       this.sendInviteForm(connection || user);
     }
-    if (!player.active)
-      this.onJoin(user);
+    if (!player.active) this.onJoin(user);
   }
   onRename(user, oldUserid, isJoining, isForceRenamed) {
-    if (user.id === oldUserid)
-      return;
+    if (user.id === oldUserid) return;
     if (!this.playerTable) {
       user.games.delete(this.roomid);
       return;
@@ -822,8 +782,7 @@ class RoomBattle extends import_room_game.RoomGame {
       this.onLeave(user, oldUserid);
       return;
     }
-    if (user.id in this.playerTable)
-      return;
+    if (user.id in this.playerTable) return;
     const player = this.playerTable[oldUserid];
     if (player) {
       this.updatePlayer(player, user);
@@ -858,8 +817,7 @@ class RoomBattle extends import_room_game.RoomGame {
       return true;
     }
     const player = this.playerTable[user.id];
-    if (!player)
-      return false;
+    if (!player) return false;
     void this.stream.write(`>forcewin ${player.slot}`);
   }
   tie() {
@@ -869,17 +827,13 @@ class RoomBattle extends import_room_game.RoomGame {
     void this.stream.write(`>tiebreak`);
   }
   forfeit(user, message = "") {
-    if (typeof user !== "string")
-      user = user.id;
-    else
-      user = toID(user);
-    if (!(user in this.playerTable))
-      return false;
+    if (typeof user !== "string") user = user.id;
+    else user = toID(user);
+    if (!(user in this.playerTable)) return false;
     return this.forfeitPlayer(this.playerTable[user], message);
   }
   forfeitPlayer(player, message = "") {
-    if (this.ended || !this.started || player.eliminated)
-      return false;
+    if (this.ended || !this.started || player.eliminated) return false;
     player.eliminated = true;
     this.room.add(`|-message|${player.name}${message || " forfeited."}`);
     this.endType = "forfeit";
@@ -896,10 +850,8 @@ class RoomBattle extends import_room_game.RoomGame {
    */
   addPlayer(user, playerOpts) {
     const player = super.addPlayer(user);
-    if (typeof user === "string")
-      user = null;
-    if (!player)
-      return null;
+    if (typeof user === "string") user = null;
+    if (!player) return null;
     const slot = player.slot;
     this[slot] = player;
     if (playerOpts) {
@@ -915,8 +867,7 @@ class RoomBattle extends import_room_game.RoomGame {
     if (user) {
       this.room.auth.set(player.id, Users.PLAYER_SYMBOL);
     }
-    if (user?.inRooms.has(this.roomid))
-      this.onConnect(user);
+    if (user?.inRooms.has(this.roomid)) this.onConnect(user);
     return player;
   }
   checkPrivacySettings(options) {
@@ -941,8 +892,7 @@ class RoomBattle extends import_room_game.RoomGame {
         room.add(`|raw|<div class="broadcast-blue"><strong>This battle is required to be public due to a player having a name starting with '${this.forcedSettings.privacy}'.</div>`);
       } else if (!options.tour || room.tour?.allowModjoin) {
         room.setPrivate("hidden");
-        if (inviteOnly)
-          room.settings.modjoin = "%";
+        if (inviteOnly) room.settings.modjoin = "%";
         room.privacySetter = privacySetter;
         if (inviteOnly) {
           room.settings.modjoin = "%";
@@ -967,11 +917,9 @@ class RoomBattle extends import_room_game.RoomGame {
       }
       delete Config.forcedpublicprefixes;
     }
-    if (!Config.forcedprefixes)
-      return null;
+    if (!Config.forcedprefixes) return null;
     for (const { type, prefix } of Config.forcedprefixes) {
-      if (user.id.startsWith(toID(prefix)) && type === key)
-        return prefix;
+      if (user.id.startsWith(toID(prefix)) && type === key) return prefix;
     }
     return null;
   }
@@ -995,8 +943,7 @@ class RoomBattle extends import_room_game.RoomGame {
         team: playerOpts?.team
       };
       void this.stream.write(`>player ${slot} ` + JSON.stringify(options));
-      if (playerOpts)
-        player.hasTeam = true;
+      if (playerOpts) player.hasTeam = true;
       this.room.add(`|player|${slot}|${player.name}|${user.avatar}|`);
       Chat.runHandlers("onBattleJoin", slot, user, this);
     } else {
@@ -1049,12 +996,10 @@ class RoomBattle extends import_room_game.RoomGame {
   /** true = send to every player; falsy = send to no one */
   sendInviteForm(connection) {
     if (connection === true) {
-      for (const player of this.players)
-        this.sendInviteForm(player.getUser());
+      for (const player of this.players) this.sendInviteForm(player.getUser());
       return;
     }
-    if (!connection)
-      return;
+    if (!connection) return;
     const playerForms = this.players.map((player) => player.id ? `<form><label>Player ${player.num}: <strong>${player.name}</strong></label></form>` : player.invite ? `<form data-submitsend="/msgroom ${this.roomid},/uninvitebattle ${player.invite}"><label>Player ${player.num}: <strong>${player.invite}</strong> (invited) <button>Uninvite</button></label></form>` : `<form data-submitsend="/msgroom ${this.roomid},/invitebattle {username}, p${player.num}"><label>Player ${player.num}: <input name="username" class="textbox" placeholder="Username" /></label> <button class="button">Add Player</button></form>`);
     if (this.gameType === "multi") {
       [playerForms[1], playerForms[2]] = [playerForms[2], playerForms[1]];
@@ -1094,20 +1039,17 @@ class RoomBattle extends import_room_game.RoomGame {
   async getTeam(user) {
     const id = toID(user);
     const player = this.playerTable[id];
-    if (!player)
-      return;
+    if (!player) return;
     return this.getPlayerTeam(player);
   }
   async getPlayerTeam(player) {
     void this.stream.write(`>requestteam ${player.slot}`);
     const teamDataPromise = new Promise((resolve, reject) => {
-      if (!this.dataResolvers)
-        this.dataResolvers = [];
+      if (!this.dataResolvers) this.dataResolvers = [];
       this.dataResolvers.push([resolve, reject]);
     });
     const resultStrings = await teamDataPromise;
-    if (!resultStrings)
-      return;
+    if (!resultStrings) return;
     const result = Teams.unpack(resultStrings[0]);
     return result;
   }
@@ -1118,12 +1060,10 @@ class RoomBattle extends import_room_game.RoomGame {
     }
   }
   async getInputLog() {
-    if (!this.logData)
-      this.logData = {};
+    if (!this.logData) this.logData = {};
     void this.stream.write(">requestlog");
     const logPromise = new Promise((resolve, reject) => {
-      if (!this.dataResolvers)
-        this.dataResolvers = [];
+      if (!this.dataResolvers) this.dataResolvers = [];
       this.dataResolvers.push([resolve, reject]);
     });
     const result = await logPromise;
@@ -1163,8 +1103,7 @@ ${side.id}
       this.push(`error
 ${err.stack}`);
     }
-    if (this.battle)
-      this.battle.sendUpdates();
+    if (this.battle) this.battle.sendUpdates();
     const deltaTime = Date.now() - startTime;
     if (deltaTime > 1e3) {
       Monitor.slow(`[slow battle] ${deltaTime}ms - ${chunk.replace(/\n/ig, " | ")}`);
@@ -1210,8 +1149,7 @@ ${text}`);
     });
     global.__version.head = `${head}`.trim();
     const origin = `${merge}`.trim();
-    if (origin !== global.__version.head)
-      global.__version.origin = origin;
+    if (origin !== global.__version.head) global.__version.origin = origin;
   } catch {
   }
   if (Config.crashguard) {

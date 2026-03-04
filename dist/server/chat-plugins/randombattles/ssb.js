@@ -30,8 +30,7 @@ class SSBSetHTML extends Chat.JSX.Component {
     if (set.skip) {
       const baseSet = toID(Object.values(import_random_teams.ssbSets[set.skip]).join());
       const skipSet = toID(Object.values(set).join()).slice(0, -toID(set.skip).length);
-      if (baseSet === skipSet)
-        return null;
+      if (baseSet === skipSet) return null;
     }
     const sigMove = baseDex.moves.get(set.signatureMove);
     return /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, "Set"), /* @__PURE__ */ Chat.h("ul", { style: { listStyleType: "none" } }, /* @__PURE__ */ Chat.h("li", null, set.species, set.gender && /* @__PURE__ */ Chat.h(Chat.Fragment, null, " (", set.gender, ")"), set.item && " @ ", Array.isArray(set.item) ? set.item.map((x) => dex.items.get(x).name).join(" / ") : set.item && dex.items.get(set.item).name), /* @__PURE__ */ Chat.h("li", null, "Ability: ", Array.isArray(set.ability) ? set.ability.map((x) => dex.abilities.get(x).name).join(" / ") : dex.abilities.get(set.ability).name), set.teraType && /* @__PURE__ */ Chat.h("li", null, "Tera Type: ", Array.isArray(set.teraType) ? set.teraType.map((x) => dex.types.get(x).name).join(" / ") : set.teraType === "Any" ? "Any" : dex.types.get(set.teraType).name), set.shiny && /* @__PURE__ */ Chat.h("li", null, "Shiny: ", typeof set.shiny === "number" ? `1 in ${set.shiny} chance` : `Yes`), set.evs && /* @__PURE__ */ Chat.h("li", null, "EVs: ", Object.entries(set.evs).filter((v) => !!v[1]).map(([statid, ev], idx, arr) => /* @__PURE__ */ Chat.h(Chat.Fragment, null, ev, " ", import__.STAT_NAMES[statid], idx !== arr.length - 1 && " / "))), set.nature && /* @__PURE__ */ Chat.h("li", null, Array.isArray(set.nature) ? set.nature.map(import__.formatNature).join(" / ") : (0, import__.formatNature)(set.nature), " Nature"), set.ivs && /* @__PURE__ */ Chat.h("li", null, "IVs: ", Object.entries(set.ivs).filter((v) => v[1] !== 31).map(([statid, iv], idx, arr) => /* @__PURE__ */ Chat.h(Chat.Fragment, null, iv, " ", import__.STAT_NAMES[statid], idx !== arr.length - 1 && " / "))), set.moves.map(
@@ -46,44 +45,25 @@ class SSBMoveHTML extends Chat.JSX.Component {
       Priority: String(sigMove.priority),
       Gen: String(sigMove.gen || 9)
     };
-    if (sigMove.isNonstandard === "Past" && dex.gen >= 8)
-      details["Past Gens Only"] = "x";
-    if (sigMove.secondary || sigMove.secondaries || sigMove.hasSheerForce)
-      details["Boosted by Sheer Force"] = "";
-    if (sigMove.flags["contact"] && dex.gen >= 3)
-      details["Contact"] = "";
-    if (sigMove.flags["sound"] && dex.gen >= 3)
-      details["Sound"] = "";
-    if (sigMove.flags["bullet"] && dex.gen >= 6)
-      details["Bullet"] = "";
-    if (sigMove.flags["pulse"] && dex.gen >= 6)
-      details["Pulse"] = "";
-    if (!sigMove.flags["protect"] && sigMove.target !== "self")
-      details["Bypasses Protect"] = "";
-    if (sigMove.flags["bypasssub"])
-      details["Bypasses Substitutes"] = "";
-    if (sigMove.flags["defrost"])
-      details["Thaws user"] = "";
-    if (sigMove.flags["bite"] && dex.gen >= 6)
-      details["Bite"] = "";
-    if (sigMove.flags["punch"] && dex.gen >= 4)
-      details["Punch"] = "";
-    if (sigMove.flags["powder"] && dex.gen >= 6)
-      details["Powder"] = "";
-    if (sigMove.flags["reflectable"] && dex.gen >= 3)
-      details["Bounceable"] = "";
-    if (sigMove.flags["charge"])
-      details["Two-turn move"] = "";
-    if (sigMove.flags["recharge"])
-      details["Has recharge turn"] = "";
-    if (sigMove.flags["gravity"] && dex.gen >= 4)
-      details["Suppressed by Gravity"] = "x";
-    if (sigMove.flags["dance"] && dex.gen >= 7)
-      details["Dance move"] = "";
-    if (sigMove.flags["slicing"] && dex.gen >= 9)
-      details["Slicing move"] = "";
-    if (sigMove.flags["wind"] && dex.gen >= 9)
-      details["Wind move"] = "";
+    if (sigMove.isNonstandard === "Past" && dex.gen >= 8) details["Past Gens Only"] = "x";
+    if (sigMove.secondary || sigMove.secondaries || sigMove.hasSheerForce) details["Boosted by Sheer Force"] = "";
+    if (sigMove.flags["contact"] && dex.gen >= 3) details["Contact"] = "";
+    if (sigMove.flags["sound"] && dex.gen >= 3) details["Sound"] = "";
+    if (sigMove.flags["bullet"] && dex.gen >= 6) details["Bullet"] = "";
+    if (sigMove.flags["pulse"] && dex.gen >= 6) details["Pulse"] = "";
+    if (!sigMove.flags["protect"] && sigMove.target !== "self") details["Bypasses Protect"] = "";
+    if (sigMove.flags["bypasssub"]) details["Bypasses Substitutes"] = "";
+    if (sigMove.flags["defrost"]) details["Thaws user"] = "";
+    if (sigMove.flags["bite"] && dex.gen >= 6) details["Bite"] = "";
+    if (sigMove.flags["punch"] && dex.gen >= 4) details["Punch"] = "";
+    if (sigMove.flags["powder"] && dex.gen >= 6) details["Powder"] = "";
+    if (sigMove.flags["reflectable"] && dex.gen >= 3) details["Bounceable"] = "";
+    if (sigMove.flags["charge"]) details["Two-turn move"] = "";
+    if (sigMove.flags["recharge"]) details["Has recharge turn"] = "";
+    if (sigMove.flags["gravity"] && dex.gen >= 4) details["Suppressed by Gravity"] = "x";
+    if (sigMove.flags["dance"] && dex.gen >= 7) details["Dance move"] = "";
+    if (sigMove.flags["slicing"] && dex.gen >= 9) details["Slicing move"] = "";
+    if (sigMove.flags["wind"] && dex.gen >= 9) details["Wind move"] = "";
     if (sigMove.zMove?.basePower) {
       details["Z-Power"] = String(sigMove.zMove.basePower);
     } else if (sigMove.zMove?.effect) {
@@ -138,10 +118,8 @@ class SSBMoveHTML extends Chat.JSX.Component {
     if (sigMove.shortDesc || sigMove.desc) {
       return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataMoveHTML(sigMove) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
         const lastEntry = idx === arr.length - 1;
-        if (!value)
-          return /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\u2713 ", detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
-        if (value === "x")
-          return /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\u2717 ", detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
+        if (!value) return /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\u2713 ", detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
+        if (value === "x") return /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\u2717 ", detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
         return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("font", { color: "#686868" }, detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
       })), sigMove.desc && sigMove.desc !== sigMove.shortDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), sigMove.desc));
     }
@@ -159,14 +137,10 @@ class SSBItemHTML extends Chat.JSX.Component {
       if (dex.gen >= 4) {
         if (sigItem.fling) {
           details["Fling Base Power"] = String(sigItem.fling.basePower);
-          if (sigItem.fling.status)
-            details["Fling Effect"] = sigItem.fling.status;
-          if (sigItem.fling.volatileStatus)
-            details["Fling Effect"] = sigItem.fling.volatileStatus;
-          if (sigItem.isBerry)
-            details["Fling Effect"] = "Activates the Berry's effect on the target.";
-          if (sigItem.id === "whiteherb")
-            details["Fling Effect"] = "Restores the target's negative stat stages to 0.";
+          if (sigItem.fling.status) details["Fling Effect"] = sigItem.fling.status;
+          if (sigItem.fling.volatileStatus) details["Fling Effect"] = sigItem.fling.volatileStatus;
+          if (sigItem.isBerry) details["Fling Effect"] = "Activates the Berry's effect on the target.";
+          if (sigItem.id === "whiteherb") details["Fling Effect"] = "Restores the target's negative stat stages to 0.";
           if (sigItem.id === "mentalherb") {
             const flingEffect = "Removes the effects of Attract, Disable, Encore, Heal Block, Taunt, and Torment from the target.";
             details["Fling Effect"] = flingEffect;
@@ -185,8 +159,7 @@ class SSBItemHTML extends Chat.JSX.Component {
       if (!baseItem.exists || (baseItem.desc || baseItem.shortDesc) !== (sigItem.desc || sigItem.shortDesc)) {
         return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataItemHTML(sigItem) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
           const lastEntry = idx === arr.length - 1;
-          if (value === "")
-            return /* @__PURE__ */ Chat.h(Chat.Fragment, null, detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
+          if (value === "") return /* @__PURE__ */ Chat.h(Chat.Fragment, null, detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
           return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("font", { color: "#686868" }, detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
         })));
       }
@@ -210,14 +183,11 @@ class SSBAbilityHTML extends Chat.JSX.Component {
       const details = {
         Gen: String(sigAbil.gen || 9) || "CAP"
       };
-      if (sigAbil.flags["cantsuppress"])
-        details["Not affected by Gastro Acid"] = "";
-      if (sigAbil.flags["breakable"])
-        details["Ignored by Mold Breaker"] = "";
+      if (sigAbil.flags["cantsuppress"]) details["Not affected by Gastro Acid"] = "";
+      if (sigAbil.flags["breakable"]) details["Ignored by Mold Breaker"] = "";
       return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataAbilityHTML(sigAbil) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
         const lastEntry = idx === arr.length - 1;
-        if (value === "")
-          return /* @__PURE__ */ Chat.h(Chat.Fragment, null, detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
+        if (value === "") return /* @__PURE__ */ Chat.h(Chat.Fragment, null, detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
         return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("font", { color: "#686868" }, "$", detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
       })), sigAbil.desc && sigAbil.shortDesc && sigAbil.desc !== sigAbil.shortDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), sigAbil.desc));
     }
@@ -247,10 +217,8 @@ class SSBPokemonHTML extends Chat.JSX.Component {
       Height: `${newSpecies.heightm} m`
     };
     details["Weight"] = `${newSpecies.weighthg / 10} kg <em>(${weighthit} BP)</em>`;
-    if (newSpecies.color && dex.gen >= 5)
-      details["Dex Colour"] = newSpecies.color;
-    if (newSpecies.eggGroups && dex.gen >= 2)
-      details["Egg Group(s)"] = newSpecies.eggGroups.join(", ");
+    if (newSpecies.color && dex.gen >= 5) details["Dex Colour"] = newSpecies.color;
+    if (newSpecies.eggGroups && dex.gen >= 2) details["Egg Group(s)"] = newSpecies.eggGroups.join(", ");
     const evos = [];
     for (const evoName of newSpecies.evos) {
       const evo = dex.species.get(evoName);
@@ -303,8 +271,7 @@ class SSBInnateHTML extends Chat.JSX.Component {
   render() {
     const { name, dex, baseDex } = this.props;
     let effect = dex.conditions.get(name + "user");
-    if (!effect.exists)
-      effect = dex.conditions.get(name);
+    if (!effect.exists) effect = dex.conditions.get(name);
     const longDesc = ``;
     const baseAbility = baseDex.deepClone(baseDex.abilities.get("noability"));
     if (effect.innateName) {
@@ -312,10 +279,8 @@ class SSBInnateHTML extends Chat.JSX.Component {
       if (!effect.desc && !effect.shortDesc) {
         baseAbility.desc = baseAbility.shortDesc = "This innate does not have a description.";
       }
-      if (effect.desc)
-        baseAbility.desc = effect.desc;
-      if (effect.shortDesc)
-        baseAbility.shortDesc = effect.shortDesc;
+      if (effect.desc) baseAbility.desc = effect.desc;
+      if (effect.shortDesc) baseAbility.shortDesc = effect.shortDesc;
       return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), "Innate Ability:", /* @__PURE__ */ Chat.h("br", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataAbilityHTML(baseAbility) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, /* @__PURE__ */ Chat.h("font", { color: "#686868" }, "Gen:"), " 9"), longDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), longDesc));
     }
     return /* @__PURE__ */ Chat.h(Chat.Fragment, null);
@@ -332,15 +297,12 @@ class SSBSetsHTML extends Chat.JSX.Component {
     }
     let name = "";
     for (const member in import_random_teams.ssbSets) {
-      if (toID(member) === targetID)
-        name = member;
+      if (toID(member) === targetID) name = member;
     }
     const sets = [];
     for (const set in import_random_teams.ssbSets) {
-      if (!set.startsWith(name))
-        continue;
-      if (!import_random_teams.ssbSets[set].skip && set !== name)
-        continue;
+      if (!set.startsWith(name)) continue;
+      if (!import_random_teams.ssbSets[set].skip && set !== name) continue;
       sets.push(set);
     }
     return sets.map((setName) => {
@@ -375,10 +337,8 @@ Config.disabledssbsets = ${JSON.stringify(disabledSets)}`);
 enforceDisabledSets();
 const commands = {
   ssb(target, room, user) {
-    if (!this.runBroadcast())
-      return;
-    if (!target)
-      return this.parse(`/help ssb`);
+    if (!this.runBroadcast()) return;
+    if (!target) return this.parse(`/help ssb`);
     return this.sendReplyBox(/* @__PURE__ */ Chat.h(SSBSetsHTML, { target }));
   },
   ssbhelp: [

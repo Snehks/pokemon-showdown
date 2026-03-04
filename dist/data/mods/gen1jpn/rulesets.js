@@ -130,8 +130,7 @@ const Rulesets = {
       };
       const species = this.dex.species.get(set.species || set.name);
       const legalityList = rgb97Legality[species.id];
-      if (!legalityList)
-        return;
+      if (!legalityList) return;
       const problems = [];
       if (set.moves) {
         for (const moveid of set.moves.map(this.toID)) {

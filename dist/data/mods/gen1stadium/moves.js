@@ -44,10 +44,8 @@ const Moves = {
         }
       },
       onDamage(damage, target, source, move) {
-        if (!source || source.isAlly(target))
-          return;
-        if (!move || move.effectType !== "Move")
-          return;
+        if (!source || source.isAlly(target)) return;
+        if (!move || move.effectType !== "Move") return;
         if (!damage && this.effectState.lastDamage > 0) {
           damage = this.effectState.totalDamage;
         }
@@ -202,10 +200,8 @@ const Moves = {
   rest: {
     inherit: true,
     onHit(target, source, move) {
-      if (target.hp >= target.maxhp)
-        return false;
-      if (!target.setStatus("slp", source, move))
-        return false;
+      if (target.hp >= target.maxhp) return false;
+      if (!target.setStatus("slp", source, move)) return false;
       target.statusState.time = 2;
       target.statusState.startTime = 2;
       target.recalculateStats();
@@ -258,14 +254,12 @@ const Moves = {
           }
           return;
         }
-        if (move.volatileStatus && target === source)
-          return;
+        if (move.volatileStatus && target === source) return;
         let damage = this.actions.getDamage(source, target, move);
         if (damage && damage > target.volatiles["substitute"].hp) {
           damage = target.volatiles["substitute"].hp;
         }
-        if (!damage && damage !== 0)
-          return null;
+        if (!damage && damage !== 0) return null;
         target.volatiles["substitute"].hp -= damage;
         this.lastDamage = damage;
         if (target.volatiles["substitute"].hp <= 0) {

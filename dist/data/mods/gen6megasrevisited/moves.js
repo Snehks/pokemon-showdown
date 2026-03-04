@@ -30,8 +30,7 @@ const Moves = {
         this.add("-sidestart", side, "move: Stealth Rock");
       },
       onSwitchIn(pokemon) {
-        if (pokemon.hasItem("heavydutyboots") || pokemon.hasAbility("exoskeleton"))
-          return;
+        if (pokemon.hasItem("heavydutyboots") || pokemon.hasAbility("exoskeleton")) return;
         const typeMod = this.clampIntRange(pokemon.runEffectiveness(this.dex.getActiveMove("stealthrock")), -6, 6);
         this.damage(pokemon.maxhp * 2 ** typeMod / 8);
       }
@@ -46,14 +45,12 @@ const Moves = {
         this.effectState.layers = 1;
       },
       onSideRestart(side) {
-        if (this.effectState.layers >= 2)
-          return false;
+        if (this.effectState.layers >= 2) return false;
         this.add("-sidestart", side, "move: Toxic Spikes");
         this.effectState.layers++;
       },
       onSwitchIn(pokemon) {
-        if (!pokemon.isGrounded())
-          return;
+        if (!pokemon.isGrounded()) return;
         if (pokemon.hasType("Poison")) {
           this.add("-sideend", pokemon.side, "move: Toxic Spikes", `[of] ${pokemon}`);
           pokemon.side.removeSideCondition("toxicspikes");
@@ -75,14 +72,12 @@ const Moves = {
         this.effectState.layers = 1;
       },
       onSideRestart(side) {
-        if (this.effectState.layers >= 3)
-          return false;
+        if (this.effectState.layers >= 3) return false;
         this.add("-sidestart", side, "Spikes");
         this.effectState.layers++;
       },
       onSwitchIn(pokemon) {
-        if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots") || pokemon.hasAbility("exoskeleton"))
-          return;
+        if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots") || pokemon.hasAbility("exoskeleton")) return;
         const damageAmounts = [0, 3, 4, 6];
         this.damage(damageAmounts[this.effectState.layers] * pokemon.maxhp / 24);
       }
@@ -95,8 +90,7 @@ const Moves = {
         this.add("-sidestart", side, "move: Sticky Web");
       },
       onSwitchIn(pokemon) {
-        if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots") || pokemon.hasAbility("exoskeleton"))
-          return;
+        if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots") || pokemon.hasAbility("exoskeleton")) return;
         this.add("-activate", pokemon, "move: Sticky Web");
         this.boost({ spe: -1 }, pokemon, pokemon.side.foe.active[0], this.dex.getActiveMove("stickyweb"));
       }

@@ -35,10 +35,8 @@ const Scripts = {
   },
   pokemon: {
     hasAbility(ability) {
-      if (this.ignoringAbility())
-        return false;
-      if (Array.isArray(ability))
-        return ability.some((abil) => this.hasAbility(abil));
+      if (this.ignoringAbility()) return false;
+      if (Array.isArray(ability)) return ability.some((abil) => this.hasAbility(abil));
       const abilityid = this.battle.toID(ability);
       return this.ability === abilityid || !!this.volatiles["ability:" + abilityid];
     },

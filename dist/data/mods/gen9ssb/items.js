@@ -131,22 +131,19 @@ const Items = {
   safetygoggles: {
     inherit: true,
     onImmunity(type, pokemon) {
-      if (type === "sandstorm" || type === "deserteddunes" || type === "hail" || type === "powder")
-        return false;
+      if (type === "sandstorm" || type === "deserteddunes" || type === "hail" || type === "powder") return false;
     }
   },
   utilityumbrella: {
     inherit: true,
     onStart(pokemon) {
-      if (!pokemon.ignoringItem())
-        return;
+      if (!pokemon.ignoringItem()) return;
       if (["sunnyday", "raindance", "desolateland", "primordialsea", "stormsurge"].includes(this.field.effectiveWeather())) {
         this.runEvent("WeatherChange", pokemon, pokemon, this.effect);
       }
     },
     onUpdate(pokemon) {
-      if (!this.effectState.inactive)
-        return;
+      if (!this.effectState.inactive) return;
       this.effectState.inactive = false;
       if (["sunnyday", "raindance", "desolateland", "primordialsea", "stormsurge"].includes(this.field.effectiveWeather())) {
         this.runEvent("WeatherChange", pokemon, pokemon, this.effect);

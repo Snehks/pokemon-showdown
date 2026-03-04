@@ -115,8 +115,7 @@ const Conditions = {
     },
     onBeforeMovePriority: 10,
     onBeforeMove(pokemon, target, move) {
-      if (move.flags["defrost"] && !(move.id === "burnup" && !pokemon.hasType("Fire")))
-        return;
+      if (move.flags["defrost"] && !(move.id === "burnup" && !pokemon.hasType("Fire"))) return;
       if (this.randomChance(1, 5)) {
         pokemon.cureStatus();
         return;
@@ -210,8 +209,7 @@ const Conditions = {
       }
       this.activeTarget = pokemon;
       const damage = this.actions.getConfusionDamage(pokemon, 40);
-      if (typeof damage !== "number")
-        throw new Error("Confusion damage not dealt");
+      if (typeof damage !== "number") throw new Error("Confusion damage not dealt");
       const activeMove = { id: this.toID("confused"), effectType: "Move", type: "???" };
       this.damage(damage, pokemon, pokemon, activeMove);
       return false;
@@ -245,8 +243,7 @@ const Conditions = {
     name: "partiallytrapped",
     duration: 5,
     durationCallback(target, source) {
-      if (source?.hasItem("gripclaw"))
-        return 8;
+      if (source?.hasItem("gripclaw")) return 8;
       return this.random(5, 7);
     },
     onStart(pokemon, source) {
@@ -269,8 +266,7 @@ const Conditions = {
     },
     onTrapPokemon(pokemon) {
       const gmaxEffect = ["gmaxcentiferno", "gmaxsandblast"].includes(this.effectState.sourceEffect.id);
-      if (this.effectState.source?.isActive || gmaxEffect)
-        pokemon.tryTrap();
+      if (this.effectState.source?.isActive || gmaxEffect) pokemon.tryTrap();
     }
   },
   lockedmove: {
@@ -298,13 +294,11 @@ const Conditions = {
       }
     },
     onEnd(target) {
-      if (this.effectState.trueDuration > 1)
-        return;
+      if (this.effectState.trueDuration > 1) return;
       target.addVolatile("confusion");
     },
     onLockMove(pokemon) {
-      if (pokemon.volatiles["dynamax"])
-        return;
+      if (pokemon.volatiles["dynamax"]) return;
       return this.effectState.move;
     }
   },
@@ -340,10 +334,8 @@ const Conditions = {
     name: "choicelock",
     noCopy: true,
     onStart(pokemon) {
-      if (!this.activeMove)
-        throw new Error("Battle.activeMove is null");
-      if (!this.activeMove.id || this.activeMove.hasBounced || this.activeMove.sourceEffect === "snatch")
-        return false;
+      if (!this.activeMove) throw new Error("Battle.activeMove is null");
+      if (!this.activeMove.id || this.activeMove.hasBounced || this.activeMove.sourceEffect === "snatch") return false;
       this.effectState.move = this.activeMove.id;
     },
     onBeforeMove(pokemon, target, move) {
@@ -401,8 +393,7 @@ const Conditions = {
     },
     onResidualOrder: 3,
     onResidual(target) {
-      if (this.getOverflowedTurnCount() < this.effectState.endingTurn)
-        return;
+      if (this.getOverflowedTurnCount() < this.effectState.endingTurn) return;
       target.side.removeSlotCondition(this.getAtSlot(this.effectState.targetSlot), "futuremove");
     },
     onEnd(target) {
@@ -457,8 +448,7 @@ const Conditions = {
       const counter = this.effectState.counter || 1;
       this.debug(`Success chance: ${Math.round(100 / counter)}%`);
       const success = this.randomChance(1, counter);
-      if (!success)
-        delete pokemon.volatiles["stall"];
+      if (!success) delete pokemon.volatiles["stall"];
       return success;
     },
     onRestart() {
@@ -490,8 +480,7 @@ const Conditions = {
       return 5;
     },
     onWeatherModifyDamage(damage, attacker, defender, move) {
-      if (defender.hasItem("utilityumbrella"))
-        return;
+      if (defender.hasItem("utilityumbrella")) return;
       if (move.type === "Water") {
         this.debug("rain water boost");
         return this.chainModify(1.5);
@@ -503,8 +492,7 @@ const Conditions = {
     },
     onFieldStart(field, source, effect) {
       if (effect?.effectType === "Ability") {
-        if (this.gen <= 5)
-          this.effectState.duration = 0;
+        if (this.gen <= 5) this.effectState.duration = 0;
         this.add("-weather", "RainDance", "[from] ability: " + effect.name, `[of] ${source}`);
       } else {
         this.add("-weather", "RainDance");
@@ -533,8 +521,7 @@ const Conditions = {
       }
     },
     onWeatherModifyDamage(damage, attacker, defender, move) {
-      if (defender.hasItem("utilityumbrella"))
-        return;
+      if (defender.hasItem("utilityumbrella")) return;
       if (move.type === "Water") {
         this.debug("Rain water boost");
         return this.chainModify(1.5);
@@ -567,8 +554,7 @@ const Conditions = {
         this.debug("Sunny Day Hydro Steam boost");
         return this.chainModify(1.5);
       }
-      if (defender.hasItem("utilityumbrella"))
-        return;
+      if (defender.hasItem("utilityumbrella")) return;
       if (move.type === "Fire") {
         this.debug("Sunny Day fire boost");
         return this.chainModify(1.5);
@@ -580,18 +566,15 @@ const Conditions = {
     },
     onFieldStart(battle, source, effect) {
       if (effect?.effectType === "Ability") {
-        if (this.gen <= 5)
-          this.effectState.duration = 0;
+        if (this.gen <= 5) this.effectState.duration = 0;
         this.add("-weather", "SunnyDay", "[from] ability: " + effect.name, `[of] ${source}`);
       } else {
         this.add("-weather", "SunnyDay");
       }
     },
     onImmunity(type, pokemon) {
-      if (pokemon.hasItem("utilityumbrella"))
-        return;
-      if (type === "frz")
-        return false;
+      if (pokemon.hasItem("utilityumbrella")) return;
+      if (type === "frz") return false;
     },
     onFieldResidualOrder: 1,
     onFieldResidual() {
@@ -616,8 +599,7 @@ const Conditions = {
       }
     },
     onWeatherModifyDamage(damage, attacker, defender, move) {
-      if (defender.hasItem("utilityumbrella"))
-        return;
+      if (defender.hasItem("utilityumbrella")) return;
       if (move.type === "Fire") {
         this.debug("Sunny Day fire boost");
         return this.chainModify(1.5);
@@ -627,10 +609,8 @@ const Conditions = {
       this.add("-weather", "DesolateLand", "[from] ability: " + effect.name, `[of] ${source}`);
     },
     onImmunity(type, pokemon) {
-      if (pokemon.hasItem("utilityumbrella"))
-        return;
-      if (type === "frz")
-        return false;
+      if (pokemon.hasItem("utilityumbrella")) return;
+      if (type === "frz") return false;
     },
     onFieldResidualOrder: 1,
     onFieldResidual() {
@@ -661,8 +641,7 @@ const Conditions = {
     },
     onFieldStart(field, source, effect) {
       if (effect?.effectType === "Ability") {
-        if (this.gen <= 5)
-          this.effectState.duration = 0;
+        if (this.gen <= 5) this.effectState.duration = 0;
         this.add("-weather", "Sandstorm", "[from] ability: " + effect.name, `[of] ${source}`);
       } else {
         this.add("-weather", "Sandstorm");
@@ -671,8 +650,7 @@ const Conditions = {
     onFieldResidualOrder: 1,
     onFieldResidual() {
       this.add("-weather", "Sandstorm", "[upkeep]");
-      if (this.field.isWeather("sandstorm"))
-        this.eachEvent("Weather");
+      if (this.field.isWeather("sandstorm")) this.eachEvent("Weather");
     },
     onWeather(target) {
       this.damage(target.baseMaxhp / 16);
@@ -693,8 +671,7 @@ const Conditions = {
     },
     onFieldStart(field, source, effect) {
       if (effect?.effectType === "Ability") {
-        if (this.gen <= 5)
-          this.effectState.duration = 0;
+        if (this.gen <= 5) this.effectState.duration = 0;
         this.add("-weather", "Hail", "[from] ability: " + effect.name, `[of] ${source}`);
       } else {
         this.add("-weather", "Hail");
@@ -703,8 +680,7 @@ const Conditions = {
     onFieldResidualOrder: 1,
     onFieldResidual() {
       this.add("-weather", "Hail", "[upkeep]");
-      if (this.field.isWeather("hail"))
-        this.eachEvent("Weather");
+      if (this.field.isWeather("hail")) this.eachEvent("Weather");
     },
     onWeather(target) {
       this.damage(target.baseMaxhp / 16);
@@ -731,8 +707,7 @@ const Conditions = {
     },
     onFieldStart(field, source, effect) {
       if (effect?.effectType === "Ability") {
-        if (this.gen <= 5)
-          this.effectState.duration = 0;
+        if (this.gen <= 5) this.effectState.duration = 0;
         this.add("-weather", "Snowscape", "[from] ability: " + effect.name, `[of] ${source}`);
       } else {
         this.add("-weather", "Snowscape");
@@ -741,8 +716,7 @@ const Conditions = {
     onFieldResidualOrder: 1,
     onFieldResidual() {
       this.add("-weather", "Snowscape", "[upkeep]");
-      if (this.field.isWeather("snowscape"))
-        this.eachEvent("Weather");
+      if (this.field.isWeather("snowscape")) this.eachEvent("Weather");
     },
     onFieldEnd() {
       this.add("-weather", "none");
@@ -786,16 +760,14 @@ const Conditions = {
         pokemon.formeChange("cramorant");
       }
       this.add("-start", pokemon, "Dynamax", pokemon.gigantamax ? "Gmax" : "");
-      if (pokemon.baseSpecies.name === "Shedinja")
-        return;
+      if (pokemon.baseSpecies.name === "Shedinja") return;
       const ratio = 1.5 + pokemon.dynamaxLevel * 0.05;
       pokemon.maxhp = Math.floor(pokemon.maxhp * ratio);
       pokemon.hp = Math.floor(pokemon.hp * ratio);
       this.add("-heal", pokemon, pokemon.getHealth, "[silent]");
     },
     onTryAddVolatile(status, pokemon) {
-      if (status.id === "flinch")
-        return null;
+      if (status.id === "flinch") return null;
     },
     onBeforeSwitchOutPriority: -1,
     onBeforeSwitchOut(pokemon) {
@@ -817,8 +789,7 @@ const Conditions = {
     },
     onEnd(pokemon) {
       this.add("-end", pokemon, "Dynamax");
-      if (pokemon.baseSpecies.name === "Shedinja")
-        return;
+      if (pokemon.baseSpecies.name === "Shedinja") return;
       pokemon.hp = pokemon.getUndynamaxedHP();
       pokemon.maxhp = pokemon.baseMaxhp;
       this.add("-heal", pokemon, pokemon.getHealth, "[silent]");
@@ -872,8 +843,7 @@ const Conditions = {
     name: "Arceus",
     onTypePriority: 1,
     onType(types, pokemon) {
-      if (pokemon.transformed || pokemon.ability !== "multitype" && this.gen >= 8)
-        return types;
+      if (pokemon.transformed || pokemon.ability !== "multitype" && this.gen >= 8) return types;
       let type = "Normal";
       if (pokemon.ability === "multitype") {
         type = pokemon.getItem().onPlate;
@@ -888,8 +858,7 @@ const Conditions = {
     name: "Silvally",
     onTypePriority: 1,
     onType(types, pokemon) {
-      if (pokemon.transformed || pokemon.ability !== "rkssystem" && this.gen >= 8)
-        return types;
+      if (pokemon.transformed || pokemon.ability !== "rkssystem" && this.gen >= 8) return types;
       let type = "Normal";
       if (pokemon.ability === "rkssystem") {
         type = pokemon.getItem().onMemory;
@@ -903,12 +872,10 @@ const Conditions = {
   zacian: {
     name: "Zacian",
     onBattleStart(pokemon) {
-      if (pokemon.item !== "rustedsword")
-        return;
+      if (pokemon.item !== "rustedsword") return;
       const rawSpecies = this.dex.species.get("Zacian-Crowned");
       const species = pokemon.setSpecies(rawSpecies);
-      if (!species)
-        return;
+      if (!species) return;
       pokemon.baseSpecies = rawSpecies;
       pokemon.details = pokemon.getUpdatedDetails();
       pokemon.setAbility(species.abilities["0"], null, null, true);
@@ -933,12 +900,10 @@ const Conditions = {
   zamazenta: {
     name: "Zamazenta",
     onBattleStart(pokemon) {
-      if (pokemon.item !== "rustedshield")
-        return;
+      if (pokemon.item !== "rustedshield") return;
       const rawSpecies = this.dex.species.get("Zamazenta-Crowned");
       const species = pokemon.setSpecies(rawSpecies);
-      if (!species)
-        return;
+      if (!species) return;
       pokemon.baseSpecies = rawSpecies;
       pokemon.details = pokemon.getUpdatedDetails();
       pokemon.setAbility(species.abilities["0"], null, null, true);

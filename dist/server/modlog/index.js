@@ -115,8 +115,7 @@ const PM = (0, import_lib.SQL)("modlog", module, {
   extension: "server/modlog/transactions.js",
   sqliteOptions: Config.modlogsqliteoptions,
   onError: (error, data, isParent) => {
-    if (!isParent)
-      return;
+    if (!isParent) return;
     Monitor.crashlog(error, "A modlog SQLite query", {
       query: JSON.stringify(data)
     });
@@ -146,8 +145,7 @@ class Modlog {
     restart();
   }
   async setupDatabase() {
-    if (!Config.usesqlite || !Config.usesqlitemodlog)
-      throw new Error(`SQLite is disabled.`);
+    if (!Config.usesqlite || !Config.usesqlitemodlog) throw new Error(`SQLite is disabled.`);
     await this.database.exec("PRAGMA foreign_keys = ON;");
     await this.database.exec(`PRAGMA case_sensitive_like = true;`);
     const dbExists = await this.database.get(`SELECT * FROM sqlite_master WHERE name = 'modlog'`);
@@ -190,8 +188,7 @@ class Modlog {
    * Writes to the modlog
    */
   async write(roomid, entry, overrideID) {
-    if (!Config.usesqlite || !Config.usesqlitemodlog)
-      return;
+    if (!Config.usesqlite || !Config.usesqlitemodlog) return;
     const roomID = entry.roomID || roomid;
     const insertableEntry = {
       action: entry.action,
@@ -209,8 +206,7 @@ class Modlog {
     await this.writeSQL([insertableEntry]);
   }
   async writeSQL(entries) {
-    if (!Config.usesqlite || !Config.usesqlitemodlog)
-      return;
+    if (!Config.usesqlite || !Config.usesqlitemodlog) return;
     if (!this.databaseReady) {
       this.queuedEntries.push(...entries);
       return;
@@ -229,8 +225,7 @@ class Modlog {
     return Promise.resolve(void 0);
   }
   destroyAllSQLite() {
-    if (!this.database)
-      return;
+    if (!this.database) return;
     void this.database.destroy();
     this.databaseReady = false;
   }
@@ -238,12 +233,9 @@ class Modlog {
     this.destroyAllSQLite();
   }
   async rename(oldID, newID) {
-    if (!Config.usesqlite || !Config.usesqlitemodlog)
-      return;
-    if (oldID === newID)
-      return;
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (!Config.usesqlite || !Config.usesqlitemodlog) return;
+    if (oldID === newID) return;
+    if (this.readyPromise) await this.readyPromise;
     if (this.databaseReady) {
       await this.database.run(this.renameQuery, [newID, oldID]);
     } else {
@@ -254,13 +246,11 @@ class Modlog {
    * Methods for reading (searching) modlog *
    ******************************************/
   async getGlobalPunishments(user, days = 30) {
-    if (!Config.usesqlite || !Config.usesqlitemodlog)
-      return null;
+    if (!Config.usesqlite || !Config.usesqlitemodlog) return null;
     return this.getGlobalPunishmentsSQL(toID(user), days);
   }
   async getGlobalPunishmentsSQL(userid, days) {
-    if (this.readyPromise)
-      await this.readyPromise;
+    if (this.readyPromise) await this.readyPromise;
     if (!this.globalPunishmentsSearchQuery) {
       throw new Error(`Modlog#globalPunishmentsSearchQuery is falsy but an SQL search function was called.`);
     }
@@ -280,8 +270,7 @@ class Modlog {
    * @returns Either a promise for ModlogResults or `null` if modlog is disabled.
    */
   async search(roomid = "global", search = { note: [], user: [], ip: [], action: [], actionTaker: [] }, maxLines = 20, onlyPunishments = false) {
-    if (!Config.usesqlite || !Config.usesqlitemodlog)
-      return null;
+    if (!Config.usesqlite || !Config.usesqlitemodlog) return null;
     const startTime = Date.now();
     let rooms;
     if (roomid === "public") {
@@ -291,10 +280,8 @@ class Modlog {
     } else {
       rooms = [roomid];
     }
-    if (this.readyPromise)
-      await this.readyPromise;
-    if (!this.databaseReady)
-      return null;
+    if (this.readyPromise) await this.readyPromise;
+    if (!this.databaseReady) return null;
     const query = this.prepareSQLSearch(rooms, maxLines, onlyPunishments, search);
     const results = (await this.database.all(query.queryText, query.args)).map((row) => this.dbRowToModlogEntry(row));
     const duration = Date.now() - startTime;
@@ -330,13 +317,11 @@ class Modlog {
    * @param sortAndLimit A fragment of the form `ORDER BY ... LIMIT ...`
    */
   buildParallelIndexScanQuery(select, ors, ands, sortAndLimit) {
-    if (!this.database)
-      throw new Error(`Parallel index scan queries cannot be built when SQLite is not enabled.`);
+    if (!this.database) throw new Error(`Parallel index scan queries cannot be built when SQLite is not enabled.`);
     let andQuery = ``;
     const andArgs = [];
     for (const and of ands) {
-      if (andQuery.length)
-        andQuery += ` AND `;
+      if (andQuery.length) andQuery += ` AND `;
       andQuery += and.query;
       andArgs.push(...and.args);
     }
@@ -347,8 +332,7 @@ class Modlog {
       args.push(...andArgs);
     } else {
       for (const or of ors) {
-        if (query.length)
-          query += ` UNION `;
+        if (query.length) query += ` UNION `;
         query += `SELECT * FROM (${select} WHERE ${or.query} ${andQuery ? ` AND ${andQuery}` : ``} ${sortAndLimit.query})`;
         args.push(...or.args, ...andArgs, ...sortAndLimit.args);
       }

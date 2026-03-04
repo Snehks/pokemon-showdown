@@ -37,19 +37,15 @@ var import_utils = require("../lib/utils");
  */
 function toID(text) {
   if (typeof text !== "string") {
-    if (text)
-      text = text.id || text.userid || text.roomid || text;
-    if (typeof text === "number")
-      text = `${text}`;
-    else if (typeof text !== "string")
-      return "";
+    if (text) text = text.id || text.userid || text.roomid || text;
+    if (typeof text === "number") text = `${text}`;
+    else if (typeof text !== "string") return "";
   }
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 function assignMissingFields(self, data) {
   for (const k in data) {
-    if (k in self)
-      continue;
+    if (k in self) continue;
     self[k] = data[k];
   }
 }
@@ -95,16 +91,13 @@ class DexNatures {
     this.dex = dex;
   }
   get(name) {
-    if (name && typeof name !== "string")
-      return name;
+    if (name && typeof name !== "string") return name;
     return this.getByID(toID(name));
   }
   getByID(id) {
-    if (id === "" || id === "constructor")
-      return EMPTY_NATURE;
+    if (id === "" || id === "constructor") return EMPTY_NATURE;
     let nature = this.natureCache.get(id);
-    if (nature)
-      return nature;
+    if (nature) return nature;
     const alias = this.dex.getAlias(id);
     if (alias) {
       nature = this.get(alias);
@@ -116,18 +109,15 @@ class DexNatures {
     if (id && this.dex.data.Natures.hasOwnProperty(id)) {
       const natureData = this.dex.data.Natures[id];
       nature = new Nature(natureData);
-      if (nature.gen > this.dex.gen)
-        nature.isNonstandard = "Future";
+      if (nature.gen > this.dex.gen) nature.isNonstandard = "Future";
     } else {
       nature = new Nature({ name: id, exists: false });
     }
-    if (nature.exists)
-      this.natureCache.set(id, this.dex.deepFreeze(nature));
+    if (nature.exists) this.natureCache.set(id, this.dex.deepFreeze(nature));
     return nature;
   }
   all() {
-    if (this.allCache)
-      return this.allCache;
+    if (this.allCache) return this.allCache;
     const natures = [];
     for (const id in this.dex.data.Natures) {
       natures.push(this.getByID(id));
@@ -162,42 +152,35 @@ class DexTypes {
     this.dex = dex;
   }
   get(name) {
-    if (name && typeof name !== "string")
-      return name;
+    if (name && typeof name !== "string") return name;
     return this.getByID(toID(name));
   }
   getByID(id) {
-    if (id === "" || id === "constructor")
-      return EMPTY_TYPE_INFO;
+    if (id === "" || id === "constructor") return EMPTY_TYPE_INFO;
     let type = this.typeCache.get(id);
-    if (type)
-      return type;
+    if (type) return type;
     const typeName = id.charAt(0).toUpperCase() + id.substr(1);
     if (typeName && this.dex.data.TypeChart.hasOwnProperty(id)) {
       type = new TypeInfo({ name: typeName, id, ...this.dex.data.TypeChart[id] });
     } else {
       type = new TypeInfo({ name: typeName, id, exists: false, effectType: "EffectType" });
     }
-    if (type.exists)
-      this.typeCache.set(id, this.dex.deepFreeze(type));
+    if (type.exists) this.typeCache.set(id, this.dex.deepFreeze(type));
     return type;
   }
   names() {
-    if (this.namesCache)
-      return this.namesCache;
+    if (this.namesCache) return this.namesCache;
     this.namesCache = this.all().filter((type) => !type.isNonstandard).map((type) => type.name);
     return this.namesCache;
   }
   isName(name) {
-    if (!name)
-      return false;
+    if (!name) return false;
     const id = name.toLowerCase();
     const typeName = id.charAt(0).toUpperCase() + id.substr(1);
     return name === typeName && this.dex.data.TypeChart.hasOwnProperty(id);
   }
   all() {
-    if (this.allCache)
-      return this.allCache;
+    if (this.allCache) return this.allCache;
     const types = [];
     for (const id in this.dex.data.TypeChart) {
       types.push(this.getByID(id));
@@ -285,13 +268,10 @@ class DexStats {
     }
   }
   getID(name) {
-    if (name === "Spd")
-      return "spe";
+    if (name === "Spd") return "spe";
     const id = toID(name);
-    if (reverseCache[id])
-      return reverseCache[id];
-    if (idsCache.includes(id))
-      return id;
+    if (reverseCache[id]) return reverseCache[id];
+    if (idsCache.includes(id)) return id;
     return null;
   }
   ids() {

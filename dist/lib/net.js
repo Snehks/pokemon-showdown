@@ -58,12 +58,10 @@ class NetStream extends Streams.ReadWriteStream {
     this.request = this.makeRequest(opts);
   }
   makeRequest(opts) {
-    if (!opts)
-      opts = {};
+    if (!opts) opts = {};
     let body = opts.body;
     if (body && typeof body !== "string") {
-      if (!opts.headers)
-        opts.headers = {};
+      if (!opts.headers) opts.headers = {};
       if (!opts.headers["Content-Type"]) {
         opts.headers["Content-Type"] = "application/x-www-form-urlencoded";
       }
@@ -73,8 +71,7 @@ class NetStream extends Streams.ReadWriteStream {
       this.uri += (this.uri.includes("?") ? "&" : "?") + NetStream.encodeQuery(opts.query);
     }
     if (body) {
-      if (!opts.headers)
-        opts.headers = {};
+      if (!opts.headers) opts.headers = {};
       if (!opts.headers["Content-Length"]) {
         opts.headers["Content-Length"] = Buffer.byteLength(body);
       }
@@ -98,14 +95,11 @@ class NetStream extends Streams.ReadWriteStream {
         this.push(data);
       });
       response.on("error", (error) => {
-        if (!this.atEOF)
-          this.pushError(error, true);
+        if (!this.atEOF) this.pushError(error, true);
       });
       response.on("end", () => {
-        if (this.state === "open")
-          this.state = "success";
-        if (!this.atEOF)
-          this.pushEnd();
+        if (this.state === "open") this.state = "success";
+        if (!this.atEOF) this.pushEnd();
       });
     });
     request.on("close", () => {
@@ -120,8 +114,7 @@ class NetStream extends Streams.ReadWriteStream {
       }
     });
     request.on("error", (error) => {
-      if (!this.atEOF)
-        this.pushError(error, true);
+      if (!this.atEOF) this.pushError(error, true);
     });
     if (opts.timeout || opts.timeout === void 0) {
       request.setTimeout(opts.timeout || 5e3, () => {
@@ -146,8 +139,7 @@ class NetStream extends Streams.ReadWriteStream {
   static encodeQuery(data) {
     let out = "";
     for (const key in data) {
-      if (out)
-        out += `&`;
+      if (out) out += `&`;
       out += `${key}=${encodeURIComponent(`${data[key]}`)}`;
     }
     return out;
@@ -157,12 +149,10 @@ class NetStream extends Streams.ReadWriteStream {
       throw new Error("You must specify opts.writable to write to a request.");
     }
     const result = this.nodeWritableStream.write(data);
-    if (result !== false)
-      return void 0;
+    if (result !== false) return void 0;
     if (!this.drainListeners.length) {
       this.nodeWritableStream.once("drain", () => {
-        for (const listener of this.drainListeners)
-          listener();
+        for (const listener of this.drainListeners) listener();
         this.drainListeners = [];
       });
     }
@@ -207,16 +197,14 @@ class NetRequest {
   async get(opts = {}) {
     const stream = this.getStream(opts);
     const response = await stream.response;
-    if (response)
-      this.response = response;
+    if (response) this.response = response;
     if (response && response.statusCode !== 200) {
       throw new HttpError(response.statusMessage || "Connection error", response.statusCode, await stream.readAll());
     }
     return stream.readAll();
   }
   post(opts = {}, body) {
-    if (!body)
-      body = opts.body;
+    if (!body) body = opts.body;
     return this.get({
       ...opts,
       method: "POST",

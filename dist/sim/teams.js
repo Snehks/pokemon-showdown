@@ -33,15 +33,13 @@ var import_dex = require("./dex");
  */
 const Teams = new class Teams2 {
   pack(team) {
-    if (!team)
-      return "";
+    if (!team) return "";
     function getIv(ivs, s) {
       return ivs[s] === 31 || ivs[s] === void 0 ? "" : ivs[s].toString();
     }
     let buf = "";
     for (const set of team) {
-      if (buf)
-        buf += "]";
+      if (buf) buf += "]";
       buf += set.name || set.species;
       const id = this.packName(set.species || set.name);
       buf += `|${this.packName(set.name || set.species) === id ? "" : id}`;
@@ -106,10 +104,8 @@ const Teams = new class Teams2 {
     return buf;
   }
   unpack(buf) {
-    if (!buf)
-      return null;
-    if (typeof buf !== "string")
-      return buf;
+    if (!buf) return null;
+    if (typeof buf !== "string") return buf;
     if (buf.startsWith("[") && buf.endsWith("]")) {
       try {
         buf = this.pack(JSON.parse(buf));
@@ -124,40 +120,33 @@ const Teams = new class Teams2 {
       const set = {};
       team.push(set);
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
+      if (j < 0) return null;
       set.name = buf.substring(i, j);
       i = j + 1;
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
+      if (j < 0) return null;
       set.species = this.unpackName(buf.substring(i, j), import_dex.Dex.species) || set.name;
       i = j + 1;
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
+      if (j < 0) return null;
       set.item = this.unpackName(buf.substring(i, j), import_dex.Dex.items);
       i = j + 1;
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
+      if (j < 0) return null;
       const ability = buf.substring(i, j);
       const species = import_dex.Dex.species.get(set.species);
       set.ability = ["", "0", "1", "H", "S"].includes(ability) ? species.abilities[ability || "0"] || (ability === "" ? "" : "!!!ERROR!!!") : this.unpackName(ability, import_dex.Dex.abilities);
       i = j + 1;
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
+      if (j < 0) return null;
       set.moves = buf.substring(i, j).split(",", 24).map((name) => this.unpackName(name, import_dex.Dex.moves));
       i = j + 1;
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
+      if (j < 0) return null;
       set.nature = this.unpackName(buf.substring(i, j), import_dex.Dex.natures);
       i = j + 1;
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
+      if (j < 0) return null;
       if (j !== i) {
         const evs = buf.substring(i, j).split(",", 6);
         set.evs = {
@@ -171,14 +160,11 @@ const Teams = new class Teams2 {
       }
       i = j + 1;
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
-      if (i !== j)
-        set.gender = buf.substring(i, j);
+      if (j < 0) return null;
+      if (i !== j) set.gender = buf.substring(i, j);
       i = j + 1;
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
+      if (j < 0) return null;
       if (j !== i) {
         const ivs = buf.substring(i, j).split(",", 6);
         set.ivs = {
@@ -192,16 +178,12 @@ const Teams = new class Teams2 {
       }
       i = j + 1;
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
-      if (i !== j)
-        set.shiny = true;
+      if (j < 0) return null;
+      if (i !== j) set.shiny = true;
       i = j + 1;
       j = buf.indexOf("|", i);
-      if (j < 0)
-        return null;
-      if (i !== j)
-        set.level = parseInt(buf.substring(i, j));
+      if (j < 0) return null;
+      if (i !== j) set.level = parseInt(buf.substring(i, j));
       i = j + 1;
       j = buf.indexOf("]", i);
       const remaining = j < 0 ? buf.substring(i) : buf.substring(i, j);
@@ -215,40 +197,32 @@ const Teams = new class Teams2 {
         set.dynamaxLevel = misc[4] ? Number(misc[4]) : 10;
         set.teraType = misc[5];
       }
-      if (segments.length > 1 && segments[1])
-        set.currentHp = parseInt(segments[1]);
-      if (segments.length > 2 && segments[2])
-        set.status = segments[2];
-      if (segments.length > 3 && segments[3])
-        set.statusDuration = parseInt(segments[3]);
+      if (segments.length > 1 && segments[1]) set.currentHp = parseInt(segments[1]);
+      if (segments.length > 2 && segments[2]) set.status = segments[2];
+      if (segments.length > 3 && segments[3]) set.statusDuration = parseInt(segments[3]);
       if (segments.length > 4 && segments[4]) {
         set.movePP = segments[4].split(",").map(Number);
       }
-      if (segments.length > 5 && segments[5])
-        set.databaseId = parseInt(segments[5]);
+      if (segments.length > 5 && segments[5]) set.databaseId = parseInt(segments[5]);
       if (segments.length > 6 && segments[6]) {
         set.moveMaxPP = segments[6].split(",").map(Number);
       }
-      if (j < 0)
-        break;
+      if (j < 0) break;
       i = j + 1;
     }
     return team;
   }
   /** Very similar to toID but without the lowercase conversion */
   packName(name) {
-    if (!name)
-      return "";
+    if (!name) return "";
     return name.replace(/[^A-Za-z0-9]+/g, "");
   }
   /** Will not entirely recover a packed name, but will be a pretty readable guess */
   unpackName(name, dexTable) {
-    if (!name)
-      return "";
+    if (!name) return "";
     if (dexTable) {
       const obj = dexTable.get(name);
-      if (obj.exists)
-        return obj.name;
+      if (obj.exists) return obj.name;
     }
     return name.replace(/([0-9]+)/g, " $1 ").replace(/([A-Z])/g, " $1").replace(/[ ][ ]/g, " ").trim();
   }
@@ -273,12 +247,9 @@ const Teams = new class Teams2 {
     } else {
       out += set.species;
     }
-    if (set.gender === "M")
-      out += ` (M)`;
-    if (set.gender === "F")
-      out += ` (F)`;
-    if (set.item)
-      out += ` @ ${set.item}`;
+    if (set.gender === "M") out += ` (M)`;
+    if (set.gender === "F") out += ` (F)`;
+    if (set.item) out += ` @ ${set.item}`;
     out += `  
 `;
     if (set.ability) {
@@ -356,8 +327,7 @@ const Teams = new class Teams2 {
       [line, item] = line.split(" @ ");
       if (item) {
         set.item = item;
-        if ((0, import_dex.toID)(set.item) === "noitem")
-          set.item = "";
+        if ((0, import_dex.toID)(set.item) === "noitem") set.item = "";
       }
       if (line.endsWith(" (M)")) {
         set.gender = "M";
@@ -407,8 +377,7 @@ const Teams = new class Teams2 {
       for (const evLine of evLines) {
         const [statValue, statName] = evLine.trim().split(" ");
         const statid = import_dex.Dex.stats.getID(statName);
-        if (!statid)
-          continue;
+        if (!statid) continue;
         const value = parseInt(statValue);
         set.evs[statid] = value;
       }
@@ -419,22 +388,17 @@ const Teams = new class Teams2 {
       for (const ivLine of ivLines) {
         const [statValue, statName] = ivLine.trim().split(" ");
         const statid = import_dex.Dex.stats.getID(statName);
-        if (!statid)
-          continue;
+        if (!statid) continue;
         let value = parseInt(statValue);
-        if (isNaN(value))
-          value = 31;
+        if (isNaN(value)) value = 31;
         set.ivs[statid] = value;
       }
     } else if (/^[A-Za-z]+ (N|n)ature/.test(line)) {
       let natureIndex = line.indexOf(" Nature");
-      if (natureIndex === -1)
-        natureIndex = line.indexOf(" nature");
-      if (natureIndex === -1)
-        return;
+      if (natureIndex === -1) natureIndex = line.indexOf(" nature");
+      if (natureIndex === -1) return;
       line = line.substr(0, natureIndex);
-      if (line !== "undefined")
-        set.nature = aggressive ? (0, import_dex.toID)(line) : line;
+      if (line !== "undefined") set.nature = aggressive ? (0, import_dex.toID)(line) : line;
     } else if (line.startsWith("-") || line.startsWith("~")) {
       line = line.slice(line.charAt(1) === " " ? 2 : 1);
       if (line.startsWith("Hidden Power [")) {
@@ -460,8 +424,7 @@ const Teams = new class Teams2 {
     if (buffer.startsWith("[")) {
       try {
         const team = JSON.parse(buffer);
-        if (!Array.isArray(team))
-          throw new Error(`Team should be an Array but isn't`);
+        if (!Array.isArray(team)) throw new Error(`Team should be an Array but isn't`);
         for (const set of team) {
           set.name = sanitize(set.name);
           set.species = sanitize(set.species);
@@ -472,16 +435,14 @@ const Teams = new class Teams2 {
           const evs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
           if (set.evs) {
             for (const statid in evs) {
-              if (typeof set.evs[statid] === "number")
-                evs[statid] = set.evs[statid];
+              if (typeof set.evs[statid] === "number") evs[statid] = set.evs[statid];
             }
           }
           set.evs = evs;
           const ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
           if (set.ivs) {
             for (const statid in ivs) {
-              if (typeof set.ivs[statid] === "number")
-                ivs[statid] = set.ivs[statid];
+              if (typeof set.ivs[statid] === "number") ivs[statid] = set.ivs[statid];
             }
           }
           set.ivs = ivs;
@@ -498,10 +459,8 @@ const Teams = new class Teams2 {
     const lines = buffer.split("\n");
     const sets = [];
     let curSet = null;
-    while (lines.length && !lines[0])
-      lines.shift();
-    while (lines.length && !lines[lines.length - 1])
-      lines.pop();
+    while (lines.length && !lines[0]) lines.shift();
+    while (lines.length && !lines[lines.length - 1]) lines.pop();
     if (lines.length === 1 && lines[0].includes("|")) {
       return this.unpack(lines[0]);
     }
@@ -535,8 +494,7 @@ const Teams = new class Teams2 {
     let TeamGenerator;
     format = import_dex.Dex.formats.get(format);
     let mod = format.mod;
-    if (format.mod === "monkeyspaw")
-      mod = "gen9";
+    if (format.mod === "monkeyspaw") mod = "gen9";
     const formatID = (0, import_dex.toID)(format);
     if (mod === "gen9ssb") {
       TeamGenerator = require("../data/mods/gen9ssb/random-teams").default;

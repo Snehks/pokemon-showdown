@@ -74,8 +74,7 @@ const Scripts = {
       if (this.battle.dex.currentMod === "gen1stadium" && (species.name === "Ditto" || this.species.name === "Ditto" && pokemon.moves.includes("transform"))) {
         return false;
       }
-      if (!this.setSpecies(species, effect, true))
-        return false;
+      if (!this.setSpecies(species, effect, true)) return false;
       this.transformed = true;
       this.weighthg = pokemon.weighthg;
       const types = pokemon.getTypes(true, true);
@@ -86,8 +85,7 @@ const Scripts = {
       let statName;
       for (statName in this.storedStats) {
         this.storedStats[statName] = pokemon.storedStats[statName];
-        if (this.modifiedStats)
-          this.modifiedStats[statName] = pokemon.modifiedStats[statName];
+        if (this.modifiedStats) this.modifiedStats[statName] = pokemon.modifiedStats[statName];
       }
       this.moveSlots = [];
       this.hpType = this.battle.gen >= 5 ? this.hpType : pokemon.hpType;
@@ -115,15 +113,12 @@ const Scripts = {
       }
       if (this.battle.gen >= 6) {
         const volatilesToCopy = ["dragoncheer", "focusenergy", "gmaxchistrike", "laserfocus"];
-        for (const volatile of volatilesToCopy)
-          this.removeVolatile(volatile);
+        for (const volatile of volatilesToCopy) this.removeVolatile(volatile);
         for (const volatile of volatilesToCopy) {
           if (pokemon.volatiles[volatile]) {
             this.addVolatile(volatile);
-            if (volatile === "gmaxchistrike")
-              this.volatiles[volatile].layers = pokemon.volatiles[volatile].layers;
-            if (volatile === "dragoncheer")
-              this.volatiles[volatile].hasDragonType = pokemon.volatiles[volatile].hasDragonType;
+            if (volatile === "gmaxchistrike") this.volatiles[volatile].layers = pokemon.volatiles[volatile].layers;
+            if (volatile === "dragoncheer") this.volatiles[volatile].hasDragonType = pokemon.volatiles[volatile].hasDragonType;
           }
         }
       }
@@ -136,8 +131,7 @@ const Scripts = {
         this.knownType = true;
         this.apparentType = this.terastallized;
       }
-      if (this.battle.gen > 2)
-        this.setAbility(pokemon.ability, this, null, true, true);
+      if (this.battle.gen > 2) this.setAbility(pokemon.ability, this, null, true, true);
       if (this.battle.gen === 4) {
         if (this.species.num === 487) {
           if (this.species.name === "Giratina" && this.item === "griseousorb") {

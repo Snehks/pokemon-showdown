@@ -402,8 +402,7 @@ const Scripts = {
   init() {
     for (const [eventId, baseId, displayName, forme] of PBO_EVENT_FORMS) {
       const baseData = this.data.Pokedex[baseId];
-      if (!baseData)
-        continue;
+      if (!baseData) continue;
       this.data.Pokedex[eventId] = {
         ...baseData,
         name: displayName,
@@ -541,10 +540,8 @@ const Scripts = {
     // Vanilla Showdown omits level when level === 100, but PBO has levels > 100.
     getUpdatedDetails(level) {
       let name = this.species.name;
-      if (["Greninja-Bond", "Rockruff-Dusk"].includes(name))
-        name = this.species.baseSpecies;
-      if (!level)
-        level = this.level;
+      if (["Greninja-Bond", "Rockruff-Dusk"].includes(name)) name = this.species.baseSpecies;
+      if (!level) level = this.level;
       return name + `, L${level}` + (this.gender === "" ? "" : `, ${this.gender}`) + (this.set.shiny ? ", shiny" : "");
     }
   }

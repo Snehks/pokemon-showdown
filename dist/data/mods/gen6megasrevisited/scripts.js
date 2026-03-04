@@ -28,8 +28,7 @@ const Scripts = {
     // for parental bond
     modifyDamage(baseDamage, pokemon, target, move, suppressMessages = false) {
       const tr = this.battle.trunc;
-      if (!move.type)
-        move.type = "???";
+      if (!move.type) move.type = "???";
       const type = move.type;
       baseDamage += 2;
       if (move.spreadHit) {
@@ -73,53 +72,42 @@ const Scripts = {
       typeMod = this.battle.clampIntRange(typeMod, -6, 6);
       target.getMoveHitData(move).typeMod = typeMod;
       if (typeMod > 0) {
-        if (!suppressMessages)
-          this.battle.add("-supereffective", target);
+        if (!suppressMessages) this.battle.add("-supereffective", target);
         for (let i = 0; i < typeMod; i++) {
           baseDamage *= 2;
         }
       }
       if (typeMod < 0) {
-        if (!suppressMessages)
-          this.battle.add("-resisted", target);
+        if (!suppressMessages) this.battle.add("-resisted", target);
         for (let i = 0; i > typeMod; i--) {
           baseDamage = tr(baseDamage / 2);
         }
       }
-      if (isCrit && !suppressMessages)
-        this.battle.add("-crit", target);
+      if (isCrit && !suppressMessages) this.battle.add("-crit", target);
       if (pokemon.status === "brn" && move.category === "Physical" && !pokemon.hasAbility("guts")) {
         if (this.battle.gen < 6 || move.id !== "facade") {
           baseDamage = this.battle.modify(baseDamage, 0.5);
         }
       }
-      if (this.battle.gen === 5 && !baseDamage)
-        baseDamage = 1;
+      if (this.battle.gen === 5 && !baseDamage) baseDamage = 1;
       baseDamage = this.battle.runEvent("ModifyDamage", pokemon, target, move, baseDamage);
       if (move.isZOrMaxPowered && target.getMoveHitData(move).zBrokeProtect) {
         baseDamage = this.battle.modify(baseDamage, 0.25);
         this.battle.add("-zbroken", target);
       }
-      if (this.battle.gen !== 5 && !baseDamage)
-        return 1;
+      if (this.battle.gen !== 5 && !baseDamage) return 1;
       return tr(baseDamage, 16);
     }
   },
   pokemon: {
     // for neutralizing gas
     ignoringAbility() {
-      if (this.battle.gen >= 5 && !this.isActive)
-        return true;
-      if (this.getAbility().flags["notransform"] && this.transformed)
-        return true;
-      if (this.getAbility().flags["cantsuppress"])
-        return false;
-      if (this.volatiles["gastroacid"])
-        return true;
-      if (this.ability === "neutralizinggas")
-        return false;
-      if (this.volatiles["neutralizinggas"])
-        return true;
+      if (this.battle.gen >= 5 && !this.isActive) return true;
+      if (this.getAbility().flags["notransform"] && this.transformed) return true;
+      if (this.getAbility().flags["cantsuppress"]) return false;
+      if (this.volatiles["gastroacid"]) return true;
+      if (this.ability === "neutralizinggas") return false;
+      if (this.volatiles["neutralizinggas"]) return true;
       return false;
     }
   },

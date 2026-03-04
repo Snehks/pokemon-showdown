@@ -29,7 +29,23 @@ var import_runner = require("./runner");
  *
  * @license MIT
  */
-const _MultiRandomRunner = class {
+class MultiRandomRunner {
+  static {
+    this.FORMATS = [
+      "gen8randombattle",
+      "gen8randomdoublesbattle",
+      "gen8battlefactory",
+      "gen7randombattle",
+      "gen7battlefactory",
+      "gen6randombattle",
+      "gen6battlefactory",
+      "gen5randombattle",
+      "gen4randombattle",
+      "gen3randombattle",
+      "gen2randombattle",
+      "gen1randombattle"
+    ];
+  }
   constructor(options) {
     this.options = { ...options };
     this.totalGames = options.totalGames;
@@ -49,8 +65,7 @@ const _MultiRandomRunner = class {
     let failures = 0;
     while (format = this.getNextFormat()) {
       if (this.all && lastFormat && format !== lastFormat) {
-        if (this.isAsync)
-          await Promise.all(games);
+        if (this.isAsync) await Promise.all(games);
         games = [];
       }
       const seed = this.prng.getSeed();
@@ -62,19 +77,16 @@ const _MultiRandomRunner = class {
           err
         );
       });
-      if (!this.isAsync)
-        await game;
+      if (!this.isAsync) await game;
       games.push(game);
       lastFormat = format;
     }
-    if (this.isAsync)
-      await Promise.all(games);
+    if (this.isAsync) await Promise.all(games);
     return failures;
   }
   getNextFormat() {
-    const FORMATS = _MultiRandomRunner.FORMATS;
-    if (this.formatIndex > FORMATS.length)
-      return false;
+    const FORMATS = MultiRandomRunner.FORMATS;
+    if (this.formatIndex > FORMATS.length) return false;
     if (this.numGames++ < this.totalGames) {
       if (this.format) {
         return this.format;
@@ -94,20 +106,5 @@ const _MultiRandomRunner = class {
     }
     return false;
   }
-};
-let MultiRandomRunner = _MultiRandomRunner;
-MultiRandomRunner.FORMATS = [
-  "gen8randombattle",
-  "gen8randomdoublesbattle",
-  "gen8battlefactory",
-  "gen7randombattle",
-  "gen7battlefactory",
-  "gen6randombattle",
-  "gen6battlefactory",
-  "gen5randombattle",
-  "gen4randombattle",
-  "gen3randombattle",
-  "gen2randombattle",
-  "gen1randombattle"
-];
+}
 //# sourceMappingURL=multi-random-runner.js.map

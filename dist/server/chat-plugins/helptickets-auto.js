@@ -86,8 +86,7 @@ function visualizePunishment(punishment) {
   return buf.join(", ");
 }
 function checkAccess(context) {
-  if (!WHITELIST.includes(context.user.id))
-    context.checkCan("bypassall");
+  if (!WHITELIST.includes(context.user.id)) context.checkCan("bypassall");
 }
 function punishmentsFor(type) {
   return settings.punishments.filter((t) => t.ticketType === type);
@@ -101,21 +100,17 @@ function determinePunishment(ticketType, results, modlog, isSingleMessage = fals
   const types = [];
   import_lib.Utils.sortBy(punishments, (p) => -ORDERED_PUNISHMENTS.indexOf(p.punishment));
   for (const punishment of punishments) {
-    if (isSingleMessage && !punishment.isSingleMessage)
-      continue;
-    if (punishment.modlogCount && modlog.length < punishment.modlogCount)
-      continue;
+    if (isSingleMessage && !punishment.isSingleMessage) continue;
+    if (punishment.modlogCount && modlog.length < punishment.modlogCount) continue;
     if (punishment.severity) {
       let hit = false;
       for (const type of punishment.severity.type) {
-        if (results[type] < punishment.severity.certainty)
-          continue;
+        if (results[type] < punishment.severity.certainty) continue;
         hit = true;
         types.push(type);
         break;
       }
-      if (!hit)
-        continue;
+      if (!hit) continue;
     }
     if (!action || supersedes(punishment.punishment, action)) {
       action = punishment.punishment;
@@ -144,18 +139,14 @@ async function getModlog(params) {
     action: [],
     actionTaker: []
   };
-  if (params.user)
-    search.user = [{ search: params.user, isExact: true }];
-  if (params.ip)
-    search.ip = [{ search: params.ip }];
-  if (params.actions)
-    search.action = params.actions.map((s) => ({ search: s }));
+  if (params.user) search.user = [{ search: params.user, isExact: true }];
+  if (params.ip) search.ip = [{ search: params.ip }];
+  if (params.actions) search.action = params.actions.map((s) => ({ search: s }));
   const res = await Rooms.Modlog.search("global", search);
   return res?.results || [];
 }
 function closeTicket(ticket, msg) {
-  if (!ticket.open)
-    return;
+  if (!ticket.open) return;
   ticket.open = false;
   ticket.active = false;
   ticket.resolved = {
@@ -180,8 +171,7 @@ async function lock(user, result, ticket, isWeek, isName) {
   let desc, type;
   const expireTime = isWeek ? Date.now() + 7 * 24 * 60 * 60 * 1e3 : null;
   if (isName) {
-    if (typeof user === "object")
-      user.resetName();
+    if (typeof user === "object") user.resetName();
     desc = "locked your username and prevented you from changing names";
     type = `locked from talking${isWeek ? ` for a week` : ""}`;
     await Punishments.namelock(id, expireTime, null, false, result.reason || "Automatically locked due to a user report");
@@ -192,8 +182,7 @@ async function lock(user, result, ticket, isWeek, isName) {
   }
   if (typeof user !== "string") {
     let message = `|popup||html|${user.name} has ${desc} for ${isWeek ? "7" : "2"} days.`;
-    if (result.reason)
-      message += `
+    if (result.reason) message += `
 
 Reason: ${result.reason}`;
     let appeal = "";
@@ -202,8 +191,7 @@ Reason: ${result.reason}`;
     } else if (Config.appealurl) {
       appeal += `appeal: <a href="${Config.appealurl}">${Config.appealurl}</a>`;
     }
-    if (appeal)
-      message += `
+    if (appeal) message += `
 
 If you feel that your lock was unjustified, you can ${appeal}.`;
     message += `
@@ -220,8 +208,7 @@ Your lock will expire in a few days.`;
 }
 const actionHandlers = {
   forcerename(user, result, ticket) {
-    if (typeof user === "string")
-      return;
+    if (typeof user === "string") return;
     const id = toID(user);
     user.resetName();
     user.trackRename = id;
@@ -276,22 +263,23 @@ const actionHandlers = {
   }
 };
 function shouldNotProcess(message) {
-  return message.startsWith("/") && !message.startsWith("//") || // broadcasted chat command
-  message.startsWith("!");
+  return (
+    // special 'command', blocks things like /log, /raw, /html
+    // (but not a // message)
+    message.startsWith("/") && !message.startsWith("//") || // broadcasted chat command
+    message.startsWith("!")
+  );
 }
 async function getMessageAverages(messages) {
   const counts = {};
   const classified = [];
   for (const message of messages) {
-    if (shouldNotProcess(message))
-      continue;
+    if (shouldNotProcess(message)) continue;
     const res = await classifier.classify(message);
-    if (!res)
-      continue;
+    if (!res) continue;
     classified.push(res);
     for (const k in res) {
-      if (!counts[k])
-        counts[k] = { count: 0, raw: 0 };
+      if (!counts[k]) counts[k] = { count: 0, raw: 0 };
       counts[k].count++;
       counts[k].raw += res[k];
     }
@@ -308,8 +296,7 @@ const checkers = {
     const user = Users.getExact(id);
     if (user && !user.trusted) {
       const result = await classifier.classify(user.name);
-      if (!result)
-        return;
+      if (!result) return;
       const keys = ["identity_attack", "sexual_explicit", "severe_toxicity"];
       const matched = keys.some((k) => result[k] >= 0.4);
       if (matched) {
@@ -318,8 +305,7 @@ const checkers = {
           actions: ["FORCERENAME", "NAMELOCK", "WEEKNAMELOCK"]
         });
         let { action } = determinePunishment("inapname", result, modlog);
-        if (!action)
-          action = "forcerename";
+        if (!action) action = "forcerename";
         return /* @__PURE__ */ new Map([[user.id, {
           action,
           user,
@@ -334,17 +320,14 @@ const checkers = {
     const links = [...(0, import_helptickets.getBattleLinks)(ticket.text[0]), ...(0, import_helptickets.getBattleLinks)(ticket.text[1])];
     for (const link of links) {
       const log = await (0, import_helptickets.getBattleLog)(link);
-      if (!log)
-        continue;
+      if (!log) continue;
       for (const [user, pokemon] of Object.entries(log.pokemon)) {
         const userid = toID(user);
         let result = null;
         for (const set of pokemon) {
-          if (!set.name)
-            continue;
+          if (!set.name) continue;
           const results = await classifier.classify(set.name);
-          if (!results)
-            continue;
+          if (!results) continue;
           const curAction = determinePunishment("inappokemon", results, []).action;
           if (curAction && (!result || supersedes(curAction, result.action))) {
             result = { action: curAction, name: set.name, result: results, replay: link };
@@ -361,24 +344,20 @@ const checkers = {
         }
       }
     }
-    if (actions.size)
-      return actions;
+    if (actions.size) return actions;
   },
   async battleharassment(ticket) {
     const urls = (0, import_helptickets.getBattleLinks)(ticket.text[0]);
     const actions = /* @__PURE__ */ new Map();
     for (const url of urls) {
       const log = await (0, import_helptickets.getBattleLog)(url);
-      if (!log)
-        continue;
+      if (!log) continue;
       const messages = {};
       for (const message of log.log) {
         const [username, text] = import_lib.Utils.splitFirst(message.slice(3), "|").map((f) => f.trim());
         const id = toID(username);
-        if (!id)
-          continue;
-        if (!messages[id])
-          messages[id] = [];
+        if (!id) continue;
+        if (!messages[id]) messages[id] = [];
         messages[id].push(text);
       }
       for (const [id, messageList] of Object.entries(messages)) {
@@ -398,8 +377,7 @@ const checkers = {
         }
         for (const result of classified) {
           const curPunishment = determinePunishment("battleharassment", result, [], true).action;
-          if (!curPunishment)
-            continue;
+          if (!curPunishment) continue;
           const exists = actions.get(id);
           if (!exists || supersedes(curPunishment, exists.action)) {
             actions.set(id, {
@@ -421,25 +399,21 @@ const checkers = {
       }
       creatorWasPunished.displayReason = displayReason;
     }
-    if (actions.size)
-      return actions;
+    if (actions.size) return actions;
   },
   async pmharassment(ticket) {
     const actions = /* @__PURE__ */ new Map();
     const targetId = toID(ticket.text[0]);
     const creator = ticket.userid;
-    if (!Config.getpmlog)
-      return;
+    if (!Config.getpmlog) return;
     const pmLog = await Config.getpmlog(targetId, creator);
     const messages = {};
     const ids = /* @__PURE__ */ new Set();
     for (const { from, message, timestamp } of pmLog) {
-      if (Date.now() - new Date(timestamp).getTime() > PMLOG_IGNORE_TIME)
-        continue;
+      if (Date.now() - new Date(timestamp).getTime() > PMLOG_IGNORE_TIME) continue;
       const id = toID(from);
       ids.add(id);
-      if (!messages[id])
-        messages[id] = [];
+      if (!messages[id]) messages[id] = [];
       messages[id].push(message);
     }
     for (const id of ids) {
@@ -461,8 +435,7 @@ const checkers = {
       }
       for (const result of classified) {
         const { action } = determinePunishment("pmharassment", result, [], true);
-        if (!action)
-          continue;
+        if (!action) continue;
         const exists = actions.get(id);
         if (!exists || supersedes(action, exists.action)) {
           actions.set(id, {
@@ -482,8 +455,7 @@ const checkers = {
       }
       creatorWasPunished.displayReason = displayReason;
     }
-    if (actions.size)
-      return actions;
+    if (actions.size) return actions;
   }
 };
 const classifier = new Artemis.LocalClassifier();
@@ -497,8 +469,7 @@ async function runPunishments(ticket, typeId) {
       const responses = [];
       for (const res of result.values()) {
         const curResult = await actionHandlers[res.action.toLowerCase()](res.user, res, ticket);
-        if (curResult)
-          responses.push([res.action, res.displayReason || curResult]);
+        if (curResult) responses.push([res.action, res.displayReason || curResult]);
         if (toID(res.user) === ticket.creator) {
           closeTicket(ticket, res.displayReason);
         }
@@ -542,13 +513,11 @@ const commands = {
     add: "addpunishment",
     addpunishment(target, room, user) {
       checkAccess(this);
-      if (!toID(target))
-        return this.parse(`/help autohelpticket`);
+      if (!toID(target)) return this.parse(`/help autohelpticket`);
       const args = Chat.parseArguments(target);
       const punishment = {};
       for (const [k, list] of Object.entries(args)) {
-        if (k !== "type" && list.length > 1)
-          throw new Chat.ErrorMessage(`More than one ${k} param provided.`);
+        if (k !== "type" && list.length > 1) throw new Chat.ErrorMessage(`More than one ${k} param provided.`);
         const val = list[0];
         switch (k) {
           case "type":
@@ -649,11 +618,9 @@ const commands = {
     deletepunishment(target, room, user) {
       checkAccess(this);
       const num = parseInt(target) - 1;
-      if (isNaN(num))
-        return this.parse(`/h autohelpticket`);
+      if (isNaN(num)) return this.parse(`/h autohelpticket`);
       const punishment = settings.punishments[num];
-      if (!punishment)
-        throw new Chat.ErrorMessage(`There is no punishment at index ${num + 1}.`);
+      if (!punishment) throw new Chat.ErrorMessage(`There is no punishment at index ${num + 1}.`);
       settings.punishments.splice(num, 1);
       this.privateGlobalModAction(
         `${user.name} removed the Artemis helpticket ${punishment.punishment} punishment indexed at ${num + 1}`
@@ -697,13 +664,11 @@ const commands = {
       saveSettings();
     },
     stats(target) {
-      if (!target)
-        target = Chat.toTimestamp(new Date()).split(" ")[0];
+      if (!target) target = Chat.toTimestamp(/* @__PURE__ */ new Date()).split(" ")[0];
       return this.parse(`/j view-autohelpticket-stats-${target}`);
     },
     logs(target) {
-      if (!target)
-        target = Chat.toTimestamp(new Date()).split(" ")[0];
+      if (!target) target = Chat.toTimestamp(/* @__PURE__ */ new Date()).split(" ")[0];
       return this.parse(`/j view-autohelpticket-logs-${target}`);
     },
     resolve(target, room, user) {
@@ -716,7 +681,7 @@ const commands = {
       if (!["success", "failure"].includes(result)) {
         return this.popupReply(`The result must be 'success' or 'failure'.`);
       }
-      (ticket.state || (ticket.state = {})).recommendResult = result;
+      (ticket.state ||= {}).recommendResult = result;
       (0, import_helptickets.writeTickets)();
       Chat.refreshPageFor(`help-text-${ticketId}`, "staff");
     }
@@ -737,7 +702,7 @@ const pages = {
       if (query.length) {
         month = /[0-9]{4}-[0-9]{2}/.exec(query.join("-"))?.[0];
       } else {
-        month = Chat.toTimestamp(new Date()).split(" ")[0].slice(0, -3);
+        month = Chat.toTimestamp(/* @__PURE__ */ new Date()).split(" ")[0].slice(0, -3);
       }
       if (!month) {
         throw new Chat.ErrorMessage(`Invalid month. Must be in YYYY-MM format.`);
@@ -755,8 +720,7 @@ const pages = {
       const failed = [];
       for (const ticket of found) {
         const day = Chat.toTimestamp(new Date(ticket.created)).split(" ")[0];
-        if (!dayStats[day])
-          dayStats[day] = { successes: 0, failures: 0, total: 0 };
+        if (!dayStats[day]) dayStats[day] = { successes: 0, failures: 0, total: 0 };
         dayStats[day].total++;
         total.total++;
         switch (ticket.state.recommendResult) {
@@ -781,8 +745,7 @@ const pages = {
       const sortedDays = import_lib.Utils.sortBy(Object.keys(dayStats), (d) => new Date(d).getTime());
       for (const [i, day] of sortedDays.entries()) {
         const cur = dayStats[day];
-        if (!cur.total)
-          continue;
+        if (!cur.total) continue;
         header += `<th>${day.split("-")[2]} (${cur.total})</th>`;
         data += `<td><small>${cur.successes} (${percent(cur.successes, cur.total)}%)`;
         if (cur.failures) {
@@ -815,7 +778,7 @@ const pages = {
       if (query.length) {
         month = /[0-9]{4}-[0-9]{2}/.exec(query.join("-"))?.[0];
       } else {
-        month = Chat.toTimestamp(new Date()).split(" ")[0].slice(0, -3);
+        month = Chat.toTimestamp(/* @__PURE__ */ new Date()).split(" ")[0].slice(0, -3);
       }
       if (!month) {
         throw new Chat.ErrorMessage(`Invalid month. Must be in YYYY-MM format.`);
@@ -827,8 +790,7 @@ const pages = {
       if (allHits.length) {
         buf += `<strong>All hits:</strong><hr />`;
         for (const hit of allHits) {
-          if (!hit.recommended)
-            continue;
+          if (!hit.recommended) continue;
           buf += `<a href="/view-help-text-${hit.userid}">${hit.userid}</a> (${hit.type}) `;
           buf += `[${Chat.toTimestamp(new Date(hit.created))}]<br />`;
           buf += import_lib.Utils.html`&bull; <code><small>${hit.recommended.join(", ")}</small></code><hr />`;
