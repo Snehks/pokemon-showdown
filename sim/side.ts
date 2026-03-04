@@ -1186,6 +1186,17 @@ export class Side {
 				if (data) return this.emitChoiceError(`Unrecognized data after "pass": ${data}`);
 				if (!this.choosePass()) return false;
 				break;
+			case 'forcepass': {
+				// [PBO] Force-pass: skip the fainted/commanding check so a healthy
+				// Pokemon can pass its turn (used when a flee attempt fails in wild
+				// battles — the player's turn is consumed, only the wild mon acts).
+				const index = this.getChoiceIndex(true);
+				if (index >= this.active.length) return false;
+				this.choice.actions.push({
+					choice: 'pass',
+				} as ChosenAction);
+				break;
+			}
 			case 'auto':
 			case 'default':
 				this.autoChoose();

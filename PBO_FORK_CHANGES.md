@@ -28,8 +28,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 12 | `data/mods/pbo/abilities.ts` | Dynahax ability | Custom Dynamax raid boss ability — blocks non-move damage, status, specific moves/abilities, draining |
 | 13 | `sim/pokemon.ts` | Skip EV clamp for NPC format | PBO raid bosses use extreme EVs (e.g. 12M HP EV); skip 0-255 clamp when `format.id === 'gen9pbonpcnationaldex'` |
 | 14 | `config/custom-formats.ts` | PBO NPC National Dex format | `[Gen 9] PBO NPC National Dex` — NPC battles with unclamped EVs for raid bosses |
+| 15 | `sim/side.ts` | `forcepass` choice command | Allows passing a healthy Pokemon's turn (failed flee in wild battles) |
 
-**Total: 14 changes across 7 files.**
+**Total: 15 changes across 7 files.**
 
 ---
 
@@ -247,6 +248,23 @@ with far too little HP.
 
 **Why:** NPC battles need a separate format so that the EV clamp bypass (Change 13)
 only applies to NPC/raid battles, not to PvP or wild battles.
+
+---
+
+## Change 15: `forcepass` choice command (sim/side.ts)
+
+**Location:** `choose()` switch statement, after `case 'pass'` / `case 'skip'`.
+
+**What it does:** Adds a `forcepass` command that pushes a `pass` action without
+checking whether the Pokemon is fainted or commanding. Standard `pass` is rejected
+by Showdown for healthy Pokemon in `move` request state.
+
+**Why:** In the main series games, when a flee attempt fails, the player's turn is
+consumed — the wild Pokemon attacks while the player does nothing. PBO needs to tell
+Showdown to skip the player's action. Standard `pass` is only valid for fainted or
+commanding Pokemon, so `forcepass` bypasses that validation.
+
+**Usage from PBO server:** `battle.choose('p1', 'forcepass')` after a failed flee.
 
 ---
 
