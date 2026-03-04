@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../config/custom-formats.ts"],
+  "sourcesContent": ["// [PBO] Custom format for PBO battle engine.\n// No team validation rules \u2014 PBO validates server-side.\n\nexport const Formats: FormatList = [\n\t{section: \"PBO\"},\n\t{\n\t\tname: \"[Gen 9] PBO Standard Battle\",\n\t\tmod: 'pbo',\n\t\truleset: ['Cancel Mod', 'HP Percentage Mod'],\n\t},\n];\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAGO,MAAM,UAAsB;AAAA,EAClC,EAAC,SAAS,MAAK;AAAA,EACf;AAAA,IACC,MAAM;AAAA,IACN,KAAK;AAAA,IACL,SAAS,CAAC,cAAc,mBAAmB;AAAA,EAC5C;AACD;",
+  "names": []
+}
