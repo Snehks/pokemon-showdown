@@ -2335,7 +2335,7 @@ class Battle {
         const script = scripts?.[action.bagItemScript];
         if (script) {
           try {
-            this.add("|bagitem|" + action.target.getSlotIdent() + "|" + action.bagItemScript);
+            this.add("bagitem", action.target.getSlot(), action.bagItemScript);
             script.use(this, action.target, action.bagItemScript, action.bagItemData || []);
           } catch (e) {
             this.debug("[PBO] BagItem script error: " + e.message);
@@ -2810,3 +2810,4 @@ class Battle {
   }
 }
 //# sourceMappingURL=battle.js.map
+

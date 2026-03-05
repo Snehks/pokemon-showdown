@@ -2827,7 +2827,7 @@ export class Battle {
 			const script = scripts?.[action.bagItemScript];
 			if (script) {
 				try {
-					this.add('|bagitem|' + action.target.getSlotIdent() + '|' + action.bagItemScript);
+					this.add('bagitem', action.target.getSlot(), action.bagItemScript);
 					script.use(this, action.target, action.bagItemScript, action.bagItemData || []);
 				} catch (e: any) {
 					this.debug('[PBO] BagItem script error: ' + e.message);
@@ -3396,3 +3396,4 @@ export class Battle {
 		(this as any).log = [];
 	}
 }
+
