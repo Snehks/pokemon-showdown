@@ -2199,6 +2199,9 @@ class Battle {
       case "start": {
         for (const side of this.sides) {
           if (side.pokemonLeft) side.pokemonLeft = side.pokemon.length;
+          if (side.pokemonLeft) {
+            side.pokemonLeft = side.pokemon.filter((pk) => !pk.fainted).length;
+          }
           this.add("teamsize", side.id, side.pokemon.length);
         }
         this.add("start");
@@ -2689,9 +2692,6 @@ class Battle {
       side = new import_side.Side(options.name || `Player ${slotNum + 1}`, this, slotNum, team);
       if (options.avatar) side.avatar = `${options.avatar}`;
       this.sides[slotNum] = side;
-      if (side.pokemonLeft) {
-        side.pokemonLeft = side.pokemon.filter((pk) => !pk.fainted).length;
-      }
     } else {
       side = this.sides[slotNum];
       didSomething = false;
