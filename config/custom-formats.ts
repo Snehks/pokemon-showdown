@@ -13,4 +13,10 @@ export const Formats: FormatList = [
 		mod: 'pbo',
 		ruleset: ['Cancel Mod', 'HP Percentage Mod'],
 	},
+	{
+		name: "[Gen 9] PBO Doubles Battle",
+		mod: 'pbo',
+		gameType: 'doubles',
+		ruleset: ['Cancel Mod', 'HP Percentage Mod'],
+	},
 ];
