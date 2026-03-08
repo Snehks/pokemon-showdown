@@ -2587,6 +2587,10 @@ class Battle {
         side = split.side;
         secret.push(split.secret);
         shared.push(split.shared);
+        if (split.pboTag) {
+          secret.push(split.pboTag);
+          shared.push(split.pboTag);
+        }
       } else {
         secret.push(part);
         shared.push(part);
@@ -2810,4 +2814,3 @@ class Battle {
   }
 }
 //# sourceMappingURL=battle.js.map
-

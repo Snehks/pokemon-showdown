@@ -3119,7 +3119,7 @@ export class Battle {
 		}
 	}
 
-	add(...parts: (Part | (() => { side: SideID, secret: string, shared: string }))[]) {
+	add(...parts: (Part | (() => { side: SideID, secret: string, shared: string, pboTag?: string }))[]) {
 		if (!parts.some(part => typeof part === 'function')) {
 			this.log.push(`|${parts.join('|')}`);
 			return;
@@ -3135,6 +3135,10 @@ export class Battle {
 				side = split.side;
 				secret.push(split.secret);
 				shared.push(split.shared);
+				if (split.pboTag) {
+					secret.push(split.pboTag);
+					shared.push(split.pboTag);
+				}
 			} else {
 				secret.push(part);
 				shared.push(part);

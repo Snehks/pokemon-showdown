@@ -583,8 +583,7 @@ export class Pokemon {
 			);
 		}
 		if (this.terastallized) details += `, tera:${this.terastallized}`;
-		const pboTag = this.databaseId ? `|[pboId] ${this.databaseId}` : '';
-		return { side: health.side, secret: `${details}|${health.secret}${pboTag}`, shared: `${details}|${health.shared}${pboTag}` };
+		return { side: health.side, secret: `${details}|${health.secret}`, shared: `${details}|${health.shared}`, pboTag: health.pboTag };
 	};
 
 	updateSpeed() {
@@ -2083,7 +2082,8 @@ export class Pokemon {
 	}
 
 	getHealth = () => {
-		if (!this.hp) return { side: this.side.id, secret: '0 fnt', shared: '0 fnt' };
+		const pboTag = this.databaseId ? `[pboId] ${this.databaseId}` : '';
+		if (!this.hp) return { side: this.side.id, secret: '0 fnt', shared: '0 fnt', pboTag };
 		let secret = `${this.hp}/${this.maxhp}`;
 		let shared;
 		if (this.battle.reportExactHP) {
@@ -2116,7 +2116,7 @@ export class Pokemon {
 			secret += ` ${this.status}`;
 			shared += ` ${this.status}`;
 		}
-		return { side: this.side.id, secret, shared };
+		return { side: this.side.id, secret, shared, pboTag };
 	};
 
 	/**
