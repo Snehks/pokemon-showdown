@@ -20,4 +20,9 @@ exports.Formats = [
         mod: 'pbo',
         ruleset: ['Team Preview', 'Cancel Mod', 'HP Percentage Mod'],
     },
+    {
+        name: "[Gen 9] PBO PvP Battle No Preview",
+        mod: 'pbo',
+        ruleset: ['Cancel Mod', 'HP Percentage Mod'],
+    },
 ];

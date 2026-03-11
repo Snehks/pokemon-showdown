@@ -30,8 +30,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 14 | `config/custom-formats.ts` | PBO NPC National Dex format | `[Gen 9] PBO NPC National Dex` — NPC battles with unclamped EVs for raid bosses |
 | 15 | `sim/side.ts` | `forcepass` choice command | Allows passing a healthy Pokemon's turn (failed flee in wild battles) |
 | 16 | `config/custom-formats.ts` | PBO PvP Battle format | `[Gen 9] PBO PvP Battle` with Team Preview rule for PvP battles |
+| 17 | `config/custom-formats.ts` | PBO PvP No Preview format | `[Gen 9] PBO PvP Battle No Preview` — PvP without team preview |
 
-**Total: 16 changes across 7 files.**
+**Total: 17 changes across 7 files.**
 
 ---
 
@@ -285,6 +286,25 @@ wild/NPC battles where preview isn't needed.
 
 **Usage from PBO server:** Start a PvP battle with `format: 'gen9pbopvpbattle'` to
 get the `teampreview` request flow.
+
+---
+
+## Change 17: PBO PvP No Preview format (config/custom-formats.ts)
+
+**Location:** `config/custom-formats.ts`, after PBO PvP Battle entry.
+
+**What it does:** Adds a `[Gen 9] PBO PvP Battle No Preview` format
+(ID: `gen9pbopvpbattlenopreview`) without the `Team Preview` rule. Same as
+`gen9pbopvpbattle` but skips team preview, going straight to battle.
+
+**Ruleset:** `['Cancel Mod', 'HP Percentage Mod']`
+
+**Why:** Some PvP tiers (e.g., RANDOM) don't need team preview. This provides
+a PvP-specific format without preview, keeping PvP and NPC/wild formats separate
+for future rule divergence.
+
+**Usage from PBO server:** Start a no-preview PvP battle with
+`format: 'gen9pbopvpbattlenopreview'`.
 
 ---
 
