@@ -29,8 +29,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 13 | `sim/pokemon.ts` | Skip EV clamp for NPC format | PBO raid bosses use extreme EVs (e.g. 12M HP EV); skip 0-255 clamp when `format.id === 'gen9pbonpcnationaldex'` |
 | 14 | `config/custom-formats.ts` | PBO NPC National Dex format | `[Gen 9] PBO NPC National Dex` — NPC battles with unclamped EVs for raid bosses |
 | 15 | `sim/side.ts` | `forcepass` choice command | Allows passing a healthy Pokemon's turn (failed flee in wild battles) |
+| 16 | `config/custom-formats.ts` | PBO PvP Battle format | `[Gen 9] PBO PvP Battle` with Team Preview rule for PvP battles |
 
-**Total: 15 changes across 7 files.**
+**Total: 16 changes across 7 files.**
 
 ---
 
@@ -265,6 +266,25 @@ Showdown to skip the player's action. Standard `pass` is only valid for fainted 
 commanding Pokemon, so `forcepass` bypasses that validation.
 
 **Usage from PBO server:** `battle.choose('p1', 'forcepass')` after a failed flee.
+
+---
+
+## Change 16: PBO PvP Battle format (config/custom-formats.ts)
+
+**Location:** `config/custom-formats.ts`, after PBO NPC National Dex entry.
+
+**What it does:** Adds a `[Gen 9] PBO PvP Battle` format (ID: `gen9pbopvpbattle`)
+with the `Team Preview` rule. This enables Showdown to emit `teampreview` requests
+so players can select their lead Pokemon before a PvP battle starts.
+
+**Ruleset:** `['Team Preview', 'Cancel Mod', 'HP Percentage Mod']`
+
+**Why:** PvP battles need team preview so players can see each other's team and pick
+leads. The existing `gen9pbostandardbattle` format lacks Team Preview and is used for
+wild/NPC battles where preview isn't needed.
+
+**Usage from PBO server:** Start a PvP battle with `format: 'gen9pbopvpbattle'` to
+get the `teampreview` request flow.
 
 ---
 

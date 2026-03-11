@@ -13,4 +13,9 @@ export const Formats: FormatList = [
 		mod: 'pbo',
 		ruleset: ['Cancel Mod', 'HP Percentage Mod'],
 	},
+	{
+		name: "[Gen 9] PBO PvP Battle",
+		mod: 'pbo',
+		ruleset: ['Team Preview', 'Cancel Mod', 'HP Percentage Mod'],
+	},
 ];
