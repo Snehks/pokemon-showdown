@@ -1197,6 +1197,10 @@ export class Side {
 				} as ChosenAction);
 				break;
 			}
+			case 'forfeit':
+				// [PBO] Player forfeits — award win to opponent immediately.
+				this.battle.win(this.foe);
+				return true;
 			case 'auto':
 			case 'default':
 				this.autoChoose();
