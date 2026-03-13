@@ -1015,7 +1015,10 @@ const OFFICIAL_AVATARS_BRUMIRAGE = /* @__PURE__ */ new Set([
   "yellgruntf",
   "zisu",
   "miku-flying",
-  "miku-ground"
+  "miku-ground",
+  "jacinthe",
+  "rainbowrocketgrunt",
+  "rainbowrocketgruntf"
 ]);
 const OFFICIAL_AVATARS_ZACWEAVILE = /* @__PURE__ */ new Set([
   "alain",
@@ -1629,7 +1632,20 @@ const OFFICIAL_AVATARS_KYLEDOVE = /* @__PURE__ */ new Set([
   "may-masters4",
   "morty-masters3",
   "selene-masters2",
-  "shauntal-masters"
+  "shauntal-masters",
+  "ansha",
+  "ansha-cook",
+  "canari",
+  "corbeau",
+  "grisham",
+  "gwynn",
+  "ivor",
+  "lebanne",
+  "phillipe",
+  "sbcmember",
+  "tarragon",
+  "taunie",
+  "urbain"
 ]);
 const OFFICIAL_AVATARS_HYOOPPA = /* @__PURE__ */ new Set([
   "brendan",

@@ -841,11 +841,13 @@ const Formats = [
     column: 2
   },
   {
-    name: "[Gen 9] BSS Factory (Bo3)",
-    desc: `Randomized 3v3 Singles featuring Pok&eacute;mon and movesets popular in Battle Stadium Singles.`,
-    mod: "gen9",
-    team: "randomBSSFactory",
-    ruleset: ["Flat Rules", "VGC Timer", "Best of = 3"]
+    name: "[Gen 9] Godly Gift Random Battle",
+    desc: `Each Pok&eacute;mon receives one base stat from the God in the first slot depending on its position in the team.`,
+    team: "randomGodlyGift",
+    ruleset: ["[Gen 9] Random Battle", "Godly Gift Mod", "Team Preview"],
+    onBegin() {
+      this.add(`raw|<div class="broadcast-blue"><b>In this format, the "God" in the first slot has "gifted" (shared) its base attack to the Pok&eacute;mon in the second slot, defense to the one in the third slot, etc."`);
+    }
   },
   {
     name: "[Gen 9] Linked",
@@ -908,6 +910,7 @@ const Formats = [
       "Zamazenta-Crowned",
       "Zekrom",
       "Arena Trap",
+      "Chlorophyll",
       "Drought",
       "Electric Surge",
       "Moody",
@@ -933,6 +936,7 @@ const Formats = [
       "Detect",
       "Dig",
       "Dive",
+      "Electric Terrain",
       "Encore",
       "Fly",
       "Imprison",
@@ -944,6 +948,7 @@ const Formats = [
       "Shell Smash",
       "Silk Trap",
       "Spiky Shield",
+      "Sunny Day",
       "Super Fang",
       "Swords Dance",
       "Taunt",
@@ -8870,7 +8875,7 @@ const Formats = [
     name: "[Gen 8] Anything Goes",
     mod: "gen8",
     searchShow: false,
-    ruleset: ["Obtainable", "Team Preview", "HP Percentage Mod", "Cancel Mod", "Endless Battle Clause"]
+    ruleset: ["Standard AG"]
   },
   {
     name: "[Gen 8] ZU",
@@ -9192,7 +9197,7 @@ const Formats = [
     name: "[Gen 7] Anything Goes",
     mod: "gen7",
     searchShow: false,
-    ruleset: ["Obtainable", "Team Preview", "HP Percentage Mod", "Cancel Mod", "Endless Battle Clause"]
+    ruleset: ["Standard AG"]
   },
   {
     name: "[Gen 7] ZU",
@@ -9482,7 +9487,7 @@ const Formats = [
     name: "[Gen 6] Anything Goes",
     mod: "gen6",
     searchShow: false,
-    ruleset: ["Obtainable", "Team Preview", "Endless Battle Clause", "HP Percentage Mod", "Cancel Mod"]
+    ruleset: ["Standard AG"]
   },
   {
     name: "[Gen 6] ZU",
@@ -9904,7 +9909,7 @@ const Formats = [
     name: "[Gen 4] Anything Goes",
     mod: "gen4",
     searchShow: false,
-    ruleset: ["Obtainable", "Endless Battle Clause", "HP Percentage Mod", "Cancel Mod"]
+    ruleset: ["Standard AG"]
   },
   {
     name: "[Gen 4] 1v1",
@@ -10295,8 +10300,7 @@ const Formats = [
       "Item Clause = 1",
       "Open Team Sheets"
     ],
-    banlist: ["Soul Dew", "Deoxys-Defense", "Deoxys-Attack", "Deoxys-Speed", "Restricted Legendary", "Mythical"],
-    unbanlist: ["Latios", "Latias", "Wobbuffet", "Wynaut"],
+    banlist: ["Restricted Legendary", "Mythical", "Soul Dew"],
     bestOfDefault: true,
     onBegin() {
       this.add("rule", "Self-KO Clause: If your last Pok\xE9mon faints to a self-KO move or effect, you will lose the battle");

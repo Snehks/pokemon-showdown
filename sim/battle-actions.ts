@@ -1652,8 +1652,11 @@ export class BattleActions {
 		if (!basePower) return 0;
 		basePower = this.battle.clampIntRange(basePower, 1);
 		// Hacked Max Moves have 0 base power, even if you Dynamax
+		// [PBO] Dynahax raid bosses use Max/G-Max moves natively — skip zeroing
 		if ((!source.volatiles['dynamax'] && move.isMax) || (move.isMax && this.dex.moves.get(move.baseMove).isMax)) {
-			basePower = 0;
+			if (!source.hasAbility('dynahax')) {
+				basePower = 0;
+			}
 		}
 
 		const dexMove = this.dex.moves.get(move.id);

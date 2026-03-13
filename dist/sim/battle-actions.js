@@ -1405,7 +1405,9 @@ class BattleActions {
     if (!basePower) return 0;
     basePower = this.battle.clampIntRange(basePower, 1);
     if (!source.volatiles["dynamax"] && move.isMax || move.isMax && this.dex.moves.get(move.baseMove).isMax) {
-      basePower = 0;
+      if (!source.hasAbility("dynahax")) {
+        basePower = 0;
+      }
     }
     const dexMove = this.dex.moves.get(move.id);
     if (source.terastallized && (source.terastallized === "Stellar" ? !source.stellarBoostedTypes.includes(move.type) : source.hasType(move.type)) && basePower < 60 && dexMove.priority <= 0 && !dexMove.multihit && // Hard move.basePower check for moves like Dragon Energy that have variable BP

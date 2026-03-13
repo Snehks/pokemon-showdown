@@ -31,8 +31,10 @@ these changes by searching for `[PBO]` comments in the source.
 | 15 | `sim/side.ts` | `forcepass` choice command | Allows passing a healthy Pokemon's turn (failed flee in wild battles) |
 | 16 | `config/custom-formats.ts` | PBO PvP Battle format | `[Gen 9] PBO PvP Battle` with Team Preview rule for PvP battles |
 | 17 | `config/custom-formats.ts` | PBO PvP No Preview format | `[Gen 9] PBO PvP Battle No Preview` — PvP without team preview |
+| 18 | `sim/side.ts` | `forfeit` choice command | Calls `battle.win(foe)` for instant forfeit |
+| 19 | `sim/battle-actions.ts`, `data/mods/pbo/abilities.ts` | Dynahax Max move power | Skip BP zeroing for Dynahax + boost Max/G-Max BP to 130 |
 
-**Total: 17 changes across 7 files.**
+**Total: 19 changes across 7 files.**
 
 ---
 
@@ -305,6 +307,47 @@ for future rule divergence.
 
 **Usage from PBO server:** Start a no-preview PvP battle with
 `format: 'gen9pbopvpbattlenopreview'`.
+
+---
+
+## Change 18: `forfeit` choice command (sim/side.ts)
+
+**Location:** `choose()` switch statement, after `case 'forcepass'`.
+
+**What it does:** Adds a `forfeit` command that immediately ends the battle by calling
+`this.battle.win(this.foe)`. The forfeiting player's opponent wins instantly.
+
+**Why:** PBO needs a way for players to forfeit mid-battle. Standard Showdown doesn't
+expose a simple forfeit command through the choice system.
+
+**Usage from PBO server:** `battle.choose('p1', 'forfeit')` to forfeit as player 1.
+
+---
+
+## Change 19: Dynahax Max move power (sim/battle-actions.ts, data/mods/pbo/abilities.ts)
+
+**Problem:** Dynamax raid bosses have G-Max/Max moves directly in their moveset but never
+actually Dynamax in the engine (they're conceptually "always dynamaxed"). Two issues:
+
+1. `battle-actions.ts` forces `basePower = 0` for any Max/G-Max move when the Pokemon
+   lacks the `dynamax` volatile
+2. G-Max moves have `basePower: 10` in their data — normally the real power is derived
+   from the base move during Dynamax transformation, but there's no transformation here
+
+**Fix (two parts):**
+
+1. **`sim/battle-actions.ts`** — Skip the BP zeroing check when the source has the
+   Dynahax ability. Non-Dynahax Pokemon using hacked Max moves still get zeroed.
+
+2. **`data/mods/pbo/abilities.ts`** — `onBasePower` handler boosts any Max/G-Max move
+   with `basePower <= 10` to 130 (standard G-Max power for ~90 BP base moves).
+
+**Why both:** The `onBasePower` event fires before the zeroing check in `battle-actions.ts`,
+so both changes are needed — the ability sets the correct power, and the zeroing bypass
+preserves it.
+
+**Scoping:** Only affects Pokemon with the Dynahax ability (raid bosses). No impact on
+PvP, wild battles, or standard Dynamax.
 
 ---
 

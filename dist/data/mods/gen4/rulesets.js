@@ -22,9 +22,26 @@ __export(rulesets_exports, {
 });
 module.exports = __toCommonJS(rulesets_exports);
 const Rulesets = {
+  standardag: {
+    inherit: true,
+    ruleset: [
+      "Obtainable",
+      "HP Percentage Mod",
+      "Cancel Mod",
+      "Endless Battle Clause"
+    ]
+  },
   standard: {
     inherit: true,
-    ruleset: ["Obtainable", "Sleep Clause Mod", "Species Clause", "Nickname Clause", "OHKO Clause", "Evasion Items Clause", "Evasion Moves Clause", "Endless Battle Clause", "HP Percentage Mod", "Cancel Mod"]
+    ruleset: [
+      "Standard AG",
+      "Sleep Clause Mod",
+      "Species Clause",
+      "Nickname Clause",
+      "OHKO Clause",
+      "Evasion Items Clause",
+      "Evasion Moves Clause"
+    ]
   },
   flatrules: {
     inherit: true,

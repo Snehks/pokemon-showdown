@@ -5233,7 +5233,7 @@ const FormatsData = {
   zamazentacrowned: {
     tier: "Uber",
     doublesTier: "DUber",
-    natDexTier: "OU"
+    natDexTier: "Uber"
   },
   eternatus: {
     tier: "Uber",

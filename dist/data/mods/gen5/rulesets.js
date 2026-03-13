@@ -25,17 +25,13 @@ const Rulesets = {
   standard: {
     inherit: true,
     ruleset: [
-      "Obtainable",
-      "Team Preview",
+      "Standard AG",
       "Species Clause",
       "Nickname Clause",
       "OHKO Clause",
       "Moody Clause",
       "Evasion Items Clause",
-      "Evasion Moves Clause",
-      "Endless Battle Clause",
-      "HP Percentage Mod",
-      "Cancel Mod"
+      "Evasion Moves Clause"
     ]
   },
   obtainablemoves: {

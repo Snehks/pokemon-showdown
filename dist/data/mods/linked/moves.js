@@ -235,13 +235,9 @@ const Moves = {
       onDisableMove(pokemon) {
         const lastMove = pokemon.lastMove;
         if (!lastMove || lastMove.id === "struggle") return;
-        if (pokemon.hasLinkedMove(lastMove)) {
-          for (const move of pokemon.getLinkedMoves()) {
-            pokemon.disableMove(move.id);
-          }
-        } else {
-          pokemon.disableMove(lastMove.id);
-        }
+        pokemon.disableMove(lastMove.id);
+        const { linkIndex, linkedMoves } = pokemon.queryLinkMove(lastMove);
+        if (linkIndex >= 0) pokemon.disableMove(linkedMoves[1 - linkIndex].id);
       }
     }
   },

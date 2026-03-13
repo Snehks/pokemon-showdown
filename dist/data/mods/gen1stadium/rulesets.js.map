@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../../../../data/mods/gen1stadium/rulesets.ts"],
-  "sourcesContent": ["export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable = {\r\n\tstandard: {\r\n\t\teffectType: 'ValidatorRule',\r\n\t\tname: 'Standard',\r\n\t\truleset: ['Obtainable', 'Stadium Sleep Clause', 'Freeze Clause Mod', 'Species Clause', 'Nickname Clause', 'OHKO Clause', 'Evasion Moves Clause', 'Exact HP Mod', 'Cancel Mod'],\r\n\t},\r\n};\r\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,WAAqE;AAAA,EACjF,UAAU;AAAA,IACT,YAAY;AAAA,IACZ,MAAM;AAAA,IACN,SAAS,CAAC,cAAc,wBAAwB,qBAAqB,kBAAkB,mBAAmB,eAAe,wBAAwB,gBAAgB,YAAY;AAAA,EAC9K;AACD;",
+  "sourcesContent": ["export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable = {\r\n\tstandardag: {\r\n\t\tinherit: true,\r\n\t\truleset: [\r\n\t\t\t'Obtainable', 'Exact HP Mod', 'Cancel Mod',\r\n\t\t],\r\n\t},\r\n\tstandard: {\r\n\t\teffectType: 'ValidatorRule',\r\n\t\tname: 'Standard',\r\n\t\truleset: [\r\n\t\t\t'Standard AG',\r\n\t\t\t'Stadium Sleep Clause', 'Freeze Clause Mod', 'Species Clause', 'Nickname Clause', 'OHKO Clause', 'Evasion Moves Clause',\r\n\t\t],\r\n\t},\r\n};\r\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,WAAqE;AAAA,EACjF,YAAY;AAAA,IACX,SAAS;AAAA,IACT,SAAS;AAAA,MACR;AAAA,MAAc;AAAA,MAAgB;AAAA,IAC/B;AAAA,EACD;AAAA,EACA,UAAU;AAAA,IACT,YAAY;AAAA,IACZ,MAAM;AAAA,IACN,SAAS;AAAA,MACR;AAAA,MACA;AAAA,MAAwB;AAAA,MAAqB;AAAA,MAAkB;AAAA,MAAmB;AAAA,MAAe;AAAA,IAClG;AAAA,EACD;AACD;",
   "names": []
 }

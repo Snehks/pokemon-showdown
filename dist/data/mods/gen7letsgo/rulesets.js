@@ -24,11 +24,26 @@ module.exports = __toCommonJS(rulesets_exports);
 const Rulesets = {
   standard: {
     inherit: true,
-    ruleset: ["LGPE Normal Rules", "Obtainable", "Team Preview", "Species Clause", "Nickname Clause", "OHKO Clause", "Evasion Moves Clause", "HP Percentage Mod", "Cancel Mod", "Sleep Clause Mod"]
+    ruleset: [
+      "Standard AG",
+      "LGPE Normal Rules",
+      "Species Clause",
+      "Nickname Clause",
+      "OHKO Clause",
+      "Evasion Moves Clause",
+      "Sleep Clause Mod"
+    ]
   },
   standarddoubles: {
     inherit: true,
-    ruleset: ["LGPE Normal Rules", "Obtainable", "Team Preview", "Species Clause", "Nickname Clause", "OHKO Clause", "Evasion Moves Clause", "HP Percentage Mod", "Cancel Mod"]
+    ruleset: [
+      "Standard AG",
+      "LGPE Normal Rules",
+      "Species Clause",
+      "Nickname Clause",
+      "OHKO Clause",
+      "Evasion Moves Clause"
+    ]
   }
 };
 //# sourceMappingURL=rulesets.js.map

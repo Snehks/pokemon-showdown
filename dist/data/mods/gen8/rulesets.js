@@ -25,47 +25,35 @@ const Rulesets = {
   standard: {
     inherit: true,
     ruleset: [
-      "Obtainable",
-      "Team Preview",
+      "Standard AG",
       "Sleep Clause Mod",
       "Species Clause",
       "Nickname Clause",
       "OHKO Clause",
       "Evasion Items Clause",
-      "Evasion Moves Clause",
-      "Endless Battle Clause",
-      "HP Percentage Mod",
-      "Cancel Mod"
+      "Evasion Moves Clause"
     ]
   },
   standarddoubles: {
     inherit: true,
     ruleset: [
-      "Obtainable",
-      "Team Preview",
+      "Standard AG",
       "Species Clause",
       "Nickname Clause",
       "OHKO Clause",
       "Evasion Moves Clause",
-      "Gravity Sleep Clause",
-      "Endless Battle Clause",
-      "HP Percentage Mod",
-      "Cancel Mod"
+      "Gravity Sleep Clause"
     ]
   },
   standardoms: {
     inherit: true,
     ruleset: [
-      "Obtainable",
-      "Team Preview",
+      "Standard AG",
       "Species Clause",
       "Nickname Clause",
       "OHKO Clause",
       "Evasion Moves Clause",
-      "Endless Battle Clause",
       "Dynamax Clause",
-      "HP Percentage Mod",
-      "Cancel Mod",
       "Overflow Stat Mod"
     ]
   },

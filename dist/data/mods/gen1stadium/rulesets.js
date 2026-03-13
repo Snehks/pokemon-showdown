@@ -22,10 +22,26 @@ __export(rulesets_exports, {
 });
 module.exports = __toCommonJS(rulesets_exports);
 const Rulesets = {
+  standardag: {
+    inherit: true,
+    ruleset: [
+      "Obtainable",
+      "Exact HP Mod",
+      "Cancel Mod"
+    ]
+  },
   standard: {
     effectType: "ValidatorRule",
     name: "Standard",
-    ruleset: ["Obtainable", "Stadium Sleep Clause", "Freeze Clause Mod", "Species Clause", "Nickname Clause", "OHKO Clause", "Evasion Moves Clause", "Exact HP Mod", "Cancel Mod"]
+    ruleset: [
+      "Standard AG",
+      "Stadium Sleep Clause",
+      "Freeze Clause Mod",
+      "Species Clause",
+      "Nickname Clause",
+      "OHKO Clause",
+      "Evasion Moves Clause"
+    ]
   }
 };
 //# sourceMappingURL=rulesets.js.map

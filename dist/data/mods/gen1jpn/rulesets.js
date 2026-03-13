@@ -25,7 +25,15 @@ const Rulesets = {
   standard: {
     effectType: "ValidatorRule",
     name: "Standard",
-    ruleset: ["Obtainable", "Desync Clause Mod", "Sleep Clause Mod", "Freeze Clause Mod", "Species Clause", "Nickname Clause", "OHKO Clause", "Evasion Moves Clause", "Endless Battle Clause", "HP Percentage Mod", "Cancel Mod"],
+    ruleset: [
+      "Standard AG",
+      "Sleep Clause Mod",
+      "Freeze Clause Mod",
+      "Species Clause",
+      "Nickname Clause",
+      "OHKO Clause",
+      "Evasion Moves Clause"
+    ],
     banlist: ["Dig", "Fly"]
   },
   nc1997movelegality: {

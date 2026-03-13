@@ -12,6 +12,14 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 			if (effect.effectType !== 'Move') return false;
 		},
 
+		// [PBO] Max/G-Max moves used natively have basePower 10 in move data.
+		// Boost to 130 (standard G-Max power derived from ~90 BP base moves).
+		onBasePower(basePower, attacker, defender, move) {
+			if (move.isMax && basePower <= 10) {
+				return 130;
+			}
+		},
+
 		// Immune to all status conditions
 		// Mirrors: canAddStatus → always false
 		onSetStatus(status, target, source, effect) {

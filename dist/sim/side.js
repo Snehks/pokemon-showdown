@@ -909,6 +909,9 @@ ${sideUpdate}`);
           });
           break;
         }
+        case "forfeit":
+          this.battle.win(this.foe);
+          return true;
         case "auto":
         case "default":
           this.autoChoose();

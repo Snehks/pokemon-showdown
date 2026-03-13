@@ -1805,6 +1805,153 @@ class RandomTeams {
     }
     return pokemon;
   }
+  randomGodlyGiftTeam() {
+    this.enforceNoDirectCustomBanlistChanges();
+    const seed = this.prng.getSeed();
+    const ruleTable = this.dex.formats.getRuleTable(this.format);
+    const pokemon = [];
+    const isMonotype = !!this.forceMonotype || ruleTable.has("sametypeclause");
+    const isDoubles = this.format.gameType !== "singles";
+    const typePool = this.dex.types.names().filter((name) => name !== "Stellar");
+    const type = this.forceMonotype || this.sample(typePool);
+    const usePotD = global.Config && Config.potd && ruleTable.has("potd");
+    const potd = usePotD ? this.dex.species.get(Config.potd) : null;
+    const baseFormes = {};
+    const typeCount = {};
+    const typeComboCount = {};
+    const typeWeaknesses = {};
+    const typeDoubleWeaknesses = {};
+    const teamDetails = {};
+    let numMaxLevelPokemon = 0;
+    const pokemonList = isDoubles ? Object.keys(this.randomDoublesSets) : Object.keys(this.randomSets);
+    const godPokemonList = pokemonList.filter((poke) => {
+      const baseStats = this.dex.species.get(poke).baseStats;
+      return baseStats.atk + baseStats.def + baseStats.spa + baseStats.spd + baseStats.spe >= 510;
+    });
+    const [pokemonPool, baseSpeciesPool] = this.getPokemonPool(type, pokemon, isMonotype, pokemonList);
+    const [godPokemonPool, godBaseSpeciesPool] = this.getPokemonPool(type, pokemon, isMonotype, godPokemonList);
+    while (baseSpeciesPool.length && pokemon.length < this.maxTeamSize) {
+      let baseSpecies, species;
+      if (pokemon.length === 0) {
+        baseSpecies = this.sampleNoReplace(godBaseSpeciesPool);
+        species = this.dex.species.get(this.sample(godPokemonPool[baseSpecies]));
+      } else {
+        baseSpecies = this.sampleNoReplace(baseSpeciesPool);
+        species = this.dex.species.get(this.sample(pokemonPool[baseSpecies]));
+        if (pokemon.length < 6) {
+          const s = ["hp", "atk", "def", "spa", "spd", "spe"];
+          const passedStatName = s[pokemon.length];
+          const passedStat = this.dex.species.get(pokemon[0].speciesId).baseStats[passedStatName];
+          if (Math.max(passedStat, 50) < species.baseStats[passedStatName]) continue;
+        }
+      }
+      if (!species.exists) continue;
+      if (baseFormes[species.baseSpecies]) continue;
+      if (["ogerpon", "ogerponhearthflame", "terapagos"].includes(species.id) && teamDetails.teraBlast) continue;
+      if (species.baseSpecies === "Zoroark" && pokemon.length >= this.maxTeamSize - 1) continue;
+      const types = species.types;
+      const typeCombo = types.slice().sort().join();
+      const weakToFreezeDry = this.dex.getEffectiveness("Ice", species) > 0 || this.dex.getEffectiveness("Ice", species) > -2 && types.includes("Water");
+      const limitFactor = Math.round(this.maxTeamSize / 6) || 1;
+      if (!isMonotype && !this.forceMonotype) {
+        let skip = false;
+        for (const typeName of types) {
+          if (typeCount[typeName] >= 2 * limitFactor) {
+            skip = true;
+            break;
+          }
+        }
+        if (skip) continue;
+        for (const typeName of this.dex.types.names()) {
+          if (this.dex.getEffectiveness(typeName, species) > 0) {
+            if (!typeWeaknesses[typeName]) typeWeaknesses[typeName] = 0;
+            if (typeWeaknesses[typeName] >= 3 * limitFactor) {
+              skip = true;
+              break;
+            }
+          }
+          if (this.dex.getEffectiveness(typeName, species) > 1) {
+            if (!typeDoubleWeaknesses[typeName]) typeDoubleWeaknesses[typeName] = 0;
+            if (typeDoubleWeaknesses[typeName] >= limitFactor) {
+              skip = true;
+              break;
+            }
+          }
+        }
+        if (skip) continue;
+        if (this.dex.getEffectiveness("Fire", species) === 0 && Object.values(species.abilities).filter((a) => ["Dry Skin", "Fluffy"].includes(a)).length) {
+          if (!typeWeaknesses["Fire"]) typeWeaknesses["Fire"] = 0;
+          if (typeWeaknesses["Fire"] >= 3 * limitFactor) continue;
+        }
+        if (weakToFreezeDry) {
+          if (!typeWeaknesses["Freeze-Dry"]) typeWeaknesses["Freeze-Dry"] = 0;
+          if (typeWeaknesses["Freeze-Dry"] >= 4 * limitFactor) continue;
+        }
+        if (!this.adjustLevel && this.getLevel(species, isDoubles) === 100 && numMaxLevelPokemon >= limitFactor) {
+          continue;
+        }
+        if (!this.getPokemonCompatibility(species, pokemon, isDoubles)) continue;
+      }
+      if (!this.forceMonotype && isMonotype && typeComboCount[typeCombo] >= 3 * limitFactor) continue;
+      if (potd?.exists && (pokemon.length === 1 || this.maxTeamSize === 1)) species = potd;
+      const set = this.randomSet(species, teamDetails, false, isDoubles);
+      pokemon.push(set);
+      if (pokemon.length === this.maxTeamSize) break;
+      baseFormes[species.baseSpecies] = 1;
+      for (const typeName of types) {
+        if (typeName in typeCount) {
+          typeCount[typeName]++;
+        } else {
+          typeCount[typeName] = 1;
+        }
+      }
+      if (typeCombo in typeComboCount) {
+        typeComboCount[typeCombo]++;
+      } else {
+        typeComboCount[typeCombo] = 1;
+      }
+      for (const typeName of this.dex.types.names()) {
+        if (this.dex.getEffectiveness(typeName, species) > 0) {
+          typeWeaknesses[typeName]++;
+        }
+        if (this.dex.getEffectiveness(typeName, species) > 1) {
+          typeDoubleWeaknesses[typeName]++;
+        }
+      }
+      if (["Dry Skin", "Fluffy"].includes(set.ability) && this.dex.getEffectiveness("Fire", species) === 0) {
+        typeWeaknesses["Fire"]++;
+      }
+      if (weakToFreezeDry) typeWeaknesses["Freeze-Dry"]++;
+      if (set.level === 100) numMaxLevelPokemon++;
+      if (set.ability === "Drizzle" || set.moves.includes("raindance")) teamDetails.rain = 1;
+      if (set.ability === "Drought" || set.ability === "Orichalcum Pulse" || set.moves.includes("sunnyday")) {
+        teamDetails.sun = 1;
+      }
+      if (set.ability === "Sand Stream") teamDetails.sand = 1;
+      if (set.ability === "Snow Warning" || set.moves.includes("snowscape") || set.moves.includes("chillyreception")) {
+        teamDetails.snow = 1;
+      }
+      if (set.moves.includes("healbell")) teamDetails.statusCure = 1;
+      if (set.moves.includes("spikes") || set.moves.includes("ceaselessedge")) {
+        teamDetails.spikes = (teamDetails.spikes || 0) + 1;
+      }
+      if (set.moves.includes("toxicspikes") || set.ability === "Toxic Debris") teamDetails.toxicSpikes = 1;
+      if (set.moves.includes("stealthrock") || set.moves.includes("stoneaxe")) teamDetails.stealthRock = 1;
+      if (set.moves.includes("stickyweb")) teamDetails.stickyWeb = 1;
+      if (set.moves.includes("defog")) teamDetails.defog = 1;
+      if (set.moves.includes("rapidspin") || set.moves.includes("mortalspin")) teamDetails.rapidSpin = 1;
+      if (set.moves.includes("auroraveil") || set.moves.includes("reflect") && set.moves.includes("lightscreen")) {
+        teamDetails.screens = 1;
+      }
+      if (set.role === "Tera Blast user" || ["ogerpon", "ogerponhearthflame", "terapagos"].includes(species.id)) {
+        teamDetails.teraBlast = 1;
+      }
+    }
+    if (pokemon.length < this.maxTeamSize && pokemon.length < 12) {
+      throw new Error(`Could not build a random team for ${this.format} (seed=${seed})`);
+    }
+    return pokemon;
+  }
   randomCCTeam() {
     this.enforceNoDirectCustomBanlistChanges();
     const dex = this.dex;
