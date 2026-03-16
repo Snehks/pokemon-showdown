@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../data/mods/pbo/rulesets.ts"],
+  "sourcesContent": ["export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable = {\r\n\tnosturdywild: {\r\n\t\teffectType: 'Rule',\r\n\t\tname: 'No Sturdy Wild',\r\n\t\tdesc: \"Sturdy is suppressed for wild Pokemon (p2).\",\r\n\t\tonSwitchIn(pokemon) {\r\n\t\t\tif (pokemon.side === this.sides[1] && pokemon.ability === 'sturdy') {\r\n\t\t\t\tpokemon.ability = '' as ID;\r\n\t\t\t}\r\n\t\t},\r\n\t},\r\n};\r\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,WAAqE;AAAA,EACjF,cAAc;AAAA,IACb,YAAY;AAAA,IACZ,MAAM;AAAA,IACN,MAAM;AAAA,IACN,WAAW,SAAS;AACnB,UAAI,QAAQ,SAAS,KAAK,MAAM,CAAC,KAAK,QAAQ,YAAY,UAAU;AACnE,gBAAQ,UAAU;AAAA,MACnB;AAAA,IACD;AAAA,EACD;AACD;",
+  "names": []
+}

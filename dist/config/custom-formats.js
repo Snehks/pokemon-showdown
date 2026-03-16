@@ -39,6 +39,11 @@ const Formats = [
     ruleset: ["Team Preview", "Cancel Mod", "HP Percentage Mod"]
   },
   {
+    name: "[Gen 9] PBO Wild Battle",
+    mod: "pbo",
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "No Sturdy Wild"]
+  },
+  {
     name: "[Gen 9] PBO PvP Battle No Preview",
     mod: "pbo",
     ruleset: ["Cancel Mod", "HP Percentage Mod"]
