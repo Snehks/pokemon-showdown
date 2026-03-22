@@ -6,7 +6,7 @@
 // These are purely visual skins (Halloween, Christmas, Summer, Valentine, Easter)
 // that share stats/abilities/moves with their base species.
 // Format: [eventId, baseShowdownId, displayName, forme]
-// Auto-generated from pokemondata.json — 373 event forms.
+// Auto-generated from pokemondata.json — 375 event forms.
 const PBO_EVENT_FORMS: [string, string, string, string][] = [
 	["abomasnowc", "abomasnow", "Abomasnow-C", "C"],
 	["absolh", "absol", "Absol-H", "H"],
@@ -66,7 +66,9 @@ const PBO_EVENT_FORMS: [string, string, string, string][] = [
 	["chesnaughts", "chesnaught", "Chesnaught-S", "S"],
 	["cinderaceh", "cinderace", "Cinderace-H", "H"],
 	["cinderaceh4", "cinderace", "Cinderace-H4", "H4"],
+	["clefablec", "clefable", "Clefable-C", "C"],
 	["clefablec4", "clefable", "Clefable-C4", "C4"],
+	["clefairyc", "clefairy", "Clefairy-C", "C"],
 	["cloysterc4", "cloyster", "Cloyster-C4", "C4"],
 	["cloysterh", "cloyster", "Cloyster-H", "H"],
 	["cobalionh4", "cobalion", "Cobalion-H4", "H4"],
