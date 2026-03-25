@@ -33,8 +33,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 17 | `config/custom-formats.ts` | PBO PvP No Preview format | `[Gen 9] PBO PvP Battle No Preview` — PvP without team preview |
 | 18 | `sim/side.ts` | `forfeit` choice command | Calls `battle.win(foe)` for instant forfeit |
 | 19 | `sim/battle-actions.ts`, `data/mods/pbo/abilities.ts` | Dynahax Max move power | Skip BP zeroing for Dynahax + boost Max/G-Max BP to 130 |
+| 20 | `config/custom-formats.ts` | Gimmick clauses | Add Terastal/Z-Move/Dynamax Clause to all PBO formats |
 
-**Total: 19 changes across 7 files.**
+**Total: 20 changes across 7 files.**
 
 ---
 
@@ -348,6 +349,28 @@ preserves it.
 
 **Scoping:** Only affects Pokemon with the Dynahax ability (raid bosses). No impact on
 PvP, wild battles, or standard Dynamax.
+
+---
+
+## Change 20: Gimmick clauses on all PBO formats (config/custom-formats.ts)
+
+**What it does:** Adds `Terastal Clause`, `Z-Move Clause`, and `Dynamax Clause` to
+the ruleset of all five PBO custom formats (Standard, NPC, PvP, Wild, PvP No Preview).
+
+**Effect:** In all PBO formats:
+- Terastallization is disabled (`canTerastallize = null` on all Pokemon at battle start)
+- Z-Moves are banned (Z-Crystal validation + rule announcement)
+- Dynamax is disabled (`dynamaxUsed = true` on all sides at battle start)
+
+**Not affected:** Showdown's built-in `gen{1-9}randombattle` formats (used by PBO's
+Random Battle mode) are untouched and retain all gimmick mechanics.
+
+**Dynahax compatibility:** Dynamax Clause prevents the Dynamax *action*, but Dynahax
+raid bosses never Dynamax — they have G-Max/Max moves directly in their moveset. The
+Dynahax ability handles power scaling independently. Confirmed safe by integration tests.
+
+**Why:** PBO restricts Tera, Z-Moves, and Dynamax to Random Battles only. These mechanics
+are not part of the standard PBO battle experience.
 
 ---
 

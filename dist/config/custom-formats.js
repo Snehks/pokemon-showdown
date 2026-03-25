@@ -26,27 +26,27 @@ const Formats = [
   {
     name: "[Gen 9] PBO Standard Battle",
     mod: "pbo",
-    ruleset: ["Cancel Mod", "HP Percentage Mod"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO NPC National Dex",
     mod: "pbo",
-    ruleset: ["Cancel Mod", "HP Percentage Mod"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO PvP Battle",
     mod: "pbo",
-    ruleset: ["Team Preview", "Cancel Mod", "HP Percentage Mod"]
+    ruleset: ["Team Preview", "Cancel Mod", "HP Percentage Mod", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO Wild Battle",
     mod: "pbo",
-    ruleset: ["Cancel Mod", "HP Percentage Mod", "No Sturdy Wild"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO PvP Battle No Preview",
     mod: "pbo",
-    ruleset: ["Cancel Mod", "HP Percentage Mod"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   }
 ];
 //# sourceMappingURL=custom-formats.js.map
