@@ -34,8 +34,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 18 | `sim/side.ts` | `forfeit` choice command | Calls `battle.win(foe)` for instant forfeit |
 | 19 | `sim/battle-actions.ts`, `data/mods/pbo/abilities.ts` | Dynahax Max move power | Skip BP zeroing for Dynahax + boost Max/G-Max BP to 130 |
 | 20 | `config/custom-formats.ts` | Gimmick clauses | Add Terastal/Z-Move/Dynamax Clause to all PBO formats |
+| 21 | `config/custom-formats.ts` | Overflow Stat Mod | Prevent 16-bit stat overflow for high-level Pokemon with +nature |
 
-**Total: 20 changes across 7 files.**
+**Total: 21 changes across 7 files.**
 
 ---
 
@@ -371,6 +372,25 @@ Dynahax ability handles power scaling independently. Confirmed safe by integrati
 
 **Why:** PBO restricts Tera, Z-Moves, and Dynamax to Random Battles only. These mechanics
 are not part of the standard PBO battle experience.
+
+---
+
+## Change 21: Overflow Stat Mod on all PBO formats (config/custom-formats.ts)
+
+**What it does:** Adds `Overflow Stat Mod` to the ruleset of all five PBO custom formats.
+
+**Why:** Showdown applies a 16-bit truncation when multiplying a stat by a +nature modifier
+(`tr(stat * 110, 16)`). For standard L100 battles this never overflows, but PBO has levels
+above 100. A Pokemon with a high base stat, max EVs, and a boosting nature at L120+ can
+exceed the 16-bit boundary (65535), causing the stat to wrap around to a tiny value.
+
+**Example:** Regirock (base 200 Def) at L120 with 252 Def EVs, 31 IVs, Impish (+Def)
+calculates a pre-nature stat of 597. `597 * 110 = 65670 > 65535`, so the 16-bit truncation
+wraps to `65670 - 65536 = 134`, producing a final Defense stat of `134 / 100 = 1`. This
+caused Regirock to be OHKOed by any physical move.
+
+**Fix:** `Overflow Stat Mod` caps the pre-nature stat at 595 before multiplication,
+preventing the overflow. `595 * 110 = 65450 < 65536` stays safe.
 
 ---
 
