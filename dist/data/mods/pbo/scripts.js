@@ -538,6 +538,48 @@ const Scripts = {
       }
     }
   },
+  // [PBO] Override clearWeather/clearTerrain to restore permanent weather/terrain
+  // when temporary weather/terrain expires. The server sets pboPermaWeather / pboPermaTerrain
+  // on the Field at battle start; when a temporary effect ends, the permanent one is restored.
+  field: {
+    inherit: true,
+    clearWeather() {
+      if (!this.weather)
+        return false;
+      const prevWeather = this.getWeather();
+      this.battle.singleEvent("FieldEnd", prevWeather, this.weatherState, this);
+      this.weather = "";
+      this.battle.clearEffectState(this.weatherState);
+      const permaId = this.pboPermaWeather;
+      if (permaId) {
+        const status = this.battle.dex.conditions.get(permaId);
+        this.weather = status.id;
+        this.weatherState = this.battle.initEffectState({ id: status.id });
+        this.weatherState.duration = 0;
+        this.battle.singleEvent("FieldStart", status, this.weatherState, this, null, null);
+      }
+      this.battle.eachEvent("WeatherChange");
+      return true;
+    },
+    clearTerrain() {
+      if (!this.terrain)
+        return false;
+      const prevTerrain = this.getTerrain();
+      this.battle.singleEvent("FieldEnd", prevTerrain, this.terrainState, this);
+      this.terrain = "";
+      this.battle.clearEffectState(this.terrainState);
+      const permaId = this.pboPermaTerrain;
+      if (permaId) {
+        const status = this.battle.dex.conditions.get(permaId);
+        this.terrain = status.id;
+        this.terrainState = this.battle.initEffectState({ id: status.id });
+        this.terrainState.duration = 0;
+        this.battle.singleEvent("FieldStart", status, this.terrainState, this, null, null);
+      }
+      this.battle.eachEvent("TerrainChange");
+      return true;
+    }
+  },
   pokemon: {
     inherit: true,
     // [PBO] Always include level in details string.
