@@ -31,41 +31,14 @@ var import_runner = require("./runner");
  *
  * @license MIT
  */
-class ExhaustiveRunner {
-  static {
-    this.DEFAULT_CYCLES = 1;
-  }
-  static {
-    this.MAX_FAILURES = 10;
-  }
-  static {
-    // TODO: Add triple battles once supported by the AI.
-    this.FORMATS = [
-      "gen9customgame",
-      "gen9doublescustomgame",
-      "gen8customgame",
-      "gen8doublescustomgame",
-      "gen7customgame",
-      "gen7doublescustomgame",
-      "gen6customgame",
-      "gen6doublescustomgame",
-      "gen5customgame",
-      "gen5doublescustomgame",
-      "gen4customgame",
-      "gen4doublescustomgame",
-      "gen3customgame",
-      "gen3doublescustomgame",
-      "gen2customgame",
-      "gen1customgame"
-    ];
-  }
+const _ExhaustiveRunner = class {
   constructor(options) {
     this.format = options.format;
-    this.cycles = options.cycles || ExhaustiveRunner.DEFAULT_CYCLES;
+    this.cycles = options.cycles || _ExhaustiveRunner.DEFAULT_CYCLES;
     this.prng = import_prng.PRNG.get(options.prng);
     this.log = !!options.log;
     this.maxGames = options.maxGames;
-    this.maxFailures = options.maxFailures || ExhaustiveRunner.MAX_FAILURES;
+    this.maxFailures = options.maxFailures || _ExhaustiveRunner.MAX_FAILURES;
     this.dual = options.dual || false;
     this.failures = 0;
     this.games = 0;
@@ -75,7 +48,7 @@ class ExhaustiveRunner {
     const seed = this.prng.getSeed();
     const pools = this.createPools(dex);
     const createAI = (s, o) => new CoordinatedPlayerAI(s, o, pools);
-    const generator = new TeamGenerator(dex, this.prng, pools, ExhaustiveRunner.getSignatures(dex, pools));
+    const generator = new TeamGenerator(dex, this.prng, pools, _ExhaustiveRunner.getSignatures(dex, pools));
     do {
       this.games++;
       try {
@@ -90,7 +63,8 @@ class ExhaustiveRunner {
           dual: this.dual,
           error: true
         }).run();
-        if (this.log) this.logProgress(pools);
+        if (this.log)
+          this.logProgress(pools);
       } catch (err) {
         this.failures++;
         console.error(
@@ -107,12 +81,12 @@ Run \`node tools/simulate exhaustive --cycles=${this.cycles} --format=${this.for
   createPools(dex) {
     return {
       pokemon: new Pool(
-        ExhaustiveRunner.onlyValid(dex.gen, dex.data.Pokedex, (p) => dex.species.get(p), (_, p) => p.name !== "Pichu-Spiky-eared" && p.name.substr(0, 8) !== "Pikachu-" && !["Greninja-Bond", "Rockruff-Dusk"].includes(p.name)),
+        _ExhaustiveRunner.onlyValid(dex.gen, dex.data.Pokedex, (p) => dex.species.get(p), (_, p) => p.name !== "Pichu-Spiky-eared" && p.name.substr(0, 8) !== "Pikachu-" && !["Greninja-Bond", "Rockruff-Dusk"].includes(p.name)),
         this.prng
       ),
-      items: new Pool(ExhaustiveRunner.onlyValid(dex.gen, dex.data.Items, (i) => dex.items.get(i)), this.prng),
-      abilities: new Pool(ExhaustiveRunner.onlyValid(dex.gen, dex.data.Abilities, (a) => dex.abilities.get(a)), this.prng),
-      moves: new Pool(ExhaustiveRunner.onlyValid(
+      items: new Pool(_ExhaustiveRunner.onlyValid(dex.gen, dex.data.Items, (i) => dex.items.get(i)), this.prng),
+      abilities: new Pool(_ExhaustiveRunner.onlyValid(dex.gen, dex.data.Abilities, (a) => dex.abilities.get(a)), this.prng),
+      moves: new Pool(_ExhaustiveRunner.onlyValid(
         dex.gen,
         dex.data.Moves,
         (m) => dex.moves.get(m),
@@ -121,7 +95,8 @@ Run \`node tools/simulate exhaustive --cycles=${this.cycles} --format=${this.for
     };
   }
   logProgress(p) {
-    if (this.games) process.stdout.write("\r\x1B[K");
+    if (this.games)
+      process.stdout.write("\r\x1B[K");
     process.stdout.write(
       `[${this.format}] P:${p.pokemon} I:${p.items} A:${p.abilities} M:${p.moves} = ${this.games}`
     );
@@ -143,7 +118,8 @@ Run \`node tools/simulate exhaustive --cycles=${this.cycles} --format=${this.for
         for (const user of item.itemUser) {
           const pokemon = (0, import_dex.toID)(user);
           const combo = { item: id };
-          if (item.zMoveFrom) combo.move = (0, import_dex.toID)(item.zMoveFrom);
+          if (item.zMoveFrom)
+            combo.move = (0, import_dex.toID)(item.zMoveFrom);
           let combos = signatures.get(pokemon);
           if (!combos) {
             combos = [];
@@ -161,16 +137,30 @@ Run \`node tools/simulate exhaustive --cycles=${this.cycles} --format=${this.for
       return v.gen <= gen && (!v.isNonstandard || !!nonStandard) && (!additional || additional(k, v));
     });
   }
-}
-class TeamGenerator {
-  static {
-    // By default, the TeamGenerator generates sets completely at random which unfortunately means
-    // certain signature combinations (eg. Mega Stone/Z Moves which only work for specific Pokemon)
-    // are unlikely to be chosen. To combat this, we keep a mapping of these combinations and some
-    // fraction of the time when we are generating sets for these particular Pokemon we give them
-    // the combinations they need to exercise the simulator more thoroughly.
-    this.COMBO = 0.5;
-  }
+};
+let ExhaustiveRunner = _ExhaustiveRunner;
+ExhaustiveRunner.DEFAULT_CYCLES = 1;
+ExhaustiveRunner.MAX_FAILURES = 10;
+// TODO: Add triple battles once supported by the AI.
+ExhaustiveRunner.FORMATS = [
+  "gen9customgame",
+  "gen9doublescustomgame",
+  "gen8customgame",
+  "gen8doublescustomgame",
+  "gen7customgame",
+  "gen7doublescustomgame",
+  "gen6customgame",
+  "gen6doublescustomgame",
+  "gen5customgame",
+  "gen5doublescustomgame",
+  "gen4customgame",
+  "gen4doublescustomgame",
+  "gen3customgame",
+  "gen3doublescustomgame",
+  "gen2customgame",
+  "gen1customgame"
+];
+const _TeamGenerator = class {
   constructor(dex, prng, pools, signatures) {
     this.dex = dex;
     this.prng = import_prng.PRNG.get(prng);
@@ -180,8 +170,10 @@ class TeamGenerator {
   }
   get exhausted() {
     const exhausted = [this.pools.pokemon.exhausted, this.pools.moves.exhausted];
-    if (this.dex.gen >= 2) exhausted.push(this.pools.items.exhausted);
-    if (this.dex.gen >= 3) exhausted.push(this.pools.abilities.exhausted);
+    if (this.dex.gen >= 2)
+      exhausted.push(this.pools.items.exhausted);
+    if (this.dex.gen >= 3)
+      exhausted.push(this.pools.abilities.exhausted);
     return Math.min.apply(null, exhausted);
   }
   generate() {
@@ -193,10 +185,11 @@ class TeamGenerator {
       let item;
       const moves = [];
       const combos = this.signatures.get(species.id);
-      if (combos && this.prng.random() > TeamGenerator.COMBO) {
+      if (combos && this.prng.random() > _TeamGenerator.COMBO) {
         const combo = this.prng.sample(combos);
         item = combo.item;
-        if (combo.move) moves.push(combo.move);
+        if (combo.move)
+          moves.push(combo.move);
       } else {
         item = this.dex.gen >= 2 ? this.pools.items.next() : "";
       }
@@ -231,7 +224,14 @@ class TeamGenerator {
     }
     return team;
   }
-}
+};
+let TeamGenerator = _TeamGenerator;
+// By default, the TeamGenerator generates sets completely at random which unfortunately means
+// certain signature combinations (eg. Mega Stone/Z Moves which only work for specific Pokemon)
+// are unlikely to be chosen. To combat this, we keep a mapping of these combinations and some
+// fraction of the time when we are generating sets for these particular Pokemon we give them
+// the combinations they need to exercise the simulator more thoroughly.
+TeamGenerator.COMBO = 0.5;
 class Pool {
   constructor(possible, prng) {
     this.possible = possible;
@@ -243,7 +243,8 @@ class Pool {
     return `${this.exhausted} (${this.unused.size}/${this.possible.length})`;
   }
   reset() {
-    if (this.filled) this.exhausted++;
+    if (this.filled)
+      this.exhausted++;
     this.iter = void 0;
     this.unused = new Set(this.shuffle(this.possible));
     if (this.possible.length && this.filled) {
@@ -251,7 +252,8 @@ class Pool {
         this.unused.delete(used);
       }
       this.filled = /* @__PURE__ */ new Set();
-      if (!this.unused.size) this.reset();
+      if (!this.unused.size)
+        this.reset();
     } else {
       this.filled = /* @__PURE__ */ new Set();
     }
@@ -273,7 +275,8 @@ class Pool {
     this.unused.delete(k);
   }
   next(num) {
-    if (!num) return this.choose();
+    if (!num)
+      return this.choose();
     const chosen = [];
     for (let i = 0; i < num; i++) {
       chosen.push(this.choose());
@@ -300,12 +303,14 @@ class Pool {
   // but this is considered to be unlikely enough that we don't care (and
   // `exhausted` is a lower bound anyway).
   choose() {
-    if (!this.unused.size) this.reset();
+    if (!this.unused.size)
+      this.reset();
     if (this.iter) {
       if (!this.iter.done) {
         const next2 = this.iter.next();
         this.iter.done = next2.done;
-        if (!next2.done) return next2.value;
+        if (!next2.done)
+          return next2.value;
       }
       return this.fill();
     }
@@ -366,9 +371,12 @@ class CoordinatedPlayerAI extends import_random_player_ai.RandomPlayerAI {
   // which we're tracking, so we need to convert them back.
   fixMove(m) {
     const id = (0, import_dex.toID)(m.move);
-    if (id.startsWith("return")) return "return";
-    if (id.startsWith("frustration")) return "frustration";
-    if (id.startsWith("hiddenpower")) return "hiddenpower";
+    if (id.startsWith("return"))
+      return "return";
+    if (id.startsWith("frustration"))
+      return "frustration";
+    if (id.startsWith("hiddenpower"))
+      return "hiddenpower";
     return id;
   }
   // Gigantamax Pokemon need to be special cased for tracking because the current

@@ -35,7 +35,8 @@ const Items = {
         if (isBMM) {
           target.removeVolatile("item:airballoon");
           target.m.scrambled.items.splice(target.m.scrambled.items.findIndex((e) => this.toID(e.thing) === "airballoon" && e.inSlot === isBMM), 1);
-          if (isBMM === "Ability") target.setAbility("No Ability");
+          if (isBMM === "Ability")
+            target.setAbility("No Ability");
         }
       }
       this.runEvent("AfterUseItem", target, null, null, this.dex.items.get("airballoon"));
@@ -52,7 +53,8 @@ const Items = {
           if (isBMM) {
             target.removeVolatile("item:airballoon");
             target.m.scrambled.items.splice(target.m.scrambled.items.findIndex((e) => this.toID(e.thing) === "airballoon" && e.inSlot === isBMM), 1);
-            if (isBMM === "Ability") target.setAbility("No Ability");
+            if (isBMM === "Ability")
+              target.setAbility("No Ability");
           }
         }
         this.runEvent("AfterUseItem", target, null, null, this.dex.items.get("airballoon"));

@@ -54,7 +54,8 @@ const Component = import_preact.default.Component;
 class FormatText extends import_preact.default.Component {
   render() {
     const child = this.props.children;
-    if (typeof child !== "string") throw new Error(`Invalid props.children type: ${!child ? child : typeof child}`);
+    if (typeof child !== "string")
+      throw new Error(`Invalid props.children type: ${!child ? child : typeof child}`);
     return /* @__PURE__ */ Chat.h(
       "span",
       {

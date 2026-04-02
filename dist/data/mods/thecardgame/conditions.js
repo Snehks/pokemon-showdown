@@ -34,7 +34,8 @@ const Conditions = {
   arceus: {
     inherit: true,
     onType(types, pokemon) {
-      if (pokemon.transformed || pokemon.ability !== "multitype" && this.gen >= 8) return types;
+      if (pokemon.transformed || pokemon.ability !== "multitype" && this.gen >= 8)
+        return types;
       let type = "Normal";
       if (pokemon.ability === "multitype") {
         type = pokemon.getItem().onPlate;
@@ -49,7 +50,8 @@ const Conditions = {
   silvally: {
     inherit: true,
     onType(types, pokemon) {
-      if (pokemon.transformed || pokemon.ability !== "rkssystem" && this.gen >= 8) return types;
+      if (pokemon.transformed || pokemon.ability !== "rkssystem" && this.gen >= 8)
+        return types;
       let type = "Normal";
       if (pokemon.ability === "rkssystem") {
         type = pokemon.getItem().onMemory;

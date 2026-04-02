@@ -41,7 +41,8 @@ class BattleQueue {
     this.battle = battle;
     this.list = [];
     const queueScripts = battle.format.queue || battle.dex.data.Scripts.queue;
-    if (queueScripts) Object.assign(this, queueScripts);
+    if (queueScripts)
+      Object.assign(this, queueScripts);
   }
   shift() {
     return this.list.shift();
@@ -68,11 +69,15 @@ class BattleQueue {
    * resolve to two Actions (mega evolution + use move)
    */
   resolveAction(action, midTurn = false) {
-    if (!action) throw new Error(`Action not passed to resolveAction`);
-    if (action.choice === "pass") return [];
+    if (!action)
+      throw new Error(`Action not passed to resolveAction`);
+    if (action.choice === "pass")
+      return [];
     const actions = [action];
-    if (!action.side && action.pokemon) action.side = action.pokemon.side;
-    if (!action.move && action.moveid) action.move = this.battle.dex.getActiveMove(action.moveid);
+    if (!action.side && action.pokemon)
+      action.side = action.pokemon.side;
+    if (!action.move && action.moveid)
+      action.move = this.battle.dex.getActiveMove(action.moveid);
     if (!action.order) {
       const orders = {
         team: 1,
@@ -165,11 +170,13 @@ class BattleQueue {
       action.move = this.battle.dex.getActiveMove(action.move);
       if (!action.targetLoc) {
         target = this.battle.getRandomTarget(action.pokemon, action.move);
-        if (target) action.targetLoc = action.pokemon.getLocOf(target);
+        if (target)
+          action.targetLoc = action.pokemon.getLocOf(target);
       }
       action.originalTarget = action.pokemon.getAtLoc(action.targetLoc);
     }
-    if (!deferPriority) this.battle.getActionSpeed(action);
+    if (!deferPriority)
+      this.battle.getActionSpeed(action);
     return actions;
   }
   /**
@@ -195,11 +202,13 @@ class BattleQueue {
    */
   changeAction(pokemon, action) {
     this.cancelAction(pokemon);
-    if (!action.pokemon) action.pokemon = pokemon;
+    if (!action.pokemon)
+      action.pokemon = pokemon;
     this.insertChoice(action);
   }
   addChoice(choices) {
-    if (!Array.isArray(choices)) choices = [choices];
+    if (!Array.isArray(choices))
+      choices = [choices];
     for (const choice of choices) {
       const resolvedChoices = this.resolveAction(choice);
       this.list.push(...resolvedChoices);
@@ -219,7 +228,8 @@ class BattleQueue {
     return null;
   }
   willMove(pokemon) {
-    if (pokemon.fainted) return null;
+    if (pokemon.fainted)
+      return null;
     for (const action of this.list) {
       if (action.choice === "move" && action.pokemon === pokemon) {
         return action;
@@ -286,7 +296,8 @@ class BattleQueue {
     if (firstIndex === null) {
       this.list.push(...actions);
     } else {
-      if (lastIndex === null) lastIndex = this.list.length;
+      if (lastIndex === null)
+        lastIndex = this.list.length;
       const index = firstIndex === lastIndex ? firstIndex : this.battle.random(firstIndex, lastIndex + 1);
       this.list.splice(index, 0, ...actions);
     }

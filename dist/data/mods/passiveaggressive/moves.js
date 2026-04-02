@@ -31,7 +31,8 @@ const Moves = {
       },
       onSwitchIn(pokemon) {
         const calc = calculate(this, this.effectState.source, pokemon, "stealthrock");
-        if (pokemon.hasItem("heavydutyboots") || !calc) return;
+        if (pokemon.hasItem("heavydutyboots") || !calc)
+          return;
         this.damage(calc * pokemon.maxhp / 8);
       }
     }
@@ -45,7 +46,8 @@ const Moves = {
       },
       onSwitchIn(pokemon) {
         const calc = calculate(this, this.effectState.source, pokemon, "stealthrock");
-        if (pokemon.hasItem("heavydutyboots") || !calc) return;
+        if (pokemon.hasItem("heavydutyboots") || !calc)
+          return;
         this.damage(calc * pokemon.maxhp / 8);
       }
     }
@@ -59,13 +61,15 @@ const Moves = {
         this.effectState.layers = 1;
       },
       onSideRestart(side, source) {
-        if (this.effectState.layers >= 3) return false;
+        if (this.effectState.layers >= 3)
+          return false;
         this.add("-sidestart", side, "Spikes");
         this.effectState.layers++;
       },
       onSwitchIn(pokemon) {
         const calc = calculate(this, this.effectState.source, pokemon, "spikes");
-        if (!calc || !pokemon.isGrounded() || pokemon.hasItem("heavydutyboots")) return;
+        if (!calc || !pokemon.isGrounded() || pokemon.hasItem("heavydutyboots"))
+          return;
         const damageAmounts = [0, 3, 4, 6];
         this.damage(calc * damageAmounts[this.effectState.layers] * pokemon.maxhp / 24);
       }
@@ -75,7 +79,8 @@ const Moves = {
     inherit: true,
     onMoveFail(target, source, move) {
       const calc = calculate(this, source, source, "axekick");
-      if (calc) this.damage(calc * source.baseMaxhp / 2, source, source, this.dex.conditions.get("High Jump Kick"));
+      if (calc)
+        this.damage(calc * source.baseMaxhp / 2, source, source, this.dex.conditions.get("High Jump Kick"));
     }
   },
   curse: {
@@ -87,7 +92,8 @@ const Moves = {
       onResidualOrder: 12,
       onResidual(pokemon) {
         const calc = calculate(this, this.effectState.source, pokemon, "curse");
-        if (calc) this.damage(calc * pokemon.baseMaxhp / 4);
+        if (calc)
+          this.damage(calc * pokemon.baseMaxhp / 4);
       }
     }
   },
@@ -102,7 +108,8 @@ const Moves = {
       onResidualSubOrder: 1,
       onResidual(pokemon) {
         const calc = calculate(this, this.effectState.source, pokemon, "firepledge");
-        if (!pokemon.hasType("Fire") && calc) this.damage(calc * pokemon.baseMaxhp / 8, pokemon);
+        if (!pokemon.hasType("Fire") && calc)
+          this.damage(calc * pokemon.baseMaxhp / 8, pokemon);
       },
       onSideResidualOrder: 26,
       onSideResidualSubOrder: 8,
@@ -116,13 +123,15 @@ const Moves = {
     onHit(target, source, move) {
       for (const ally of target.adjacentAllies()) {
         const calc = calculate(this, source, ally, "flameburst");
-        if (calc) this.damage(calc * ally.baseMaxhp / 16, ally, source, this.dex.conditions.get("Flame Burst"));
+        if (calc)
+          this.damage(calc * ally.baseMaxhp / 16, ally, source, this.dex.conditions.get("Flame Burst"));
       }
     },
     onAfterSubDamage(damage, target, source, move) {
       for (const ally of target.adjacentAllies()) {
         const calc = calculate(this, source, ally, "flameburst");
-        if (calc) this.damage(calc * ally.baseMaxhp / 16, ally, source, this.dex.conditions.get("Flame Burst"));
+        if (calc)
+          this.damage(calc * ally.baseMaxhp / 16, ally, source, this.dex.conditions.get("Flame Burst"));
       }
     }
   },
@@ -130,14 +139,16 @@ const Moves = {
     inherit: true,
     onMoveFail(target, source, move) {
       const calc = calculate(this, source, source, "highjumpkick");
-      if (calc) this.damage(calc * source.baseMaxhp / 2, source, source, this.dex.conditions.get("High Jump Kick"));
+      if (calc)
+        this.damage(calc * source.baseMaxhp / 2, source, source, this.dex.conditions.get("High Jump Kick"));
     }
   },
   jumpkick: {
     inherit: true,
     onMoveFail(target, source, move) {
       const calc = calculate(this, source, source, "jumpkick");
-      if (calc) this.damage(calc * source.baseMaxhp / 2, source, source, this.dex.conditions.get("Jump Kick"));
+      if (calc)
+        this.damage(calc * source.baseMaxhp / 2, source, source, this.dex.conditions.get("Jump Kick"));
     }
   },
   leechseed: {
@@ -188,7 +199,8 @@ const Moves = {
       onResidualOrder: 11,
       onResidual(pokemon) {
         const calc = calculate(this, this.effectState.source, pokemon, "nightmare");
-        if (calc) this.damage(calc * pokemon.baseMaxhp / 4);
+        if (calc)
+          this.damage(calc * pokemon.baseMaxhp / 4);
       }
     }
   },
@@ -204,7 +216,8 @@ const Moves = {
         if (move.type === "Fire") {
           this.add("-activate", pokemon, "move: Powder");
           const calc = calculate(this, this.effectState.source, pokemon, "powder");
-          if (calc) this.damage(this.clampIntRange(Math.round(calc * pokemon.maxhp / 4), 1));
+          if (calc)
+            this.damage(this.clampIntRange(Math.round(calc * pokemon.maxhp / 4), 1));
           this.attrLastMove("[still]");
           return false;
         }
@@ -222,7 +235,8 @@ const Moves = {
       onResidualOrder: 13,
       onResidual(pokemon) {
         const calc = calculate(this, this.effectState.source, pokemon, "saltcure");
-        if (calc) this.damage(calc * pokemon.baseMaxhp / (pokemon.hasType(["Water", "Steel"]) ? 4 : 8));
+        if (calc)
+          this.damage(calc * pokemon.baseMaxhp / (pokemon.hasType(["Water", "Steel"]) ? 4 : 8));
       },
       onEnd(pokemon) {
         this.add("-end", pokemon, "Salt Cure");
@@ -239,8 +253,10 @@ const Moves = {
       onTryHitPriority: 3,
       onTryHit(target, source, move) {
         if (!move.flags["protect"]) {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
-          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
+          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id))
+            return;
+          if (move.isZ || move.isMax)
+            target.getMoveHitData(move).zBrokeProtect = true;
           return;
         }
         if (move.smartTarget) {
@@ -285,7 +301,8 @@ const Moves = {
     inherit: true,
     onMoveFail(target, source, move) {
       const calc = calculate(this, source, source, "supercellslam");
-      if (calc) this.damage(calc * source.baseMaxhp / 2, source, source, this.dex.conditions.get("Supercell Slam"));
+      if (calc)
+        this.damage(calc * source.baseMaxhp / 2, source, source, this.dex.conditions.get("Supercell Slam"));
     }
   },
   toxicspikes: {
@@ -297,12 +314,14 @@ const Moves = {
         this.effectState.layers = 1;
       },
       onSideRestart(side) {
-        if (this.effectState.layers >= 2) return false;
+        if (this.effectState.layers >= 2)
+          return false;
         this.add("-sidestart", side, "move: Toxic Spikes");
         this.effectState.layers++;
       },
       onSwitchIn(pokemon) {
-        if (!pokemon.isGrounded()) return;
+        if (!pokemon.isGrounded())
+          return;
         if (pokemon.hasType("Poison")) {
           this.add("-sideend", pokemon.side, "move: Toxic Spikes", `[of] ${pokemon}`);
           pokemon.side.removeSideCondition("toxicspikes");
@@ -320,7 +339,8 @@ function calculate(battle, source, pokemon, moveid = "tackle") {
   const move = battle.dex.getActiveMove(moveid);
   move.type = source.getTypes()[0];
   const typeMod = 2 ** battle.clampIntRange(pokemon.runEffectiveness(move), -6, 6);
-  if (!pokemon.runImmunity(move)) return 0;
+  if (!pokemon.runImmunity(move))
+    return 0;
   return typeMod;
 }
 //# sourceMappingURL=moves.js.map

@@ -304,7 +304,8 @@ const Items = {
         "wrap"
       ];
       if (affectedByKingsRock.includes(move.id)) {
-        if (!move.secondaries) move.secondaries = [];
+        if (!move.secondaries)
+          move.secondaries = [];
         move.secondaries.push({
           chance: 10,
           volatileStatus: "flinch"
@@ -327,7 +328,8 @@ const Items = {
   laxincense: {
     inherit: true,
     onModifyAccuracy(accuracy) {
-      if (typeof accuracy !== "number") return;
+      if (typeof accuracy !== "number")
+        return;
       this.debug("lax incense - decreasing accuracy");
       return accuracy * 0.95;
     }

@@ -96,7 +96,8 @@ const Conditions = {
         return;
       }
       const damage = this.actions.getDamage(pokemon, pokemon, 40);
-      if (typeof damage !== "number") throw new Error("Confusion damage not dealt");
+      if (typeof damage !== "number")
+        throw new Error("Confusion damage not dealt");
       this.damage(damage, pokemon, pokemon, {
         id: "confused",
         effectType: "Move",
@@ -112,7 +113,8 @@ const Conditions = {
         pokemon.cureStatus();
         return;
       }
-      if (move.flags["defrost"]) return;
+      if (move.flags["defrost"])
+        return;
       this.add("cant", pokemon, "frz");
       return false;
     }
@@ -131,7 +133,8 @@ const Conditions = {
   partiallytrapped: {
     inherit: true,
     durationCallback(target, source) {
-      if (source.hasItem("gripclaw")) return 6;
+      if (source.hasItem("gripclaw"))
+        return 6;
       return this.random(3, 7);
     },
     onResidualOrder: 10,
@@ -145,7 +148,8 @@ const Conditions = {
   choicelock: {
     inherit: true,
     onStart(pokemon) {
-      if (!pokemon.lastMove) return false;
+      if (!pokemon.lastMove)
+        return false;
       this.effectState.move = pokemon.lastMove.id;
     }
   },

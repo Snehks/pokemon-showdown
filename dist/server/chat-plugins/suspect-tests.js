@@ -41,7 +41,8 @@ if (!suspectTests.whitelist && !suspectTests.suspects) {
 }
 function checkPermissions(context) {
   const user = context.user;
-  if (suspectTests.whitelist?.includes(user.id)) return true;
+  if (suspectTests.whitelist?.includes(user.id))
+    return true;
   context.checkCan("gdeclare");
 }
 const commands = {
@@ -52,7 +53,8 @@ const commands = {
       if (!Object.keys(suspects).length) {
         throw new Chat.ErrorMessage("There are no suspect tests running.");
       }
-      if (!this.runBroadcast()) return;
+      if (!this.runBroadcast())
+        return;
       let buffer = "<strong>Suspect tests currently running:</strong>";
       for (const test of Object.values(suspects)) {
         buffer += "<br />";
@@ -68,11 +70,13 @@ const commands = {
         return this.parse("/help suspects");
       }
       const format = Dex.formats.get(tier);
-      if (format.effectType !== "Format") throw new Chat.ErrorMessage(`"${tier}" is not a valid tier.`);
+      if (format.effectType !== "Format")
+        throw new Chat.ErrorMessage(`"${tier}" is not a valid tier.`);
       const suspectString = suspect.trim();
       const [month, day] = date.trim().split(date.includes("-") ? "-" : "/");
       const isValidDate = /[0-1]?[0-9]/.test(month) && /[0-3]?[0-9]/.test(day);
-      if (!isValidDate) throw new Chat.ErrorMessage("Dates must be in the format MM/DD.");
+      if (!isValidDate)
+        throw new Chat.ErrorMessage("Dates must be in the format MM/DD.");
       const dateActual = `${month}/${day}`;
       const reqData = {};
       if (!reqs.length) {
@@ -118,7 +122,8 @@ const commands = {
       };
       saveSuspectTests();
       this.sendReply(`Added a suspect test notice for ${suspectString} in ${format.name}.`);
-      if (reqData.coil) this.sendReply("Remember to add a B value for your test's COIL setting with /suspects setbvalue.");
+      if (reqData.coil)
+        this.sendReply("Remember to add a B value for your test's COIL setting with /suspects setbvalue.");
     },
     end: "remove",
     delete: "remove",
@@ -126,7 +131,8 @@ const commands = {
       checkPermissions(this);
       const format = toID(target);
       const test = suspectTests.suspects[format];
-      if (!test) throw new Chat.ErrorMessage(`There is no suspect test for '${target}'. Check spelling?`);
+      if (!test)
+        throw new Chat.ErrorMessage(`There is no suspect test for '${target}'. Check spelling?`);
       const [out, error] = await LoginServer.request("suspects/end", {
         format
       });

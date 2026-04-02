@@ -45,7 +45,8 @@ const commands = {
   randquote(target, room, user) {
     room = this.requireRoom();
     const roomQuotes = quotes[room.roomid];
-    if (!roomQuotes?.length) throw new Chat.ErrorMessage(`This room has no quotes.`);
+    if (!roomQuotes?.length)
+      throw new Chat.ErrorMessage(`This room has no quotes.`);
     this.runBroadcast(true);
     const { quote, date, userid } = roomQuotes[Math.floor(Math.random() * roomQuotes.length)];
     const time = Chat.toTimestamp(new Date(date), { human: true });
@@ -63,7 +64,8 @@ const commands = {
     if (!target) {
       return this.parse(`/help addquote`);
     }
-    if (!quotes[room.roomid]) quotes[room.roomid] = [];
+    if (!quotes[room.roomid])
+      quotes[room.roomid] = [];
     const roomQuotes = quotes[room.roomid];
     if (this.filter(target) !== target) {
       throw new Chat.ErrorMessage(`Invalid quote.`);
@@ -88,7 +90,8 @@ const commands = {
   removequote(target, room, user) {
     room = this.requireRoom();
     this.checkCan("mute", null, room);
-    if (!quotes[room.roomid]?.length) throw new Chat.ErrorMessage(`This room has no quotes.`);
+    if (!quotes[room.roomid]?.length)
+      throw new Chat.ErrorMessage(`This room has no quotes.`);
     const roomQuotes = quotes[room.roomid];
     const index = toID(target) === "last" ? roomQuotes.length - 1 : parseInt(toID(target)) - 1;
     if (isNaN(index)) {
@@ -108,7 +111,8 @@ const commands = {
   viewquote(target, room, user) {
     room = this.requireRoom();
     const roomQuotes = quotes[room.roomid];
-    if (!roomQuotes?.length) throw new Chat.ErrorMessage(`This room has no quotes.`);
+    if (!roomQuotes?.length)
+      throw new Chat.ErrorMessage(`This room has no quotes.`);
     const [num, showAuthor] = import_lib.Utils.splitFirst(target, ",");
     const index = num === "last" ? roomQuotes.length - 1 : parseInt(num) - 1;
     if (isNaN(index)) {
@@ -130,7 +134,8 @@ const commands = {
   viewquotes: "quotes",
   quotes(target, room) {
     const targetRoom = target ? Rooms.search(target) : room;
-    if (!targetRoom) throw new Chat.ErrorMessage(`Invalid room.`);
+    if (!targetRoom)
+      throw new Chat.ErrorMessage(`Invalid room.`);
     this.parse(`/join view-quotes-${targetRoom.roomid}`);
   },
   quoteshelp: [`/quotes [room] - Shows all quotes for [room]. Defaults the room the command is used in.`],
@@ -177,7 +182,8 @@ const pages = {
 const handlers = {
   onRenameRoom(oldID, newID) {
     if (quotes[oldID]) {
-      if (!quotes[newID]) quotes[newID] = [];
+      if (!quotes[newID])
+        quotes[newID] = [];
       quotes[newID].push(...quotes[oldID]);
       delete quotes[oldID];
       saveQuotes();

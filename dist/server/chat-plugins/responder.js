@@ -36,14 +36,15 @@ try {
   answererData = JSON.parse((0, import_lib.FS)(DATA_PATH).readSync());
 } catch {
 }
-class AutoResponder {
+const _AutoResponder = class {
   constructor(room, data) {
     this.room = room;
     this.data = data || { pairs: {}, ignore: [] };
-    AutoResponder.migrateStats(this.data, this);
+    _AutoResponder.migrateStats(this.data, this);
   }
   static migrateStats(data, responder) {
-    if (!data.stats) return data;
+    if (!data.stats)
+      return data;
     for (const date in data.stats) {
       for (const entry of data.stats[date].matches) {
         void this.logMessage(responder.room.roomid, { ...entry, date });
@@ -53,9 +54,6 @@ class AutoResponder {
     responder.data = data;
     responder.writeState();
     return data;
-  }
-  static {
-    this.logStream = (0, import_lib.FS)(LOG_PATH).createAppendStream();
   }
   static logMessage(roomid, entry) {
     return this.logStream.writeLine(JSON.stringify({
@@ -68,7 +66,8 @@ class AutoResponder {
     question = question.slice(0, 300);
     const room = this.room;
     const helpFaqs = import_room_faqs.roomFaqs[room.roomid];
-    if (!helpFaqs) return null;
+    if (!helpFaqs)
+      return null;
     const normalized = Chat.normalize(question);
     if (this.data.ignore) {
       if (this.data.ignore.some((t) => new RegExp(t, "i").test(normalized))) {
@@ -80,7 +79,7 @@ class AutoResponder {
       const match = this.test(normalized, faq);
       if (match) {
         if (user) {
-          const timestamp = Chat.toTimestamp(/* @__PURE__ */ new Date()).split(" ")[1];
+          const timestamp = Chat.toTimestamp(new Date()).split(" ")[1];
           const log = `${timestamp} |c| ${user.name}|${question}`;
           this.log(log, faq, match.regex);
         }
@@ -104,13 +103,17 @@ class AutoResponder {
     return null;
   }
   getFaqID(faq) {
-    if (!faq) throw new Chat.ErrorMessage(`Your input must be in the format [input] => [faq].`);
+    if (!faq)
+      throw new Chat.ErrorMessage(`Your input must be in the format [input] => [faq].`);
     faq = faq.trim();
-    if (!faq) throw new Chat.ErrorMessage(`Your FAQ ID can't be empty.`);
+    if (!faq)
+      throw new Chat.ErrorMessage(`Your FAQ ID can't be empty.`);
     const room = this.room;
     const entry = import_room_faqs.roomFaqs[room.roomid][faq];
-    if (!entry) throw new Chat.ErrorMessage(`FAQ ID "${faq}" not found.`);
-    if (!entry.alias) return faq;
+    if (!entry)
+      throw new Chat.ErrorMessage(`FAQ ID "${faq}" not found.`);
+    if (!entry.alias)
+      return faq;
     return entry.source;
   }
   async getStatsFor(date) {
@@ -119,7 +122,8 @@ class AutoResponder {
     for await (const raw of stream.byLine()) {
       try {
         const data = JSON.parse(raw);
-        if (data.date !== date || data.room !== this.room.roomid) continue;
+        if (data.date !== date || data.room !== this.room.roomid)
+          continue;
         buf.push(data);
       } catch {
       }
@@ -132,7 +136,8 @@ class AutoResponder {
     for await (const raw of stream.byLine()) {
       try {
         const data = JSON.parse(raw);
-        if (!data.date || data.room !== this.room.roomid) continue;
+        if (!data.date || data.room !== this.room.roomid)
+          continue;
         buf.add(data.date);
       } catch {
       }
@@ -143,11 +148,15 @@ class AutoResponder {
    * Checks if the FAQ exists. If not, deletes all references to it.
    */
   updateFaqData(faq) {
-    if (Config.nofswriting) return true;
+    if (Config.nofswriting)
+      return true;
     const room = this.room;
-    if (!room) return;
-    if (import_room_faqs.roomFaqs[room.roomid][faq]) return true;
-    if (this.data.pairs[faq]) delete this.data.pairs[faq];
+    if (!room)
+      return;
+    if (import_room_faqs.roomFaqs[room.roomid][faq])
+      return true;
+    if (this.data.pairs[faq])
+      delete this.data.pairs[faq];
     return false;
   }
   stringRegex(str, raw) {
@@ -156,10 +165,12 @@ class AutoResponder {
     if (!raw && args.length > 10) {
       throw new Chat.ErrorMessage(`Too many arguments.`);
     }
-    if (str.length > 300 && !raw) throw new Chat.ErrorMessage("Your given string is too long.");
+    if (str.length > 300 && !raw)
+      throw new Chat.ErrorMessage("Your given string is too long.");
     return args.map((item) => {
       const split = item.split("&").map((string) => {
-        if (raw) return string;
+        if (raw)
+          return string;
         return string.replace(/[\\^$.*+?()[\]{}]/g, "\\$&").trim();
       });
       return split.map((term) => {
@@ -172,23 +183,27 @@ class AutoResponder {
         if (term.startsWith("!")) {
           return `^(?!.*${term.slice(1)})`;
         }
-        if (!term.trim()) return null;
+        if (!term.trim())
+          return null;
         return `(?=.*?(${term.trim()}))`;
       }).filter(Boolean).join("");
     }).filter(Boolean).join("");
   }
   test(question, faq) {
-    if (!this.data.pairs[faq]) this.data.pairs[faq] = [];
+    if (!this.data.pairs[faq])
+      this.data.pairs[faq] = [];
     const regexes = this.data.pairs[faq].map((item) => new RegExp(item, "i"));
-    if (!regexes.length) return;
+    if (!regexes.length)
+      return;
     for (const regex of regexes) {
-      if (regex.test(question)) return { faq, regex: regex.toString() };
+      if (regex.test(question))
+        return { faq, regex: regex.toString() };
     }
     return null;
   }
   log(entry, faq, expression) {
-    const [day] = import_lib.Utils.splitFirst(Chat.toTimestamp(/* @__PURE__ */ new Date()), " ");
-    void AutoResponder.logMessage(this.room.roomid, {
+    const [day] = import_lib.Utils.splitFirst(Chat.toTimestamp(new Date()), " ");
+    void _AutoResponder.logMessage(this.room.roomid, {
       message: entry,
       faqName: faq,
       regex: expression,
@@ -205,8 +220,10 @@ class AutoResponder {
   tryAddRegex(inputString, raw) {
     let [args, faq] = inputString.split("=>").map((item) => item.trim());
     faq = this.getFaqID(toID(faq));
-    if (!this.data.pairs) this.data.pairs = {};
-    if (!this.data.pairs[faq]) this.data.pairs[faq] = [];
+    if (!this.data.pairs)
+      this.data.pairs = {};
+    if (!this.data.pairs[faq])
+      this.data.pairs[faq] = [];
     const regex = raw ? args.trim() : this.stringRegex(args, raw);
     if (this.data.pairs[faq].includes(regex)) {
       throw new Chat.ErrorMessage(`That regex is already stored.`);
@@ -217,9 +234,12 @@ class AutoResponder {
   }
   tryRemoveRegex(faq, index) {
     faq = this.getFaqID(faq);
-    if (!this.data.pairs) this.data.pairs = {};
-    if (!this.data.pairs[faq]) throw new Chat.ErrorMessage(`There are no regexes for ${faq}.`);
-    if (!this.data.pairs[faq][index]) throw new Chat.ErrorMessage("Your provided index is invalid.");
+    if (!this.data.pairs)
+      this.data.pairs = {};
+    if (!this.data.pairs[faq])
+      throw new Chat.ErrorMessage(`There are no regexes for ${faq}.`);
+    if (!this.data.pairs[faq][index])
+      throw new Chat.ErrorMessage("Your provided index is invalid.");
     this.data.pairs[faq].splice(index, 1);
     this.writeState();
     return true;
@@ -241,7 +261,8 @@ class AutoResponder {
     if (terms.some((t) => t.length > 300)) {
       throw new Chat.ErrorMessage(`One of your terms is too long.`);
     }
-    if (!this.data.ignore) this.data.ignore = [];
+    if (!this.data.ignore)
+      this.data.ignore = [];
     this.data.ignore.push(...terms);
     this.writeState();
     return terms;
@@ -254,7 +275,9 @@ class AutoResponder {
     this.writeState();
     return true;
   }
-}
+};
+let AutoResponder = _AutoResponder;
+AutoResponder.logStream = (0, import_lib.FS)(LOG_PATH).createAppendStream();
 for (const room of Rooms.rooms.values()) {
   room.responder?.destroy();
   if (answererData[room.roomid]) {
@@ -285,10 +308,13 @@ const commands = {
   question(target, room, user) {
     room = this.requireRoom();
     const responder = room.responder;
-    if (!responder) throw new Chat.ErrorMessage(`This room does not have an autoresponder configured.`);
-    if (!target) return this.parse("/help question");
+    if (!responder)
+      throw new Chat.ErrorMessage(`This room does not have an autoresponder configured.`);
+    if (!target)
+      return this.parse("/help question");
     const reply = responder.visualize(target, true);
-    if (!reply) return this.sendReplyBox(`No answer found.`);
+    if (!reply)
+      return this.sendReplyBox(`No answer found.`);
     this.runBroadcast();
     this.sendReplyBox(reply);
   },
@@ -322,12 +348,14 @@ const commands = {
         throw new Chat.ErrorMessage(`Secret rooms cannot enable an autoresponder.`);
       }
       if (this.meansYes(target)) {
-        if (room.responder) throw new Chat.ErrorMessage(`The Autoresponder for this room is already enabled.`);
+        if (room.responder)
+          throw new Chat.ErrorMessage(`The Autoresponder for this room is already enabled.`);
         room.responder = new AutoResponder(room, answererData[room.roomid]);
         room.responder.writeState();
       }
       if (this.meansNo(target)) {
-        if (!room.responder) throw new Chat.ErrorMessage(`The Autoresponder for this room is already disabled.`);
+        if (!room.responder)
+          throw new Chat.ErrorMessage(`The Autoresponder for this room is already disabled.`);
         room.responder.destroy();
       }
       this.privateModAction(`${user.name} ${!room.responder ? "disabled" : "enabled"} the auto-response filter.`);
@@ -356,7 +384,8 @@ const commands = {
       }
       this.checkCan("ban", null, room);
       const num = parseInt(index);
-      if (isNaN(num)) throw new Chat.ErrorMessage("Invalid index.");
+      if (isNaN(num))
+        throw new Chat.ErrorMessage("Invalid index.");
       room.responder.tryRemoveRegex(faq, num - 1);
       this.privateModAction(`${user.name} removed regex ${num} from the usable regexes for ${faq}.`);
       this.modlog("AUTOFILTER REMOVE", null, `removed regex ${index} for FAQ ${faq}`);
@@ -422,7 +451,8 @@ const pages = {
     const canChange = user.can("ban", null, room);
     let buf = "";
     const refresh = (type, extra) => {
-      if (extra) extra = extra.filter(Boolean);
+      if (extra)
+        extra = extra.filter(Boolean);
       let button = `<button class="button" name="send" value="/join view-autoresponder-${room.roomid}-${type}`;
       button += `${extra?.length ? `-${extra.join("-")}` : ""}" style="float: right">`;
       button += `<i class="fa fa-refresh"></i> Refresh</button><br />`;
@@ -441,9 +471,11 @@ const pages = {
         buf += `${back}${refresh("stats", [date])}<hr />`;
         if (date) {
           const stats = await room.responder.getStatsFor(date);
-          if (!stats) return `<h2>No stats.</h2>`;
+          if (!stats)
+            return `<h2>No stats.</h2>`;
           this.title = `[Autoresponder Stats] ${date ? date : ""}`;
-          if (!stats.length) return `<h2>No stats for ${date}.</h2>`;
+          if (!stats.length)
+            return `<h2>No stats for ${date}.</h2>`;
           buf += `<strong>Total messages answered: ${stats.length}</strong><hr />`;
           buf += `<details><summary>All messages and the corresponding answers (FAQs):</summary>`;
           for (const entry of stats) {
@@ -470,16 +502,19 @@ const pages = {
         this.checkCan("show", null, room);
         buf = `<div class="pad"><h2>${room.title} responder regexes and responses:</h2>${back}${refresh("keys")}<hr />`;
         buf += Object.entries(roomData.pairs).map(([item, regexes]) => {
-          if (regexes.length < 1) return null;
+          if (regexes.length < 1)
+            return null;
           let buffer = `<details><summary>${item}</summary>`;
           buffer += `<div class="ladder pad"><table><tr><th>Index</th><th>Regex</th>`;
-          if (canChange) buffer += `<th>Options</th>`;
+          if (canChange)
+            buffer += `<th>Options</th>`;
           buffer += `</tr>`;
           for (const regex of regexes) {
             const index = regexes.indexOf(regex) + 1;
             const button = `<button class="button" name="send"value="/msgroom ${room.roomid},/ar remove ${item}, ${index}">Remove</button>`;
             buffer += import_lib.Utils.html`<tr><td>${index}</td><td><code>${regex}</code></td>`;
-            if (canChange) buffer += `<td>${button}</td>`;
+            if (canChange)
+              buffer += `<td>${button}</td>`;
             buffer += `</tr>`;
           }
           buffer += `</details>`;
@@ -512,7 +547,8 @@ const pages = {
 const handlers = {
   onRenameRoom(oldID, newID) {
     if (answererData[oldID]) {
-      if (!answererData[newID]) answererData[newID] = { pairs: {} };
+      if (!answererData[newID])
+        answererData[newID] = { pairs: {} };
       Object.assign(answererData[newID], answererData[oldID]);
       delete answererData[oldID];
       (0, import_lib.FS)(DATA_PATH).writeUpdate(() => JSON.stringify(answererData));

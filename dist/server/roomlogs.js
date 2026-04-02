@@ -35,7 +35,8 @@ var import_database = require("../lib/database");
  * @license MIT
  */
 const roomlogDB = (() => {
-  if (!global.Config || !Config.replaysdb || Config.disableroomlogdb) return null;
+  if (!global.Config || !Config.replaysdb || Config.disableroomlogdb)
+    return null;
   return new import_database.PGDatabase(Config.replaysdb);
 })();
 const roomlogTable = roomlogDB?.getTable("roomlogs");
@@ -55,7 +56,8 @@ class Roomlog {
   }
   getScrollback(channel = 0) {
     let log = this.log;
-    if (!this.noLogTimes) log = [`|:|${~~(Date.now() / 1e3)}`].concat(log);
+    if (!this.noLogTimes)
+      log = [`|:|${~~(Date.now() / 1e3)}`].concat(log);
     if (!this.isMultichannel) {
       return log.join("\n") + "\n";
     }
@@ -66,7 +68,8 @@ class Roomlog {
       if (split) {
         const canSeePrivileged = channel === Number(split[1]) || channel === -1;
         const ownLine = this.log[i + (canSeePrivileged ? 1 : 2)];
-        if (ownLine) log.push(ownLine);
+        if (ownLine)
+          log.push(ownLine);
         i += 2;
       } else {
         log.push(line);
@@ -75,7 +78,8 @@ class Roomlog {
     return log.join("\n") + "\n";
   }
   setupRoomlogStream() {
-    if (this.roomlogStream === null) return;
+    if (this.roomlogStream === null)
+      return;
     if (!Config.logchat || this.roomid.startsWith("battle-") || this.roomid.startsWith("game-")) {
       this.roomlogStream = null;
       return;
@@ -85,15 +89,17 @@ class Roomlog {
       this.roomlogStream = null;
       return;
     }
-    const date = /* @__PURE__ */ new Date();
+    const date = new Date();
     const dateString = Chat.toTimestamp(date).split(" ")[0];
     const monthString = dateString.split("-", 2).join("-");
     const basepath = `chat/${this.roomid}/`;
     const relpath = `${monthString}/${dateString}.txt`;
-    if (relpath === this.roomlogFilename) return;
+    if (relpath === this.roomlogFilename)
+      return;
     Monitor.logPath(basepath + monthString).mkdirpSync();
     this.roomlogFilename = relpath;
-    if (this.roomlogStream) void this.roomlogStream.writeEnd();
+    if (this.roomlogStream)
+      void this.roomlogStream.writeEnd();
     this.roomlogStream = Monitor.logPath(basepath + relpath).createAppendStream();
     const link0 = basepath + "today.txt.0";
     Monitor.logPath(link0).unlinkIfExistsSync();
@@ -102,7 +108,8 @@ class Roomlog {
       Monitor.logPath(link0).renameSync(basepath + "today.txt");
     } catch {
     }
-    if (!Roomlogs.rollLogTimer) Roomlogs.rollLogs();
+    if (!Roomlogs.rollLogTimer)
+      Roomlogs.rollLogs();
   }
   add(message) {
     this.roomlog(message);
@@ -126,10 +133,12 @@ class Roomlog {
     for (const line of this.log) {
       if (line.startsWith("|c:|")) {
         const curUserid = toID(line.split("|", 4)[3]);
-        if (curUserid === userid) return true;
+        if (curUserid === userid)
+          return true;
       } else if (line.startsWith("|c|")) {
         const curUserid = toID(line.split("|", 3)[2]);
-        if (curUserid === userid) return true;
+        if (curUserid === userid)
+          return true;
       }
     }
     return false;
@@ -142,9 +151,12 @@ class Roomlog {
       if (parsed) {
         const userid = toID(parsed.user);
         if (userids.includes(userid)) {
-          if (!cleared.includes(userid)) cleared.push(userid);
-          if (!this.roomlogStream && !this.roomlogTable) return true;
-          if (clearAll) return false;
+          if (!cleared.includes(userid))
+            cleared.push(userid);
+          if (!this.roomlogStream && !this.roomlogTable)
+            return true;
+          if (clearAll)
+            return false;
           if (lineCount > 0) {
             lineCount--;
             return false;
@@ -178,7 +190,8 @@ class Roomlog {
         break;
       }
     }
-    if (!matched) this.log.push(fullMessage);
+    if (!matched)
+      this.log.push(fullMessage);
     this.broadcastBuffer.push(fullMessage);
   }
   parseChatLine(line) {
@@ -190,8 +203,9 @@ class Roomlog {
       }
     }
   }
-  roomlog(message, date = /* @__PURE__ */ new Date()) {
-    if (!Config.logchat) return;
+  roomlog(message, date = new Date()) {
+    if (!Config.logchat)
+      return;
     message = message.replace(/<img[^>]* src="data:image\/png;base64,[^">]+"[^>]*>/g, "[img]");
     if (this.roomlogTable) {
       const chatData = this.parseChatLine(message);
@@ -264,7 +278,8 @@ class Roomlog {
     return true;
   }
   static rollLogs() {
-    if (Roomlogs.rollLogTimer === true) return;
+    if (Roomlogs.rollLogTimer === true)
+      return;
     if (Roomlogs.rollLogTimer) {
       clearTimeout(Roomlogs.rollLogTimer);
     }
@@ -273,12 +288,13 @@ class Roomlog {
       log.setupRoomlogStream();
     }
     const time = Date.now();
-    const nextMidnight = /* @__PURE__ */ new Date();
+    const nextMidnight = new Date();
     nextMidnight.setHours(24, 0, 0, 0);
     Roomlogs.rollLogTimer = setTimeout(() => Roomlog.rollLogs(), nextMidnight.getTime() - time);
   }
   truncate() {
-    if (this.noAutoTruncate) return;
+    if (this.noAutoTruncate)
+      return;
     if (this.log.length > 100) {
       const truncationLength = this.log.length - 100;
       this.log.splice(0, truncationLength);
@@ -304,7 +320,8 @@ class Roomlog {
 const roomlogs = /* @__PURE__ */ new Map();
 function createRoomlog(room, options = {}) {
   let roomlog = Roomlogs.roomlogs.get(room.roomid);
-  if (roomlog) throw new Error(`Roomlog ${room.roomid} already exists`);
+  if (roomlog)
+    throw new Error(`Roomlog ${room.roomid} already exists`);
   roomlog = new Roomlog(room, options);
   Roomlogs.roomlogs.set(room.roomid, roomlog);
   return roomlog;

@@ -27,7 +27,8 @@ const Moves = {
     condition: {
       // Ability suppression implemented in Pokemon.ignoringAbility() within sim/pokemon.js
       onStart(pokemon) {
-        if (pokemon.hasItem("Ability Shield")) return false;
+        if (pokemon.hasItem("Ability Shield"))
+          return false;
         this.add("-endability", pokemon);
         this.singleEvent("End", pokemon.getAbility(), pokemon.abilityState, pokemon, pokemon, "gastroacid");
         const keys = Object.keys(pokemon.volatiles).filter((x) => x.startsWith("ability:"));
@@ -46,10 +47,12 @@ const Moves = {
         this.add("-singlemove", pokemon, "Grudge");
       },
       onFaint(target, source, effect) {
-        if (!source || source.fainted || !effect) return;
+        if (!source || source.fainted || !effect)
+          return;
         if (effect.effectType === "Move" && !effect.flags["futuremove"] && source.lastMove) {
           let move = source.lastMove;
-          if (move.isMax && move.baseMove) move = this.dex.moves.get(move.baseMove);
+          if (move.isMax && move.baseMove)
+            move = this.dex.moves.get(move.baseMove);
           for (const moveSlot of source.moveSlots) {
             if (moveSlot.id === move.id) {
               moveSlot.pp = 0;
@@ -97,10 +100,13 @@ const Moves = {
       if (source.transformed || !move || move.flags["failmimic"] || source.moves.includes(move.id)) {
         return false;
       }
-      if (move.isZ || move.isMax) return false;
+      if (move.isZ || move.isMax)
+        return false;
       const mimicIndex = source.moves.indexOf("mimic");
-      if (mimicIndex < 0) return false;
-      if (!source.m.curMoves.includes("mimic")) return false;
+      if (mimicIndex < 0)
+        return false;
+      if (!source.m.curMoves.includes("mimic"))
+        return false;
       const mimickedMove = {
         move: move.name,
         id: move.id,
@@ -121,11 +127,15 @@ const Moves = {
     onHit(target, source) {
       const disallowedMoves = ["chatter", "sketch", "struggle"];
       const move = target.lastMove;
-      if (source.transformed || !move || source.moves.includes(move.id)) return false;
-      if (disallowedMoves.includes(move.id) || move.isZ || move.isMax) return false;
+      if (source.transformed || !move || source.moves.includes(move.id))
+        return false;
+      if (disallowedMoves.includes(move.id) || move.isZ || move.isMax)
+        return false;
       const sketchIndex = source.moves.indexOf("sketch");
-      if (sketchIndex < 0) return false;
-      if (!source.m.curMoves.includes("sketch")) return false;
+      if (sketchIndex < 0)
+        return false;
+      if (!source.m.curMoves.includes("sketch"))
+        return false;
       const sketchedMove = {
         move: move.name,
         id: move.id,
@@ -191,7 +201,8 @@ const Moves = {
         foeAlly.m.innate = "ability:" + sourceAbility.id;
         foeAlly.addVolatile(foeAlly.m.innate);
       }
-      if (!target.isAlly(source)) target.volatileStaleness = "external";
+      if (!target.isAlly(source))
+        target.volatileStaleness = "external";
       this.singleEvent("Start", targetAbility, source.abilityState, source);
       this.singleEvent("Start", sourceAbility, target.abilityState, target);
     }

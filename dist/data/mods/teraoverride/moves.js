@@ -31,7 +31,8 @@ const Moves = {
   burnup: {
     inherit: true,
     onTryMove(pokemon, target, move) {
-      if (pokemon.hasType(pokemon.teraType)) return;
+      if (pokemon.hasType(pokemon.teraType))
+        return;
       this.add("-fail", pokemon, "move: Burn Up");
       this.attrLastMove("[still]");
       return null;
@@ -98,7 +99,8 @@ const Moves = {
   doubleshock: {
     inherit: true,
     onTryMove(pokemon, target, move) {
-      if (pokemon.hasType(pokemon.teraType)) return;
+      if (pokemon.hasType(pokemon.teraType))
+        return;
       this.add("-fail", pokemon, "move: Double Shock");
       this.attrLastMove("[still]");
       return null;
@@ -108,7 +110,8 @@ const Moves = {
     inherit: true,
     condition: {
       onStart(target, source, effect) {
-        if (target.volatiles["focusenergy"]) return false;
+        if (target.volatiles["focusenergy"])
+          return false;
         if (effect && ["costar", "imposter", "psychup", "transform"].includes(effect.id)) {
           this.add("-start", target, "move: Dragon Cheer", "[silent]");
         } else {
@@ -141,7 +144,8 @@ const Moves = {
         }
       },
       onTryAddVolatile(status, target) {
-        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
+        if (!target.isGrounded() || target.isSemiInvulnerable())
+          return;
         if (status.id === "yawn") {
           this.add("-activate", target, "move: Electric Terrain");
           return null;
@@ -206,7 +210,8 @@ const Moves = {
       onResidualOrder: 5,
       onResidualSubOrder: 1,
       onResidual(pokemon) {
-        if (!pokemon.hasType(this.effectState.source.teraType)) this.damage(pokemon.baseMaxhp / 8, pokemon);
+        if (!pokemon.hasType(this.effectState.source.teraType))
+          this.damage(pokemon.baseMaxhp / 8, pokemon);
       },
       onSideResidualOrder: 26,
       onSideResidualSubOrder: 8,
@@ -234,7 +239,8 @@ const Moves = {
   flyingpress: {
     inherit: true,
     onEffectiveness(typeMod, target, type, move) {
-      if (!target) return;
+      if (!target)
+        return;
       return typeMod + this.dex.getEffectiveness(target.side.foe.active[0].teraType, type);
     }
   },
@@ -246,7 +252,8 @@ const Moves = {
         this.add("-start", pokemon, "Foresight");
       },
       onNegateImmunity(pokemon, type) {
-        if (pokemon.hasType(this.effectState.source.teraType) && ["Normal", "Fighting"].includes(type)) return false;
+        if (pokemon.hasType(this.effectState.source.teraType) && ["Normal", "Fighting"].includes(type))
+          return false;
       },
       onModifyBoost(boosts) {
         if (boosts.evasion && boosts.evasion > 0) {
@@ -258,15 +265,18 @@ const Moves = {
   forestscurse: {
     inherit: true,
     onHit(target, source) {
-      if (target.hasType(source.teraType)) return false;
-      if (!target.addType(source.teraType)) return false;
+      if (target.hasType(source.teraType))
+        return false;
+      if (!target.addType(source.teraType))
+        return false;
       this.add("-start", target, "typeadd", source.teraType, "[from] move: Forest's Curse");
     }
   },
   freezedry: {
     inherit: true,
     onEffectiveness(typeMod, target, type) {
-      if (target && type === target.side.foe.active[0].teraType) return 1;
+      if (target && type === target.side.foe.active[0].teraType)
+        return 1;
     }
   },
   gmaxcannonade: {
@@ -279,7 +289,8 @@ const Moves = {
       onResidualOrder: 5,
       onResidualSubOrder: 1,
       onResidual(target) {
-        if (!target.hasType(this.effectState.source.teraType)) this.damage(target.baseMaxhp / 6, target);
+        if (!target.hasType(this.effectState.source.teraType))
+          this.damage(target.baseMaxhp / 6, target);
       },
       onSideResidualOrder: 26,
       onSideResidualSubOrder: 11,
@@ -295,7 +306,8 @@ const Moves = {
         this.add("-sidestart", side, "move: G-Max Steelsurge");
       },
       onSwitchIn(pokemon) {
-        if (pokemon.hasItem("heavydutyboots")) return;
+        if (pokemon.hasItem("heavydutyboots"))
+          return;
         const steelHazard = this.dex.getActiveMove("Stealth Rock");
         steelHazard.type = this.effectState.source.teraType;
         const typeMod = this.clampIntRange(pokemon.runEffectiveness(steelHazard), -6, 6);
@@ -313,7 +325,8 @@ const Moves = {
       onResidualOrder: 5,
       onResidualSubOrder: 1,
       onResidual(target) {
-        if (!target.hasType(this.effectState.source.teraType)) this.damage(target.baseMaxhp / 6, target);
+        if (!target.hasType(this.effectState.source.teraType))
+          this.damage(target.baseMaxhp / 6, target);
       },
       onSideResidualOrder: 26,
       onSideResidualSubOrder: 11,
@@ -332,7 +345,8 @@ const Moves = {
       onResidualOrder: 5,
       onResidualSubOrder: 1,
       onResidual(target) {
-        if (!target.hasType(this.effectState.source.teraType)) this.damage(target.baseMaxhp / 6, target);
+        if (!target.hasType(this.effectState.source.teraType))
+          this.damage(target.baseMaxhp / 6, target);
       },
       onSideResidualOrder: 26,
       onSideResidualSubOrder: 11,
@@ -351,7 +365,8 @@ const Moves = {
       onResidualOrder: 5,
       onResidualSubOrder: 1,
       onResidual(target) {
-        if (!target.hasType(this.effectState.source.teraType)) this.damage(target.baseMaxhp / 6, target);
+        if (!target.hasType(this.effectState.source.teraType))
+          this.damage(target.baseMaxhp / 6, target);
       },
       onSideResidualOrder: 26,
       onSideResidualSubOrder: 11,
@@ -461,7 +476,8 @@ const Moves = {
         this.add("-start", pokemon, "Miracle Eye");
       },
       onNegateImmunity(pokemon, type) {
-        if (pokemon.hasType(this.effectState.source.teraType) && type === "Psychic") return false;
+        if (pokemon.hasType(this.effectState.source.teraType) && type === "Psychic")
+          return false;
       },
       onModifyBoost(boosts) {
         if (boosts.evasion && boosts.evasion > 0) {
@@ -482,16 +498,19 @@ const Moves = {
         return 5;
       },
       onSetStatus(status, target, source, effect) {
-        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
+        if (!target.isGrounded() || target.isSemiInvulnerable())
+          return;
         if (effect && (effect.status || effect.id === "yawn")) {
           this.add("-activate", target, "move: Misty Terrain");
         }
         return false;
       },
       onTryAddVolatile(status, target, source, effect) {
-        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
+        if (!target.isGrounded() || target.isSemiInvulnerable())
+          return;
         if (status.id === "confusion") {
-          if (effect.effectType === "Move" && !effect.secondaries) this.add("-activate", target, "move: Misty Terrain");
+          if (effect.effectType === "Move" && !effect.secondaries)
+            this.add("-activate", target, "move: Misty Terrain");
           return null;
         }
       },
@@ -540,9 +559,11 @@ const Moves = {
   naturalgift: {
     inherit: true,
     onModifyType(move, pokemon) {
-      if (pokemon.ignoringItem()) return;
+      if (pokemon.ignoringItem())
+        return;
       const item = pokemon.getItem();
-      if (!item.naturalGift) return;
+      if (!item.naturalGift)
+        return;
       move.type = pokemon.teraType;
     }
   },
@@ -580,7 +601,8 @@ const Moves = {
         if (effect && (effect.priority <= 0.1 || effect.target === "self")) {
           return;
         }
-        if (target.isSemiInvulnerable() || target.isAlly(source)) return;
+        if (target.isSemiInvulnerable() || target.isAlly(source))
+          return;
         if (!target.isGrounded()) {
           const baseMove = this.dex.moves.get(effect.id);
           if (baseMove.priority > 0) {
@@ -616,13 +638,16 @@ const Moves = {
     inherit: true,
     condition: {
       onStart(pokemon) {
-        if (pokemon.terastallized) return false;
+        if (pokemon.terastallized)
+          return false;
         this.add("-start", pokemon, "Tar Shot");
       },
       onEffectivenessPriority: -2,
       onEffectiveness(typeMod, target, type, move) {
-        if (!target || move.type !== this.effectState.source.teraType) return;
-        if (type !== target.getTypes()[0]) return;
+        if (!target || move.type !== this.effectState.source.teraType)
+          return;
+        if (type !== target.getTypes()[0])
+          return;
         return typeMod + 1;
       }
     }
@@ -663,7 +688,8 @@ const Moves = {
           targets.push(pokemon);
         }
       }
-      if (!targets.length && !anyAirborne) return false;
+      if (!targets.length && !anyAirborne)
+        return false;
       for (const pokemon of targets) {
         this.boost({ atk: 1, spa: 1 }, pokemon, source);
       }
@@ -703,7 +729,8 @@ const Moves = {
         this.add("-sidestart", side, "move: Stealth Rock");
       },
       onSwitchIn(pokemon) {
-        if (pokemon.hasItem("heavydutyboots")) return;
+        if (pokemon.hasItem("heavydutyboots"))
+          return;
         const typeMod = this.clampIntRange(pokemon.runEffectiveness(this.effectState.source.teraType), -6, 6);
         this.damage(pokemon.maxhp * 2 ** typeMod / 8);
       }
@@ -729,7 +756,8 @@ const Moves = {
   terrainpulse: {
     inherit: true,
     onModifyType(move, pokemon) {
-      if (!pokemon.isGrounded()) return;
+      if (!pokemon.isGrounded())
+        return;
       if (this.field.terrain) {
         move.type = pokemon.teraType;
       }
@@ -744,12 +772,14 @@ const Moves = {
         this.effectState.layers = 1;
       },
       onSideRestart(side) {
-        if (this.effectState.layers >= 2) return false;
+        if (this.effectState.layers >= 2)
+          return false;
         this.add("-sidestart", side, "move: Toxic Spikes");
         this.effectState.layers++;
       },
       onSwitchIn(pokemon) {
-        if (!pokemon.isGrounded()) return;
+        if (!pokemon.isGrounded())
+          return;
         if (pokemon.hasType(this.effectState.source.teraType)) {
           this.add("-sideend", pokemon.side, "move: Toxic Spikes", `[of] ${pokemon}`);
           pokemon.side.removeSideCondition("toxicspikes");
@@ -765,8 +795,10 @@ const Moves = {
   trickortreat: {
     inherit: true,
     onHit(target, source) {
-      if (target.hasType(source.teraType)) return false;
-      if (!target.addType(source.teraType)) return false;
+      if (target.hasType(source.teraType))
+        return false;
+      if (!target.addType(source.teraType))
+        return false;
       this.add("-start", target, "typeadd", source.teraType, "[from] move: Trick-or-Treat");
       if (target.side.active.length === 2 && target.position === 1) {
         const action = this.queue.willMove(target);

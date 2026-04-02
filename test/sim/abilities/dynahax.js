@@ -91,6 +91,52 @@ describe('Dynahax', () => {
 		assert.fullHP(battle.p2.active[0]);
 	});
 
+	// ── Non-move healing immunity (onTryHeal) ──
+
+	it('should block Grassy Terrain healing', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Smeargle', ability: 'owntempo', moves: ['grassyterrain', 'tackle'] }],
+			[{ species: 'Blastoise', ability: 'dynahax', moves: ['splash'] }],
+		]);
+		// Damage Dynahax with a move
+		battle.makeChoices('move tackle', 'move splash');
+		const hp = battle.p2.active[0].hp;
+		assert.false.fullHP(battle.p2.active[0]);
+		// Set Grassy Terrain — residual fires at end of turn, should NOT heal Dynahax
+		battle.makeChoices('move grassyterrain', 'move splash');
+		assert.equal(battle.p2.active[0].hp, hp);
+	});
+
+	it('should block Leftovers healing', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Smeargle', ability: 'owntempo', moves: ['splash'] }],
+			[{ species: 'Blastoise', ability: 'dynahax', item: 'leftovers', moves: ['splash'] }],
+		]);
+		// Directly damage Dynahax (Tackle too weak vs Blastoise to outpace Leftovers)
+		battle.p2.active[0].hp = battle.p2.active[0].maxhp - 100;
+		const hp = battle.p2.active[0].hp;
+		// Splash both — Leftovers residual fires, should NOT heal Dynahax
+		battle.makeChoices('move splash', 'move splash');
+		assert.equal(battle.p2.active[0].hp, hp);
+	});
+
+	it('should block Aqua Ring healing', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Smeargle', ability: 'owntempo', moves: ['splash'] }],
+			[{ species: 'Blastoise', ability: 'dynahax', moves: ['aquaring', 'splash'] }],
+		]);
+		// P2 sets Aqua Ring
+		battle.makeChoices('move splash', 'move aquaring');
+		// Directly damage Dynahax
+		battle.p2.active[0].hp = battle.p2.active[0].maxhp - 100;
+		const hp = battle.p2.active[0].hp;
+		// Both splash — Aqua Ring residual fires, should NOT heal Dynahax
+		battle.makeChoices('move splash', 'move splash');
+		assert.equal(battle.p2.active[0].hp, hp);
+	});
+
+	// ── Move damage still goes through ──
+
 	it('should still take damage from regular moves', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
 			[{ species: 'Smeargle', ability: 'owntempo', moves: ['tackle'] }],

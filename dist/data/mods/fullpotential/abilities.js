@@ -26,7 +26,8 @@ const Abilities = {
     inherit: true,
     onAnyModifyBoost(boosts, pokemon) {
       const unawareUser = this.effectState.target;
-      if (unawareUser === pokemon) return;
+      if (unawareUser === pokemon)
+        return;
       if (unawareUser === this.activePokemon && pokemon === this.activeTarget) {
         boosts["def"] = 0;
         boosts["spd"] = 0;

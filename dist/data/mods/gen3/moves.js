@@ -46,7 +46,8 @@ const Moves = {
   astonish: {
     inherit: true,
     basePowerCallback(pokemon, target) {
-      if (target.volatiles["minimize"]) return 60;
+      if (target.volatiles["minimize"])
+        return 60;
       return 30;
     }
   },
@@ -86,7 +87,8 @@ const Moves = {
       },
       onDamagePriority: -101,
       onDamage(damage, target, source, move) {
-        if (!move || move.effectType !== "Move" || !source) return;
+        if (!move || move.effectType !== "Move" || !source)
+          return;
         this.effectState.totalDamage += damage;
         this.effectState.lastDamageSource = source;
       },
@@ -166,7 +168,8 @@ const Moves = {
         return false;
       }
       const type = this.sample(possibleTypes);
-      if (!target.setType(type)) return false;
+      if (!target.setType(type))
+        return false;
       this.add("-start", target, "typechange", type);
     }
   },
@@ -189,7 +192,8 @@ const Moves = {
         return false;
       }
       const randomType = this.sample(possibleTypes);
-      if (!source.setType(randomType)) return false;
+      if (!source.setType(randomType))
+        return false;
       this.add("-start", source, "typechange", randomType);
     }
   },
@@ -204,7 +208,8 @@ const Moves = {
       },
       onRedirectTargetPriority: -1,
       onRedirectTarget(target, source, source2) {
-        if (source !== this.effectState.target || !this.effectState.slot) return;
+        if (source !== this.effectState.target || !this.effectState.slot)
+          return;
         return this.getAtSlot(this.effectState.slot);
       },
       onDamagePriority: -101,
@@ -288,7 +293,8 @@ const Moves = {
   doomdesire: {
     inherit: true,
     onTry(source, target) {
-      if (!target.side.addSlotCondition(target, "futuremove")) return false;
+      if (!target.side.addSlotCondition(target, "futuremove"))
+        return false;
       const moveData = {
         name: "Doom Desire",
         basePower: 120,
@@ -362,7 +368,8 @@ const Moves = {
   extrasensory: {
     inherit: true,
     basePowerCallback(pokemon, target) {
-      if (target.volatiles["minimize"]) return 160;
+      if (target.volatiles["minimize"])
+        return 160;
       return 80;
     }
   },
@@ -465,7 +472,8 @@ const Moves = {
     onMoveFail(target, source, move) {
       if (target.runImmunity("Fighting")) {
         const damage = this.actions.getDamage(source, target, move, true);
-        if (typeof damage !== "number") throw new Error("HJK recoil failed");
+        if (typeof damage !== "number")
+          throw new Error("HJK recoil failed");
         this.damage(this.clampIntRange(damage / 2, 1, Math.floor(target.maxhp / 2)), source, source, move);
       }
     }
@@ -480,7 +488,8 @@ const Moves = {
     onMoveFail(target, source, move) {
       if (target.runImmunity("Fighting")) {
         const damage = this.actions.getDamage(source, target, move, true);
-        if (typeof damage !== "number") throw new Error("Jump Kick didn't recoil");
+        if (typeof damage !== "number")
+          throw new Error("Jump Kick didn't recoil");
         this.damage(this.clampIntRange(damage / 2, 1, Math.floor(target.maxhp / 2)), source, source, move);
       }
     }
@@ -520,7 +529,8 @@ const Moves = {
       },
       onRedirectTargetPriority: -1,
       onRedirectTarget(target, source, source2) {
-        if (source !== this.effectState.target || !this.effectState.slot) return;
+        if (source !== this.effectState.target || !this.effectState.slot)
+          return;
         return this.getAtSlot(this.effectState.slot);
       },
       onDamagePriority: -101,
@@ -580,7 +590,8 @@ const Moves = {
   needlearm: {
     inherit: true,
     basePowerCallback(pokemon, target) {
-      if (target.volatiles["minimize"]) return 120;
+      if (target.volatiles["minimize"])
+        return 120;
       return 60;
     }
   },
@@ -607,8 +618,10 @@ const Moves = {
   pursuit: {
     inherit: true,
     beforeTurnCallback(pokemon, target) {
-      if (["frz", "slp"].includes(pokemon.status) || pokemon.hasAbility("truant") && pokemon.truantTurn) return;
-      if (pokemon.isAlly(target)) return;
+      if (["frz", "slp"].includes(pokemon.status) || pokemon.hasAbility("truant") && pokemon.truantTurn)
+        return;
+      if (pokemon.isAlly(target))
+        return;
       target.addVolatile("pursuit");
       const data = target.volatiles["pursuit"];
       if (!data.sources) {
@@ -695,7 +708,8 @@ const Moves = {
         this.add("-start", target, "stockpile" + this.effectState.layers);
       },
       onRestart(target) {
-        if (this.effectState.layers >= 3) return false;
+        if (this.effectState.layers >= 3)
+          return false;
         this.effectState.layers++;
         this.add("-start", target, "stockpile" + this.effectState.layers);
       },
@@ -819,7 +833,8 @@ const Moves = {
           move.category = "Special";
           break;
       }
-      if (this.field.effectiveWeather()) move.basePower *= 2;
+      if (this.field.effectiveWeather())
+        move.basePower *= 2;
     }
   },
   zapcannon: {

@@ -60,7 +60,8 @@ const Scripts = {
       let sideTrapped = true;
       let sideStaleness;
       for (const pokemon of side.active) {
-        if (!pokemon) continue;
+        if (!pokemon)
+          continue;
         pokemon.moveThisTurn = "";
         pokemon.newlySwitched = false;
         pokemon.moveLastTurnResult = pokemon.moveThisTurnResult;
@@ -85,7 +86,8 @@ const Scripts = {
             pokemon.disableMove(pokemon.lastMove.id);
           }
         }
-        if (pokemon.getLastAttackedBy() && this.gen >= 7) pokemon.knownType = true;
+        if (pokemon.getLastAttackedBy() && this.gen >= 7)
+          pokemon.knownType = true;
         for (let i = pokemon.attackedBy.length - 1; i >= 0; i--) {
           const attack = pokemon.attackedBy[i];
           if (attack.source.isActive) {
@@ -113,7 +115,8 @@ const Scripts = {
         if (this.gen > 2) {
           for (const source of pokemon.foes()) {
             const species = (source.illusion || source).species;
-            if (!species.abilities) continue;
+            if (!species.abilities)
+              continue;
             for (const abilitySlot in species.abilities) {
               const abilityName = species.abilities[abilitySlot];
               if (abilityName === source.ability) {
@@ -126,16 +129,20 @@ const Scripts = {
                 continue;
               }
               const ability = this.dex.abilities.get(abilityName);
-              if (ruleTable.has("-ability:" + ability.id)) continue;
-              if (pokemon.knownType && !this.dex.getImmunity("trapped", pokemon)) continue;
+              if (ruleTable.has("-ability:" + ability.id))
+                continue;
+              if (pokemon.knownType && !this.dex.getImmunity("trapped", pokemon))
+                continue;
               this.singleEvent("FoeMaybeTrapPokemon", ability, {}, pokemon, source);
             }
           }
         }
-        if (pokemon.fainted) continue;
+        if (pokemon.fainted)
+          continue;
         sideTrapped = sideTrapped && pokemon.trapped;
         const staleness = pokemon.volatileStaleness || pokemon.staleness;
-        if (staleness) sideStaleness = sideStaleness === "external" ? sideStaleness : staleness;
+        if (staleness)
+          sideStaleness = sideStaleness === "external" ? sideStaleness : staleness;
         pokemon.activeTurns++;
       }
       trappedBySide.push(sideTrapped);
@@ -143,7 +150,8 @@ const Scripts = {
       side.faintedLastTurn = side.faintedThisTurn;
       side.faintedThisTurn = null;
     }
-    if (this.maybeTriggerEndlessBattleClause(trappedBySide, stalenessBySide)) return;
+    if (this.maybeTriggerEndlessBattleClause(trappedBySide, stalenessBySide))
+      return;
     if (this.gameType === "triples" && this.sides.every((side) => side.pokemonLeft === 1)) {
       const actives = this.getAllActive();
       if (actives.length > 1 && !actives[0].isAdjacent(actives[1])) {
@@ -164,8 +172,10 @@ const Scripts = {
         }
       }
     }
-    if (this.gen === 2) this.quickClawRoll = this.randomChance(60, 256);
-    if (this.gen === 3) this.quickClawRoll = this.randomChance(1, 5);
+    if (this.gen === 2)
+      this.quickClawRoll = this.randomChance(60, 256);
+    if (this.gen === 3)
+      this.quickClawRoll = this.randomChance(1, 5);
     let buf = `<div class="broadcast-blue"><details><summary>What does which wish do?</summary>`;
     buf += `&bullet; <b>Mega Evolution:</b> <span style="font-size: 9px;">Revive one fainted Pokemon</span><br />`;
     buf += `&bullet; <b>Mega Evolution X:</b> <span style="font-size: 9px;">Gain a +2 boost in the current Pokemon's dominant attack and defense stat</span><br />`;
@@ -181,7 +191,8 @@ const Scripts = {
     switch (action.choice) {
       case "start": {
         for (const side of this.sides) {
-          if (side.pokemonLeft) side.pokemonLeft = side.pokemon.length;
+          if (side.pokemonLeft)
+            side.pokemonLeft = side.pokemon.length;
           this.add("teamsize", side.id, side.pokemon.length);
         }
         this.add("start");
@@ -190,7 +201,8 @@ const Scripts = {
         }
         this.format.onBattleStart?.call(this);
         for (const rule of this.ruleTable.keys()) {
-          if ("+*-!".includes(rule.charAt(0))) continue;
+          if ("+*-!".includes(rule.charAt(0)))
+            continue;
           const subFormat = this.dex.formats.get(rule);
           subFormat.onBattleStart?.call(this);
         }
@@ -209,8 +221,10 @@ const Scripts = {
         break;
       }
       case "move":
-        if (!action.pokemon.isActive) return false;
-        if (action.pokemon.fainted) return false;
+        if (!action.pokemon.isActive)
+          return false;
+        if (action.pokemon.fainted)
+          return false;
         this.actions.runMove(action.move, action.pokemon, action.targetLoc, {
           sourceEffect: action.sourceEffect,
           zMove: action.zmove,
@@ -230,25 +244,33 @@ const Scripts = {
       case "runDynamax":
         action.pokemon.addVolatile("dynamax");
         action.pokemon.side.dynamaxUsed = true;
-        if (action.pokemon.side.allySide) action.pokemon.side.allySide.dynamaxUsed = true;
+        if (action.pokemon.side.allySide)
+          action.pokemon.side.allySide.dynamaxUsed = true;
         break;
       case "terastallize":
         this.actions.terastallize(action.pokemon);
         break;
       case "beforeTurnMove":
-        if (!action.pokemon.isActive) return false;
-        if (action.pokemon.fainted) return false;
+        if (!action.pokemon.isActive)
+          return false;
+        if (action.pokemon.fainted)
+          return false;
         this.debug("before turn callback: " + action.move.id);
         const target = this.getTarget(action.pokemon, action.move, action.targetLoc);
-        if (!target) return false;
-        if (!action.move.beforeTurnCallback) throw new Error(`beforeTurnMove has no beforeTurnCallback`);
+        if (!target)
+          return false;
+        if (!action.move.beforeTurnCallback)
+          throw new Error(`beforeTurnMove has no beforeTurnCallback`);
         action.move.beforeTurnCallback.call(this, action.pokemon, target);
         break;
       case "priorityChargeMove":
-        if (!action.pokemon.isActive) return false;
-        if (action.pokemon.fainted) return false;
+        if (!action.pokemon.isActive)
+          return false;
+        if (action.pokemon.fainted)
+          return false;
         this.debug("priority charge callback: " + action.move.id);
-        if (!action.move.priorityChargeCallback) throw new Error(`priorityChargeMove has no priorityChargeCallback`);
+        if (!action.move.priorityChargeCallback)
+          throw new Error(`priorityChargeMove has no priorityChargeCallback`);
         action.move.priorityChargeCallback.call(this, action.pokemon);
         break;
       case "event":
@@ -295,7 +317,8 @@ const Scripts = {
         action.target.status = "";
         action.target.hp = 1;
         action.target.sethp(action.target.maxhp / 2);
-        if (!action.sourceEffect) action.target.m.revivedByMonkeysPaw = true;
+        if (!action.sourceEffect)
+          action.target.m.revivedByMonkeysPaw = true;
         this.add("-heal", action.target, action.target.getHealth, "[from] move: Revival Blessing");
         action.pokemon.side.removeSlotCondition(action.pokemon, "revivalblessing");
         break;
@@ -303,8 +326,10 @@ const Scripts = {
         this.actions.runSwitch(action.pokemon);
         break;
       case "shift":
-        if (!action.pokemon.isActive) return false;
-        if (action.pokemon.fainted) return false;
+        if (!action.pokemon.isActive)
+          return false;
+        if (action.pokemon.fainted)
+          return false;
         this.swapPosition(action.pokemon, 1);
         break;
       case "beforeTurn":
@@ -316,20 +341,23 @@ const Scripts = {
         this.updateSpeed();
         residualPokemon = this.getAllActive().map((pokemon) => [pokemon, pokemon.getUndynamaxedHP()]);
         this.fieldEvent("Residual");
-        if (!this.ended) this.add("upkeep");
+        if (!this.ended)
+          this.add("upkeep");
         break;
     }
     for (const side of this.sides) {
       for (const pokemon of side.active) {
         if (pokemon.forceSwitchFlag) {
-          if (pokemon.hp) this.actions.dragIn(pokemon.side, pokemon.position);
+          if (pokemon.hp)
+            this.actions.dragIn(pokemon.side, pokemon.position);
           pokemon.forceSwitchFlag = false;
         }
       }
     }
     this.clearActiveMove();
     this.faintMessages();
-    if (this.ended) return true;
+    if (this.ended)
+      return true;
     if (!this.queue.peek() || this.gen <= 3 && ["move", "residual"].includes(this.queue.peek().choice)) {
       this.checkFainted();
     } else if (["megaEvo", "megaEvoX", "megaEvoY"].includes(action.choice) && this.gen === 7) {
@@ -374,14 +402,16 @@ const Scripts = {
           }
           pokemon.switchFlag = false;
         }
-        if (!reviveSwitch) switches[i] = false;
+        if (!reviveSwitch)
+          switches[i] = false;
       } else if (switches[i]) {
         for (const pokemon of this.sides[i].active) {
           if (pokemon.hp && pokemon.switchFlag && pokemon.switchFlag !== "revivalblessing" && !pokemon.skipBeforeSwitchOutEventFlag) {
             this.runEvent("BeforeSwitchOut", pokemon);
             pokemon.skipBeforeSwitchOutEventFlag = true;
             this.faintMessages();
-            if (this.ended) return true;
+            if (this.ended)
+              return true;
             if (pokemon.fainted) {
               switches[i] = this.sides[i].active.some((sidePokemon) => sidePokemon && !!sidePokemon.switchFlag);
             }
@@ -395,11 +425,13 @@ const Scripts = {
         return true;
       }
     }
-    if (this.gen < 5) this.eachEvent("Update");
+    if (this.gen < 5)
+      this.eachEvent("Update");
     if (this.gen >= 8 && (this.queue.peek()?.choice === "move" || this.queue.peek()?.choice === "runDynamax")) {
       this.updateSpeed();
       for (const queueAction of this.queue.list) {
-        if (queueAction.pokemon) this.getActionSpeed(queueAction);
+        if (queueAction.pokemon)
+          this.getActionSpeed(queueAction);
       }
       this.queue.sort();
     }
@@ -408,28 +440,37 @@ const Scripts = {
   actions: {
     inherit: true,
     canMegaEvo(pokemon) {
-      if (!pokemon.side.wishesRemaining) return null;
-      if (!pokemon.side.wishes["life"]) return null;
+      if (!pokemon.side.wishesRemaining)
+        return null;
+      if (!pokemon.side.wishes["life"])
+        return null;
       return "yes";
     },
     canMegaEvoX(pokemon) {
-      if (!pokemon.side.wishesRemaining) return null;
-      if (!pokemon.side.wishes["power"]) return null;
+      if (!pokemon.side.wishesRemaining)
+        return null;
+      if (!pokemon.side.wishes["power"])
+        return null;
       return "yes";
     },
     canMegaEvoY(pokemon) {
-      if (!pokemon.side.wishesRemaining) return null;
-      if (!pokemon.side.wishes["luck"]) return null;
+      if (!pokemon.side.wishesRemaining)
+        return null;
+      if (!pokemon.side.wishes["luck"])
+        return null;
       return "yes";
     },
     canTerastallize(pokemon) {
-      if (!pokemon.side.wishesRemaining) return null;
-      if (!pokemon.side.wishes["knowledge"]) return null;
+      if (!pokemon.side.wishesRemaining)
+        return null;
+      if (!pokemon.side.wishes["knowledge"])
+        return null;
       return "Stellar";
     },
     // wish for life (dead teammate is revived, but that teammate has permanent slow start)
     runMegaEvo(pokemon) {
-      if (!pokemon.canMegaEvo) return false;
+      if (!pokemon.canMegaEvo)
+        return false;
       for (const ally of pokemon.side.pokemon) {
         ally.canMegaEvo = null;
       }
@@ -445,7 +486,8 @@ const Scripts = {
     },
     // wish for power (+2 prominent stat/defense, -2 every other stat)
     runMegaEvoX(pokemon) {
-      if (!pokemon.canMegaEvoX) return false;
+      if (!pokemon.canMegaEvoX)
+        return false;
       for (const ally of pokemon.side.pokemon) {
         ally.canMegaEvoX = null;
       }
@@ -456,11 +498,13 @@ const Scripts = {
       this.battle.add("-message", `At the cost of great power, ${pokemon.name} has become very frail.`);
       this.battle.add("-message", `They have ${pokemon.side.wishesRemaining} wish${pokemon.side.wishesRemaining === 1 ? "" : "es"} remaining.`);
       let positiveBoosts = ["atk", "def"];
-      if (pokemon.getStat("spa", false, true) > pokemon.getStat("atk", false, true)) positiveBoosts = ["spa", "spd"];
+      if (pokemon.getStat("spa", false, true) > pokemon.getStat("atk", false, true))
+        positiveBoosts = ["spa", "spd"];
       const boostsTable = {};
       let boost;
       for (boost in pokemon.boosts) {
-        if (boost === "accuracy" || boost === "evasion" || boost === "spe") continue;
+        if (boost === "accuracy" || boost === "evasion" || boost === "spe")
+          continue;
         if (positiveBoosts.includes(boost)) {
           boostsTable[boost] = 2;
         } else {
@@ -473,7 +517,8 @@ const Scripts = {
     },
     // wish for luck (serene grace + focus energy but confused)
     runMegaEvoY(pokemon) {
-      if (!pokemon.canMegaEvoY) return false;
+      if (!pokemon.canMegaEvoY)
+        return false;
       for (const ally of pokemon.side.pokemon) {
         ally.canMegaEvoY = null;
       }
@@ -491,7 +536,8 @@ const Scripts = {
     },
     // wish for knowledge
     terastallize(pokemon) {
-      if (!pokemon.canTerastallize) return;
+      if (!pokemon.canTerastallize)
+        return;
       for (const ally of pokemon.side.pokemon) {
         ally.canTerastallize = null;
       }

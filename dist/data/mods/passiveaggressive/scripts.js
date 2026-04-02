@@ -46,7 +46,8 @@ const Scripts = {
           targetHits = this.battle.random(targetHits[0], targetHits[1] + 1);
         }
       }
-      if (targetHits === 10 && pokemon.hasItem("loadeddice")) targetHits -= this.battle.random(7);
+      if (targetHits === 10 && pokemon.hasItem("loadeddice"))
+        targetHits -= this.battle.random(7);
       targetHits = Math.floor(targetHits);
       let nullDamage = true;
       let moveDamage = [];
@@ -54,9 +55,12 @@ const Scripts = {
       let targetsCopy = targets.slice(0);
       let hit;
       for (hit = 1; hit <= targetHits; hit++) {
-        if (damage.includes(false)) break;
-        if (hit > 1 && pokemon.status === "slp" && (!isSleepUsable || this.battle.gen === 4)) break;
-        if (targets.every((target2) => !target2?.hp)) break;
+        if (damage.includes(false))
+          break;
+        if (hit > 1 && pokemon.status === "slp" && (!isSleepUsable || this.battle.gen === 4))
+          break;
+        if (targets.every((target2) => !target2?.hp))
+          break;
         move.hit = hit;
         if (move.smartTarget && targets.length > 1) {
           targetsCopy = [targets[hit - 1]];
@@ -98,11 +102,13 @@ const Scripts = {
           accuracy = this.battle.runEvent("ModifyAccuracy", target, pokemon, move, accuracy);
           if (!move.alwaysHit) {
             accuracy = this.battle.runEvent("Accuracy", target, pokemon, move, accuracy);
-            if (accuracy !== true && !this.battle.randomChance(accuracy, 100)) break;
+            if (accuracy !== true && !this.battle.randomChance(accuracy, 100))
+              break;
           }
         }
         const moveData = move;
-        if (!moveData.flags) moveData.flags = {};
+        if (!moveData.flags)
+          moveData.flags = {};
         let moveDamageThisHit;
         [moveDamageThisHit, targetsCopy] = this.spreadMoveHit(targetsCopy, pokemon, move, moveData);
         if (move.smartTarget) {
@@ -110,10 +116,12 @@ const Scripts = {
         } else {
           moveDamage = moveDamageThisHit;
         }
-        if (!moveDamage.some((val) => val !== false)) break;
+        if (!moveDamage.some((val) => val !== false))
+          break;
         nullDamage = false;
         for (const [i, md] of moveDamage.entries()) {
-          if (move.smartTarget && i !== hit - 1) continue;
+          if (move.smartTarget && i !== hit - 1)
+            continue;
           damage[i] = md === true || !md ? 0 : md;
           move.totalDamage += damage[i];
         }
@@ -132,8 +140,10 @@ const Scripts = {
           break;
         }
       }
-      if (hit === 1) return damage.fill(false);
-      if (nullDamage) damage.fill(false);
+      if (hit === 1)
+        return damage.fill(false);
+      if (nullDamage)
+        damage.fill(false);
       this.battle.faintMessages(false, false, !pokemon.hp);
       if (move.multihit && typeof move.smartTarget !== "boolean") {
         this.battle.add("-hitcount", targets[0], hit - 1);
@@ -141,7 +151,8 @@ const Scripts = {
       if ((move.recoil || move.id === "chloroblast") && move.totalDamage) {
         const hpBeforeRecoil = pokemon.hp;
         const recoilDamage = this.calcRecoilDamage(move.totalDamage, move, pokemon);
-        if (recoilDamage !== 1.1) this.battle.damage(recoilDamage, pokemon, pokemon, "recoil");
+        if (recoilDamage !== 1.1)
+          this.battle.damage(recoilDamage, pokemon, pokemon, "recoil");
         if (pokemon.hp <= pokemon.maxhp / 2 && hpBeforeRecoil > pokemon.maxhp / 2) {
           this.battle.runEvent("EmergencyExit", pokemon, pokemon);
         }
@@ -170,8 +181,10 @@ const Scripts = {
           }
         }
       }
-      if (move.ohko && !targets[0].hp) this.battle.add("-ohko");
-      if (!damage.some((val) => !!val || val === 0)) return damage;
+      if (move.ohko && !targets[0].hp)
+        this.battle.add("-ohko");
+      if (!damage.some((val) => !!val || val === 0))
+        return damage;
       this.battle.eachEvent("Update");
       this.afterMoveSecondaryEvent(targetsCopy.filter((val) => !!val), pokemon, move);
       if (!(move.hasSheerForce && pokemon.hasAbility("sheerforce"))) {
@@ -189,8 +202,10 @@ const Scripts = {
     },
     calcRecoilDamage(damageDealt, move, pokemon) {
       const calc = calculate(this.battle, pokemon, pokemon, move.id);
-      if (calc === 0) return 1.1;
-      if (move.id === "chloroblast") return Math.round(calc * pokemon.maxhp / 2);
+      if (calc === 0)
+        return 1.1;
+      if (move.id === "chloroblast")
+        return Math.round(calc * pokemon.maxhp / 2);
       const recoil = Math.round(damageDealt * calc * move.recoil[0] / move.recoil[1]);
       return this.battle.clampIntRange(recoil, 1);
     }
@@ -200,7 +215,8 @@ function calculate(battle, source, pokemon, moveid = "tackle") {
   const move = battle.dex.getActiveMove(moveid);
   move.type = source.getTypes()[0];
   const typeMod = 2 ** battle.clampIntRange(pokemon.runEffectiveness(move), -6, 6);
-  if (!pokemon.runImmunity(move)) return 0;
+  if (!pokemon.runImmunity(move))
+    return 0;
   return typeMod;
 }
 //# sourceMappingURL=scripts.js.map

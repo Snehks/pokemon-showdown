@@ -93,7 +93,7 @@ const GLOBAL_PERMISSIONS = [
   "rangeban",
   "promote"
 ];
-class Auth extends Map {
+const _Auth = class extends Map {
   /**
    * Will return the default group symbol if the user isn't in a group.
    *
@@ -101,39 +101,49 @@ class Auth extends Map {
    * users with temporary global auth.
    */
   get(user) {
-    if (typeof user !== "string") return user.tempGroup;
-    return super.get(user) || Auth.defaultSymbol();
+    if (typeof user !== "string")
+      return user.tempGroup;
+    return super.get(user) || _Auth.defaultSymbol();
   }
   isStaff(userid) {
     if (this.has(userid)) {
       const rank = this.get(userid);
-      return Auth.atLeast(rank, "*") || Auth.atLeast(rank, "%");
+      return _Auth.atLeast(rank, "*") || _Auth.atLeast(rank, "%");
     } else {
       return false;
     }
   }
   atLeast(user, group) {
-    if (user.hasSysopAccess()) return true;
+    if (user.hasSysopAccess())
+      return true;
     if (group === "trusted" || group === "autoconfirmed") {
-      if (user.trusted && group === "trusted") return true;
-      if (user.autoconfirmed && !user.locked && group === "autoconfirmed") return true;
+      if (user.trusted && group === "trusted")
+        return true;
+      if (user.autoconfirmed && !user.locked && group === "autoconfirmed")
+        return true;
       group = Config.groupsranking[1];
     }
-    if (user.locked || user.semilocked) return false;
-    if (group === "unlocked") return true;
+    if (user.locked || user.semilocked)
+      return false;
+    if (group === "unlocked")
+      return true;
     if (group === "whitelist" && this.has(user.id)) {
       return true;
     }
-    if (!Config.groups[group]) return false;
-    if (this.get(user.id) === " " && group !== " ") return false;
-    return Auth.atLeast(this.get(user.id), group);
+    if (!Config.groups[group])
+      return false;
+    if (this.get(user.id) === " " && group !== " ")
+      return false;
+    return _Auth.atLeast(this.get(user.id), group);
   }
   static defaultSymbol() {
     return Config.groupsranking[0];
   }
   static getGroup(symbol, fallback) {
-    if (Config.groups[symbol]) return Config.groups[symbol];
-    if (fallback !== void 0) return fallback;
+    if (Config.groups[symbol])
+      return Config.groups[symbol];
+    if (fallback !== void 0)
+      return fallback;
     return {
       ...Config.groups["+"],
       symbol,
@@ -143,13 +153,14 @@ class Auth extends Map {
   }
   getEffectiveSymbol(user) {
     const group = this.get(user);
-    if (this.has(user.id) && group === Auth.defaultSymbol()) {
+    if (this.has(user.id) && group === _Auth.defaultSymbol()) {
       return "whitelist";
     }
     return group;
   }
   static hasPermission(user, permission, target, room, cmd, cmdToken) {
-    if (user.hasSysopAccess()) return true;
+    if (user.hasSysopAccess())
+      return true;
     const auth = room ? room.auth : Users.globalAuth;
     const symbol = auth.getEffectiveSymbol(user);
     let targetSymbol;
@@ -161,13 +172,13 @@ class Auth extends Map {
       targetSymbol = auth.get(target);
     }
     if (!targetSymbol || ["whitelist", "trusted", "autoconfirmed"].includes(targetSymbol)) {
-      targetSymbol = Auth.defaultSymbol();
+      targetSymbol = _Auth.defaultSymbol();
     }
-    let group = Auth.getGroup(symbol);
-    if (group["root"]) return true;
-    if (room?.settings.section && room.settings.section === Users.globalAuth.sectionLeaders.get(user.id) && // But dont override ranks above moderator such as room owner
-    Auth.getGroup("@").rank > group.rank) {
-      group = Auth.getGroup("@");
+    let group = _Auth.getGroup(symbol);
+    if (group["root"])
+      return true;
+    if (room?.settings.section && room.settings.section === Users.globalAuth.sectionLeaders.get(user.id) && _Auth.getGroup("@").rank > group.rank) {
+      group = _Auth.getGroup("@");
     }
     let jurisdiction = group[permission];
     if (jurisdiction === true && permission !== "jurisdiction") {
@@ -177,14 +188,17 @@ class Auth extends Map {
     if (roomPermissions) {
       let foundSpecificPermission = false;
       if (cmd) {
-        if (!cmdToken) cmdToken = `/`;
+        if (!cmdToken)
+          cmdToken = `/`;
         const namespace = cmd.slice(0, cmd.indexOf(" "));
         if (roomPermissions[`${cmdToken}${cmd}`]) {
-          if (!auth.atLeast(user, roomPermissions[`${cmdToken}${cmd}`])) return false;
+          if (!auth.atLeast(user, roomPermissions[`${cmdToken}${cmd}`]))
+            return false;
           jurisdiction = "u";
           foundSpecificPermission = true;
         } else if (roomPermissions[`${cmdToken}${namespace}`]) {
-          if (!auth.atLeast(user, roomPermissions[`${cmdToken}${namespace}`])) return false;
+          if (!auth.atLeast(user, roomPermissions[`${cmdToken}${namespace}`]))
+            return false;
           jurisdiction = "u";
           foundSpecificPermission = true;
         }
@@ -193,19 +207,21 @@ class Auth extends Map {
         }
       }
       if (!foundSpecificPermission && roomPermissions[permission]) {
-        if (!auth.atLeast(user, roomPermissions[permission])) return false;
+        if (!auth.atLeast(user, roomPermissions[permission]))
+          return false;
         jurisdiction = "u";
       }
     }
-    return Auth.hasJurisdiction(symbol, jurisdiction, targetSymbol);
+    return _Auth.hasJurisdiction(symbol, jurisdiction, targetSymbol);
   }
   static atLeast(symbol, symbol2) {
-    return Auth.getGroup(symbol).rank >= Auth.getGroup(symbol2).rank;
+    return _Auth.getGroup(symbol).rank >= _Auth.getGroup(symbol2).rank;
   }
   static supportedRoomPermissions(room = null) {
     const commands = [];
     for (const handler of Chat.allCommands()) {
-      if (!handler.hasRoomPermissions && !handler.broadcastable) continue;
+      if (!handler.hasRoomPermissions && !handler.broadcastable)
+        continue;
       const cmdPrefix = handler.hasRoomPermissions ? "/" : "!";
       commands.push(`${cmdPrefix}${handler.fullCmd}`);
       if (handler.aliases.length) {
@@ -232,30 +248,29 @@ class Auth extends Map {
     if (jurisdiction.includes("a")) {
       return true;
     }
-    if (jurisdiction.includes("u") && Auth.getGroup(symbol).rank > Auth.getGroup(targetSymbol).rank) {
+    if (jurisdiction.includes("u") && _Auth.getGroup(symbol).rank > _Auth.getGroup(targetSymbol).rank) {
       return true;
     }
     return false;
   }
   static listJurisdiction(user, permission) {
     const symbols = Object.keys(Config.groups);
-    return symbols.filter((targetSymbol) => Auth.hasPermission(user, permission, targetSymbol));
+    return symbols.filter((targetSymbol) => _Auth.hasPermission(user, permission, targetSymbol));
   }
   static isValidSymbol(symbol) {
-    if (symbol.length !== 1) return false;
+    if (symbol.length !== 1)
+      return false;
     return !/[A-Za-z0-9|,]/.test(symbol);
   }
   static isAuthLevel(level) {
-    if (Config.groupsranking.includes(level)) return true;
+    if (Config.groupsranking.includes(level))
+      return true;
     return ["\u203D", "!", "unlocked", "trusted", "autoconfirmed", "whitelist"].includes(level);
   }
-  static {
-    this.ROOM_PERMISSIONS = ROOM_PERMISSIONS;
-  }
-  static {
-    this.GLOBAL_PERMISSIONS = GLOBAL_PERMISSIONS;
-  }
-}
+};
+let Auth = _Auth;
+Auth.ROOM_PERMISSIONS = ROOM_PERMISSIONS;
+Auth.GLOBAL_PERMISSIONS = GLOBAL_PERMISSIONS;
 class RoomAuth extends Auth {
   constructor(room) {
     super();
@@ -286,7 +301,8 @@ class RoomAuth extends Auth {
     const symbol = super.getEffectiveSymbol(user);
     if (!this.room.persist && symbol === user.tempGroup) {
       const replaceGroup = Auth.getGroup(symbol).globalGroupInPersonalRoom;
-      if (replaceGroup) return replaceGroup;
+      if (replaceGroup)
+        return replaceGroup;
     }
     if (this.room.settings.isPrivate === true && user.can("makeroom")) {
       return Users.globalAuth.get(user);
@@ -318,11 +334,13 @@ class RoomAuth extends Auth {
     this.room.settings.auth[id] = symbol;
     this.room.saveSettings();
     const user = Users.get(id);
-    if (user) this.room.onUpdateIdentity(user);
+    if (user)
+      this.room.onUpdateIdentity(user);
     return this;
   }
   delete(id) {
-    if (!this.has(id)) return false;
+    if (!this.has(id))
+      return false;
     super.delete(id);
     delete this.room.settings.auth[id];
     this.room.saveSettings();
@@ -349,7 +367,8 @@ class GlobalAuth extends Auth {
   load() {
     const data = (0, import_fs.FS)("config/usergroups.csv").readIfExistsSync();
     for (const row of data.split("\n")) {
-      if (!row) continue;
+      if (!row)
+        continue;
       const [name, symbol, sectionid] = row.split(",");
       const id = (0, import_dex_data.toID)(name);
       if (!id) {
@@ -358,15 +377,18 @@ class GlobalAuth extends Auth {
         continue;
       }
       this.usernames.set(id, name);
-      if (sectionid) this.sectionLeaders.set(id, sectionid);
+      if (sectionid)
+        this.sectionLeaders.set(id, sectionid);
       const newSymbol = symbol.charAt(0);
       const preexistingSymbol = super.has(id) ? super.get(id) : null;
-      if (preexistingSymbol && Auth.atLeast(preexistingSymbol, newSymbol)) continue;
+      if (preexistingSymbol && Auth.atLeast(preexistingSymbol, newSymbol))
+        continue;
       super.set(id, newSymbol);
     }
   }
   set(id, group, username) {
-    if (!username) username = id;
+    if (!username)
+      username = id;
     const user = Users.get(id, true);
     if (user) {
       user.tempGroup = group;
@@ -380,7 +402,8 @@ class GlobalAuth extends Auth {
     return this;
   }
   delete(id) {
-    if (!super.has(id)) return false;
+    if (!super.has(id))
+      return false;
     super.delete(id);
     const user = Users.get(id);
     if (user) {
@@ -391,20 +414,23 @@ class GlobalAuth extends Auth {
     return true;
   }
   setSection(id, sectionid, username) {
-    if (!username) username = id;
+    if (!username)
+      username = id;
     const user = Users.get(id);
     if (user) {
       user.updateIdentity();
       username = user.name;
       Rooms.global.checkAutojoin(user);
     }
-    if (!super.has(id)) this.set(id, " ", username);
+    if (!super.has(id))
+      this.set(id, " ", username);
     this.sectionLeaders.set(id, sectionid);
     void this.save();
     return this;
   }
   deleteSection(id) {
-    if (!this.sectionLeaders.has(id)) return false;
+    if (!this.sectionLeaders.has(id))
+      return false;
     this.sectionLeaders.delete(id);
     if (super.get(id) === " ") {
       return this.delete(id);

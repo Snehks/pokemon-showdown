@@ -49,7 +49,8 @@ const Items = {
   brightpowder: {
     inherit: true,
     onModifyAccuracy(accuracy) {
-      if (typeof accuracy !== "number") return;
+      if (typeof accuracy !== "number")
+        return;
       this.debug("brightpowder - decreasing accuracy");
       return accuracy - 20;
     }
@@ -202,7 +203,8 @@ const Items = {
         "wingattack"
       ];
       if (affectedByKingsRock.includes(move.id)) {
-        if (!move.secondaries) move.secondaries = [];
+        if (!move.secondaries)
+          move.secondaries = [];
         move.secondaries.push({
           chance: 12,
           volatileStatus: "flinch",

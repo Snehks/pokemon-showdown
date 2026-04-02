@@ -25,7 +25,8 @@ const Items = {
   buggem: {
     inherit: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Grass" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -36,7 +37,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Fighting" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -50,7 +52,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Normal" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -70,7 +73,8 @@ const Items = {
   fairygem: {
     inherit: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Psychic" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -79,7 +83,8 @@ const Items = {
   flyinggem: {
     inherit: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Normal" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -88,7 +93,8 @@ const Items = {
   ghostgem: {
     inherit: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Psychic" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -113,7 +119,8 @@ const Items = {
   groundgem: {
     inherit: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Fighting" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -130,7 +137,8 @@ const Items = {
   icegem: {
     inherit: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Water" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -155,9 +163,12 @@ const Items = {
   ironball: {
     inherit: true,
     onEffectiveness(typeMod, target, type, move) {
-      if (!target) return;
-      if (target.volatiles["ingrain"] || target.volatiles["smackdown"] || this.field.getPseudoWeather("gravity")) return;
-      if (move.type === "Fighting" && target.hasType("Normal")) return 0;
+      if (!target)
+        return;
+      if (target.volatiles["ingrain"] || target.volatiles["smackdown"] || this.field.getPseudoWeather("gravity"))
+        return;
+      if (move.type === "Fighting" && target.hasType("Normal"))
+        return 0;
     }
   },
   kasibberry: {
@@ -165,7 +176,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Psychic" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -179,7 +191,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Dark" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -215,7 +228,8 @@ const Items = {
   poisongem: {
     inherit: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Dark" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -224,7 +238,8 @@ const Items = {
   rockgem: {
     inherit: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Fighting" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -243,7 +258,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Psychic" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -265,7 +281,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Fighting" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -335,7 +352,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Grass" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -357,7 +375,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Water" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");

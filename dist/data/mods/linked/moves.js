@@ -27,7 +27,8 @@ const Moves = {
     beforeTurnCallback(pokemon) {
       const linkedMoves = pokemon.getLinkedMoves();
       if (linkedMoves.length) {
-        if (linkedMoves[0].id !== "pursuit" && linkedMoves[1].id === "pursuit") return;
+        if (linkedMoves[0].id !== "pursuit" && linkedMoves[1].id === "pursuit")
+          return;
       }
       for (const target of pokemon.foes()) {
         target.addVolatile("pursuit");
@@ -43,11 +44,15 @@ const Moves = {
     inherit: true,
     onTryHit(target, pokemon) {
       const action = this.queue.willMove(target);
-      if (!action) return false;
+      if (!action)
+        return false;
       const move = this.dex.getActiveMove(action.linked?.[0] || action.move.id);
-      if (action.zmove || move.isZ || move.isMax) return false;
-      if (target.volatiles["mustrecharge"]) return false;
-      if (move.category === "Status" || move.flags["failmefirst"]) return false;
+      if (action.zmove || move.isZ || move.isMax)
+        return false;
+      if (target.volatiles["mustrecharge"])
+        return false;
+      if (move.category === "Status" || move.flags["failmefirst"])
+        return false;
       pokemon.addVolatile("mefirst");
       this.actions.useMove(move, pokemon, { target });
       return null;
@@ -58,8 +63,7 @@ const Moves = {
     inherit: true,
     onTry(source, target) {
       const action = this.queue.willMove(target);
-      if (!action || action.choice !== "move" || // @ts-expect-error modded
-      !action.linked && action.move.category === "Status" && action.move.id !== "mefirst") {
+      if (!action || action.choice !== "move" || !action.linked && action.move.category === "Status" && action.move.id !== "mefirst") {
         this.attrLastMove("[still]");
         this.add("-fail", source);
         return null;
@@ -71,7 +75,8 @@ const Moves = {
       }
       if (action.linked) {
         for (const linkedMove of action.linked) {
-          if (linkedMove.category !== "Status" || linkedMove.id === "mefirst") return;
+          if (linkedMove.category !== "Status" || linkedMove.id === "mefirst")
+            return;
         }
         this.attrLastMove("[still]");
         this.add("-fail", source);
@@ -83,8 +88,7 @@ const Moves = {
     inherit: true,
     onTry(source, target) {
       const action = this.queue.willMove(target);
-      if (!action || action.choice !== "move" || // @ts-expect-error modded
-      !action.linked && action.move.category === "Status" && action.move.id !== "mefirst") {
+      if (!action || action.choice !== "move" || !action.linked && action.move.category === "Status" && action.move.id !== "mefirst") {
         this.attrLastMove("[still]");
         this.add("-fail", source);
         return null;
@@ -96,7 +100,8 @@ const Moves = {
       }
       if (action.linked) {
         for (const linkedMove of action.linked) {
-          if (linkedMove.category !== "Status" || linkedMove.id === "mefirst") return;
+          if (linkedMove.category !== "Status" || linkedMove.id === "mefirst")
+            return;
         }
         this.attrLastMove("[still]");
         this.add("-fail", source);
@@ -108,8 +113,7 @@ const Moves = {
     inherit: true,
     onTry(source, target) {
       const action = this.queue.willMove(target);
-      if (!action || action.choice !== "move" || action.move.priority < 0.1 || // @ts-expect-error modded
-      !action.linked && action.move.category === "Status" && action.move.id !== "mefirst") {
+      if (!action || action.choice !== "move" || action.move.priority < 0.1 || !action.linked && action.move.category === "Status" && action.move.id !== "mefirst") {
         this.attrLastMove("[still]");
         this.add("-fail", source);
         return null;
@@ -121,7 +125,8 @@ const Moves = {
       }
       if (action.linked) {
         for (const linkedMove of action.linked) {
-          if (linkedMove.category !== "Status" || linkedMove.id === "mefirst") return;
+          if (linkedMove.category !== "Status" || linkedMove.id === "mefirst")
+            return;
         }
         this.attrLastMove("[still]");
         this.add("-fail", source);
@@ -137,8 +142,10 @@ const Moves = {
       // doesn't get copied by Z-Baton Pass
       onStart(target) {
         let move = target.lastMove;
-        if (!move || target.volatiles["dynamax"]) return false;
-        if (move.isMax && move.baseMove) move = this.dex.moves.get(move.baseMove);
+        if (!move || target.volatiles["dynamax"])
+          return false;
+        if (move.isMax && move.baseMove)
+          move = this.dex.moves.get(move.baseMove);
         const linkedMoves = target.getLinkedMoves(true);
         const moveSlot = target.getMoveData(move.id);
         const isLinkedMove = linkedMoves.some((x) => x.id === move.id);
@@ -168,15 +175,18 @@ const Moves = {
         this.effectState.timesActivated[this.turn]++;
         if (!Array.isArray(this.effectState.move)) {
           this.queue.cancelAction(pokemon);
-          if (move.id !== this.effectState.move) return this.effectState.move;
+          if (move.id !== this.effectState.move)
+            return this.effectState.move;
         } else {
           switch (this.effectState.timesActivated[this.turn]) {
             case 1: {
-              if (this.effectState.move[0] !== move.id) return this.effectState.move[0];
+              if (this.effectState.move[0] !== move.id)
+                return this.effectState.move[0];
               return;
             }
             case 2:
-              if (this.effectState.move[1] !== move.id) return this.effectState.move[1];
+              if (this.effectState.move[1] !== move.id)
+                return this.effectState.move[1];
               return;
           }
         }
@@ -198,16 +208,19 @@ const Moves = {
         this.add("-end", target, "Encore");
       },
       onDisableMove(pokemon) {
-        if (!this.effectState.move) return;
+        if (!this.effectState.move)
+          return;
         if (Array.isArray(this.effectState.move)) {
-          if (this.effectState.move.every((move) => !pokemon.hasMove(move))) return;
+          if (this.effectState.move.every((move) => !pokemon.hasMove(move)))
+            return;
           for (const moveSlot of pokemon.moveSlots) {
             if (!this.effectState.move.map((move) => move.id).includes(moveSlot.id)) {
               pokemon.disableMove(moveSlot.id);
             }
           }
         } else {
-          if (!pokemon.hasMove(this.effectState.move)) return;
+          if (!pokemon.hasMove(this.effectState.move))
+            return;
           for (const moveSlot of pokemon.moveSlots) {
             if (moveSlot.id !== this.effectState.move) {
               pokemon.disableMove(moveSlot.id);
@@ -226,7 +239,8 @@ const Moves = {
           delete pokemon.volatiles["torment"];
           return false;
         }
-        if (effect?.id === "gmaxmeltdown") this.effectState.duration = 3;
+        if (effect?.id === "gmaxmeltdown")
+          this.effectState.duration = 3;
         this.add("-start", pokemon, "Torment");
       },
       onEnd(pokemon) {
@@ -234,10 +248,12 @@ const Moves = {
       },
       onDisableMove(pokemon) {
         const lastMove = pokemon.lastMove;
-        if (!lastMove || lastMove.id === "struggle") return;
+        if (!lastMove || lastMove.id === "struggle")
+          return;
         pokemon.disableMove(lastMove.id);
         const { linkIndex, linkedMoves } = pokemon.queryLinkMove(lastMove);
-        if (linkIndex >= 0) pokemon.disableMove(linkedMoves[1 - linkIndex].id);
+        if (linkIndex >= 0)
+          pokemon.disableMove(linkedMoves[1 - linkIndex].id);
       }
     }
   },
@@ -249,10 +265,12 @@ const Moves = {
         this.add("-singlemove", pokemon, "Grudge");
       },
       onFaint(target, source, effect) {
-        if (!source || source.fainted || !effect) return;
+        if (!source || source.fainted || !effect)
+          return;
         let move = source.lastMove;
         if (effect.effectType === "Move" && !effect.flags["futuremove"] && move) {
-          if (move.isMax && move.baseMove) move = this.dex.moves.get(move.baseMove);
+          if (move.isMax && move.baseMove)
+            move = this.dex.moves.get(move.baseMove);
           for (const moveSlot of source.moveSlots) {
             if (moveSlot.id === move.id) {
               moveSlot.pp = 0;
@@ -263,7 +281,8 @@ const Moves = {
       },
       onBeforeMovePriority: 100,
       onBeforeMove(pokemon) {
-        if (pokemon.moveThisTurn) return;
+        if (pokemon.moveThisTurn)
+          return;
         this.debug("removing Grudge before attack");
         pokemon.removeVolatile("grudge");
       }
@@ -277,7 +296,8 @@ const Moves = {
         this.add("-singlemove", pokemon, "Destiny Bond");
       },
       onFaint(target, source, effect) {
-        if (!source || !effect || target.isAlly(source)) return;
+        if (!source || !effect || target.isAlly(source))
+          return;
         if (effect.effectType === "Move" && !effect.flags["futuremove"]) {
           if (source.volatiles["dynamax"]) {
             this.add("-hint", "Dynamaxed Pok\xE9mon are immune to Destiny Bond.");
@@ -289,7 +309,8 @@ const Moves = {
       },
       onBeforeMovePriority: -1,
       onBeforeMove(pokemon, target, move) {
-        if (pokemon.moveThisTurn || move.id === "destinybond") return;
+        if (pokemon.moveThisTurn || move.id === "destinybond")
+          return;
         this.debug("removing Destiny Bond before attack");
         pokemon.removeVolatile("destinybond");
       },

@@ -86,7 +86,8 @@ function onDatabaseStart(database) {
   if (version !== migrations.length) {
     for (const migration of migrations) {
       const num = /(\d+)\.sql$/.exec(migration)?.[1];
-      if (!num || version >= num) continue;
+      if (!num || version >= num)
+        continue;
       database.exec("BEGIN TRANSACTION");
       try {
         database.exec((0, import_lib.FS)(`databases/migrations/pms/${migration}`).readSync());

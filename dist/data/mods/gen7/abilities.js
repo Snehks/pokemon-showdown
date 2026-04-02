@@ -68,7 +68,8 @@ const Abilities = {
         }
       }
       let randomStat = stats.length ? this.sample(stats) : void 0;
-      if (randomStat) boost[randomStat] = 2;
+      if (randomStat)
+        boost[randomStat] = 2;
       stats = [];
       let statMinus;
       for (statMinus in pokemon.boosts) {
@@ -77,7 +78,8 @@ const Abilities = {
         }
       }
       randomStat = stats.length ? this.sample(stats) : void 0;
-      if (randomStat) boost[randomStat] = -1;
+      if (randomStat)
+        boost[randomStat] = -1;
       this.boost(boost, pokemon, pokemon);
     }
   },

@@ -42,6 +42,7 @@ const PBO_EVENT_FORMS = [
   ["archeopsh4", "archeops", "Archeops-H4", "H4"],
   ["armaldoh4", "armaldo", "Armaldo-H4", "H4"],
   ["armarougeh4", "armarouge", "Armarouge-H4", "H4"],
+  ["armoredmewtwo", "mewtwo", "Armored-Mewtwo", "Armored"],
   ["azumarille", "azumarill", "Azumarill-E", "E"],
   ["azumarillh", "azumarill", "Azumarill-H", "H"],
   ["bagonh", "bagon", "Bagon-H", "H"],
@@ -79,7 +80,9 @@ const PBO_EVENT_FORMS = [
   ["chesnaughts", "chesnaught", "Chesnaught-S", "S"],
   ["cinderaceh", "cinderace", "Cinderace-H", "H"],
   ["cinderaceh4", "cinderace", "Cinderace-H4", "H4"],
+  ["clefablec", "clefable", "Clefable-C", "C"],
   ["clefablec4", "clefable", "Clefable-C4", "C4"],
+  ["clefairyc", "clefairy", "Clefairy-C", "C"],
   ["cloysterc4", "cloyster", "Cloyster-C4", "C4"],
   ["cloysterh", "cloyster", "Cloyster-H", "H"],
   ["cobalionh4", "cobalion", "Cobalion-H4", "H4"],
@@ -402,7 +405,8 @@ const Scripts = {
   init() {
     for (const [eventId, baseId, displayName, forme] of PBO_EVENT_FORMS) {
       const baseData = this.data.Pokedex[baseId];
-      if (!baseData) continue;
+      if (!baseData)
+        continue;
       this.data.Pokedex[eventId] = {
         ...baseData,
         name: displayName,
@@ -540,8 +544,10 @@ const Scripts = {
     // Vanilla Showdown omits level when level === 100, but PBO has levels > 100.
     getUpdatedDetails(level) {
       let name = this.species.name;
-      if (["Greninja-Bond", "Rockruff-Dusk"].includes(name)) name = this.species.baseSpecies;
-      if (!level) level = this.level;
+      if (["Greninja-Bond", "Rockruff-Dusk"].includes(name))
+        name = this.species.baseSpecies;
+      if (!level)
+        level = this.level;
       return name + `, L${level}` + (this.gender === "" ? "" : `, ${this.gender}`) + (this.set.shiny ? ", shiny" : "");
     }
   }

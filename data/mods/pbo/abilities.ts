@@ -12,6 +12,12 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 			if (effect.effectType !== 'Move') return false;
 		},
 
+		// Block all non-move healing (Grassy Terrain, Leftovers, Aqua Ring, etc.)
+		// Mirrors: canPokemonGainHpFromTerrain → false, getModifiedRestorationHpFromItem → 1
+		onTryHeal(damage, target, source, effect) {
+			if (effect && effect.effectType !== 'Move') return 0;
+		},
+
 		// [PBO] Max/G-Max moves used natively have basePower 10 in move data.
 		// Boost to 130 (standard G-Max power derived from ~90 BP base moves).
 		onBasePower(basePower, attacker, defender, move) {

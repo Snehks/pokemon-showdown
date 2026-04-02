@@ -45,8 +45,10 @@ const Scripts = {
       return !!(this.battle.gen >= 5 && !this.isActive || (this.volatiles["gastroacid"] || neutralizinggas && (this.ability !== "neutralizinggas" || this.m.innates?.some((k) => k === "neutralizinggas"))) && !this.getAbility().flags["cantsuppress"]);
     },
     hasAbility(ability) {
-      if (this.ignoringAbility()) return false;
-      if (Array.isArray(ability)) return ability.some((abil) => this.hasAbility(abil));
+      if (this.ignoringAbility())
+        return false;
+      if (Array.isArray(ability))
+        return ability.some((abil) => this.hasAbility(abil));
       ability = this.battle.toID(ability);
       return this.ability === ability || !!this.volatiles["ability:" + ability];
     },
@@ -55,7 +57,8 @@ const Scripts = {
       if (pokemon.fainted || this.illusion || pokemon.illusion || pokemon.volatiles["substitute"] && this.battle.gen >= 5 || pokemon.transformed && this.battle.gen >= 2 || this.transformed && this.battle.gen >= 5 || species.name === "Eternatus-Eternamax") {
         return false;
       }
-      if (!this.setSpecies(species, effect, true)) return false;
+      if (!this.setSpecies(species, effect, true))
+        return false;
       this.transformed = true;
       this.weighthg = pokemon.weighthg;
       const types = pokemon.getTypes(true, true);
@@ -66,7 +69,8 @@ const Scripts = {
       let statName;
       for (statName in this.storedStats) {
         this.storedStats[statName] = pokemon.storedStats[statName];
-        if (this.modifiedStats) this.modifiedStats[statName] = pokemon.modifiedStats[statName];
+        if (this.modifiedStats)
+          this.modifiedStats[statName] = pokemon.modifiedStats[statName];
       }
       this.moveSlots = [];
       this.set.ivs = this.battle.gen >= 5 ? this.set.ivs : pokemon.set.ivs;
@@ -95,12 +99,15 @@ const Scripts = {
       }
       if (this.battle.gen >= 6) {
         const volatilesToCopy = ["dragoncheer", "focusenergy", "gmaxchistrike", "laserfocus"];
-        for (const volatile of volatilesToCopy) this.removeVolatile(volatile);
+        for (const volatile of volatilesToCopy)
+          this.removeVolatile(volatile);
         for (const volatile of volatilesToCopy) {
           if (pokemon.volatiles[volatile]) {
             this.addVolatile(volatile);
-            if (volatile === "gmaxchistrike") this.volatiles[volatile].layers = pokemon.volatiles[volatile].layers;
-            if (volatile === "dragoncheer") this.volatiles[volatile].hasDragonType = pokemon.volatiles[volatile].hasDragonType;
+            if (volatile === "gmaxchistrike")
+              this.volatiles[volatile].layers = pokemon.volatiles[volatile].layers;
+            if (volatile === "dragoncheer")
+              this.volatiles[volatile].hasDragonType = pokemon.volatiles[volatile].hasDragonType;
           }
         }
       }
@@ -150,11 +157,14 @@ const Scripts = {
      * as well as sending all relevant messages sent to the client.
      */
     formeChange(speciesId, source, isPermanent, message) {
-      if (!source) source = this.battle.effect;
+      if (!source)
+        source = this.battle.effect;
       const rawSpecies = this.battle.dex.species.get(speciesId);
       const species = this.setSpecies(rawSpecies, source);
-      if (!species) return false;
-      if (this.battle.gen <= 2) return true;
+      if (!species)
+        return false;
+      if (this.battle.gen <= 2)
+        return true;
       const apparentSpecies = this.illusion ? this.illusion.species.name : species.baseSpecies;
       if (isPermanent) {
         this.baseSpecies = rawSpecies;

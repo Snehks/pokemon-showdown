@@ -113,7 +113,8 @@ const Abilities = {
   },
   lightningrod: {
     onFoeRedirectTarget(target, source, source2, move) {
-      if (this.dex.moves.get(move.id).type !== "Electric") return;
+      if (this.dex.moves.get(move.id).type !== "Electric")
+        return;
       if (this.validTarget(this.effectState.target, source, move.target)) {
         return this.effectState.target;
       }
@@ -135,8 +136,10 @@ const Abilities = {
       }
     },
     onAnyMaybeTrapPokemon(pokemon, source) {
-      if (!source) source = this.effectState.target;
-      if (!source || !pokemon.isAdjacent(source)) return;
+      if (!source)
+        source = this.effectState.target;
+      if (!source || !pokemon.isAdjacent(source))
+        return;
       if (!pokemon.knownType || pokemon.hasType("Steel")) {
         pokemon.maybeTrapped = true;
       }
@@ -220,7 +223,8 @@ const Abilities = {
     },
     onStart(pokemon) {
       const target = pokemon.side.randomFoe();
-      if (!target || target.fainted) return;
+      if (!target || target.fainted)
+        return;
       const ability = target.getAbility();
       pokemon.setAbility(ability, target);
     },

@@ -87,7 +87,8 @@ const Abilities = {
   overcoat: {
     inherit: true,
     onImmunity(type, pokemon) {
-      if (type === "sandstorm" || type === "hail") return false;
+      if (type === "sandstorm" || type === "hail")
+        return false;
     },
     onTryHit() {
     },
@@ -105,7 +106,8 @@ const Abilities = {
       if (move.secondaries && move.id !== "secretpower") {
         this.debug("doubling secondary chance");
         for (const secondary of move.secondaries) {
-          if (secondary.chance) secondary.chance *= 2;
+          if (secondary.chance)
+            secondary.chance *= 2;
         }
       }
     }
@@ -118,7 +120,8 @@ const Abilities = {
   rebound: {
     inherit: true,
     onAllyTryHitSide(target, source, move) {
-      if (this.effectState.target.activeTurns) return;
+      if (this.effectState.target.activeTurns)
+        return;
       if (target.isAlly(source) || move.hasBounced || !move.flags["reflectable"]) {
         return;
       }

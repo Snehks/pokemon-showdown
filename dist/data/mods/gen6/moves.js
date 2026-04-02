@@ -74,7 +74,8 @@ const Moves = {
         }
       },
       onOverrideAction(pokemon, target, move) {
-        if (move.id !== this.effectState.move) return this.effectState.move;
+        if (move.id !== this.effectState.move)
+          return this.effectState.move;
       },
       onResidualOrder: 16,
       onResidual(target) {
@@ -102,7 +103,8 @@ const Moves = {
     inherit: true,
     basePower: 30,
     onAfterMoveSecondarySelf(pokemon, target, move) {
-      if (!target || target.fainted || target.hp <= 0) this.boost({ atk: 2 }, pokemon, pokemon, move);
+      if (!target || target.fainted || target.hp <= 0)
+        this.boost({ atk: 2 }, pokemon, pokemon, move);
     }
   },
   flyingpress: {
@@ -171,7 +173,8 @@ const Moves = {
         return 5;
       },
       onSetStatus(status, target, source, effect) {
-        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
+        if (!target.isGrounded() || target.isSemiInvulnerable())
+          return;
         if (effect && (effect.status || effect.id === "yawn")) {
           this.add("-activate", target, "move: Misty Terrain");
         }
@@ -255,7 +258,8 @@ const Moves = {
         this.boost({ def: 1, spd: 1 }, target, target);
       },
       onRestart(target) {
-        if (this.effectState.layers >= 3) return false;
+        if (this.effectState.layers >= 3)
+          return false;
         this.effectState.layers++;
         this.add("-start", target, "stockpile" + this.effectState.layers);
         this.boost({ def: 1, spd: 1 }, target, target);

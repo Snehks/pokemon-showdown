@@ -51,7 +51,8 @@ const Scripts = {
     },
     runMegaEvo(pokemon) {
       const speciesid = pokemon.canMegaEvo || pokemon.canMegaEvoX || pokemon.canMegaEvoY;
-      if (!speciesid) return false;
+      if (!speciesid)
+        return false;
       pokemon.formeChange(speciesid, null, true);
       this.battle.add("-mega", pokemon, this.dex.species.get(speciesid).baseSpecies);
       pokemon.formeRegression = true;
@@ -64,12 +65,14 @@ const Scripts = {
       return true;
     },
     runMegaEvoX(pokemon) {
-      if (!pokemon.canMegaEvoX) return false;
+      if (!pokemon.canMegaEvoX)
+        return false;
       pokemon.canMegaEvoY = false;
       return this.runMegaEvo(pokemon);
     },
     runMegaEvoY(pokemon) {
-      if (!pokemon.canMegaEvoY) return false;
+      if (!pokemon.canMegaEvoY)
+        return false;
       pokemon.canMegaEvoX = false;
       return this.runMegaEvo(pokemon);
     }

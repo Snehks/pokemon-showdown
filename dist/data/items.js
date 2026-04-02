@@ -189,7 +189,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 3)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 3))
+        return false;
     },
     onEat(pokemon) {
       this.heal(pokemon.baseMaxhp / 3);
@@ -380,7 +381,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Steel" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -604,7 +606,8 @@ const Items = {
       }
     },
     onTakeItem(item, source) {
-      if (source.baseSpecies.baseSpecies === "Kyogre") return false;
+      if (source.baseSpecies.baseSpecies === "Kyogre")
+        return false;
       return true;
     },
     itemUser: ["Kyogre"],
@@ -648,7 +651,8 @@ const Items = {
       this.effect.onUpdate.call(this, pokemon);
     },
     onUpdate(pokemon) {
-      if (!this.effectState.started || pokemon.transformed) return;
+      if (!this.effectState.started || pokemon.transformed)
+        return;
       if (pokemon.hasAbility("protosynthesis") && !this.field.isWeather("sunnyday") && pokemon.useItem()) {
         pokemon.addVolatile("protosynthesis");
       }
@@ -657,7 +661,8 @@ const Items = {
       }
     },
     onTakeItem(item, source) {
-      if (source.baseSpecies.tags.includes("Paradox")) return false;
+      if (source.baseSpecies.tags.includes("Paradox"))
+        return false;
       return true;
     },
     num: 1880,
@@ -680,7 +685,8 @@ const Items = {
     },
     onModifyAccuracyPriority: -2,
     onModifyAccuracy(accuracy) {
-      if (typeof accuracy !== "number") return;
+      if (typeof accuracy !== "number")
+        return;
       this.debug("brightpowder - decreasing accuracy");
       return this.chainModify([3686, 4096]);
     },
@@ -692,7 +698,8 @@ const Items = {
     spritenum: 53,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Bug" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -836,7 +843,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Rock" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -987,7 +995,8 @@ const Items = {
     },
     onModifyAtkPriority: 1,
     onModifyAtk(atk, pokemon) {
-      if (pokemon.volatiles["dynamax"]) return;
+      if (pokemon.volatiles["dynamax"])
+        return;
       return this.chainModify(1.5);
     },
     isChoice: true,
@@ -1010,7 +1019,8 @@ const Items = {
       pokemon.addVolatile("choicelock");
     },
     onModifySpe(spe, pokemon) {
-      if (pokemon.volatiles["dynamax"]) return;
+      if (pokemon.volatiles["dynamax"])
+        return;
       return this.chainModify(1.5);
     },
     isChoice: true,
@@ -1034,7 +1044,8 @@ const Items = {
     },
     onModifySpAPriority: 1,
     onModifySpA(spa, pokemon) {
-      if (pokemon.volatiles["dynamax"]) return;
+      if (pokemon.volatiles["dynamax"])
+        return;
       return this.chainModify(1.5);
     },
     isChoice: true,
@@ -1052,7 +1063,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Fighting" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -1083,7 +1095,8 @@ const Items = {
     },
     onTryBoostPriority: 1,
     onTryBoost(boost, target, source, effect) {
-      if (source && target === source) return;
+      if (source && target === source)
+        return;
       let showMsg = false;
       let i;
       for (i in boost) {
@@ -1131,7 +1144,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Flying" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -1155,7 +1169,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Dark" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -1181,7 +1196,8 @@ const Items = {
       }
     },
     onTakeItem(item, source) {
-      if (source.baseSpecies.baseSpecies === "Ogerpon") return false;
+      if (source.baseSpecies.baseSpecies === "Ogerpon")
+        return false;
       return true;
     },
     forcedForme: "Ogerpon-Cornerstone",
@@ -1282,7 +1298,8 @@ const Items = {
     spritenum: 89,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Dark" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -1406,8 +1423,10 @@ const Items = {
     onAttractPriority: -100,
     onAttract(target, source) {
       this.debug(`attract intercepted: ${target} from ${source}`);
-      if (!source || source === target) return;
-      if (!source.volatiles["attract"]) source.addVolatile("attract", target);
+      if (!source || source === target)
+        return;
+      if (!source.volatiles["attract"])
+        source.addVolatile("attract", target);
     },
     num: 280,
     gen: 4
@@ -1509,7 +1528,8 @@ const Items = {
     spritenum: 107,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Dragon" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -1696,10 +1716,13 @@ const Items = {
     onAfterMoveSecondaryPriority: 2,
     onAfterMoveSecondary(target, source, move) {
       if (source && source !== target && target.hp && move && move.category !== "Status" && !move.flags["futuremove"]) {
-        if (!this.canSwitch(target.side) || target.forceSwitchFlag || target.beingCalledBack || target.isSkyDropped()) return;
-        if (target.volatiles["commanding"] || target.volatiles["commanded"]) return;
+        if (!this.canSwitch(target.side) || target.forceSwitchFlag || target.beingCalledBack || target.isSkyDropped())
+          return;
+        if (target.volatiles["commanding"] || target.volatiles["commanded"])
+          return;
         for (const pokemon of this.getAllActive()) {
-          if (pokemon.switchFlag === true) return;
+          if (pokemon.switchFlag === true)
+            return;
         }
         target.switchFlag = true;
         if (target.useItem()) {
@@ -1719,7 +1742,8 @@ const Items = {
       basePower: 50
     },
     onAfterBoost(boost, pokemon) {
-      if (this.effectState.eject || this.activeMove?.id === "partingshot") return;
+      if (this.effectState.eject || this.activeMove?.id === "partingshot")
+        return;
       let i;
       for (i in boost) {
         if (boost[i] < 0) {
@@ -1730,27 +1754,34 @@ const Items = {
     },
     onAnySwitchInPriority: -4,
     onAnySwitchIn() {
-      if (!this.effectState.eject) return;
+      if (!this.effectState.eject)
+        return;
       this.effectState.target.useItem();
     },
     onAnyAfterMega() {
-      if (!this.effectState.eject) return;
+      if (!this.effectState.eject)
+        return;
       this.effectState.target.useItem();
     },
     onAnyAfterMove() {
-      if (!this.effectState.eject) return;
+      if (!this.effectState.eject)
+        return;
       this.effectState.target.useItem();
     },
     onResidualOrder: 29,
     onResidual(pokemon) {
-      if (!this.effectState.eject) return;
+      if (!this.effectState.eject)
+        return;
       this.effectState.target.useItem();
     },
     onUseItem(item, pokemon) {
-      if (!this.canSwitch(pokemon.side)) return false;
-      if (pokemon.volatiles["commanding"] || pokemon.volatiles["commanded"]) return false;
+      if (!this.canSwitch(pokemon.side))
+        return false;
+      if (pokemon.volatiles["commanding"] || pokemon.volatiles["commanded"])
+        return false;
       for (const active of this.getAllActive()) {
-        if (active.switchFlag === true) return false;
+        if (active.switchFlag === true)
+          return false;
       }
       return true;
     },
@@ -1777,7 +1808,8 @@ const Items = {
     spritenum: 120,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status" || move.flags["pledgecombo"]) return;
+      if (target === source || move.category === "Status" || move.flags["pledgecombo"])
+        return;
       if (move.type === "Electric" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -1865,7 +1897,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 4)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 4))
+        return false;
     },
     onEat() {
     },
@@ -1951,7 +1984,8 @@ const Items = {
     spritenum: 611,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Fairy" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -2012,7 +2046,8 @@ const Items = {
     spritenum: 139,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Fighting" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -2063,7 +2098,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 3)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 3))
+        return false;
     },
     onEat(pokemon) {
       this.heal(pokemon.baseMaxhp / 3);
@@ -2079,7 +2115,8 @@ const Items = {
     spritenum: 141,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status" || move.flags["pledgecombo"]) return;
+      if (target === source || move.category === "Status" || move.flags["pledgecombo"])
+        return;
       if (move.type === "Fire" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -2218,7 +2255,8 @@ const Items = {
     spritenum: 149,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Flying" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -2460,7 +2498,8 @@ const Items = {
     spritenum: 161,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Ghost" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -2559,7 +2598,8 @@ const Items = {
     spritenum: 172,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status" || move.flags["pledgecombo"]) return;
+      if (target === source || move.category === "Status" || move.flags["pledgecombo"])
+        return;
       if (move.type === "Grass" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -2701,7 +2741,8 @@ const Items = {
     spritenum: 182,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Ground" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -2761,7 +2802,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Dragon" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -2821,7 +2863,8 @@ const Items = {
       }
     },
     onTakeItem(item, source) {
-      if (source.baseSpecies.baseSpecies === "Ogerpon") return false;
+      if (source.baseSpecies.baseSpecies === "Ogerpon")
+        return false;
       return true;
     },
     forcedForme: "Ogerpon-Hearthflame",
@@ -2927,7 +2970,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 3)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 3))
+        return false;
     },
     onEat(pokemon) {
       this.heal(pokemon.baseMaxhp / 3);
@@ -2943,7 +2987,8 @@ const Items = {
     spritenum: 218,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Ice" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -3056,9 +3101,12 @@ const Items = {
       basePower: 130
     },
     onEffectiveness(typeMod, target, type, move) {
-      if (!target) return;
-      if (target.volatiles["ingrain"] || target.volatiles["smackdown"] || this.field.getPseudoWeather("gravity")) return;
-      if (move.type === "Ground" && target.hasType("Flying")) return 0;
+      if (!target)
+        return;
+      if (target.volatiles["ingrain"] || target.volatiles["smackdown"] || this.field.getPseudoWeather("gravity"))
+        return;
+      if (move.type === "Ground" && target.hasType("Flying"))
+        return 0;
     },
     // airborneness negation implemented in sim/pokemon.js:Pokemon#isGrounded
     onModifySpe(spe) {
@@ -3140,7 +3188,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Ghost" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -3164,7 +3213,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Poison" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -3187,7 +3237,8 @@ const Items = {
     },
     onAfterMoveSecondary(target, source, move) {
       if (move.category === "Physical") {
-        if (move.id === "present" && move.heal) return;
+        if (move.id === "present" && move.heal)
+          return;
         target.eatItem();
       }
     },
@@ -3219,9 +3270,11 @@ const Items = {
     onModifyMovePriority: -1,
     onModifyMove(move) {
       if (move.category !== "Status") {
-        if (!move.secondaries) move.secondaries = [];
+        if (!move.secondaries)
+          move.secondaries = [];
         for (const secondary of move.secondaries) {
-          if (secondary.volatileStatus === "flinch") return;
+          if (secondary.volatileStatus === "flinch")
+            return;
         }
         move.secondaries.push({
           chance: 10,
@@ -3304,7 +3357,8 @@ const Items = {
     },
     onModifyAccuracyPriority: -2,
     onModifyAccuracy(accuracy) {
-      if (typeof accuracy !== "number") return;
+      if (typeof accuracy !== "number")
+        return;
       this.debug("lax incense - decreasing accuracy");
       return this.chainModify([3686, 4096]);
     },
@@ -3360,16 +3414,19 @@ const Items = {
       type: "Fighting"
     },
     onUpdate(pokemon) {
-      if (!pokemon.hp) return;
+      if (!pokemon.hp)
+        return;
       if (pokemon.moveSlots.some((move) => move.pp === 0)) {
         pokemon.eatItem();
       }
     },
     onEat(pokemon) {
       const moveSlot = pokemon.moveSlots.find((move) => move.pp === 0) || pokemon.moveSlots.find((move) => move.pp < move.maxpp);
-      if (!moveSlot) return;
+      if (!moveSlot)
+        return;
       moveSlot.pp += 10;
-      if (moveSlot.pp > moveSlot.maxpp) moveSlot.pp = moveSlot.maxpp;
+      if (moveSlot.pp > moveSlot.maxpp)
+        moveSlot.pp = moveSlot.maxpp;
       this.add("-activate", pokemon, "item: Leppa Berry", moveSlot.move, "[consumed]");
     },
     num: 154,
@@ -3714,7 +3771,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 3)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 3))
+        return false;
     },
     onEat(pokemon) {
       this.heal(pokemon.baseMaxhp / 3);
@@ -3742,8 +3800,10 @@ const Items = {
     name: "Mail",
     spritenum: 403,
     onTakeItem(item, source) {
-      if (!this.activeMove) return false;
-      if (this.activeMove.id !== "knockoff" && this.activeMove.id !== "thief" && this.activeMove.id !== "covet") return false;
+      if (!this.activeMove)
+        return false;
+      if (this.activeMove.id !== "knockoff" && this.activeMove.id !== "thief" && this.activeMove.id !== "covet")
+        return false;
     },
     num: 137,
     gen: 2,
@@ -3908,7 +3968,8 @@ const Items = {
       const conditions = ["attract", "taunt", "encore", "torment", "disable", "healblock"];
       for (const firstCondition of conditions) {
         if (pokemon.volatiles[firstCondition]) {
-          if (!pokemon.useItem()) return;
+          if (!pokemon.useItem())
+            return;
           for (const secondCondition of conditions) {
             pokemon.removeVolatile(secondCondition);
             if (firstCondition === "attract" && secondCondition === "attract") {
@@ -4007,7 +4068,8 @@ const Items = {
           pokemon.removeVolatile("metronome");
           return;
         }
-        if (move.callsMove) return;
+        if (move.callsMove)
+          return;
         if (this.effectState.lastMove === move.id && pokemon.moveLastTurnResult) {
           this.effectState.numConsecutive++;
         } else if (pokemon.volatiles["twoturnmove"]) {
@@ -4150,8 +4212,10 @@ const Items = {
       basePower: 30
     },
     onFoeAfterBoost(boost, target, source, effect) {
-      if (effect?.name === "Opportunist" || effect?.name === "Mirror Herb") return;
-      if (!this.effectState.boosts) this.effectState.boosts = {};
+      if (effect?.name === "Opportunist" || effect?.name === "Mirror Herb")
+        return;
+      if (!this.effectState.boosts)
+        this.effectState.boosts = {};
       const boostPlus = this.effectState.boosts;
       let i;
       for (i in boost) {
@@ -4163,24 +4227,29 @@ const Items = {
     },
     onAnySwitchInPriority: -3,
     onAnySwitchIn() {
-      if (!this.effectState.ready) return;
+      if (!this.effectState.ready)
+        return;
       this.effectState.target.useItem();
     },
     onAnyAfterMega() {
-      if (!this.effectState.ready) return;
+      if (!this.effectState.ready)
+        return;
       this.effectState.target.useItem();
     },
     onAnyAfterTerastallization() {
-      if (!this.effectState.ready) return;
+      if (!this.effectState.ready)
+        return;
       this.effectState.target.useItem();
     },
     onAnyAfterMove() {
-      if (!this.effectState.ready) return;
+      if (!this.effectState.ready)
+        return;
       this.effectState.target.useItem();
     },
     onResidualOrder: 29,
     onResidual(pokemon) {
-      if (!this.effectState.ready) return;
+      if (!this.effectState.ready)
+        return;
       this.effectState.target.useItem();
     },
     onUse(pokemon) {
@@ -4322,7 +4391,8 @@ const Items = {
     spritenum: 307,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status" || move.flags["pledgecombo"]) return;
+      if (target === source || move.category === "Status" || move.flags["pledgecombo"])
+        return;
       if (move.type === "Normal" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -4351,7 +4421,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Fire" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -4404,7 +4475,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, 10)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, 10))
+        return false;
     },
     onEat(pokemon) {
       this.heal(10);
@@ -4453,7 +4525,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Water" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -4477,7 +4550,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Psychic" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -4659,7 +4733,8 @@ const Items = {
     spritenum: 344,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Poison" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -4870,7 +4945,8 @@ const Items = {
     spritenum: 369,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Psychic" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -4945,7 +5021,8 @@ const Items = {
     },
     onModifyMovePriority: 1,
     onModifyMove(move) {
-      if (move.flags["punch"]) delete move.flags["contact"];
+      if (move.flags["punch"])
+        delete move.flags["contact"];
     },
     num: 1884,
     gen: 9
@@ -4984,7 +5061,8 @@ const Items = {
   quickclaw: {
     onFractionalPriorityPriority: -2,
     onFractionalPriority(priority, pokemon, target, move) {
-      if (move.category === "Status" && pokemon.hasAbility("myceliummight")) return;
+      if (move.category === "Status" && pokemon.hasAbility("myceliummight"))
+        return;
       if (priority <= 0 && this.randomChance(1, 5)) {
         this.add("-activate", pokemon, "item: Quick Claw");
         return 0.1;
@@ -5103,9 +5181,11 @@ const Items = {
     onModifyMovePriority: -1,
     onModifyMove(move) {
       if (move.category !== "Status") {
-        if (!move.secondaries) move.secondaries = [];
+        if (!move.secondaries)
+          move.secondaries = [];
         for (const secondary of move.secondaries) {
-          if (secondary.volatileStatus === "flinch") return;
+          if (secondary.volatileStatus === "flinch")
+            return;
         }
         move.secondaries.push({
           chance: 10,
@@ -5169,7 +5249,8 @@ const Items = {
       }
     },
     onTakeItem(item, source) {
-      if (source.baseSpecies.baseSpecies === "Groudon") return false;
+      if (source.baseSpecies.baseSpecies === "Groudon")
+        return false;
       return true;
     },
     itemUser: ["Groudon"],
@@ -5205,7 +5286,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Grass" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -5233,7 +5315,8 @@ const Items = {
     spritenum: 415,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Rock" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -5362,7 +5445,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Fairy" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -5457,7 +5541,8 @@ const Items = {
       basePower: 80
     },
     onImmunity(type, pokemon) {
-      if (type === "sandstorm" || type === "hail" || type === "powder") return false;
+      if (type === "sandstorm" || type === "hail" || type === "powder")
+        return false;
     },
     onTryHit(pokemon, source, move) {
       if (move.flags["powder"] && pokemon !== source && this.dex.getImmunity("powder", pokemon)) {
@@ -5692,7 +5777,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Ground" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -5749,7 +5835,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 4)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 4))
+        return false;
     },
     onEat(pokemon) {
       this.heal(pokemon.baseMaxhp / 4);
@@ -6034,7 +6121,8 @@ const Items = {
     spritenum: 473,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status") return;
+      if (target === source || move.category === "Status")
+        return;
       if (move.type === "Steel" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -6113,7 +6201,8 @@ const Items = {
     onHit(target, source, move) {
       if (source && source !== target && !source.item && move && this.checkMoveMakesContact(move, source, target)) {
         const barb = target.takeItem();
-        if (!barb) return;
+        if (!barb)
+          return;
         source.setItem(barb);
       }
     },
@@ -6219,7 +6308,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Bug" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -7433,13 +7523,15 @@ const Items = {
     },
     // Partially implemented in Pokemon.effectiveWeather() in sim/pokemon.ts
     onStart(pokemon) {
-      if (!pokemon.ignoringItem()) return;
+      if (!pokemon.ignoringItem())
+        return;
       if (["sunnyday", "raindance", "desolateland", "primordialsea"].includes(this.field.effectiveWeather())) {
         this.runEvent("WeatherChange", pokemon, pokemon, this.effect);
       }
     },
     onUpdate(pokemon) {
-      if (!this.effectState.inactive) return;
+      if (!this.effectState.inactive)
+        return;
       this.effectState.inactive = false;
       if (["sunnyday", "raindance", "desolateland", "primordialsea"].includes(this.field.effectiveWeather())) {
         this.runEvent("WeatherChange", pokemon, pokemon, this.effect);
@@ -7489,7 +7581,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Electric" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -7507,7 +7600,8 @@ const Items = {
     spritenum: 528,
     isGem: true,
     onSourceTryPrimaryHit(target, source, move) {
-      if (target === source || move.category === "Status" || move.flags["pledgecombo"]) return;
+      if (target === source || move.category === "Status" || move.flags["pledgecombo"])
+        return;
       if (move.type === "Water" && source.useItem()) {
         source.addVolatile("gem");
       }
@@ -7613,7 +7707,8 @@ const Items = {
       }
     },
     onTakeItem(item, source) {
-      if (source.baseSpecies.baseSpecies === "Ogerpon") return false;
+      if (source.baseSpecies.baseSpecies === "Ogerpon")
+        return false;
       return true;
     },
     forcedForme: "Ogerpon-Wellspring",
@@ -7675,7 +7770,8 @@ const Items = {
           this.effectState.boosts[i] = 0;
         }
       }
-      if (ready) this.effectState.target.useItem();
+      if (ready)
+        this.effectState.target.useItem();
       delete this.effectState.boosts;
     },
     onAnySwitchInPriority: -2,
@@ -7728,7 +7824,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 3)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 3))
+        return false;
     },
     onEat(pokemon) {
       this.heal(pokemon.baseMaxhp / 3);
@@ -7765,7 +7862,8 @@ const Items = {
     onSourceModifyDamage(damage, source, target, move) {
       if (move.type === "Ice" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-        if (hitSub) return;
+        if (hitSub)
+          return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -7854,7 +7952,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, 10)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, 10))
+        return false;
     },
     onEat(pokemon) {
       this.heal(10);
@@ -7935,7 +8034,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, 30)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, 30))
+        return false;
     },
     onEat(pokemon) {
       this.heal(30);
@@ -8018,7 +8118,8 @@ const Items = {
       type: "Fighting"
     },
     onUpdate(pokemon) {
-      if (!pokemon.hp) return;
+      if (!pokemon.hp)
+        return;
       const moveSlot = pokemon.lastMove && pokemon.getMoveData(pokemon.lastMove.id);
       if (moveSlot && moveSlot.pp === 0) {
         pokemon.addVolatile("leppaberry");
@@ -8041,7 +8142,8 @@ const Items = {
         }
       }
       moveSlot.pp += 5;
-      if (moveSlot.pp > moveSlot.maxpp) moveSlot.pp = moveSlot.maxpp;
+      if (moveSlot.pp > moveSlot.maxpp)
+        moveSlot.pp = moveSlot.maxpp;
       this.add("-activate", pokemon, "item: Mystery Berry", moveSlot.move);
     },
     num: 154,

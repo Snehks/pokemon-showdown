@@ -38,7 +38,8 @@ const GitHub = new class {
   constructor() {
     this.hook = null;
     this.updates = /* @__PURE__ */ Object.create(null);
-    if (!Config.github) return;
+    if (!Config.github)
+      return;
     try {
       this.hook = require("githubhook")({
         logger: {
@@ -53,7 +54,8 @@ const GitHub = new class {
     this.listen();
   }
   listen() {
-    if (!this.hook) return;
+    if (!this.hook)
+      return;
     this.hook.listen();
     this.hook.on("push", (repo, ref, result) => this.handlePush(repo, ref, result));
     this.hook.on("pull_request", (repo, ref, result) => this.handlePull(repo, ref, result));
@@ -72,7 +74,8 @@ const GitHub = new class {
   }
   handlePush(repo, ref, result) {
     const branch = /[^/]+$/.exec(ref)?.[0] || "";
-    if (branch !== "master") return;
+    if (branch !== "master")
+      return;
     const messages = {
       staff: [],
       development: []
@@ -93,11 +96,14 @@ const GitHub = new class {
     }
   }
   handlePull(repo, ref, result) {
-    if (this.isRateLimited(result.number)) return;
-    if (this.isGitbanned(result)) return;
+    if (this.isRateLimited(result.number))
+      return;
+    if (this.isGitbanned(result))
+      return;
     const url = result.pull_request.html_url;
     const action = this.isValidAction(result.action);
-    if (!action) return;
+    if (!action)
+      return;
     const repoName = this.getRepoName(repo);
     const userName = this.getUsername(result.sender.login);
     const title = result.pull_request.title;
@@ -106,17 +112,21 @@ const GitHub = new class {
     this.report("development", repo, buf);
   }
   report(roomid, repo, messages) {
-    if (!STAFF_REPOS.includes(repo) && roomid === "staff") return;
-    if (Array.isArray(messages)) messages = messages.join("<br />");
+    if (!STAFF_REPOS.includes(repo) && roomid === "staff")
+      return;
+    if (Array.isArray(messages))
+      messages = messages.join("<br />");
     Rooms.get(roomid)?.add(`|c| GitHub|/raw <div class="infobox">${messages}</div>`).update();
   }
   isGitbanned(result) {
-    if (!gitData.bans) return false;
+    if (!gitData.bans)
+      return false;
     return gitData.bans[result.sender.login] || gitData.bans[result.pull_request.user.login];
   }
   isRateLimited(prNumber) {
     if (this.updates[prNumber]) {
-      if (this.updates[prNumber] + COOLDOWN > Date.now()) return true;
+      if (this.updates[prNumber] + COOLDOWN > Date.now())
+        return true;
       this.updates[prNumber] = Date.now();
       return false;
     }
@@ -124,7 +134,8 @@ const GitHub = new class {
     return false;
   }
   isValidAction(action) {
-    if (action === "synchronize") return "updated";
+    if (action === "synchronize")
+      return "updated";
     if (action === "review_requested") {
       return "requested a review for";
     } else if (action === "review_request_removed") {
@@ -152,12 +163,15 @@ const commands = {
       room = this.requireRoom("development");
       this.checkCan("mute", null, room);
       const [username, reason] = import_lib.Utils.splitFirst(target, ",").map((u) => u.trim());
-      if (!toID(target)) return this.parse(`/help github`);
-      if (!toID(username)) throw new Chat.ErrorMessage("Provide a username.");
+      if (!toID(target))
+        return this.parse(`/help github`);
+      if (!toID(username))
+        throw new Chat.ErrorMessage("Provide a username.");
       if (room.auth.has(toID(GitHub.getUsername(username)))) {
         throw new Chat.ErrorMessage("That user is Dev roomauth. If you need to do this, demote them and try again.");
       }
-      if (!gitData.bans) gitData.bans = {};
+      if (!gitData.bans)
+        gitData.bans = {};
       if (gitData.bans[toID(username)]) {
         throw new Chat.ErrorMessage(`${username} is already gitbanned.`);
       }
@@ -170,10 +184,13 @@ const commands = {
       room = this.requireRoom("development");
       this.checkCan("mute", null, room);
       target = toID(target);
-      if (!target) return this.parse("/help github");
-      if (!gitData.bans?.[target]) throw new Chat.ErrorMessage("That user is not gitbanned.");
+      if (!target)
+        return this.parse("/help github");
+      if (!gitData.bans?.[target])
+        throw new Chat.ErrorMessage("That user is not gitbanned.");
       delete gitData.bans[target];
-      if (!Object.keys(gitData.bans).length) delete gitData.bans;
+      if (!Object.keys(gitData.bans).length)
+        delete gitData.bans;
       GitHub.save();
       this.privateModAction(`${user.name} allowed the GitHub user ${target} to have their GitHub actions reported to this server.`);
       this.modlog("GITHUB UNBAN", target);
@@ -188,8 +205,10 @@ const commands = {
       room = this.requireRoom("development");
       this.checkCan("mute", null, room);
       const [gitName, username] = import_lib.Utils.splitFirst(target, ",").map((u) => u.trim());
-      if (!toID(gitName) || !toID(username)) return this.parse(`/help github`);
-      if (!gitData.usernames) gitData.usernames = {};
+      if (!toID(gitName) || !toID(username))
+        return this.parse(`/help github`);
+      if (!gitData.usernames)
+        gitData.usernames = {};
       gitData.usernames[toID(gitName)] = username;
       GitHub.save();
       this.privateModAction(`${user.name} set ${gitName}'s name on reported GitHub actions to be ${username}.`);
@@ -200,11 +219,14 @@ const commands = {
       room = this.requireRoom("development");
       this.checkCan("mute", null, room);
       target = toID(target);
-      if (!target) return this.parse(`/help github`);
+      if (!target)
+        return this.parse(`/help github`);
       const name = gitData.usernames?.[target];
-      if (!name) throw new Chat.ErrorMessage(`${target} is not a GitHub username on our list.`);
+      if (!name)
+        throw new Chat.ErrorMessage(`${target} is not a GitHub username on our list.`);
       delete gitData.usernames?.[target];
-      if (!Object.keys(gitData.usernames || {}).length) delete gitData.usernames;
+      if (!Object.keys(gitData.usernames || {}).length)
+        delete gitData.usernames;
       GitHub.save();
       this.privateModAction(`${user.name} removed ${target}'s name from the GitHub username list.`);
       this.modlog("GITHUB CLEARNAME", target, `from the name ${name}`);
@@ -226,9 +248,11 @@ const pages = {
   github: {
     bans(query, user) {
       const room = Rooms.get("development");
-      if (!room) throw new Chat.ErrorMessage("No Development room found.");
+      if (!room)
+        throw new Chat.ErrorMessage("No Development room found.");
       this.checkCan("mute", null, room);
-      if (!gitData.bans) throw new Chat.ErrorMessage("There are no gitbans at this time.");
+      if (!gitData.bans)
+        throw new Chat.ErrorMessage("There are no gitbans at this time.");
       let buf = `<div class="pad"><h2>Current Gitbans:</h2><hr /><ol>`;
       for (const [username, reason] of Object.entries(gitData.bans)) {
         buf += `<li><strong>${username}</strong> - ${reason.trim() || "(No reason found)"}</li>`;
@@ -237,7 +261,8 @@ const pages = {
       return buf;
     },
     names() {
-      if (!gitData.usernames) throw new Chat.ErrorMessage("There are no GitHub usernames in the list.");
+      if (!gitData.usernames)
+        throw new Chat.ErrorMessage("There are no GitHub usernames in the list.");
       let buf = `<div class="pad"><h2>Current GitHub username mappings:</h2><hr /><ol>`;
       for (const [username, name] of Object.entries(gitData.usernames)) {
         buf += `<li><strong>${username}</strong> - ${name}</li>`;

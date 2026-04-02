@@ -25,7 +25,8 @@ const Abilities = {
   merciless: {
     shortDesc: "This Pokemon's attacks are critical hits if the target is statused.",
     onModifyCritRatio(critRatio, source, target) {
-      if (target?.status) return 5;
+      if (target?.status)
+        return 5;
     },
     name: "Merciless",
     rating: 1.5,
@@ -86,7 +87,8 @@ const Abilities = {
     },
     onModifyMovePriority: 8,
     onModifyMove(move, pokemon) {
-      if (move.category === "Status") return;
+      if (move.category === "Status")
+        return;
       if (["Fire", "Water", "Grass", "Electric", "Dark", "Psychic", "Dragon", "Fairy", "Ice"].includes(move.type)) {
         move.category = "Special";
       } else {
@@ -168,7 +170,8 @@ const Abilities = {
       }
     },
     onImmunity(type, pokemon) {
-      if (type === "hail") return false;
+      if (type === "hail")
+        return false;
     },
     shortDesc: "This Pokemon receives 1/2 damage from special attacks. Ice moves have 1.5x power. Hail immunity.",
     gen: 6
@@ -276,7 +279,8 @@ const Abilities = {
           boosts[i] = 0;
         }
       }
-      if (this.effectState.herb) return;
+      if (this.effectState.herb)
+        return;
       if (activate) {
         pokemon.setBoost(boosts);
         this.effectState.herb = true;
@@ -309,7 +313,8 @@ const Abilities = {
     },
     onBasePowerPriority: 23,
     onBasePower(basePower, pokemon, target, move) {
-      if (move.typeChangerBoosted) return this.chainModify([5325, 4096]);
+      if (move.typeChangerBoosted)
+        return this.chainModify([5325, 4096]);
     },
     name: "Intoxicate",
     rating: 4,
@@ -321,12 +326,15 @@ const Abilities = {
     },
     onAnySetWeather(target, source, weather) {
       const strongWeathers = ["desolateland", "primordialsea", "deltastream"];
-      if (this.field.getWeather().id === "deltastream" && !strongWeathers.includes(weather.id)) return false;
+      if (this.field.getWeather().id === "deltastream" && !strongWeathers.includes(weather.id))
+        return false;
     },
     onEnd(pokemon) {
-      if (this.field.weatherState.source !== pokemon) return;
+      if (this.field.weatherState.source !== pokemon)
+        return;
       for (const target of this.getAllActive()) {
-        if (target === pokemon) continue;
+        if (target === pokemon)
+          continue;
         if (target.hasAbility("dragonsgale")) {
           this.field.weatherState.source = target;
           return;
@@ -346,7 +354,8 @@ const Abilities = {
   },
   parentalbond: {
     onPrepareHit(source, target, move) {
-      if (move.category === "Status" || move.selfdestruct || move.multihit) return;
+      if (move.category === "Status" || move.selfdestruct || move.multihit)
+        return;
       if ([
         "endeavor",
         "seismictoss",
@@ -360,7 +369,8 @@ const Abilities = {
         "counter",
         "mirrorcoat",
         "metalburst"
-      ].includes(move.id)) return;
+      ].includes(move.id))
+        return;
       if (!move.spreadHit && !move.isZ && !move.isMax) {
         move.multihit = 2;
         move.multihitType = "parentalbond";
@@ -386,7 +396,8 @@ const Abilities = {
           return;
         }
       }
-      if (move && move.type === "Flying") return priority + 1;
+      if (move && move.type === "Flying")
+        return priority + 1;
     }
   },
   prankster: {

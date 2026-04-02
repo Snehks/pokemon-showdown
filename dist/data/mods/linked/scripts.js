@@ -24,13 +24,15 @@ module.exports = __toCommonJS(scripts_exports);
 const Scripts = {
   gen: 9,
   init() {
+    var _a;
     const removeTwoTurnMove = function(target) {
       delete target.volatiles["twoturnmove"];
     };
     for (const id in this.data.Moves) {
       if (this.data.Moves[id].flags["charge"] && id !== "skydrop") {
-        this.modData("Moves", id).condition ||= {};
-        if ("onEnd" in this.modData("Moves", id).condition) throw new Error(`onEnd needs manual override for move ${id}`);
+        (_a = this.modData("Moves", id)).condition || (_a.condition = {});
+        if ("onEnd" in this.modData("Moves", id).condition)
+          throw new Error(`onEnd needs manual override for move ${id}`);
         this.modData("Moves", id).condition.onEnd = removeTwoTurnMove;
       }
     }
@@ -78,7 +80,8 @@ const Scripts = {
         priority = this.singleEvent("ModifyPriority", move, null, action.pokemon, null, null, priority);
         priority = this.runEvent("ModifyPriority", action.pokemon, null, move, priority);
         action.priority = priority + action.fractionalPriority;
-        if (this.gen > 5) action.move.priority = priority;
+        if (this.gen > 5)
+          action.move.priority = priority;
       }
     }
     if (!action.pokemon) {
@@ -93,7 +96,8 @@ const Scripts = {
     switch (action.choice) {
       case "start": {
         for (const side of this.sides) {
-          if (side.pokemonLeft) side.pokemonLeft = side.pokemon.length;
+          if (side.pokemonLeft)
+            side.pokemonLeft = side.pokemon.length;
           this.add("teamsize", side.id, side.pokemon.length);
         }
         this.add("start");
@@ -102,7 +106,8 @@ const Scripts = {
         }
         this.format.onBattleStart?.call(this);
         for (const rule of this.ruleTable.keys()) {
-          if ("+*-!".includes(rule.charAt(0))) continue;
+          if ("+*-!".includes(rule.charAt(0)))
+            continue;
           const subFormat = this.dex.formats.get(rule);
           subFormat.onBattleStart?.call(this);
         }
@@ -121,8 +126,10 @@ const Scripts = {
         break;
       }
       case "move":
-        if (!action.pokemon.isActive) return false;
-        if (action.pokemon.fainted) return false;
+        if (!action.pokemon.isActive)
+          return false;
+        if (action.pokemon.fainted)
+          return false;
         if (action.linked) {
           const linkedMoves = action.linked;
           for (let i = linkedMoves.length - 1; i >= 0; i--) {
@@ -165,25 +172,33 @@ const Scripts = {
       case "runDynamax":
         action.pokemon.addVolatile("dynamax");
         action.pokemon.side.dynamaxUsed = true;
-        if (action.pokemon.side.allySide) action.pokemon.side.allySide.dynamaxUsed = true;
+        if (action.pokemon.side.allySide)
+          action.pokemon.side.allySide.dynamaxUsed = true;
         break;
       case "terastallize":
         this.actions.terastallize(action.pokemon);
         break;
       case "beforeTurnMove":
-        if (!action.pokemon.isActive) return false;
-        if (action.pokemon.fainted) return false;
+        if (!action.pokemon.isActive)
+          return false;
+        if (action.pokemon.fainted)
+          return false;
         this.debug("before turn callback: " + action.move.id);
         const target = this.getTarget(action.pokemon, action.move, action.targetLoc);
-        if (!target) return false;
-        if (!action.move.beforeTurnCallback) throw new Error(`beforeTurnMove has no beforeTurnCallback`);
+        if (!target)
+          return false;
+        if (!action.move.beforeTurnCallback)
+          throw new Error(`beforeTurnMove has no beforeTurnCallback`);
         action.move.beforeTurnCallback.call(this, action.pokemon, target);
         break;
       case "priorityChargeMove":
-        if (!action.pokemon.isActive) return false;
-        if (action.pokemon.fainted) return false;
+        if (!action.pokemon.isActive)
+          return false;
+        if (action.pokemon.fainted)
+          return false;
         this.debug("priority charge callback: " + action.move.id);
-        if (!action.move.priorityChargeCallback) throw new Error(`priorityChargeMove has no priorityChargeCallback`);
+        if (!action.move.priorityChargeCallback)
+          throw new Error(`priorityChargeMove has no priorityChargeCallback`);
         action.move.priorityChargeCallback.call(this, action.pokemon);
         break;
       case "event":
@@ -237,8 +252,10 @@ const Scripts = {
         this.actions.runSwitch(action.pokemon);
         break;
       case "shift":
-        if (!action.pokemon.isActive) return false;
-        if (action.pokemon.fainted) return false;
+        if (!action.pokemon.isActive)
+          return false;
+        if (action.pokemon.fainted)
+          return false;
         this.swapPosition(action.pokemon, 1);
         break;
       case "beforeTurn":
@@ -250,20 +267,23 @@ const Scripts = {
         this.updateSpeed();
         residualPokemon = this.getAllActive().map((pokemon) => [pokemon, pokemon.getUndynamaxedHP()]);
         this.fieldEvent("Residual");
-        if (!this.ended) this.add("upkeep");
+        if (!this.ended)
+          this.add("upkeep");
         break;
     }
     for (const side of this.sides) {
       for (const pokemon of side.active) {
         if (pokemon.forceSwitchFlag) {
-          if (pokemon.hp) this.actions.dragIn(pokemon.side, pokemon.position);
+          if (pokemon.hp)
+            this.actions.dragIn(pokemon.side, pokemon.position);
           pokemon.forceSwitchFlag = false;
         }
       }
     }
     this.clearActiveMove();
     this.faintMessages();
-    if (this.ended) return true;
+    if (this.ended)
+      return true;
     if (!this.queue.peek() || this.gen <= 3 && ["move", "residual"].includes(this.queue.peek().choice)) {
       this.checkFainted();
     } else if (["megaEvo", "megaEvoX", "megaEvoY"].includes(action.choice) && this.gen === 7) {
@@ -308,14 +328,16 @@ const Scripts = {
           }
           pokemon.switchFlag = false;
         }
-        if (!reviveSwitch) switches[i] = false;
+        if (!reviveSwitch)
+          switches[i] = false;
       } else if (switches[i]) {
         for (const pokemon of this.sides[i].active) {
           if (pokemon.hp && pokemon.switchFlag && pokemon.switchFlag !== "revivalblessing" && !pokemon.skipBeforeSwitchOutEventFlag) {
             this.runEvent("BeforeSwitchOut", pokemon);
             pokemon.skipBeforeSwitchOutEventFlag = true;
             this.faintMessages();
-            if (this.ended) return true;
+            if (this.ended)
+              return true;
             if (pokemon.fainted) {
               switches[i] = this.sides[i].active.some((sidePokemon) => sidePokemon && !!sidePokemon.switchFlag);
             }
@@ -329,12 +351,14 @@ const Scripts = {
         return true;
       }
     }
-    if (this.gen < 5) this.eachEvent("Update");
+    if (this.gen < 5)
+      this.eachEvent("Update");
     const nextAction = this.queue.peek();
     if (this.gen >= 8 && (nextAction?.choice === "move" || nextAction?.choice === "runDynamax") && nextAction?.pokemon !== action.pokemon) {
       this.updateSpeed();
       for (const queueAction of this.queue.list) {
-        if (queueAction.pokemon) this.getActionSpeed(queueAction);
+        if (queueAction.pokemon)
+          this.getActionSpeed(queueAction);
       }
       this.queue.sort();
     }
@@ -386,7 +410,8 @@ const Scripts = {
         if (changedMove && changedMove !== true) {
           baseMove = this.dex.getActiveMove(changedMove);
           baseMove.priority = priority;
-          if (pranksterBoosted) baseMove.pranksterBoosted = pranksterBoosted;
+          if (pranksterBoosted)
+            baseMove.pranksterBoosted = pranksterBoosted;
           target = this.battle.getRandomTarget(pokemon, baseMove);
         }
       }
@@ -419,7 +444,8 @@ const Scripts = {
       let lockedMove;
       if (!externalMove) {
         lockedMove = this.battle.runEvent("LockMove", pokemon);
-        if (lockedMove === true) lockedMove = false;
+        if (lockedMove === true)
+          lockedMove = false;
         if (!lockedMove) {
           if (!pokemon.deductPP(baseMove, null, target) && move.id !== "struggle") {
             this.battle.add("cant", pokemon, "nopp", move);
@@ -443,7 +469,8 @@ const Scripts = {
       const oldActiveMove = move;
       const moveDidSomething = this.useMove(baseMove, pokemon, { target, sourceEffect, zMove, maxMove });
       this.battle.lastSuccessfulMoveThisTurn = moveDidSomething ? this.battle.activeMove && this.battle.activeMove.id : null;
-      if (this.battle.activeMove) move = this.battle.activeMove;
+      if (this.battle.activeMove)
+        move = this.battle.activeMove;
       this.battle.singleEvent("AfterMove", move, null, pokemon, target, move);
       this.battle.runEvent("AfterMove", pokemon, target, move);
       if (move.flags["cantusetwice"] && pokemon.removeVolatile(move.id)) {
@@ -452,7 +479,8 @@ const Scripts = {
       if (move.flags["dance"] && moveDidSomething && !move.isExternal) {
         const dancers = [];
         for (const currentPoke of this.battle.getAllActive()) {
-          if (pokemon === currentPoke) continue;
+          if (pokemon === currentPoke)
+            continue;
           if (currentPoke.hasAbility("dancer") && !currentPoke.isSemiInvulnerable()) {
             dancers.push(currentPoke);
           }
@@ -462,15 +490,18 @@ const Scripts = {
         );
         const targetOf1stDance = this.battle.activeTarget;
         for (const dancer of dancers) {
-          if (this.battle.faintMessages()) break;
-          if (dancer.fainted) continue;
+          if (this.battle.faintMessages())
+            break;
+          if (dancer.fainted)
+            continue;
           this.battle.add("-activate", dancer, "ability: Dancer");
           const dancersTarget = !targetOf1stDance.isAlly(dancer) && pokemon.isAlly(dancer) ? targetOf1stDance : pokemon;
           const dancersTargetLoc = dancer.getLocOf(dancersTarget);
           this.runMove(move.id, dancer, dancersTargetLoc, { sourceEffect: this.dex.abilities.get("dancer"), externalMove: true });
         }
       }
-      if (noLock && pokemon.volatiles["lockedmove"]) delete pokemon.volatiles["lockedmove"];
+      if (noLock && pokemon.volatiles["lockedmove"])
+        delete pokemon.volatiles["lockedmove"];
       this.battle.faintMessages();
       this.battle.checkWin();
       if (this.battle.gen <= 4) {
@@ -480,11 +511,15 @@ const Scripts = {
   },
   queue: {
     resolveAction(action, midTurn = false) {
-      if (!action) throw new Error(`Action not passed to resolveAction`);
-      if (action.choice === "pass") return [];
+      if (!action)
+        throw new Error(`Action not passed to resolveAction`);
+      if (action.choice === "pass")
+        return [];
       const actions = [action];
-      if (!action.side && action.pokemon) action.side = action.pokemon.side;
-      if (!action.move && action.moveid) action.move = this.battle.dex.getActiveMove(action.moveid);
+      if (!action.side && action.pokemon)
+        action.side = action.pokemon.side;
+      if (!action.move && action.moveid)
+        action.move = this.battle.dex.getActiveMove(action.moveid);
       if (!action.order) {
         const orders = {
           team: 1,
@@ -599,11 +634,13 @@ const Scripts = {
         action.move = this.battle.dex.getActiveMove(action.move);
         if (!action.targetLoc) {
           target = this.battle.getRandomTarget(action.pokemon, action.move);
-          if (target) action.targetLoc = action.pokemon.getLocOf(target);
+          if (target)
+            action.targetLoc = action.pokemon.getLocOf(target);
         }
         action.originalTarget = action.pokemon.getAtLoc(action.targetLoc);
       }
-      if (!deferPriority) this.battle.getActionSpeed(action);
+      if (!deferPriority)
+        this.battle.getActionSpeed(action);
       return actions;
     }
   },
@@ -615,13 +652,16 @@ const Scripts = {
     },
     getLinkedMoves(ignoreDisabled) {
       const linkedMoves = this.moveSlots.slice(0, 2);
-      if (linkedMoves.length !== 2 || linkedMoves[0].pp <= 0 || linkedMoves[1].pp <= 0) return [];
+      if (linkedMoves.length !== 2 || linkedMoves[0].pp <= 0 || linkedMoves[1].pp <= 0)
+        return [];
       const ret = [
         this.battle.dex.getActiveMove(linkedMoves[0].id),
         this.battle.dex.getActiveMove(linkedMoves[1].id)
       ];
-      if (ignoreDisabled) return ret;
-      if (!this.ateBerry && ret.some((x) => x.id === "belch")) return [];
+      if (ignoreDisabled)
+        return ret;
+      if (!this.ateBerry && ret.some((x) => x.id === "belch"))
+        return [];
       if (this.hasItem("assaultvest") && (ret[0].category === "Status" || ret[1].category === "Status")) {
         return [];
       }
@@ -629,7 +669,8 @@ const Scripts = {
     },
     hasLinkedMove(move) {
       const linkedMoves = this.getLinkedMoves(true);
-      if (!linkedMoves.length) return false;
+      if (!linkedMoves.length)
+        return false;
       return linkedMoves.some((x) => x.id === move.id);
     },
     getIsMoveLocked() {
@@ -643,7 +684,8 @@ const Scripts = {
     },
     queryLinkMove(move, ignoreDisabled) {
       const linkedMoves = this.getLinkedMoves(ignoreDisabled);
-      if (!linkedMoves.length) return { linkIndex: -1, linkedMoves };
+      if (!linkedMoves.length)
+        return { linkIndex: -1, linkedMoves };
       return { linkIndex: linkedMoves.findIndex((x) => x.id === move.id), linkedMoves };
     }
   }

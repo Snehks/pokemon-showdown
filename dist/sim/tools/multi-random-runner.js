@@ -29,23 +29,7 @@ var import_runner = require("./runner");
  *
  * @license MIT
  */
-class MultiRandomRunner {
-  static {
-    this.FORMATS = [
-      "gen8randombattle",
-      "gen8randomdoublesbattle",
-      "gen8battlefactory",
-      "gen7randombattle",
-      "gen7battlefactory",
-      "gen6randombattle",
-      "gen6battlefactory",
-      "gen5randombattle",
-      "gen4randombattle",
-      "gen3randombattle",
-      "gen2randombattle",
-      "gen1randombattle"
-    ];
-  }
+const _MultiRandomRunner = class {
   constructor(options) {
     this.options = { ...options };
     this.totalGames = options.totalGames;
@@ -65,7 +49,8 @@ class MultiRandomRunner {
     let failures = 0;
     while (format = this.getNextFormat()) {
       if (this.all && lastFormat && format !== lastFormat) {
-        if (this.isAsync) await Promise.all(games);
+        if (this.isAsync)
+          await Promise.all(games);
         games = [];
       }
       const seed = this.prng.getSeed();
@@ -77,16 +62,19 @@ class MultiRandomRunner {
           err
         );
       });
-      if (!this.isAsync) await game;
+      if (!this.isAsync)
+        await game;
       games.push(game);
       lastFormat = format;
     }
-    if (this.isAsync) await Promise.all(games);
+    if (this.isAsync)
+      await Promise.all(games);
     return failures;
   }
   getNextFormat() {
-    const FORMATS = MultiRandomRunner.FORMATS;
-    if (this.formatIndex > FORMATS.length) return false;
+    const FORMATS = _MultiRandomRunner.FORMATS;
+    if (this.formatIndex > FORMATS.length)
+      return false;
     if (this.numGames++ < this.totalGames) {
       if (this.format) {
         return this.format;
@@ -106,5 +94,20 @@ class MultiRandomRunner {
     }
     return false;
   }
-}
+};
+let MultiRandomRunner = _MultiRandomRunner;
+MultiRandomRunner.FORMATS = [
+  "gen8randombattle",
+  "gen8randomdoublesbattle",
+  "gen8battlefactory",
+  "gen7randombattle",
+  "gen7battlefactory",
+  "gen6randombattle",
+  "gen6battlefactory",
+  "gen5randombattle",
+  "gen4randombattle",
+  "gen3randombattle",
+  "gen2randombattle",
+  "gen1randombattle"
+];
 //# sourceMappingURL=multi-random-runner.js.map

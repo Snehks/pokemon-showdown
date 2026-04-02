@@ -37,7 +37,8 @@ const Moves = {
       while (currentStage < 6) {
         loopStage = currentStage;
         currentStage++;
-        if (currentStage < 6) currentStage++;
+        if (currentStage < 6)
+          currentStage++;
         target.boosts.atk = loopStage;
         if (target.getStat("atk", false, true) < 999) {
           target.boosts.atk = currentStage;

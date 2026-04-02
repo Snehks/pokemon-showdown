@@ -107,7 +107,8 @@ const Items = {
       }
     },
     onTryEatItem(item, pokemon) {
-      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 4)) return false;
+      if (!this.runEvent("TryHeal", pokemon, null, this.effect, pokemon.baseMaxhp / 4))
+        return false;
     },
     onEat(pokemon) {
       this.heal(pokemon.baseMaxhp / 4);

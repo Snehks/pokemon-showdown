@@ -38,7 +38,8 @@ const Abilities = {
         }
       } else {
         const possibleAbilities = [source.ability, ...source.m.innates || []].filter((val) => !this.dex.abilities.get(val).flags["cantsuppress"] && val !== "mummy");
-        if (!possibleAbilities.length) return;
+        if (!possibleAbilities.length)
+          return;
         if (this.checkMoveMakesContact(move, source, target, !source.isAlly(target))) {
           const abil = this.sample(possibleAbilities);
           if (abil === source.ability) {
@@ -65,7 +66,8 @@ const Abilities = {
       pokemon.abilityState.ending = false;
       if (pokemon.m.innates) {
         for (const innate of pokemon.m.innates) {
-          if (this.dex.abilities.get(innate).flags["cantsuppress"] || innate === "neutralizinggas") continue;
+          if (this.dex.abilities.get(innate).flags["cantsuppress"] || innate === "neutralizinggas")
+            continue;
           pokemon.removeVolatile("ability:" + innate);
         }
       }
@@ -79,7 +81,8 @@ const Abilities = {
         }
         if (target.m.innates) {
           for (const innate of target.m.innates) {
-            if (this.dex.abilities.get(innate).flags["cantsuppress"]) continue;
+            if (this.dex.abilities.get(innate).flags["cantsuppress"])
+              continue;
             target.removeVolatile("ability:" + innate);
           }
         }
@@ -87,7 +90,8 @@ const Abilities = {
     },
     onEnd(source) {
       this.add("-end", source, "ability: Neutralizing Gas");
-      if (source.abilityState.ending) return;
+      if (source.abilityState.ending)
+        return;
       source.abilityState.ending = true;
       const sortedActive = this.getAllActive();
       this.speedSort(sortedActive);
@@ -96,7 +100,8 @@ const Abilities = {
           this.singleEvent("Start", pokemon.getAbility(), pokemon.abilityState, pokemon);
           if (pokemon.m.innates) {
             for (const innate of pokemon.m.innates) {
-              if (pokemon.volatiles["ability:" + innate]) continue;
+              if (pokemon.volatiles["ability:" + innate])
+                continue;
               pokemon.addVolatile("ability:" + innate, pokemon);
             }
           }
@@ -108,13 +113,16 @@ const Abilities = {
     inherit: true,
     onAllyFaint(ally) {
       const pokemon = this.effectState.target;
-      if (!pokemon.hp) return;
+      if (!pokemon.hp)
+        return;
       const isAbility = pokemon.ability === "powerofalchemy";
       let possibleAbilities = [ally.ability];
-      if (ally.m.innates) possibleAbilities.push(...ally.m.innates);
+      if (ally.m.innates)
+        possibleAbilities.push(...ally.m.innates);
       const additionalBannedAbilities = [pokemon.ability, ...pokemon.m.innates || []];
       possibleAbilities = possibleAbilities.filter((val) => !this.dex.abilities.get(val).flags["noreceiver"] && !additionalBannedAbilities.includes(val));
-      if (!possibleAbilities.length) return;
+      if (!possibleAbilities.length)
+        return;
       const ability = this.dex.abilities.get(possibleAbilities[this.random(possibleAbilities.length)]);
       this.add("-ability", pokemon, ability, "[from] ability: Power of Alchemy", `[of] ${ally}`);
       if (isAbility) {
@@ -129,13 +137,16 @@ const Abilities = {
     inherit: true,
     onAllyFaint(ally) {
       const pokemon = this.effectState.target;
-      if (!pokemon.hp) return;
+      if (!pokemon.hp)
+        return;
       const isAbility = pokemon.ability === "receiver";
       let possibleAbilities = [ally.ability];
-      if (ally.m.innates) possibleAbilities.push(...ally.m.innates);
+      if (ally.m.innates)
+        possibleAbilities.push(...ally.m.innates);
       const additionalBannedAbilities = [pokemon.ability, ...pokemon.m.innates || []];
       possibleAbilities = possibleAbilities.filter((val) => !this.dex.abilities.get(val).flags["noreceiver"] && !additionalBannedAbilities.includes(val));
-      if (!possibleAbilities.length) return;
+      if (!possibleAbilities.length)
+        return;
       const ability = this.dex.abilities.get(possibleAbilities[this.random(possibleAbilities.length)]);
       this.add("-ability", pokemon, ability, "[from] ability: Receiver", `[of] ${ally}`);
       if (isAbility) {
@@ -149,7 +160,8 @@ const Abilities = {
   trace: {
     inherit: true,
     onUpdate(pokemon) {
-      if (!this.effectState.seek) return;
+      if (!this.effectState.seek)
+        return;
       const isAbility = pokemon.ability === "trace";
       const possibleTargets = [];
       for (const target of pokemon.side.foe.active) {
@@ -161,7 +173,8 @@ const Abilities = {
         const rand = this.random(possibleTargets.length);
         const target = possibleTargets[rand];
         let possibleAbilities = [target.ability];
-        if (target.m.innates) possibleAbilities.push(...target.m.innates);
+        if (target.m.innates)
+          possibleAbilities.push(...target.m.innates);
         const additionalBannedAbilities = [pokemon.ability, ...pokemon.m.innates || []];
         possibleAbilities = possibleAbilities.filter((val) => !this.dex.abilities.get(val).flags["notrace"] && !additionalBannedAbilities.includes(val));
         if (!possibleAbilities.length) {
@@ -185,10 +198,12 @@ const Abilities = {
     onDamagingHit(damage, target, source, move) {
       const isAbility = target.ability === "wanderingspirit";
       if (isAbility) {
-        if (source.getAbility().flags["failskillswap"] || target.volatiles["dynamax"]) return;
+        if (source.getAbility().flags["failskillswap"] || target.volatiles["dynamax"])
+          return;
         if (this.checkMoveMakesContact(move, source, target)) {
           const sourceAbility = source.setAbility("wanderingspirit", target);
-          if (!sourceAbility) return;
+          if (!sourceAbility)
+            return;
           if (target.isAlly(source)) {
             this.add("-activate", target, "Skill Swap", "", "", `[of] ${source}`);
           } else {
@@ -198,11 +213,13 @@ const Abilities = {
         }
       } else {
         const possibleAbilities = [source.ability, ...source.m.innates || []].filter((val) => !this.dex.abilities.get(val).flags["failskillswap"]);
-        if (!possibleAbilities.length || target.volatiles["dynamax"]) return;
+        if (!possibleAbilities.length || target.volatiles["dynamax"])
+          return;
         if (move.flags["contact"]) {
           const sourceAbility = this.sample(possibleAbilities);
           if (sourceAbility === source.ability) {
-            if (!source.setAbility("wanderingspirit", target)) return;
+            if (!source.setAbility("wanderingspirit", target))
+              return;
           } else {
             source.removeVolatile("ability:" + sourceAbility);
             source.addVolatile("ability:wanderingspirit", source);
