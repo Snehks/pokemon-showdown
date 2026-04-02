@@ -38,7 +38,8 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 		onTryHit(target, source, move) {
 			if (target === source) return;
 			const blocked = new Set([
-				'soak', 'doodle', 'perishsong', 'torment', 'taunt', 'encore',
+				'soak', 'magicpowder', 'trickortreat', 'forestscurse',
+				'doodle', 'perishsong', 'torment', 'taunt', 'encore',
 				'trick', 'switcheroo', 'entrainment', 'skillswap', 'painsplit',
 				'endeavor', 'finalgambit', 'simplebeam', 'destinybond', 'foulplay',
 				'bind', 'infestation', 'clamp', 'firespin', 'magmastorm',

@@ -56,6 +56,9 @@ const Abilities = {
         return;
       const blocked = /* @__PURE__ */ new Set([
         "soak",
+        "magicpowder",
+        "trickortreat",
+        "forestscurse",
         "doodle",
         "perishsong",
         "torment",

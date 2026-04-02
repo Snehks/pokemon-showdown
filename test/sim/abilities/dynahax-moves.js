@@ -153,6 +153,36 @@ describe('Dynahax [Blocked Moves]', () => {
 		assert.equal(battle.p2.active[0].getTypes().join('/'), typesBefore);
 	});
 
+	it('should block Magic Powder', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Hatterene', ability: 'owntempo', moves: ['magicpowder'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+		]);
+		const typesBefore = battle.p2.active[0].getTypes().join('/');
+		battle.makeChoices('move magicpowder', 'move splash');
+		assert.equal(battle.p2.active[0].getTypes().join('/'), typesBefore);
+	});
+
+	it('should block Trick-or-Treat', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Gourgeist', ability: 'owntempo', moves: ['trickortreat'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+		]);
+		const typesBefore = battle.p2.active[0].getTypes().join('/');
+		battle.makeChoices('move trickortreat', 'move splash');
+		assert.equal(battle.p2.active[0].getTypes().join('/'), typesBefore);
+	});
+
+	it("should block Forest's Curse", () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Trevenant', ability: 'owntempo', moves: ['forestscurse'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+		]);
+		const typesBefore = battle.p2.active[0].getTypes().join('/');
+		battle.makeChoices('move forestscurse', 'move splash');
+		assert.equal(battle.p2.active[0].getTypes().join('/'), typesBefore);
+	});
+
 	it('should block Simple Beam', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
 			[{ species: 'Smeargle', ability: 'owntempo', moves: ['simplebeam'] }],
