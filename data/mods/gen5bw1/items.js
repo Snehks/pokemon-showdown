@@ -1,0 +1,45 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Items = void 0;
+exports.Items = {
+    apicotberry: {
+        inherit: true,
+        isNonstandard: "Unobtainable",
+    },
+    custapberry: {
+        inherit: true,
+        isNonstandard: "Unobtainable",
+    },
+    ganlonberry: {
+        inherit: true,
+        isNonstandard: "Unobtainable",
+    },
+    jabocaberry: {
+        inherit: true,
+        isNonstandard: "Unobtainable",
+    },
+    liechiberry: {
+        inherit: true,
+        isNonstandard: "Unobtainable",
+    },
+    micleberry: {
+        inherit: true,
+        isNonstandard: "Unobtainable",
+    },
+    petayaberry: {
+        inherit: true,
+        isNonstandard: "Unobtainable",
+    },
+    rowapberry: {
+        inherit: true,
+        isNonstandard: "Unobtainable",
+    },
+    salacberry: {
+        inherit: true,
+        isNonstandard: "Unobtainable",
+    },
+    souldew: {
+        inherit: true,
+        isNonstandard: "Unobtainable",
+    },
+};
