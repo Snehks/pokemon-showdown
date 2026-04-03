@@ -80,8 +80,7 @@ const Repl = new class {
     this.listenersSetup = false;
   }
   setupListeners(filename) {
-    if (Repl.listenersSetup)
-      return;
+    if (Repl.listenersSetup) return;
     Repl.listenersSetup = true;
     process.once("exit", (code) => {
       for (const s of Repl.socketPathnames) {
@@ -101,14 +100,12 @@ const Repl = new class {
       process.once("SIGINT", () => process.exit(128 + 2));
     }
     global.heapdump = (targetPath) => {
-      if (!targetPath)
-        targetPath = `${filename}-${new Date().toISOString()}`;
+      if (!targetPath) targetPath = `${filename}-${(/* @__PURE__ */ new Date()).toISOString()}`;
       let handler;
       try {
         handler = require("node-oom-heapdump")();
       } catch (e) {
-        if (e.code !== "MODULE_NOT_FOUND")
-          throw e;
+        if (e.code !== "MODULE_NOT_FOUND") throw e;
         throw new Error(`node-oom-heapdump is not installed. Run \`npm install --no-save node-oom-heapdump\` and try again.`);
       }
       return handler.createHeapSnapshot(targetPath);
@@ -120,16 +117,14 @@ const Repl = new class {
    */
   async cleanup() {
     const config = typeof Config !== "undefined" ? Config : {};
-    if (!config.repl)
-      return;
+    if (!config.repl) return;
     const directory = path.dirname(
       path.resolve(import_fs.FS.ROOT_PATH, config.replsocketprefix || "logs/repl", "app")
     );
     const files = await fs.promises.readdir(directory);
     await runParallelWithLimit(files, MAX_CONCURRENT_CLEANUP_SOCKETS, async (file) => {
       const pathname = path.resolve(directory, file);
-      if (!await isSocket(pathname))
-        return;
+      if (!await isSocket(pathname)) return;
       await new Promise((resolve, reject) => {
         const socket = net.connect(pathname, () => {
           socket.end();
@@ -148,8 +143,7 @@ const Repl = new class {
    */
   start(filename, evalFunction) {
     const config = typeof Config !== "undefined" ? Config : {};
-    if (!config.repl)
-      return;
+    if (!config.repl) return;
     if (evalFunction === eval) {
       throw new TypeError(`Expected 'evalFunction' to be a wrapper around direct eval.`);
     }

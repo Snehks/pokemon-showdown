@@ -26,8 +26,7 @@ const Scripts = {
   inherit: "gen9",
   init() {
     for (const id in this.data.Pokedex) {
-      if (this.species.get(id).isCosmeticForme)
-        continue;
+      if (this.species.get(id).isCosmeticForme) continue;
       const types = Array.from(new Set(this.data.Pokedex[id].types.map((type) => type.replace(/(Ghost|Fairy)/g, "Psychic").replace(/Bug/g, "Grass").replace(/Ice/g, "Water").replace(/(Rock|Ground)/g, "Fighting").replace(/Flying/g, "Normal").replace(/Poison/g, "Dark"))));
       this.modData("Pokedex", id).types = types;
     }
@@ -88,25 +87,21 @@ const Scripts = {
       return false;
     },
     runImmunity(source, message) {
-      if (!source)
-        return true;
+      if (!source) return true;
       const type = typeof source !== "string" ? source.type : source;
       if (typeof source !== "string") {
         if (source.ignoreImmunity && (source.ignoreImmunity === true || source.ignoreImmunity[type])) {
           return true;
         }
       }
-      if (!type || type === "???")
-        return true;
+      if (!type || type === "???") return true;
       if (!this.battle.dex.types.isName(type)) {
         throw new Error("Use runStatusImmunity for " + type);
       }
       const negateImmunity = !this.battle.runEvent("NegateImmunity", this, type);
       const notImmune = type === "Fighting" ? this.isGrounded(negateImmunity) : negateImmunity || this.battle.dex.getImmunity(type, this);
-      if (notImmune)
-        return true;
-      if (!message)
-        return false;
+      if (notImmune) return true;
+      if (!message) return false;
       if (notImmune === null) {
         this.battle.add("-immune", this, "[from] ability: Levitate");
       } else {

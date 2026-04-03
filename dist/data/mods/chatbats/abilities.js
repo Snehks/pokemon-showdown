@@ -32,8 +32,7 @@ const Abilities = {
       }
     },
     onSetStatus(status, target, source, effect) {
-      if (status.id !== "brn")
-        return;
+      if (status.id !== "brn") return;
       if (effect?.status) {
         this.add("-immune", target, "[from] ability: Thick Fat");
       }
@@ -51,8 +50,7 @@ const Abilities = {
       }
     },
     onUpdate(pokemon) {
-      if (!this.effectState.callillumise)
-        return;
+      if (!this.effectState.callillumise) return;
       this.add("-message", `Volbeat calls upon Illumise for aid!`);
       const newMoves = ["bugbuzz", "icebeam", "thunderbolt", "quiverdance"];
       pokemon.moveSlots = newMoves.map((move) => {
@@ -105,8 +103,7 @@ const Abilities = {
       }
     },
     onUpdate(pokemon) {
-      if (!this.effectState.callvolbeat)
-        return;
+      if (!this.effectState.callvolbeat) return;
       this.add("-message", `Illumise calls upon Volbeat for aid!`);
       const newMoves = ["victorydance", "lunge", "mightycleave", "earthquake"];
       pokemon.moveSlots = newMoves.map((move) => {
@@ -198,8 +195,7 @@ const Abilities = {
     },
     onSwitchInPriority: -1,
     onUpdate(pokemon) {
-      if (pokemon.species.id !== "glastrier" || !pokemon.hp)
-        return;
+      if (pokemon.species.id !== "glastrier" || !pokemon.hp) return;
       if (pokemon.hp < pokemon.maxhp / 2) {
         if (pokemon.species.id !== "calyrexice" && pokemon.ability === "frozenarmor") {
           pokemon.formeChange("Calyrex-Ice", null, true);
@@ -289,8 +285,7 @@ const Abilities = {
   stillwater: {
     onAnyModifyBoost(boosts, pokemon) {
       const unawareUser = this.effectState.target;
-      if (unawareUser === pokemon)
-        return;
+      if (unawareUser === pokemon) return;
       if (unawareUser === this.activePokemon && pokemon === this.activeTarget) {
         boosts["def"] = 0;
         boosts["spd"] = 0;
@@ -363,8 +358,7 @@ const Abilities = {
   omnivore: {
     onDamagingHitOrder: 1,
     onDamagingHit(damage, target, source, move) {
-      if (!target.hp)
-        return;
+      if (!target.hp) return;
       this.add("-activate", target, "ability: Omnivore");
       target.addVolatile("stockpile");
     },
@@ -385,29 +379,23 @@ const Abilities = {
       }
     },
     onCriticalHit(target, source, move) {
-      if (!target)
-        return;
+      if (!target) return;
       if (!["sudowoodo"].includes(target.species.id)) {
         return;
       }
       const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-      if (hitSub)
-        return;
-      if (!target.runImmunity(move.type))
-        return;
+      if (hitSub) return;
+      if (!target.runImmunity(move.type)) return;
       return false;
     },
     onEffectiveness(typeMod, target, type, move) {
-      if (!target || move.category === "Status")
-        return;
+      if (!target || move.category === "Status") return;
       if (!["sudowoodo"].includes(target.species.id)) {
         return;
       }
       const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-      if (hitSub)
-        return;
-      if (!target.runImmunity(move.type))
-        return;
+      if (hitSub) return;
+      if (!target.runImmunity(move.type)) return;
       return 0;
     },
     onUpdate(pokemon) {
@@ -440,8 +428,7 @@ const Abilities = {
         }
       }
       if (effect.effectType !== "Move") {
-        if (effect.effectType === "Ability")
-          this.add("-activate", source, "ability: " + effect.name);
+        if (effect.effectType === "Ability") this.add("-activate", source, "ability: " + effect.name);
         return false;
       }
     },
@@ -460,29 +447,23 @@ const Abilities = {
       }
     },
     onCriticalHit(target, source, move) {
-      if (!target)
-        return;
+      if (!target) return;
       if (!["mimikyu", "mimikyutotem"].includes(target.species.id)) {
         return;
       }
       const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-      if (hitSub)
-        return;
-      if (!target.runImmunity(move.type))
-        return;
+      if (hitSub) return;
+      if (!target.runImmunity(move.type)) return;
       return false;
     },
     onEffectiveness(typeMod, target, type, move) {
-      if (!target || move.category === "Status")
-        return;
+      if (!target || move.category === "Status") return;
       if (!["mimikyu", "mimikyutotem"].includes(target.species.id)) {
         return;
       }
       const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"] && !(move.infiltrates && this.gen >= 6);
-      if (hitSub)
-        return;
-      if (!target.runImmunity(move.type))
-        return;
+      if (hitSub) return;
+      if (!target.runImmunity(move.type)) return;
       return 0;
     },
     onUpdate(pokemon) {
@@ -536,12 +517,10 @@ const Abilities = {
   protean: {
     inherit: true,
     onPrepareHit(source, target, move) {
-      if (move.hasBounced || move.flags["futuremove"] || move.sourceEffect === "snatch" || move.callsMove)
-        return;
+      if (move.hasBounced || move.flags["futuremove"] || move.sourceEffect === "snatch" || move.callsMove) return;
       const type = move.type;
       if (type && type !== "???" && source.getTypes().join() !== type) {
-        if (!source.setType(type))
-          return;
+        if (!source.setType(type)) return;
         this.add("-start", source, "typechange", type, "[from] ability: Protean");
       }
     },
@@ -550,8 +529,7 @@ const Abilities = {
   },
   berserk: {
     onUpdate(pokemon) {
-      if (pokemon.species.id !== "infernape" || !pokemon.hp || pokemon.m.triggeredBerserk)
-        return;
+      if (pokemon.species.id !== "infernape" || !pokemon.hp || pokemon.m.triggeredBerserk) return;
       if (pokemon.hp < pokemon.maxhp / 2) {
         this.boost({ spa: 1 }, pokemon, pokemon);
         pokemon.m.triggeredBerserk = true;
@@ -569,8 +547,7 @@ const Abilities = {
     },
     onModifyAtkPriority: 1,
     onModifyAtk(atk, pokemon) {
-      if (pokemon.volatiles["dynamax"])
-        return;
+      if (pokemon.volatiles["dynamax"]) return;
       this.debug("bsc Attack boost");
       return this.chainModify(1.5);
     },
@@ -583,8 +560,7 @@ const Abilities = {
     },
     // applies move lock
     onAfterMoveSecondarySelf(pokemon, source, move) {
-      if (move.id === "dragondance")
-        return;
+      if (move.id === "dragondance") return;
       if (!pokemon.volatiles["bloodsoakedcrescent"]) {
         this.add("-start", pokemon, "Blood-Soaked Rage");
       }
@@ -610,13 +586,11 @@ const Abilities = {
         }
       },
       onEnd(target) {
-        if (this.effectState.trueDuration > 1)
-          return;
+        if (this.effectState.trueDuration > 1) return;
         target.addVolatile("confusion");
       },
       onLockMove(pokemon) {
-        if (pokemon.volatiles["dynamax"])
-          return;
+        if (pokemon.volatiles["dynamax"]) return;
         return this.effectState.move;
       }
     },
@@ -648,20 +622,15 @@ const Abilities = {
   biogenesis: {
     onSwitchInPriority: -1,
     onBeforeSwitchIn(pokemon) {
-      if (pokemon.m.didRandomMoves)
-        return;
+      if (pokemon.m.didRandomMoves) return;
       const moves = this.dex.moves.all();
       const newMoves = [];
       while (newMoves.length < 8) {
         const newMove = this.sample(moves);
-        if (newMove.basePower === 1)
-          continue;
-        if (newMove.isMax === true)
-          continue;
-        if (newMove.isNonstandard === "Gigantamax")
-          continue;
-        if (newMoves.map((x) => x.id).includes(newMove.id))
-          continue;
+        if (newMove.basePower === 1) continue;
+        if (newMove.isMax === true) continue;
+        if (newMove.isNonstandard === "Gigantamax") continue;
+        if (newMoves.map((x) => x.id).includes(newMove.id)) continue;
         newMoves.push(newMove);
       }
       pokemon.moveSlots = newMoves.map((move) => {
@@ -680,8 +649,7 @@ const Abilities = {
       pokemon.m.didRandomMoves = true;
     },
     onSwitchIn(pokemon) {
-      if (!pokemon)
-        return;
+      if (!pokemon) return;
       if (!pokemon.m.hasTypeChanged) {
         this.add("-ability", pokemon, "Biogenesis");
         this.add("-anim", pokemon, "Growth", pokemon);
@@ -763,8 +731,7 @@ const Abilities = {
   },
   brainfreeze: {
     onModifyCritRatio(critRatio, source, target) {
-      if (target && (target.status === "frostbite" || this.field.isWeather("snowscape")))
-        return 5;
+      if (target && (target.status === "frostbite" || this.field.isWeather("snowscape"))) return 5;
     },
     flags: {},
     name: "Brain Freeze",
@@ -866,8 +833,7 @@ const Abilities = {
         return this.chainModify(2.25);
       } else if (defender.hasType("Steel")) {
         return;
-      } else
-        return this.chainModify(1.5);
+      } else return this.chainModify(1.5);
     },
     onTryHit(target, source, move) {
       if (target.hasType("Fairy")) {
@@ -879,12 +845,10 @@ const Abilities = {
       if (move.secondaries) {
         this.debug("doubling secondary chance");
         for (const secondary of move.secondaries) {
-          if (secondary.chance)
-            secondary.chance *= 2;
+          if (secondary.chance) secondary.chance *= 2;
         }
       }
-      if (move.self?.chance)
-        move.self.chance *= 2;
+      if (move.self?.chance) move.self.chance *= 2;
     },
     flags: {},
     name: "Dragon's Jaw",
@@ -940,10 +904,8 @@ const Abilities = {
       this.singleEvent("WeatherChange", this.effect, this.effectState, pokemon);
     },
     onWeatherChange(pokemon) {
-      if (!pokemon.isActive || pokemon.baseSpecies.baseSpecies !== "Kyogre" || pokemon.transformed)
-        return;
-      if (!pokemon.hp)
-        return;
+      if (!pokemon.isActive || pokemon.baseSpecies.baseSpecies !== "Kyogre" || pokemon.transformed) return;
+      if (!pokemon.hp) return;
       if (["raindance", "primordialsea"].includes(pokemon.effectiveWeather())) {
         if (pokemon.species.id !== "kyogreprimal") {
           pokemon.formeChange("Kyogre-Primal", this.effect, false);
@@ -956,16 +918,14 @@ const Abilities = {
     },
     onAllyModifyAtkPriority: 3,
     onAllyModifyAtk(atk, pokemon) {
-      if (this.effectState.target.baseSpecies.baseSpecies !== "Kyogre")
-        return;
+      if (this.effectState.target.baseSpecies.baseSpecies !== "Kyogre") return;
       if (["raindance", "primordialsea"].includes(pokemon.effectiveWeather())) {
         return this.chainModify(1.5);
       }
     },
     onAllyModifySpDPriority: 4,
     onAllyModifySpD(spd, pokemon) {
-      if (this.effectState.target.baseSpecies.baseSpecies !== "Kyogre")
-        return;
+      if (this.effectState.target.baseSpecies.baseSpecies !== "Kyogre") return;
       if (["raindance", "primordialsea"].includes(pokemon.effectiveWeather())) {
         return this.chainModify(1.5);
       }
@@ -1001,8 +961,7 @@ const Abilities = {
     inherit: true,
     onModifyMovePriority: -5,
     onModifyMove(move) {
-      if (!move.ignoreImmunity)
-        move.ignoreImmunity = {};
+      if (!move.ignoreImmunity) move.ignoreImmunity = {};
       if (move.ignoreImmunity !== true) {
         move.ignoreImmunity["Poison"] = true;
       }
@@ -1028,8 +987,7 @@ const Abilities = {
   },
   nibblenibble: {
     onPrepareHit(source, target, move) {
-      if (move.category === "Status" || move.multihit || move.flags["noparentalbond"] || move.flags["charge"] || move.flags["futuremove"] || move.spreadHit || move.isZ || move.isMax || !move.flags["bite"])
-        return;
+      if (move.category === "Status" || move.multihit || move.flags["noparentalbond"] || move.flags["charge"] || move.flags["futuremove"] || move.spreadHit || move.isZ || move.isMax || !move.flags["bite"]) return;
       move.multihit = 2;
       move.multihitType = "parentalbond";
     },

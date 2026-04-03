@@ -119,8 +119,7 @@ const Conditions = {
         selfdestruct: move.selfdestruct
       };
       const damage = this.actions.getDamage(pokemon, pokemon, move);
-      if (typeof damage !== "number")
-        throw new Error("Confusion damage not dealt");
+      if (typeof damage !== "number") throw new Error("Confusion damage not dealt");
       this.directDamage(damage);
       return false;
     }
@@ -132,12 +131,10 @@ const Conditions = {
     },
     onAfterMoveSelfPriority: 100,
     onAfterMoveSelf(pokemon) {
-      if (["brn", "psn", "tox"].includes(pokemon.status))
-        pokemon.volatiles["residualdmg"].counter++;
+      if (["brn", "psn", "tox"].includes(pokemon.status)) pokemon.volatiles["residualdmg"].counter++;
     },
     onAfterSwitchInSelf(pokemon) {
-      if (["brn", "psn", "tox"].includes(pokemon.status))
-        pokemon.volatiles["residualdmg"].counter++;
+      if (["brn", "psn", "tox"].includes(pokemon.status)) pokemon.volatiles["residualdmg"].counter++;
     }
   }
 };

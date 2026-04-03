@@ -30,14 +30,12 @@ const Scripts = {
       this.battle.runEvent("EntryHazard", pokemon);
       this.battle.runEvent("SwitchIn", pokemon);
       if (this.battle.gen <= 2) {
-        for (const poke of this.battle.getAllActive())
-          poke.lastMove = null;
+        for (const poke of this.battle.getAllActive()) poke.lastMove = null;
         if (!pokemon.side.faintedThisTurn && pokemon.draggedIn !== this.battle.turn) {
           this.battle.runEvent("AfterSwitchInSelf", pokemon);
         }
       }
-      if (!pokemon.hp)
-        return false;
+      if (!pokemon.hp) return false;
       pokemon.isStarted = true;
       if (!pokemon.fainted) {
         this.battle.singleEvent("Start", pokemon.getAbility(), pokemon.abilityState, pokemon);
@@ -52,8 +50,7 @@ const Scripts = {
       return true;
     },
     modifyDamage(baseDamage, pokemon, target, move, suppressMessages = false) {
-      if (!move.type)
-        move.type = "???";
+      if (!move.type) move.type = "???";
       const type = move.type;
       if (pokemon.status === "brn" && baseDamage && move.category === "Physical" && !pokemon.hasAbility("guts")) {
         baseDamage = this.battle.modify(baseDamage, 0.5);
@@ -84,21 +81,18 @@ const Scripts = {
       typeMod = this.battle.clampIntRange(typeMod, -6, 6);
       target.getMoveHitData(move).typeMod = typeMod;
       if (typeMod > 0) {
-        if (!suppressMessages)
-          this.battle.add("-supereffective", target);
+        if (!suppressMessages) this.battle.add("-supereffective", target);
         for (let i = 0; i < typeMod; i++) {
           baseDamage *= 2;
         }
       }
       if (typeMod < 0) {
-        if (!suppressMessages)
-          this.battle.add("-resisted", target);
+        if (!suppressMessages) this.battle.add("-resisted", target);
         for (let i = 0; i > typeMod; i--) {
           baseDamage = Math.floor(baseDamage / 2);
         }
       }
-      if (isCrit && !suppressMessages)
-        this.battle.add("-crit", target);
+      if (isCrit && !suppressMessages) this.battle.add("-crit", target);
       baseDamage = this.battle.runEvent("ModifyDamage", pokemon, target, move, baseDamage);
       if (!Math.floor(baseDamage)) {
         return 1;
@@ -109,8 +103,7 @@ const Scripts = {
       const hitResults = this.battle.runEvent("Invulnerability", targets, pokemon, move);
       for (const [i, target] of targets.entries()) {
         if (hitResults[i] === false) {
-          if (!move.spreadHit)
-            this.battle.attrLastMove("[miss]");
+          if (!move.spreadHit) this.battle.attrLastMove("[miss]");
           this.battle.add("-miss", pokemon, target);
         }
       }
@@ -162,8 +155,7 @@ const Scripts = {
           accuracy = this.battle.runEvent("Accuracy", target, pokemon, move, accuracy);
         }
         if (accuracy !== true && !this.battle.randomChance(accuracy, 100)) {
-          if (!move.spreadHit)
-            this.battle.attrLastMove("[miss]");
+          if (!move.spreadHit) this.battle.attrLastMove("[miss]");
           this.battle.add("-miss", pokemon, target);
           hitResults[i] = false;
           continue;

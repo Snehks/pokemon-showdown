@@ -70,7 +70,7 @@ function saveStats(month = getMonth()) {
   (0, import_lib.FS)(STATS_PATH.replace("{{MONTH}}", month)).writeUpdate(() => JSON.stringify(curStats));
 }
 function getMonth() {
-  return Chat.toTimestamp(new Date()).split(" ")[0].slice(0, -3);
+  return Chat.toTimestamp(/* @__PURE__ */ new Date()).split(" ")[0].slice(0, -3);
 }
 function getSpeciesName(set, format) {
   const species = set.species;
@@ -180,12 +180,10 @@ async function collectStats(battle, winner, players) {
   checkRollover();
   for (const p of battle.players) {
     const team = await battle.getPlayerTeam(p);
-    if (!team)
-      return;
+    if (!team) return;
     const mons = team.map((f) => getSpeciesName(f, format));
     for (const mon of mons) {
-      if (!formatData.mons[mon])
-        formatData.mons[mon] = { timesGenerated: 0, numWins: 0 };
+      if (!formatData.mons[mon]) formatData.mons[mon] = { timesGenerated: 0, numWins: 0 };
       formatData.mons[mon].timesGenerated++;
       if (toID(winner) === toID(p.name)) {
         formatData.mons[mon].numWins++;
@@ -199,8 +197,7 @@ const commands = {
   randswinrates(target, room, user) {
     target = toID(target);
     if (/^(gen|)[0-9]+$/.test(target)) {
-      if (target.startsWith("gen"))
-        target = target.slice(3);
+      if (target.startsWith("gen")) target = target.slice(3);
       target = `gen${target}randombattle`;
     }
     return this.parse(`/j view-winrates-${target ? Dex.formats.get(target).id : `gen${Dex.gen}randombattle`}`);
@@ -224,12 +221,10 @@ const commands = {
 };
 const pages = {
   async winrates(query, user) {
-    if (!user.named)
-      return Rooms.RETRY_AFTER_LOGIN;
+    if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
     query = query.join("-").split("--");
     const format = toID(query.shift());
-    if (!format)
-      throw new Chat.ErrorMessage(`Specify a format to view winrates for.`);
+    if (!format) throw new Chat.ErrorMessage(`Specify a format to view winrates for.`);
     if (!stats.formats[format]) {
       throw new Chat.ErrorMessage(`That format does not have winrates tracked.`);
     }
@@ -246,8 +241,8 @@ const pages = {
     if (isOldMonth && !await (0, import_lib.FS)(STATS_PATH.replace("{{MONTH}}", month)).exists()) {
       throw new Chat.ErrorMessage(`There are no winrates for that month.`);
     }
-    const prevMonth = new Date(new Date(`${month}-15`).getTime() - 30 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 7);
-    const nextMonth = new Date(new Date(`${month}-15`).getTime() + 30 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 7);
+    const prevMonth = new Date((/* @__PURE__ */ new Date(`${month}-15`)).getTime() - 30 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 7);
+    const nextMonth = new Date((/* @__PURE__ */ new Date(`${month}-15`)).getTime() + 30 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 7);
     const prevMonthExists = await (0, import_lib.FS)(STATS_PATH.replace("{{MONTH}}", prevMonth)).exists();
     const nextMonthExists = await (0, import_lib.FS)(STATS_PATH.replace("{{MONTH}}", nextMonth)).exists();
     const statData = month === stats.month ? stats : JSON.parse(await (0, import_lib.FS)(STATS_PATH.replace("{{MONTH}}", month)).read());

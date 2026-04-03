@@ -25,14 +25,12 @@ const Abilities = {
   trace: {
     inherit: true,
     onUpdate(pokemon) {
-      if (!this.effectState.seek)
-        return;
+      if (!this.effectState.seek) return;
       const isAbility = pokemon.ability === "trace";
       const possibleTargets = pokemon.adjacentFoes().filter(
         (target2) => !target2.getAbility().flags["notrace"] && target2.ability !== "noability"
       );
-      if (!possibleTargets.length)
-        return;
+      if (!possibleTargets.length) return;
       const target = this.sample(possibleTargets);
       const ability = target.getAbility();
       if (isAbility) {
@@ -67,8 +65,7 @@ const Abilities = {
     },
     onEnd(source) {
       this.add("-end", source, "ability: Neutralizing Gas");
-      if (source.abilityState.ending)
-        return;
+      if (source.abilityState.ending) return;
       source.abilityState.ending = true;
       const sortedActive = this.getAllActive();
       this.speedSort(sortedActive);

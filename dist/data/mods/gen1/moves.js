@@ -247,8 +247,7 @@ const Moves = {
           pokemon.removeVolatile("disable");
           return;
         }
-        if (pokemon.volatiles["bide"])
-          move = this.dex.getActiveMove("bide");
+        if (pokemon.volatiles["bide"]) move = this.dex.getActiveMove("bide");
         if (move.id === this.effectState.move) {
           this.add("cant", pokemon, "Disable", move);
           pokemon.removeVolatile("twoturnmove");
@@ -425,8 +424,7 @@ const Moves = {
         }
         const toLeech = this.clampIntRange(Math.floor(pokemon.baseMaxhp / 16), 1) * toxicCounter;
         const damage = this.damage(toLeech, pokemon, leecher);
-        if (residualdmg)
-          this.hint("In Gen 1, Leech Seed's damage is affected by Toxic's counter.", true);
+        if (residualdmg) this.hint("In Gen 1, Leech Seed's damage is affected by Toxic's counter.", true);
         if (!damage || toLeech > damage) {
           this.hint("In Gen 1, Leech Seed recovery is not limited by the remaining HP of the seeded Pokemon.", true);
         }
@@ -466,8 +464,7 @@ const Moves = {
         moves.sort((a, b) => a.num - b.num);
         randomMove = this.sample(moves).id;
       }
-      if (!randomMove)
-        return false;
+      if (!randomMove) return false;
       pokemon.side.lastSelectedMove = this.toID(randomMove);
       this.actions.useMove(randomMove, pokemon);
     }
@@ -477,12 +474,10 @@ const Moves = {
     flags: { protect: 1, bypasssub: 1, metronome: 1 },
     onHit(target, source) {
       const moveslot = source.moves.indexOf("mimic");
-      if (moveslot < 0)
-        return false;
+      if (moveslot < 0) return false;
       const moves = target.moves;
       const moveid = this.sample(moves);
-      if (!moveid)
-        return false;
+      if (!moveid) return false;
       const move = this.dex.moves.get(moveid);
       source.moveSlots[moveslot] = {
         move: move.name,
@@ -515,8 +510,7 @@ const Moves = {
         this.add("-start", pokemon, "Mist");
       },
       onTryBoost(boost, target, source, effect) {
-        if (effect.effectType === "Move" && effect.category !== "Status")
-          return;
+        if (effect.effectType === "Move" && effect.category !== "Status") return;
         if (source && target !== source) {
           let showMsg = false;
           let i;
@@ -614,8 +608,7 @@ const Moves = {
     inherit: true,
     heal: null,
     onHit(target) {
-      if (target.hp === target.maxhp)
-        return false;
+      if (target.hp === target.maxhp) return false;
       if (target.hp === target.maxhp || (target.hp === target.maxhp - 255 || target.hp === target.maxhp - 511) && target.hp % 256 !== 0) {
         this.hint(
           "In Gen 1, recovery moves fail if (user's maximum HP - user's current HP + 1) is divisible by 256, unless the current hp is also divisible by 256."
@@ -654,16 +647,14 @@ const Moves = {
     onTry() {
     },
     onHit(target, source, move) {
-      if (target.hp === target.maxhp)
-        return false;
+      if (target.hp === target.maxhp) return false;
       if (target.hp === target.maxhp || (target.hp === target.maxhp - 255 || target.hp === target.maxhp - 511) && target.hp % 256 !== 0) {
         this.hint(
           "In Gen 1, recovery moves fail if (user's maximum HP - user's current HP + 1) is divisible by 256, unless the current hp is also divisible by 256."
         );
         return false;
       }
-      if (!target.setStatus("slp", source, move))
-        return false;
+      if (!target.setStatus("slp", source, move)) return false;
       target.statusState.time = 2;
       target.statusState.startTime = 2;
       this.heal(target.maxhp);
@@ -756,8 +747,7 @@ const Moves = {
     inherit: true,
     heal: null,
     onHit(target) {
-      if (target.hp === target.maxhp)
-        return false;
+      if (target.hp === target.maxhp) return false;
       if (target.hp === target.maxhp || (target.hp === target.maxhp - 255 || target.hp === target.maxhp - 511) && target.hp % 256 !== 0) {
         this.hint(
           "In Gen 1, recovery moves fail if (user's maximum HP - user's current HP + 1) is divisible by 256, unless the current hp is also divisible by 256."
@@ -814,13 +804,10 @@ const Moves = {
           }
           return;
         }
-        if (move.volatileStatus && target === source)
-          return;
+        if (move.volatileStatus && target === source) return;
         let uncappedDamage = move.hit > 1 ? this.lastDamage : this.actions.getDamage(source, target, move);
-        if (move.id === "bide")
-          uncappedDamage = source.volatiles["bide"].damage * 2;
-        if (!uncappedDamage && uncappedDamage !== 0)
-          return null;
+        if (move.id === "bide") uncappedDamage = source.volatiles["bide"].damage * 2;
+        if (!uncappedDamage && uncappedDamage !== 0) return null;
         this.lastDamage = uncappedDamage;
         target.volatiles["substitute"].hp -= uncappedDamage > target.volatiles["substitute"].hp ? target.volatiles["substitute"].hp : uncappedDamage;
         if (target.volatiles["substitute"].hp <= 0) {

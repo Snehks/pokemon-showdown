@@ -27,15 +27,13 @@ const Abilities = {
     condition: {
       duration: 5,
       durationCallback(target, source, effect) {
-        if (target.m.revivedByMonkeysPaw)
-          return 0;
+        if (target.m.revivedByMonkeysPaw) return 0;
         return 5;
       },
       onResidualOrder: 28,
       onResidualSubOrder: 2,
       onStart(target, source, effect) {
-        if (target.m.revivedByMonkeysPaw)
-          this.effectState.duration = 0;
+        if (target.m.revivedByMonkeysPaw) this.effectState.duration = 0;
         this.add("-start", target, "ability: Slow Start");
       },
       onModifyAtkPriority: 5,

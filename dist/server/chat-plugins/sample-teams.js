@@ -41,22 +41,18 @@ function save() {
   (0, import_lib.FS)(SAMPLE_TEAMS).writeUpdate(() => JSON.stringify(teamData));
 }
 for (const formatid in teamData.teams) {
-  if (!teamData.teams[formatid].uncategorized)
-    teamData.teams[formatid].uncategorized = {};
+  if (!teamData.teams[formatid].uncategorized) teamData.teams[formatid].uncategorized = {};
 }
 save();
 const SampleTeams = new class SampleTeams2 {
   isRoomStaff(user, roomids) {
     let matched = false;
-    if (!roomids?.length)
-      return false;
+    if (!roomids?.length) return false;
     for (const roomid of roomids) {
       const room = Rooms.search(roomid);
-      if (!room)
-        continue;
+      if (!room) continue;
       matched = room.auth.isStaff(user.id);
-      if (matched)
-        break;
+      if (matched) break;
     }
     return matched;
   }
@@ -68,22 +64,18 @@ const SampleTeams = new class SampleTeams2 {
   }
   whitelistedRooms(formatid, names = false) {
     formatid = this.sanitizeFormat(formatid);
-    if (!teamData.whitelist[formatid]?.length)
-      return null;
+    if (!teamData.whitelist[formatid]?.length) return null;
     return import_lib.Utils.sortBy(teamData.whitelist[formatid], (x) => {
-      if (!names)
-        return x;
+      if (!names) return x;
       const room = Rooms.search(x);
-      if (!room)
-        return x;
+      if (!room) return x;
       return room.title;
     });
   }
   whitelistRooms(formatids, roomids) {
     for (const unsanitizedFormatid of formatids) {
       const formatid = this.sanitizeFormat(unsanitizedFormatid);
-      if (!teamData.whitelist[formatid])
-        teamData.whitelist[formatid] = [];
+      if (!teamData.whitelist[formatid]) teamData.whitelist[formatid] = [];
       for (const roomid of roomids) {
         const targetRoom = Rooms.search(roomid);
         if (!targetRoom?.persist) {
@@ -100,17 +92,14 @@ const SampleTeams = new class SampleTeams2 {
   unwhitelistRoom(formatid, roomid) {
     formatid = this.sanitizeFormat(formatid, false);
     const targetRoom = Rooms.search(roomid);
-    if (!targetRoom?.persist)
-      throw new Chat.ErrorMessage(`Room ${roomid} not found. Check spelling?`);
-    if (!teamData.whitelist[formatid]?.length)
-      throw new Chat.ErrorMessage(`No rooms are whitelisted for ${formatid}.`);
+    if (!targetRoom?.persist) throw new Chat.ErrorMessage(`Room ${roomid} not found. Check spelling?`);
+    if (!teamData.whitelist[formatid]?.length) throw new Chat.ErrorMessage(`No rooms are whitelisted for ${formatid}.`);
     if (!teamData.whitelist[formatid].includes(targetRoom.roomid)) {
       throw new Chat.ErrorMessage(`Room ${targetRoom.title} isn't whitelisted.`);
     }
     const index = teamData.whitelist[formatid].indexOf(targetRoom.roomid);
     teamData.whitelist[formatid].splice(index, 1);
-    if (!teamData.whitelist[formatid].length)
-      delete teamData.whitelist[formatid];
+    if (!teamData.whitelist[formatid].length) delete teamData.whitelist[formatid];
     save();
   }
   sanitizeFormat(formatid, checkExists = false) {
@@ -184,8 +173,7 @@ const SampleTeams = new class SampleTeams2 {
     if (this.findTeamName(formatid, category, teamName)) {
       throw new Chat.ErrorMessage(`There is already a team for ${formatid} with the name ${teamName} in the ${category} category.`);
     }
-    if (!teamData.teams[formatid][category])
-      this.addCategory(user, formatid, category);
+    if (!teamData.teams[formatid][category]) this.addCategory(user, formatid, category);
     teamData.teams[formatid][category][teamName] = Teams.pack(Teams.import(team.trim()));
     save();
     return teamData.teams[formatid][category][teamName];
@@ -210,17 +198,14 @@ const SampleTeams = new class SampleTeams2 {
     }
     const oldTeam = teamData.teams[formatid][categoryName][teamName];
     delete teamData.teams[formatid][categoryName][teamName];
-    if (!Object.keys(teamData.teams[formatid][categoryName]).length)
-      delete teamData.teams[formatid][categoryName];
-    if (!Object.keys(teamData.teams[formatid]).filter((x) => x !== "uncategorized").length)
-      delete teamData.teams[formatid];
+    if (!Object.keys(teamData.teams[formatid][categoryName]).length) delete teamData.teams[formatid][categoryName];
+    if (!Object.keys(teamData.teams[formatid]).filter((x) => x !== "uncategorized").length) delete teamData.teams[formatid];
     save();
     return oldTeam;
   }
   formatTeam(teamName, teamStr, broadcasting = false) {
     const team = Teams.unpack(teamStr);
-    if (!team)
-      return `Team is not correctly formatted. PM room staff to fix the formatting.`;
+    if (!team) return `Team is not correctly formatted. PM room staff to fix the formatting.`;
     let buf = ``;
     if (!broadcasting) {
       buf += `<center><strong style="letter-spacing:1.2pt">${team.map((x) => `<psicon pokemon="${x.species}" />`).join("")}`;
@@ -238,8 +223,7 @@ const SampleTeams = new class SampleTeams2 {
     if (whitelistedRooms?.length) {
       for (const roomid of whitelistedRooms) {
         const room = Rooms.get(roomid);
-        if (!room)
-          continue;
+        if (!room) continue;
         context.room = room;
         context.modlog(action, null, `${formatid}: ${note}`);
         context.privateModAction(log);
@@ -267,8 +251,7 @@ const SampleTeams = new class SampleTeams2 {
   }
   findTeamName(formatid, categoryid, teamid) {
     const categoryName = this.findCategory(formatid, categoryid);
-    if (!categoryName)
-      return null;
+    if (!categoryName) return null;
     let match = null;
     for (const teamName in teamData.teams[formatid][categoryName] || {}) {
       if (toID(teamName) === teamid) {
@@ -285,11 +268,9 @@ const SampleTeams = new class SampleTeams2 {
     for (const formatid in teamData.whitelist) {
       for (const [i, roomid] of teamData.whitelist[formatid].entries()) {
         const room = Rooms.search(roomid);
-        if (room)
-          continue;
+        if (room) continue;
         teamData.whitelist[formatid].splice(i, 1);
-        if (!teamData.whitelist[formatid].length)
-          delete teamData.whitelist[formatid];
+        if (!teamData.whitelist[formatid].length) delete teamData.whitelist[formatid];
         save();
       }
     }
@@ -299,8 +280,7 @@ const destroy = SampleTeams.destroy;
 const handlers = {
   onRenameRoom(oldID, newID) {
     for (const formatid in teamData.whitelist) {
-      if (!SampleTeams.whitelistedRooms(formatid)?.includes(oldID))
-        continue;
+      if (!SampleTeams.whitelistedRooms(formatid)?.includes(oldID)) continue;
       SampleTeams.unwhitelistRoom(formatid, oldID);
       SampleTeams.whitelistRooms([formatid], [newID]);
     }

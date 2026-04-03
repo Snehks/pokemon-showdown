@@ -71,8 +71,7 @@ const Moves = {
         moves.sort((a, b) => a.num - b.num);
         randomMove = this.sample(moves).id;
       }
-      if (!randomMove)
-        return false;
+      if (!randomMove) return false;
       this.actions.useMove(randomMove, target);
     }
   },

@@ -26,20 +26,17 @@ const Scripts = {
   inherit: "gen7",
   init() {
     for (const i in this.data.Items) {
-      if (!this.data.Items[i].megaStone)
-        continue;
+      if (!this.data.Items[i].megaStone) continue;
       this.modData("Items", i).onTakeItem = false;
     }
   },
   actions: {
     canMegaEvo(pokemon) {
-      if (pokemon.species.isMega || pokemon.species.isPrimal)
-        return null;
+      if (pokemon.species.isMega || pokemon.species.isPrimal) return null;
       const item = pokemon.getItem();
       if (item.megaStone) {
         const values = Object.values(item.megaStone);
-        if (values.includes(pokemon.name))
-          return null;
+        if (values.includes(pokemon.name)) return null;
         return values[0];
       } else if (pokemon.baseMoves.includes("dragonascent")) {
         return "Rayquaza-Mega";
@@ -48,8 +45,7 @@ const Scripts = {
       }
     },
     runMegaEvo(pokemon) {
-      if (pokemon.species.isMega || pokemon.species.isPrimal)
-        return false;
+      if (pokemon.species.isMega || pokemon.species.isPrimal) return false;
       const isUltraBurst = !pokemon.canMegaEvo;
       const species = this.getMixedSpecies(
         pokemon.m.originalSpecies,
@@ -68,8 +64,7 @@ const Scripts = {
         }
       }
       pokemon.canMegaEvo = false;
-      if (isUltraBurst)
-        pokemon.canUltraBurst = null;
+      if (isUltraBurst) pokemon.canUltraBurst = null;
       return true;
     },
     getMixedSpecies(originalForme, formeChange, pokemon) {
@@ -104,17 +99,13 @@ const Scripts = {
       } else if (formeChangeSpecies.types[1] !== baseSpecies.types[1]) {
         deltas.type = formeChangeSpecies.types[1];
       }
-      if (formeChangeSpecies.isMega && !formeType)
-        formeType = "Mega";
-      if (formeChangeSpecies.isPrimal)
-        formeType = "Primal";
-      if (formeType)
-        deltas.formeType = formeType;
+      if (formeChangeSpecies.isMega && !formeType) formeType = "Mega";
+      if (formeChangeSpecies.isPrimal) formeType = "Primal";
+      if (formeType) deltas.formeType = formeType;
       return deltas;
     },
     mutateOriginalSpecies(speciesOrForme, deltas) {
-      if (!deltas)
-        throw new TypeError("Must specify deltas!");
+      if (!deltas) throw new TypeError("Must specify deltas!");
       const species = this.dex.deepClone(this.dex.species.get(speciesOrForme));
       species.abilities = { "0": deltas.ability };
       if (species.types[0] === deltas.type) {
@@ -130,10 +121,8 @@ const Scripts = {
       species.heightm = Math.max(0.1, (species.heightm * 10 + deltas.heightm * 10) / 10);
       species.originalSpecies = deltas.originalSpecies;
       species.requiredItem = deltas.requiredItem;
-      if (deltas.formeType === "Mega" || deltas.isMega)
-        species.isMega = true;
-      if (deltas.formeType === "Primal")
-        species.isPrimal = true;
+      if (deltas.formeType === "Mega" || deltas.isMega) species.isMega = true;
+      if (deltas.formeType === "Primal") species.isPrimal = true;
       return species;
     }
   }

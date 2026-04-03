@@ -43,8 +43,7 @@ const roomFaqs = (() => {
       }
     }
   }
-  if (save)
-    saveRoomFaqs(data);
+  if (save) saveRoomFaqs(data);
   return data;
 })();
 function saveRoomFaqs(table) {
@@ -68,11 +67,9 @@ function visualizeFaq(faq) {
   return Chat.formatText(faq.source, true);
 }
 function getAlias(roomid, key) {
-  if (!roomFaqs[roomid])
-    return false;
+  if (!roomFaqs[roomid]) return false;
   const value = roomFaqs[roomid][key];
-  if (value?.alias)
-    return value.source;
+  if (value?.alias) return value.source;
   return false;
 }
 const commands = {
@@ -84,21 +81,16 @@ const commands = {
     if (useHTML && !user.can("addhtml", null, room, this.fullCmd)) {
       throw new Chat.ErrorMessage(`You are not allowed to use raw HTML in roomfaqs.`);
     }
-    if (!room.persist)
-      throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
-    if (!target)
-      return this.parse("/help roomfaq");
+    if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+    if (!target) return this.parse("/help roomfaq");
     target = target.trim();
     const input = this.filter(target);
-    if (target !== input)
-      throw new Chat.ErrorMessage("You are not allowed to use filtered words in roomfaq entries.");
+    if (target !== input) throw new Chat.ErrorMessage("You are not allowed to use filtered words in roomfaq entries.");
     let [topic, ...rest] = input.split(",");
     topic = toID(topic);
-    if (!(topic && rest.length))
-      return this.parse("/help roomfaq");
+    if (!(topic && rest.length)) return this.parse("/help roomfaq");
     let text = rest.join(",").trim();
-    if (topic.length > 25)
-      throw new Chat.ErrorMessage("FAQ topics should not exceed 25 characters.");
+    if (topic.length > 25) throw new Chat.ErrorMessage("FAQ topics should not exceed 25 characters.");
     const lengthWithoutFormatting = Chat.stripFormatting(text).length;
     if (lengthWithoutFormatting > (useHTML ? MAX_HTML_ROOMFAQ_LENGTH : MAX_ROOMFAQ_LENGTH)) {
       throw new Chat.ErrorMessage(`FAQ entries must not exceed ${useHTML ? MAX_HTML_ROOMFAQ_LENGTH : MAX_ROOMFAQ_LENGTH} characters.`);
@@ -111,8 +103,7 @@ const commands = {
       text = text.replace(/\n/ig, "<br />");
       text = this.checkHTML(text);
     }
-    if (!roomFaqs[room.roomid])
-      roomFaqs[room.roomid] = {};
+    if (!roomFaqs[room.roomid]) roomFaqs[room.roomid] = {};
     const exists = topic in roomFaqs[room.roomid];
     roomFaqs[room.roomid][topic] = {
       source: text,
@@ -128,10 +119,8 @@ const commands = {
     this.checkChat();
     this.checkCan("ban", null, room);
     const topic = toID(target);
-    if (!topic)
-      return this.parse("/help roomfaq");
-    if (!roomFaqs[room.roomid]?.[topic])
-      throw new Chat.ErrorMessage("Invalid topic.");
+    if (!topic) return this.parse("/help roomfaq");
+    if (!roomFaqs[room.roomid]?.[topic]) throw new Chat.ErrorMessage("Invalid topic.");
     if (room.settings.repeats?.length && room.settings.repeats.filter((x) => x.faq && x.id === topic).length) {
       this.parse(`/msgroom ${room.roomid},/removerepeat ${topic}`);
     }
@@ -141,8 +130,7 @@ const commands = {
     ).map(
       (val) => delete roomFaqs[room.roomid][val]
     );
-    if (!Object.keys(roomFaqs[room.roomid]).length)
-      delete roomFaqs[room.roomid];
+    if (!Object.keys(roomFaqs[room.roomid]).length) delete roomFaqs[room.roomid];
     saveRoomFaqs();
     this.privateModAction(`${user.name} removed the FAQ for '${topic}'`);
     this.modlog("ROOMFAQ", null, `removed ${topic}`);
@@ -152,15 +140,11 @@ const commands = {
     room = this.requireRoom();
     this.checkChat();
     this.checkCan("ban", null, room);
-    if (!room.persist)
-      throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+    if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
     const [alias, topic] = target.split(",").map((val) => toID(val));
-    if (!(alias && topic))
-      return this.parse("/help roomfaq");
-    if (alias.length > 25)
-      throw new Chat.ErrorMessage("FAQ topics should not exceed 25 characters.");
-    if (alias === topic)
-      throw new Chat.ErrorMessage("You cannot make the alias have the same name as the topic.");
+    if (!(alias && topic)) return this.parse("/help roomfaq");
+    if (alias.length > 25) throw new Chat.ErrorMessage("FAQ topics should not exceed 25 characters.");
+    if (alias === topic) throw new Chat.ErrorMessage("You cannot make the alias have the same name as the topic.");
     if (roomFaqs[room.roomid][alias] && !roomFaqs[room.roomid][alias].alias) {
       throw new Chat.ErrorMessage("You cannot overwrite an existing topic with an alias; please delete the topic first.");
     }
@@ -182,11 +166,9 @@ const commands = {
   rfaq: "roomfaq",
   roomfaq(target, room, user, connection, cmd) {
     room = this.requireRoom();
-    if (!roomFaqs[room.roomid])
-      throw new Chat.ErrorMessage("This room has no FAQ topics.");
+    if (!roomFaqs[room.roomid]) throw new Chat.ErrorMessage("This room has no FAQ topics.");
     let topic = toID(target);
-    if (topic === "constructor")
-      return false;
+    if (topic === "constructor") return false;
     if (!topic) {
       return this.parse(`/join view-roomfaqs-${room.roomid}`);
     }
@@ -226,14 +208,12 @@ const commands = {
         if (!validTopics.includes(normalized)) {
           return this.errorReply(`'${target}' is an invalid topic.`);
         }
-        if (!this.runBroadcast())
-          return;
+        if (!this.runBroadcast()) return;
         return faqCommand.call(this, target, room, user, connection, "faq", "!");
       }
       return this.errorReply("Invalid topic.");
     }
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     const rfaq = roomFaqs[room.roomid][topic];
     this.sendReplyBox(visualizeFaq(rfaq));
     if (!this.broadcasting && user.can("ban", null, room, "addfaq")) {
@@ -291,8 +271,7 @@ const pages = {
 const handlers = {
   onRenameRoom(oldID, newID) {
     if (roomFaqs[oldID]) {
-      if (!roomFaqs[newID])
-        roomFaqs[newID] = {};
+      if (!roomFaqs[newID]) roomFaqs[newID] = {};
       Object.assign(roomFaqs[newID], roomFaqs[oldID]);
       delete roomFaqs[oldID];
       saveRoomFaqs();

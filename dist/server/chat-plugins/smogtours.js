@@ -50,11 +50,10 @@ try {
   const data = JSON.parse((0, import_lib.FS)("config/chat-plugins/smogtours.json").readSync());
   const PRIO = ["title", "icon"];
   for (const key in data) {
-    const section = tours[key] || (tours[key] = data[key]);
+    const section = tours[key] ||= data[key];
     for (const k in data[key]) {
       if (PRIO.includes(k)) {
-        if (!section[k])
-          section[k] = data[key][k];
+        if (!section[k]) section[k] = data[key][k];
       } else {
         section[k] = data[key][k];
       }
@@ -67,8 +66,7 @@ function saveTours() {
 }
 function getTour(categoryID, id) {
   id = toID(id);
-  if (!tours[categoryID])
-    return null;
+  if (!tours[categoryID]) return null;
   const idx = tours[categoryID].tours.findIndex((f) => f.id === id) ?? -1;
   const tour = tours[categoryID].tours[idx];
   if (!tour) {
@@ -188,8 +186,7 @@ const commands = {
         return this.parse(`/help smogtours`);
       }
       const section = tours[sectionID];
-      if (!section)
-        return this.popupReply(`Invalid section: "${sectionID}"`);
+      if (!section) return this.popupReply(`Invalid section: "${sectionID}"`);
       const idx = section.tours.findIndex((t) => t.id === tourID);
       const title = section.tours[idx].title;
       if (idx < 0) {
@@ -212,8 +209,7 @@ const commands = {
       if (section.whitelist?.includes(targetID)) {
         throw new Chat.ErrorMessage(`That user is already whitelisted on that section.`);
       }
-      if (!section.whitelist)
-        section.whitelist = [];
+      if (!section.whitelist) section.whitelist = [];
       section.whitelist.push(targetID);
       this.privateGlobalModAction(
         `${user.name} whitelisted ${targetID} to manage tours for the ${section.title} section`
@@ -340,10 +336,8 @@ function instantTournaments() {
   const roomTours = [];
   for (const tourRoom of Rooms.rooms.values()) {
     const tournament = tourRoom.game;
-    if (!tournament || tournament?.constructor.name !== "Tournament")
-      continue;
-    if (tourRoom.settings.isPrivate || tourRoom.settings.isPersonal || tourRoom.settings.staffRoom)
-      continue;
+    if (!tournament || tournament?.constructor.name !== "Tournament") continue;
+    if (tourRoom.settings.isPrivate || tourRoom.settings.isPersonal || tourRoom.settings.staffRoom) continue;
     roomTours.push(tournament);
   }
   if (!roomTours.length) {
@@ -366,8 +360,7 @@ function instantTournaments() {
     buf += `</ul>`;
   }
   if (started.length) {
-    if (signups.length)
-      buf += `<br />`;
+    if (signups.length) buf += `<br />`;
     buf += `<strong>Started:</strong><ul class="roomlist">`;
     for (const tour of started) {
       buf += renderLink(tour);
@@ -382,8 +375,7 @@ const pages = {
       let buf = `${refresh(this.pageid)}<br /><center>`;
       buf += `<h2><psicon pokemon="Meloetta-Pirouette" />Welcome!<psicon pokemon="Meloetta-Pirouette" /></h2>`;
       const icon = tours.official.icon;
-      if (icon)
-        buf += `<img src="${icon[0]}" width="${icon[1] / 2}" height="${icon[2] / 2}"></center>`;
+      if (icon) buf += `<img src="${icon[0]}" width="${icon[1] / 2}" height="${icon[2] / 2}"></center>`;
       buf += `<hr />`;
       this.title = "[Tournaments] All";
       buf += `<p>Smogon runs official tournaments across their metagames where the strongest and most `;
@@ -462,8 +454,7 @@ const pages = {
           needsSave = true;
         }
       }
-      if (needsSave)
-        saveTours();
+      if (needsSave) saveTours();
       if (!category.tours.length) {
         buf += `<p>There are currently no tournaments in this section with open signups.</p>`;
         buf += `<p>Check back later for new tours.</p>`;
@@ -497,7 +488,7 @@ const pages = {
       buf += keys.map((k) => `<option>${k}</option>`).join("");
       buf += `</select><br />`;
       buf += `Info link: <input name="url" /><br />`;
-      buf += `End date: <input type="date" name="enddate" value="${Chat.toTimestamp(new Date()).split(" ")[0]}" /><br />`;
+      buf += `End date: <input type="date" name="enddate" value="${Chat.toTimestamp(/* @__PURE__ */ new Date()).split(" ")[0]}" /><br />`;
       buf += `<abbr title="Max length and width: 300px">Image link</abbr> (optional): <input name="img" /><br />`;
       buf += `Artist name (required if image provided): <input name="artist" /><br />`;
       buf += `Image credit URL (required if image provided, must be a link to the creator's Smogon profile): `;
@@ -515,11 +506,9 @@ const pages = {
         return Chat.resolvePage(`view-tournaments-manage`, user, this.connection);
       }
       const section = tours[sectionID];
-      if (!section)
-        return error("edit", `Invalid section: "${sectionID}"`, user);
+      if (!section) return error("edit", `Invalid section: "${sectionID}"`, user);
       const tour = section.tours.find((t) => t.id === tourID);
-      if (!tour)
-        return error("edit", `Tour with ID "${tourID}" not found.`, user);
+      if (!tour) return error("edit", `Tour with ID "${tourID}" not found.`, user);
       let buf = `${refresh(this.pageid)}<br /><center><h2>Edit tournament "${tour.title}"</h2></center><hr />`;
       buf += `<form data-submitsend="/smogtours edit ${tour.id}|{title}|${sectionID}|{url}|{enddate}|{img}|{credit}|{artist}|{shortDesc}|{desc}">`;
       buf += `Title: <input name="title" value="${tour.title}"/><br />`;

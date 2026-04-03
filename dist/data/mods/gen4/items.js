@@ -48,8 +48,7 @@ const Items = {
     inherit: true,
     onModifyAccuracyPriority: 5,
     onModifyAccuracy(accuracy) {
-      if (typeof accuracy !== "number")
-        return;
+      if (typeof accuracy !== "number") return;
       this.debug("brightpowder - decreasing accuracy");
       return accuracy * 0.9;
     }
@@ -87,12 +86,10 @@ const Items = {
   chopleberry: {
     inherit: true,
     onSourceModifyDamage(damage, source, target, move) {
-      if (move.causedCrashDamage)
-        return damage;
+      if (move.causedCrashDamage) return damage;
       if (move.type === "Fighting" && target.getMoveHitData(move).typeMod > 0) {
         const hitSub = target.volatiles["substitute"] && !move.flags["bypasssub"];
-        if (hitSub)
-          return;
+        if (hitSub) return;
         if (target.eatItem()) {
           this.debug("-50% reduction");
           this.add("-enditem", target, this.effect, "[weaken]");
@@ -108,8 +105,7 @@ const Items = {
     onBeforeTurn(pokemon) {
       if (pokemon.hp <= pokemon.maxhp / 4 || pokemon.hp <= pokemon.maxhp / 2 && pokemon.ability === "gluttony") {
         const action = this.queue.willMove(pokemon);
-        if (!action)
-          return;
+        if (!action) return;
         this.queue.insertChoice({
           choice: "event",
           event: "Custap",
@@ -193,8 +189,7 @@ const Items = {
         }
       },
       onAfterMoveSecondary(target) {
-        if (this.effectState.activated)
-          target.useItem();
+        if (this.effectState.activated) target.useItem();
         target.removeVolatile("focussash");
       }
     }
@@ -436,8 +431,7 @@ const Items = {
         "zenheadbutt"
       ];
       if (affectedByKingsRock.includes(move.id)) {
-        if (!move.secondaries)
-          move.secondaries = [];
+        if (!move.secondaries) move.secondaries = [];
         move.secondaries.push({
           chance: 10,
           volatileStatus: "flinch"
@@ -449,8 +443,7 @@ const Items = {
     inherit: true,
     onModifyAccuracyPriority: 5,
     onModifyAccuracy(accuracy) {
-      if (typeof accuracy !== "number")
-        return;
+      if (typeof accuracy !== "number") return;
       this.debug("lax incense - decreasing accuracy");
       return accuracy * 0.9;
     }
@@ -477,8 +470,7 @@ const Items = {
       return basePower;
     },
     onModifyDamagePhase2(damage, source, target, move) {
-      if (!move.flags["futuremove"])
-        return damage * 1.3;
+      if (!move.flags["futuremove"]) return damage * 1.3;
     },
     condition: {
       duration: 1,
@@ -802,8 +794,7 @@ const Items = {
         "zenheadbutt"
       ];
       if (affectedByRazorFang.includes(move.id)) {
-        if (!move.secondaries)
-          move.secondaries = [];
+        if (!move.secondaries) move.secondaries = [];
         move.secondaries.push({
           chance: 10,
           volatileStatus: "flinch"

@@ -2090,8 +2090,7 @@ class RandomStaffBrosTeams extends import_teams.default {
     if (debug.length) {
       while (debug.length < 6) {
         const staff = this.sampleNoReplace(pool);
-        if (debug.includes(staff) || ssbSets[staff].skip)
-          continue;
+        if (debug.includes(staff) || ssbSets[staff].skip) continue;
         debug.push(staff);
       }
       pool = debug;
@@ -2105,25 +2104,21 @@ class RandomStaffBrosTeams extends import_teams.default {
     const typePool = {};
     let depth = 0;
     while (pool.length && team.length < this.maxTeamSize) {
-      if (depth >= 200)
-        throw new Error(`Infinite loop in Super Staff Bros team generation.`);
+      if (depth >= 200) throw new Error(`Infinite loop in Super Staff Bros team generation.`);
       depth++;
       const name = meme ? this.sample(pool) : afd ? "April" : this.sampleNoReplace(pool);
       const ssbSet = meme ? this.dex.deepClone(afdSSBSets[name]) : this.dex.deepClone(ssbSets[name]);
-      if (ssbSet.skip)
-        continue;
+      if (ssbSet.skip) continue;
       if (!(debug.length || monotype || meme || afd)) {
         const species = this.dex.species.get(ssbSet.species);
         const weaknesses = [];
         for (const type of this.dex.types.names()) {
           const typeMod = this.dex.getEffectiveness(type, species.types);
-          if (typeMod > 0)
-            weaknesses.push(type);
+          if (typeMod > 0) weaknesses.push(type);
         }
         let rejected = false;
         for (const type of weaknesses) {
-          if (typePool[type] === void 0)
-            typePool[type] = 0;
+          if (typePool[type] === void 0) typePool[type] = 0;
           if (typePool[type] >= 3) {
             rejected = true;
             break;
@@ -2136,8 +2131,7 @@ class RandomStaffBrosTeams extends import_teams.default {
             rejected = true;
           }
         }
-        if (rejected)
-          continue;
+        if (rejected) continue;
         for (const type of weaknesses) {
           typePool[type]++;
         }
@@ -2149,8 +2143,7 @@ class RandomStaffBrosTeams extends import_teams.default {
       const moves = [];
       while (moves.length < 3 && ssbSet.moves.length > 0) {
         let move = this.sampleNoReplace(ssbSet.moves);
-        if (Array.isArray(move))
-          move = this.sampleNoReplace(move);
+        if (Array.isArray(move)) move = this.sampleNoReplace(move);
         moves.push(this.dex.moves.get(move).name);
       }
       moves.push(this.dex.moves.get(ssbSet.signatureMove).name);
@@ -2189,8 +2182,7 @@ class RandomStaffBrosTeams extends import_teams.default {
           teraType = "Water";
         }
       }
-      if (teraType)
-        set.teraType = teraType;
+      if (teraType) set.teraType = teraType;
       team.push(set);
       if (team.length === this.maxTeamSize && set.ability === "Illusion") {
         team[this.maxTeamSize - 1] = team[this.maxTeamSize - 2];

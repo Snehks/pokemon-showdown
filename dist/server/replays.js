@@ -52,8 +52,7 @@ const Replays = new class {
       ...row,
       players: row.players.split(",").map((player) => player.startsWith("!") ? player.slice(1) : player)
     };
-    if (!replay.password && replay.private === 1)
-      replay.private = 2;
+    if (!replay.password && replay.private === 1) replay.private = 2;
     return replay;
   }
   toReplays(rows) {
@@ -96,8 +95,7 @@ const Replays = new class {
         });
       }
     } catch (e) {
-      if (e?.routine !== "NewUniquenessConstraintViolationError")
-        throw e;
+      if (e?.routine !== "NewUniquenessConstraintViolationError") throw e;
       await replays.update(replay.id, {
         log: replayData.log,
         inputlog: replayData.inputlog,
@@ -115,8 +113,7 @@ const Replays = new class {
   }
   async get(id) {
     const replayData = await replays.get(id);
-    if (!replayData)
-      return null;
+    if (!replayData) return null;
     await replays.update(replayData.id, { views: import_database.SQL`views + 1` });
     return this.toReplay(replayData);
   }
@@ -133,11 +130,9 @@ const Replays = new class {
   }
   search(args) {
     const page = args.page || 0;
-    if (page > 100)
-      return Promise.resolve([]);
+    if (page > 100) return Promise.resolve([]);
     let limit1 = 50 * (page - 1);
-    if (limit1 < 0)
-      limit1 = 0;
+    if (limit1 < 0) limit1 = 0;
     const isPrivate = args.isPrivate ? 1 : 0;
     const format = args.format ? toID(args.format) : null;
     if (args.username) {
@@ -185,14 +180,12 @@ const Replays = new class {
     }
   }
   fullSearch(term, page = 0) {
-    if (page > 0)
-      return Promise.resolve([]);
+    if (page > 0) return Promise.resolve([]);
     const patterns = term.split(",").map((subterm) => {
       const escaped = subterm.replace(/%/g, "\\%").replace(/_/g, "\\_");
       return `%${escaped}%`;
     });
-    if (patterns.length !== 1 && patterns.length !== 2)
-      return Promise.resolve([]);
+    if (patterns.length !== 1 && patterns.length !== 2) return Promise.resolve([]);
     const secondPattern = patterns.length >= 2 ? import_database.SQL`AND log LIKE ${patterns[1]} ` : void 0;
     return replays.query()`SELECT /*+ MAX_EXECUTION_TIME(10000) */ 
 			uploadtime, id, format, players, rating FROM ps_replays 

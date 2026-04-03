@@ -116,15 +116,12 @@ class PatternTester {
     if (this.fastElements.has(spaceIndex >= 0 ? text.slice(0, spaceIndex) : text)) {
       return true;
     }
-    if (!this.regexp)
-      return false;
+    if (!this.regexp) return false;
     return this.regexp.test(text);
   }
   test(text) {
-    if (!text.includes("\n"))
-      return null;
-    if (this.testCommand(text))
-      return text;
+    if (!text.includes("\n")) return null;
+    if (this.testCommand(text)) return text;
     const pmMatches = /^(\/(?:pm|w|whisper|msg) [^,]*, ?)(.*)/i.exec(text);
     if (pmMatches && this.testCommand(pmMatches[2])) {
       if (text.split("\n").every((line) => line.startsWith(pmMatches[1]))) {
@@ -137,8 +134,7 @@ class PatternTester {
 }
 class ErrorMessage extends Error {
   constructor(message) {
-    if (Array.isArray(message))
-      message = message.join("\n");
+    if (Array.isArray(message)) message = message.join("\n");
     super(message);
     this.name = "ErrorMessage";
     Error.captureStackTrace(this, ErrorMessage);
@@ -199,8 +195,7 @@ class MessageContext {
    */
   splitFormat(target, atLeastOneTarget, allowRules) {
     const targets = typeof target === "string" ? target.split(",") : target;
-    if (!targets[0].trim())
-      targets.pop();
+    if (!targets[0].trim()) targets.pop();
     if (targets.length > (atLeastOneTarget ? 1 : 0)) {
       const { dex: dex2, format: format2, isMatch } = this.extractFormat(targets[0].trim(), allowRules);
       if (isMatch) {
@@ -253,8 +248,7 @@ class MessageContext {
     return { targetUser, rest };
   }
   getUserOrSelf(target, { exactName } = {}) {
-    if (!target.trim())
-      return this.user;
+    if (!target.trim()) return this.user;
     return Users.get(target, exactName);
   }
   tr(strings, ...keys) {
@@ -295,8 +289,7 @@ class PageContext extends MessageContext {
     return room;
   }
   extractRoom(pageid) {
-    if (!pageid)
-      pageid = this.pageid;
+    if (!pageid) pageid = this.pageid;
     const parts = pageid.split("-");
     const room = Rooms.get(parts[2]) || null;
     this.room = room;
@@ -324,12 +317,10 @@ ${content}`);
     this.send("|deinit");
   }
   async resolve(pageid) {
-    if (pageid)
-      this.pageid = pageid;
+    if (pageid) this.pageid = pageid;
     const parts = this.pageid.split("-");
     parts.shift();
-    if (!this.connection.openPages)
-      this.connection.openPages = /* @__PURE__ */ new Set();
+    if (!this.connection.openPages) this.connection.openPages = /* @__PURE__ */ new Set();
     this.connection.openPages.add(parts.join("-"));
     let handler = Chat.pages;
     while (handler) {
@@ -341,13 +332,11 @@ ${content}`);
     this.args = parts;
     let res;
     try {
-      if (typeof handler !== "function")
-        this.pageDoesNotExist();
+      if (typeof handler !== "function") this.pageDoesNotExist();
       res = await handler.call(this, parts, this.user, this.connection);
     } catch (err) {
       if (err.name?.endsWith("ErrorMessage")) {
-        if (err.message)
-          this.errorReply(err.message.replace(/\n/g, "<br />"));
+        if (err.message) this.errorReply(err.message.replace(/\n/g, "<br />"));
         return;
       }
       if (err.name.endsWith("Interruption")) {
@@ -362,8 +351,7 @@ ${content}`);
         `<div class="pad"><div class="broadcast-red"><strong>Pokemon Showdown crashed!</strong><br />Don't worry, we're working on fixing it.</div></div>`
       );
     }
-    if (typeof res === "object" && res)
-      res = JSX.render(res);
+    if (typeof res === "object" && res) res = JSX.render(res);
     if (typeof res === "string") {
       this.setHTML(res);
       res = void 0;
@@ -479,8 +467,7 @@ class CommandContext extends MessageContext {
           this.sendChatMessage(resolvedMessage);
         }
         this.update();
-        if (resolvedMessage === false)
-          return false;
+        if (resolvedMessage === false) return false;
       }).catch((err) => {
         if (err.name?.endsWith("ErrorMessage")) {
           this.errorReply(err.message);
@@ -529,8 +516,7 @@ It needs to be sent to a user or room.`);
     }
   }
   run(handler) {
-    if (typeof handler === "string")
-      handler = Chat.commands[handler];
+    if (typeof handler === "string") handler = Chat.commands[handler];
     if (!handler.broadcastable && this.cmdToken === "!") {
       throw new Chat.ErrorMessage([
         `The command "${this.fullCmd}" can't be broadcast.`,
@@ -538,18 +524,15 @@ It needs to be sent to a user or room.`);
       ]);
     }
     let result = handler.call(this, this.target, this.room, this.user, this.connection, this.cmd, this.message);
-    if (result === void 0)
-      result = false;
+    if (result === void 0) result = false;
     return result;
   }
   checkFormat(room, user, message) {
-    if (!room)
-      return true;
+    if (!room) return true;
     if (!room.settings.filterStretching && !room.settings.filterCaps && !room.settings.filterEmojis && !room.settings.filterLinks) {
       return true;
     }
-    if (user.can("mute", null, room))
-      return true;
+    if (user.can("mute", null, room)) return true;
     if (room.settings.filterStretching && /(.+?)\1{5,}/i.test(user.name)) {
       throw new Chat.ErrorMessage(`Your username contains too much stretching, which this room doesn't allow.`);
     }
@@ -580,10 +563,8 @@ It needs to be sent to a user or room.`);
     return true;
   }
   checkSlowchat(room, user) {
-    if (!room?.settings.slowchat)
-      return true;
-    if (user.can("show", null, room))
-      return true;
+    if (!room?.settings.slowchat) return true;
+    if (user.can("show", null, room)) return true;
     const lastActiveSeconds = (Date.now() - user.lastMessageTime) / 1e3;
     if (lastActiveSeconds < room.settings.slowchat) {
       throw new Chat.ErrorMessage(this.tr`This room has slow-chat enabled. You can only talk once every ${room.settings.slowchat} seconds.`);
@@ -591,8 +572,7 @@ It needs to be sent to a user or room.`);
     return true;
   }
   checkBanwords(room, message) {
-    if (!room)
-      return true;
+    if (!room) return true;
     if (!room.banwordRegex) {
       if (room.settings.banwords?.length) {
         room.banwordRegex = new RegExp("(?:\\b|(?!\\w))(?:" + room.settings.banwords.join("|") + ")(?:\\b|\\B(?!\\w))", "i");
@@ -600,8 +580,7 @@ It needs to be sent to a user or room.`);
         room.banwordRegex = true;
       }
     }
-    if (!message)
-      return true;
+    if (!message) return true;
     if (room.banwordRegex !== true && room.banwordRegex.test(message)) {
       throw new Chat.ErrorMessage(`Your message contained a word banned by this room.`);
     }
@@ -612,8 +591,7 @@ It needs to be sent to a user or room.`);
   }
   pmTransform(originalMessage, sender, receiver) {
     if (!sender) {
-      if (this.room)
-        throw new Error(`Not a PM`);
+      if (this.room) throw new Error(`Not a PM`);
       sender = this.user;
       receiver = this.pmTarget;
     }
@@ -650,8 +628,7 @@ It needs to be sent to a user or room.`);
 `);
   }
   sendReply(data) {
-    if (this.isQuiet)
-      return;
+    if (this.isQuiet) return;
     if (this.broadcasting && this.broadcastToRoom) {
       this.add(data);
     } else {
@@ -673,13 +650,11 @@ It needs to be sent to a user or room.`);
 |error|`));
   }
   addBox(htmlContent) {
-    if (typeof htmlContent !== "string")
-      htmlContent = JSX.render(htmlContent);
+    if (typeof htmlContent !== "string") htmlContent = JSX.render(htmlContent);
     this.add(`|html|<div class="infobox">${htmlContent}</div>`);
   }
   sendReplyBox(htmlContent) {
-    if (typeof htmlContent !== "string")
-      htmlContent = JSX.render(htmlContent);
+    if (typeof htmlContent !== "string") htmlContent = JSX.render(htmlContent);
     this.sendReply(`|c|${this.room && this.broadcasting ? this.user.getIdentity() : "~"}|/raw <div class="infobox">${htmlContent}</div>`);
   }
   popupReply(message) {
@@ -752,15 +727,12 @@ It needs to be sent to a user or room.`);
         entry.ip = user.latestIp;
         const userid = user.getLastId();
         entry.userid = userid;
-        if (user.autoconfirmed && user.autoconfirmed !== userid)
-          entry.autoconfirmedID = user.autoconfirmed;
+        if (user.autoconfirmed && user.autoconfirmed !== userid) entry.autoconfirmedID = user.autoconfirmed;
         const alts = user.getAltUsers(false, true).slice(1).map((alt) => alt.getLastId());
-        if (alts.length)
-          entry.alts = alts;
+        if (alts.length) entry.alts = alts;
       }
     }
-    if (ip)
-      entry.ip = ip;
+    if (ip) entry.ip = ip;
     if (this.room) {
       this.room.modlog(entry);
     } else {
@@ -780,21 +752,17 @@ It needs to be sent to a user or room.`);
         const userid = user.getLastId();
         entry.userid = userid;
         if (!options.noalts) {
-          if (user.autoconfirmed && user.autoconfirmed !== userid)
-            entry.autoconfirmedID = user.autoconfirmed;
+          if (user.autoconfirmed && user.autoconfirmed !== userid) entry.autoconfirmedID = user.autoconfirmed;
           const alts = user.getAltUsers(false, true).slice(1).map((alt) => alt.getLastId());
-          if (alts.length)
-            entry.alts = alts;
+          if (alts.length) entry.alts = alts;
         }
-        if (!options.noip)
-          entry.ip = user.latestIp;
+        if (!options.noip) entry.ip = user.latestIp;
       }
     }
     (this.room || Rooms.global).modlog(entry);
   }
   parseSpoiler(reason) {
-    if (!reason)
-      return { publicReason: "", privateReason: "" };
+    if (!reason) return { publicReason: "", privateReason: "" };
     let publicReason = reason;
     let privateReason = reason;
     const targetLowercase = reason.toLowerCase();
@@ -808,8 +776,7 @@ It needs to be sent to a user or room.`);
     return { publicReason, privateReason };
   }
   roomlog(data) {
-    if (this.room)
-      this.room.roomlog(data);
+    if (this.room) this.room.roomlog(data);
   }
   stafflog(data) {
     (Rooms.get("staff") || Rooms.lobby || this.room)?.roomlog(data);
@@ -822,8 +789,7 @@ It needs to be sent to a user or room.`);
     }
   }
   update() {
-    if (this.room)
-      this.room.update();
+    if (this.room) this.room.update();
   }
   filter(message) {
     return Chat.filter(message, this);
@@ -1011,8 +977,7 @@ It needs to be sent to a user or room.`);
         }
       }
     }
-    if (typeof message !== "string")
-      return true;
+    if (typeof message !== "string") return true;
     if (!message) {
       throw new Chat.ErrorMessage(this.tr`Your message can't be blank.`);
     }
@@ -1035,12 +1000,10 @@ It needs to be sent to a user or room.`);
     }
     this.checkFormat(room, user, message);
     this.checkSlowchat(room, user);
-    if (room && !user.can("mute", null, room))
-      this.checkBanwords(room, message);
+    if (room && !user.can("mute", null, room)) this.checkBanwords(room, message);
     const gameFilter = this.checkGameFilter();
     if (typeof gameFilter === "string") {
-      if (gameFilter === "")
-        throw new Chat.Interruption();
+      if (gameFilter === "") throw new Chat.Interruption();
       throw new Chat.ErrorMessage(gameFilter);
     }
     if (room?.settings.highTraffic && toID(message).replace(/[^a-z]+/, "").length < 2 && !user.can("show", null, room)) {
@@ -1062,18 +1025,13 @@ It needs to be sent to a user or room.`);
     return message;
   }
   checkCanPM(targetUser, user) {
-    if (!user)
-      user = this.user;
-    if (user.id === targetUser.id)
-      return true;
+    if (!user) user = this.user;
+    if (user.id === targetUser.id) return true;
     const setting = targetUser.settings.blockPMs;
-    if (user.can("lock") || !setting)
-      return true;
-    if (setting === true && !user.can("lock"))
-      return false;
+    if (user.can("lock") || !setting) return true;
+    if (setting === true && !user.can("lock")) return false;
     const friends = targetUser.friends || /* @__PURE__ */ new Set();
-    if (setting === "friends")
-      return friends.has(user.id);
+    if (setting === "friends") return friends.has(user.id);
     return Users.globalAuth.atLeast(user, setting);
   }
   checkPMHTML(targetUser) {
@@ -1097,18 +1055,14 @@ It needs to be sent to a user or room.`);
       const domain = domainMatches?.[1];
       const hostMatches = /^(?:http:\/\/|https:\/\/)?([^/]*[^/.])\.?($|\/|:)/.exec(link);
       let host = hostMatches?.[1];
-      if (host?.startsWith("www."))
-        host = host.slice(4);
-      if (!domain || !host)
-        return null;
+      if (host?.startsWith("www.")) host = host.slice(4);
+      if (!domain || !host) return null;
       return !(LINK_WHITELIST.includes(host) || LINK_WHITELIST.includes(`*.${domain}`));
     });
   }
   checkEmbedURI(uri) {
-    if (uri.startsWith("https://"))
-      return uri;
-    if (uri.startsWith("//"))
-      return uri;
+    if (uri.startsWith("https://")) return uri;
+    if (uri.startsWith("//")) return uri;
     if (uri.startsWith("data:")) {
       return uri;
     } else {
@@ -1122,8 +1076,7 @@ It needs to be sent to a user or room.`);
    */
   checkHTML(htmlContent) {
     htmlContent = `${htmlContent || ""}`.trim();
-    if (!htmlContent)
-      return "";
+    if (!htmlContent) return "";
     if (/>here.?</i.test(htmlContent) || /click here/i.test(htmlContent)) {
       throw new Chat.ErrorMessage('Do not use "click here" \u2013\xA0See [[Design standard #2 <https://github.com/smogon/pokemon-showdown/blob/master/CONTRIBUTING.md#design-standards>]]');
     }
@@ -1176,11 +1129,9 @@ It needs to be sent to a user or room.`);
         const tagContent = tag.slice(isClosingTag ? 2 : 1, contentEndLoc).replace(/\s+/, " ").trim();
         const tagNameEndIndex = tagContent.indexOf(" ");
         const tagName = tagContent.slice(0, tagNameEndIndex >= 0 ? tagNameEndIndex : void 0).toLowerCase();
-        if (tagName === "!--")
-          continue;
+        if (tagName === "!--") continue;
         if (isClosingTag) {
-          if (LEGAL_AUTOCLOSE_TAGS.includes(tagName))
-            continue;
+          if (LEGAL_AUTOCLOSE_TAGS.includes(tagName)) continue;
           if (!stack.length) {
             throw new Chat.ErrorMessage(`Extraneous </${tagName}> without an opening tag.`);
           }
@@ -1408,12 +1359,9 @@ const Chat = new class {
         context.pmTarget,
         originalMessage
       );
-      if (output === false)
-        return null;
-      if (!output && output !== void 0)
-        return output;
-      if (output !== void 0)
-        message = output;
+      if (output === false) return null;
+      if (!output && output !== void 0) return output;
+      if (output !== void 0) message = output;
     }
     return message;
   }
@@ -1428,10 +1376,8 @@ const Chat = new class {
         name = name.replace(/[\u110B\u114C\u11BC\u11EE\u11F0\u3147\u3180]+/g, "");
       }
       name = name.replace(/[\u00a1\u2580-\u2590\u25A0\u25Ac\u25AE\u25B0\u2a0d\u534d\u5350]/g, "");
-      if (name.includes("@") && name.includes("."))
-        return "";
-      if (/[a-z0-9]\.(com|net|org|us|uk|co|gg|tk|ml|gq|ga|xxx|download|stream)\b/i.test(name))
-        name = name.replace(/\./g, "");
+      if (name.includes("@") && name.includes(".")) return "";
+      if (/[a-z0-9]\.(com|net|org|us|uk|co|gg|tk|ml|gq|ga|xxx|download|stream)\b/i.test(name)) name = name.replace(/\./g, "");
       const nameSymbols = name.replace(
         /[^\u00A1-\u00BF\u00D7\u00F7\u02B9-\u0362\u2012-\u2027\u2030-\u205E\u2050-\u205F\u2090-\u23FA\u2500-\u2BD1]+/g,
         ""
@@ -1454,8 +1400,7 @@ const Chat = new class {
     name = import_sim.Dex.getName(name);
     for (const curFilter of Chat.namefilters) {
       name = curFilter(name, user);
-      if (!name)
-        return "";
+      if (!name) return "";
     }
     return name;
   }
@@ -1477,10 +1422,8 @@ const Chat = new class {
   nicknamefilter(nickname, user) {
     for (const curFilter of Chat.nicknamefilters) {
       const filtered = curFilter(nickname, user);
-      if (filtered === false)
-        return false;
-      if (!filtered)
-        return "";
+      if (filtered === false) return false;
+      if (!filtered) return "";
     }
     return nickname;
   }
@@ -1488,8 +1431,7 @@ const Chat = new class {
     status = status.replace(/\|/g, "");
     for (const curFilter of Chat.statusfilters) {
       status = curFilter(status, user);
-      if (!status)
-        return "";
+      if (!status) return "";
     }
     return status;
   }
@@ -1497,14 +1439,12 @@ const Chat = new class {
     const directories = await (0, import_lib.FS)(TRANSLATION_DIRECTORY).readdir();
     Chat.languages.set("english", "English");
     for (const dirname of directories) {
-      if (/[^a-z0-9]/.test(dirname))
-        continue;
+      if (/[^a-z0-9]/.test(dirname)) continue;
       const dir = (0, import_lib.FS)(`${TRANSLATION_DIRECTORY}/${dirname}`);
       const languageID = import_sim.Dex.toID(dirname);
       const files = await dir.readdir();
       for (const filename of files) {
-        if (!filename.endsWith(".js"))
-          continue;
+        if (!filename.endsWith(".js")) continue;
         const content = require(`${TRANSLATION_DIRECTORY}/${dirname}/${filename}`).translations;
         if (!Chat.translations.has(languageID)) {
           Chat.translations.set(languageID, /* @__PURE__ */ new Map());
@@ -1535,8 +1475,7 @@ const Chat = new class {
     }
   }
   tr(language, strings = "", ...keys) {
-    if (!language)
-      language = "english";
+    if (!language) language = "english";
     const trString = typeof strings === "string" ? strings : strings.join("${}");
     if (Chat.translationsLoaded && !Chat.translations.has(language)) {
       throw new Error(`Trying to translate to a nonexistent language: ${language}`);
@@ -1546,8 +1485,7 @@ const Chat = new class {
     }
     const entry = Chat.translations.get(language)?.get(trString);
     let [translated, keyLabels, valLabels] = entry || ["", [], []];
-    if (!translated)
-      translated = trString;
+    if (!translated) translated = trString;
     if (keys.length) {
       let reconstructed = "";
       const left = keyLabels.slice();
@@ -1558,8 +1496,7 @@ const Chat = new class {
           if (index < 0) {
             index = left.findIndex((val) => !!val);
           }
-          if (index < 0)
-            index = i;
+          if (index < 0) index = i;
           reconstructed += keys[index];
           left[index] = null;
         }
@@ -1569,27 +1506,22 @@ const Chat = new class {
     return translated;
   }
   async prepareDatabase() {
-    if (process.send)
-      return;
-    if (!Config.usesqlite)
-      return;
+    if (process.send) return;
+    if (!Config.usesqlite) return;
     const { hasDBInfo } = await this.database.get(
       `SELECT count(*) AS hasDBInfo FROM sqlite_master WHERE type = 'table' AND name = 'db_info'`
     );
-    if (!hasDBInfo)
-      await this.database.runFile("./databases/schemas/chat-plugins.sql");
+    if (!hasDBInfo) await this.database.runFile("./databases/schemas/chat-plugins.sql");
     const result = await this.database.get(
       `SELECT value as curVersion FROM db_info WHERE key = 'version'`
     );
     const curVersion = parseInt(result.curVersion);
-    if (!curVersion)
-      throw new Error(`db_info table is present, but schema version could not be parsed`);
+    if (!curVersion) throw new Error(`db_info table is present, but schema version could not be parsed`);
     const migrationsFolder = "./databases/migrations/chat-plugins";
     const migrationsToRun = [];
     for (const migrationFile of await (0, import_lib.FS)(migrationsFolder).readdir()) {
       const migrationVersion = parseInt(/v(\d+)\.sql$/.exec(migrationFile)?.[1] || "");
-      if (!migrationVersion)
-        continue;
+      if (!migrationVersion) continue;
       if (migrationVersion > curVersion) {
         migrationsToRun.push({ version: migrationVersion, file: migrationFile });
         Monitor.adminlog(`Pushing to migrationsToRun: ${migrationVersion} at ${migrationFile} - mainModule ${process.mainModule === module} !process.send ${!process.send}`);
@@ -1647,31 +1579,26 @@ const Chat = new class {
     if (room && room.log.getLineCount() !== initialRoomlogLength) {
       room.messagesSent++;
       for (const [handler, numMessages] of room.nthMessageHandlers) {
-        if (room.messagesSent % numMessages === 0)
-          handler(room, message);
+        if (room.messagesSent % numMessages === 0) handler(room, message);
       }
     }
     return result;
   }
   logSlowMessage(startTime, context) {
     const timeUsed = Date.now() - startTime;
-    if (timeUsed < 1e3)
-      return;
-    if (context.cmd === "search" || context.cmd === "savereplay")
-      return;
+    if (timeUsed < 1e3) return;
+    if (context.cmd === "search" || context.cmd === "savereplay") return;
     const logMessage = `[slow command] ${timeUsed}ms - ${context.user.name} (${context.connection.ip}): <${context.room ? context.room.roomid : context.pmTarget ? `PM:${context.pmTarget?.name}` : "CMD"}> ${context.message.replace(/\n/ig, " ")}`;
     Monitor.slow(logMessage);
   }
   getPluginName(file) {
     const nameWithExt = pathModule.relative(__dirname, file).replace(/^chat-(?:commands|plugins)./, "");
     let name = nameWithExt.slice(0, nameWithExt.lastIndexOf("."));
-    if (name.endsWith("/index"))
-      name = name.slice(0, -6);
+    if (name.endsWith("/index")) name = name.slice(0, -6);
     return name;
   }
   loadPluginFile(file) {
-    if (!file.endsWith(".js"))
-      return;
+    if (!file.endsWith(".js")) return;
     this.loadPlugin(require((0, import_lib.FS)(file).path), this.getPluginName(file));
   }
   loadPluginDirectory(dir, depth = 0) {
@@ -1679,8 +1606,7 @@ const Chat = new class {
       const path = pathModule.join(dir, file);
       if ((0, import_lib.FS)(path).isDirectorySync()) {
         depth++;
-        if (depth > MAX_PLUGIN_LOADING_DEPTH)
-          continue;
+        if (depth > MAX_PLUGIN_LOADING_DEPTH) continue;
         this.loadPluginDirectory(path, depth);
       } else {
         try {
@@ -1700,16 +1626,12 @@ const Chat = new class {
       }
       if (typeof entry === "string") {
         const base = commandTable[entry];
-        if (!base)
-          continue;
-        if (!base.aliases)
-          base.aliases = [];
-        if (!base.aliases.includes(cmd2))
-          base.aliases.push(cmd2);
+        if (!base) continue;
+        if (!base.aliases) base.aliases = [];
+        if (!base.aliases.includes(cmd2)) base.aliases.push(cmd2);
         continue;
       }
-      if (typeof entry !== "function")
-        continue;
+      if (typeof entry !== "function") continue;
       const handlerCode = entry.toString();
       entry.requiresRoom = /requireRoom\((?:'|"|`)(.*?)(?:'|"|`)/.exec(handlerCode)?.[1] || /this\.requireRoom\(/.test(handlerCode);
       entry.hasRoomPermissions = /\bthis\.(checkCan|can)\([^,)\n]*, [^,)\n]*,/.test(handlerCode);
@@ -1717,21 +1639,16 @@ const Chat = new class {
       entry.isPrivate = /\bthis\.(?:privately(Check)?Can|commandDoesNotExist)\(/.test(handlerCode);
       entry.requiredPermission = /this\.(?:checkCan|privately(?:Check)?Can)\(['`"]([a-zA-Z0-9]+)['"`](\)|, )/.exec(handlerCode)?.[1];
       entry.plugin = pluginName;
-      if (!entry.aliases)
-        entry.aliases = [];
+      if (!entry.aliases) entry.aliases = [];
       const runsCommand = /this.run\((?:'|"|`)(.*?)(?:'|"|`)\)/.exec(handlerCode);
       if (runsCommand) {
         const [, baseCommand] = runsCommand;
         const baseEntry = commandTable[baseCommand];
         if (baseEntry) {
-          if (baseEntry.requiresRoom)
-            entry.requiresRoom = baseEntry.requiresRoom;
-          if (baseEntry.hasRoomPermissions)
-            entry.hasRoomPermissions = baseEntry.hasRoomPermissions;
-          if (baseEntry.broadcastable)
-            entry.broadcastable = baseEntry.broadcastable;
-          if (baseEntry.isPrivate)
-            entry.isPrivate = baseEntry.isPrivate;
+          if (baseEntry.requiresRoom) entry.requiresRoom = baseEntry.requiresRoom;
+          if (baseEntry.hasRoomPermissions) entry.hasRoomPermissions = baseEntry.hasRoomPermissions;
+          if (baseEntry.broadcastable) entry.broadcastable = baseEntry.broadcastable;
+          if (baseEntry.isPrivate) entry.isPrivate = baseEntry.isPrivate;
         }
       }
       entry.cmd = cmd2;
@@ -1754,38 +1671,27 @@ const Chat = new class {
       Object.assign(Chat.crqHandlers, plugin.crqHandlers);
     }
     if (plugin.roomSettings) {
-      if (!Array.isArray(plugin.roomSettings))
-        plugin.roomSettings = [plugin.roomSettings];
+      if (!Array.isArray(plugin.roomSettings)) plugin.roomSettings = [plugin.roomSettings];
       Chat.roomSettings = Chat.roomSettings.concat(plugin.roomSettings);
     }
-    if (plugin.chatfilter)
-      Chat.filters.push(plugin.chatfilter);
-    if (plugin.namefilter)
-      Chat.namefilters.push(plugin.namefilter);
-    if (plugin.hostfilter)
-      Chat.hostfilters.push(plugin.hostfilter);
-    if (plugin.loginfilter)
-      Chat.loginfilters.push(plugin.loginfilter);
-    if (plugin.punishmentfilter)
-      Chat.punishmentfilters.push(plugin.punishmentfilter);
-    if (plugin.nicknamefilter)
-      Chat.nicknamefilters.push(plugin.nicknamefilter);
-    if (plugin.statusfilter)
-      Chat.statusfilters.push(plugin.statusfilter);
+    if (plugin.chatfilter) Chat.filters.push(plugin.chatfilter);
+    if (plugin.namefilter) Chat.namefilters.push(plugin.namefilter);
+    if (plugin.hostfilter) Chat.hostfilters.push(plugin.hostfilter);
+    if (plugin.loginfilter) Chat.loginfilters.push(plugin.loginfilter);
+    if (plugin.punishmentfilter) Chat.punishmentfilters.push(plugin.punishmentfilter);
+    if (plugin.nicknamefilter) Chat.nicknamefilters.push(plugin.nicknamefilter);
+    if (plugin.statusfilter) Chat.statusfilters.push(plugin.statusfilter);
     if (plugin.onRenameRoom) {
-      if (!Chat.handlers["onRenameRoom"])
-        Chat.handlers["onRenameRoom"] = [];
+      if (!Chat.handlers["onRenameRoom"]) Chat.handlers["onRenameRoom"] = [];
       Chat.handlers["onRenameRoom"].push(plugin.onRenameRoom);
     }
     if (plugin.onRoomClose) {
-      if (!Chat.handlers["onRoomClose"])
-        Chat.handlers["onRoomClose"] = [];
+      if (!Chat.handlers["onRoomClose"]) Chat.handlers["onRoomClose"] = [];
       Chat.handlers["onRoomClose"].push(plugin.onRoomClose);
     }
     if (plugin.handlers) {
       for (const handlerName in plugin.handlers) {
-        if (!Chat.handlers[handlerName])
-          Chat.handlers[handlerName] = [];
+        if (!Chat.handlers[handlerName]) Chat.handlers[handlerName] = [];
         Chat.handlers[handlerName].push(plugin.handlers[handlerName]);
       }
     }
@@ -1795,13 +1701,10 @@ const Chat = new class {
     Chat.plugins[name] = plugin;
   }
   loadPlugins(oldPlugins) {
-    if (Chat.commands)
-      return;
-    if (oldPlugins)
-      Chat.oldPlugins = oldPlugins;
+    if (Chat.commands) return;
+    if (oldPlugins) Chat.oldPlugins = oldPlugins;
     void (0, import_lib.FS)("package.json").readIfExists().then((data) => {
-      if (data)
-        Chat.packageData = JSON.parse(data);
+      if (data) Chat.packageData = JSON.parse(data);
     });
     Chat.commands = /* @__PURE__ */ Object.create(null);
     Chat.pages = /* @__PURE__ */ Object.create(null);
@@ -1823,8 +1726,7 @@ const Chat = new class {
   }
   runHandlers(name, ...args) {
     const handlers = this.handlers[name];
-    if (!handlers)
-      return;
+    if (!handlers) return;
     for (const h of handlers) {
       void h.call(this, ...args);
     }
@@ -1844,8 +1746,7 @@ const Chat = new class {
    * to use a command that doesn't exist.
    */
   parseCommand(message, recursing = false) {
-    if (!message.trim())
-      return null;
+    if (!message.trim()) return null;
     if (message.startsWith(`>> `)) {
       message = `/eval ${message.slice(3)}`;
     } else if (message.startsWith(`>>> `)) {
@@ -1858,16 +1759,12 @@ const Chat = new class {
       message = `/MEE ${message.slice(3)}`;
     }
     const cmdToken = message.charAt(0);
-    if (!VALID_COMMAND_TOKENS.includes(cmdToken))
-      return null;
-    if (cmdToken === message.charAt(1))
-      return null;
-    if (cmdToken === BROADCAST_TOKEN && /[^A-Za-z0-9]/.test(message.charAt(1)))
-      return null;
+    if (!VALID_COMMAND_TOKENS.includes(cmdToken)) return null;
+    if (cmdToken === message.charAt(1)) return null;
+    if (cmdToken === BROADCAST_TOKEN && /[^A-Za-z0-9]/.test(message.charAt(1))) return null;
     let [cmd2, target] = import_lib.Utils.splitFirst(message.slice(1), " ");
     cmd2 = cmd2.toLowerCase();
-    if (cmd2.endsWith(","))
-      cmd2 = cmd2.slice(0, -1);
+    if (cmd2.endsWith(",")) cmd2 = cmd2.slice(0, -1);
     let curCommands = Chat.commands;
     let commandHandler;
     let fullCmd = cmd2;
@@ -1939,16 +1836,14 @@ const Chat = new class {
       }
       results.push(handler);
     }
-    if (table !== Chat.commands)
-      return results;
+    if (table !== Chat.commands) return results;
     return results.filter((handler, i) => results.indexOf(handler) === i);
   }
   /**
    * Strips HTML from a string.
    */
   stripHTML(htmlContent) {
-    if (!htmlContent)
-      return "";
+    if (!htmlContent) return "";
     return htmlContent.replace(/<[^>]*>/g, "");
   }
   /**
@@ -2039,9 +1934,8 @@ const Chat = new class {
    *
    */
   toDurationString(val, options = {}) {
-    const date = new Date(+val);
-    if (isNaN(date.getTime()))
-      return "forever";
+    const date = /* @__PURE__ */ new Date(+val);
+    if (isNaN(date.getTime())) return "forever";
     const parts = [
       date.getUTCFullYear() - 1970,
       date.getUTCMonth(),
@@ -2074,24 +1968,18 @@ const Chat = new class {
    * Takes an array and turns it into a sentence string by adding commas and the word "and"
    */
   toListString(arr, conjunction = "and") {
-    if (!arr.length)
-      return "";
-    if (arr.length === 1)
-      return arr[0];
-    if (arr.length === 2)
-      return `${arr[0]} ${conjunction.trim()} ${arr[1]}`;
+    if (!arr.length) return "";
+    if (arr.length === 1) return arr[0];
+    if (arr.length === 2) return `${arr[0]} ${conjunction.trim()} ${arr[1]}`;
     return `${arr.slice(0, -1).join(", ")}, ${conjunction.trim()} ${arr.slice(-1)[0]}`;
   }
   /**
    * Takes an array and turns it into a sentence string by adding commas and the word "or"
    */
   toOrList(arr) {
-    if (!arr.length)
-      return "";
-    if (arr.length === 1)
-      return arr[0];
-    if (arr.length === 2)
-      return `${arr[0]} or ${arr[1]}`;
+    if (!arr.length) return "";
+    if (arr.length === 1) return arr[0];
+    if (arr.length === 2) return `${arr[0]} or ${arr[1]}`;
     return `${arr.slice(0, -1).join(", ")}, or ${arr.slice(-1)[0]}`;
   }
   /**
@@ -2116,10 +2004,8 @@ const Chat = new class {
     const params = str.slice(str.startsWith("\n") ? 1 : 0).split("\n");
     const output = [];
     for (const [i, param] of params.entries()) {
-      if (output.length < cutoff && param.length > 80 && cutoff > 2)
-        cutoff--;
-      if (param.length > cutoff * 160 && i < cutoff)
-        cutoff = i;
+      if (output.length < cutoff && param.length > 80 && cutoff > 2) cutoff--;
+      if (param.length > cutoff * 160 && i < cutoff) cutoff = i;
       output.push(import_lib.Utils[isCode ? "escapeHTMLForceWrap" : "escapeHTML"](param));
     }
     if (output.length > cutoff) {
@@ -2224,14 +2110,12 @@ const Chat = new class {
   parseArguments(str, delim = ",", opts = { useIDs: true }) {
     const result = {};
     for (const part of str.split(delim)) {
-      let [key, val] = import_lib.Utils.splitFirst(part, opts.paramDelim || (opts.paramDelim = "=")).map((f) => f.trim());
-      if (opts.useIDs)
-        key = toID(key);
+      let [key, val] = import_lib.Utils.splitFirst(part, opts.paramDelim ||= "=").map((f) => f.trim());
+      if (opts.useIDs) key = toID(key);
       if (!toID(key) || !opts.allowEmpty && !toID(val)) {
         throw new Chat.ErrorMessage(`Invalid option ${part}. Must be in [key]${opts.paramDelim}[value] format.`);
       }
-      if (!result[key])
-        result[key] = [];
+      if (!result[key]) result[key] = [];
       result[key].push(val);
     }
     return result;
@@ -2258,18 +2142,15 @@ const Chat = new class {
    */
   async fitImage(url, maxHeight = 300, maxWidth = 300) {
     const { height, width } = await Chat.getImageDimensions(url);
-    if (width <= maxWidth && height <= maxHeight)
-      return [width, height, false];
+    if (width <= maxWidth && height <= maxHeight) return [width, height, false];
     const ratio = Math.min(maxHeight / height, maxWidth / width);
     return [Math.round(width * ratio), Math.round(height * ratio), true];
   }
   refreshPageFor(pageid, roomid, checkPrefix = false, ignoreUsers = null) {
     const room = Rooms.get(roomid);
-    if (!room)
-      return false;
+    if (!room) return false;
     for (const id in room.users) {
-      if (ignoreUsers?.includes(id))
-        continue;
+      if (ignoreUsers?.includes(id)) continue;
       const u = room.users[id];
       for (const conn of u.connections) {
         if (conn.openPages) {
@@ -2315,8 +2196,7 @@ const Chat = new class {
     return this.linkRegex.exec(possibleUrl);
   }
   registerMonitor(id, entry) {
-    if (!Chat.filterWords[id])
-      Chat.filterWords[id] = [];
+    if (!Chat.filterWords[id]) Chat.filterWords[id] = [];
     Chat.monitors[id] = entry;
   }
   resolvePage(pageid, user, connection) {

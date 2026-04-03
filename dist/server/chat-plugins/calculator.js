@@ -70,11 +70,9 @@ function parseMathematicalExpression(infix) {
   let isExprExpected = true;
   for (const token of infixArray) {
     if (isExprExpected && "+-".includes(token)) {
-      if (token === "-")
-        operatorStack.push("negative");
+      if (token === "-") operatorStack.push("negative");
     } else if ("^%*/+-".includes(token)) {
-      if (isExprExpected)
-        throw new SyntaxError(`Got "${token}" where an expression should be`);
+      if (isExprExpected) throw new SyntaxError(`Got "${token}" where an expression should be`);
       const op = OPERATORS[token];
       let prevToken = operatorStack[operatorStack.length - 1] || "(";
       let prevOp = OPERATORS[prevToken];
@@ -86,31 +84,26 @@ function parseMathematicalExpression(infix) {
       operatorStack.push(token);
       isExprExpected = true;
     } else if (token === "(") {
-      if (!isExprExpected)
-        throw new SyntaxError(`Got "(" where an operator should be`);
+      if (!isExprExpected) throw new SyntaxError(`Got "(" where an operator should be`);
       operatorStack.push(token);
       isExprExpected = true;
     } else if (token === ")") {
-      if (isExprExpected)
-        throw new SyntaxError(`Got ")" where an expression should be`);
+      if (isExprExpected) throw new SyntaxError(`Got ")" where an expression should be`);
       while (operatorStack.length && operatorStack[operatorStack.length - 1] !== "(") {
         outputQueue.push(operatorStack.pop());
       }
       operatorStack.pop();
       isExprExpected = false;
     } else {
-      if (!isExprExpected)
-        throw new SyntaxError(`Got "${token}" where an operator should be`);
+      if (!isExprExpected) throw new SyntaxError(`Got "${token}" where an operator should be`);
       outputQueue.push(token);
       isExprExpected = false;
     }
   }
-  if (isExprExpected)
-    throw new SyntaxError(`Input ended where an expression should be`);
+  if (isExprExpected) throw new SyntaxError(`Input ended where an expression should be`);
   while (operatorStack.length > 0) {
     const token = operatorStack.pop();
-    if (token === "(")
-      continue;
+    if (token === "(") continue;
     outputQueue.push(token);
   }
   return outputQueue;
@@ -120,8 +113,7 @@ function solveRPN(rpn) {
   const resultStack = [];
   for (let token of rpn) {
     if (token === "negative") {
-      if (!resultStack.length)
-        throw new SyntaxError(`Unknown syntax error`);
+      if (!resultStack.length) throw new SyntaxError(`Unknown syntax error`);
       resultStack.push(-resultStack.pop());
     } else if (!"^%*/+-".includes(token)) {
       if (token.endsWith("h")) {
@@ -131,12 +123,9 @@ function solveRPN(rpn) {
       } else if (token.endsWith("b")) {
         token = `0b${token.slice(0, -1)}`;
       }
-      if (token.startsWith("0x"))
-        base = 16;
-      if (token.startsWith("0b"))
-        base = 2;
-      if (token.startsWith("0o"))
-        base = 8;
+      if (token.startsWith("0x")) base = 16;
+      if (token.startsWith("0b")) base = 2;
+      if (token.startsWith("0o")) base = 8;
       let num = Number(token);
       if (isNaN(num) && token.toUpperCase() in Math) {
         num = Math[token.toUpperCase()];
@@ -146,8 +135,7 @@ function solveRPN(rpn) {
       }
       resultStack.push(num);
     } else {
-      if (resultStack.length < 2)
-        throw new SyntaxError(`Unknown syntax error`);
+      if (resultStack.length < 2) throw new SyntaxError(`Unknown syntax error`);
       const a = resultStack.pop();
       const b = resultStack.pop();
       switch (token) {
@@ -172,15 +160,13 @@ function solveRPN(rpn) {
       }
     }
   }
-  if (resultStack.length !== 1)
-    throw new SyntaxError(`Unknown syntax error`);
+  if (resultStack.length !== 1) throw new SyntaxError(`Unknown syntax error`);
   return [resultStack.pop(), base];
 }
 const commands = {
   math: "calculate",
   calculate(target, room, user) {
-    if (!target)
-      return this.parse("/help calculate");
+    if (!target) return this.parse("/help calculate");
     let base = 0;
     const baseMatchResult = /\b(?:in|to)\s+([a-zA-Z]+)\b/.exec(target);
     if (baseMatchResult) {
@@ -206,17 +192,14 @@ const commands = {
       }
     }
     const expression = target.replace(/\b(in|to)\s+([a-zA-Z]+)\b/g, "").trim();
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     try {
       const [result, inferredBase] = solveRPN(parseMathematicalExpression(expression));
-      if (!base)
-        base = inferredBase;
+      if (!base) base = inferredBase;
       let baseResult = "";
       if (Number.isFinite(result) && base !== 10) {
         baseResult = `${BASE_PREFIXES[base]}${result.toString(base).toUpperCase()}`;
-        if (baseResult === expression)
-          baseResult = "";
+        if (baseResult === expression) baseResult = "";
       }
       let resultStr = "";
       const resultTruncated = parseFloat(result.toPrecision(15));

@@ -60,16 +60,11 @@ class Item extends import_dex_data.BasicEffect {
         this.gen = 3;
       }
     }
-    if (this.isBerry)
-      this.fling = { basePower: 10 };
-    if (this.id.endsWith("plate"))
-      this.fling = { basePower: 90 };
-    if (this.onDrive)
-      this.fling = { basePower: 70 };
-    if (this.megaStone)
-      this.fling = { basePower: 80 };
-    if (this.onMemory)
-      this.fling = { basePower: 50 };
+    if (this.isBerry) this.fling = { basePower: 10 };
+    if (this.id.endsWith("plate")) this.fling = { basePower: 90 };
+    if (this.onDrive) this.fling = { basePower: 70 };
+    if (this.megaStone) this.fling = { basePower: 80 };
+    if (this.onMemory) this.fling = { basePower: 50 };
     (0, import_dex_data.assignMissingFields)(this, data);
   }
 }
@@ -81,17 +76,14 @@ class DexItems {
     this.dex = dex;
   }
   get(name) {
-    if (name && typeof name !== "string")
-      return name;
+    if (name && typeof name !== "string") return name;
     const id = name ? (0, import_dex_data.toID)(name.trim()) : "";
     return this.getByID(id);
   }
   getByID(id) {
-    if (id === "" || id === "constructor")
-      return EMPTY_ITEM;
+    if (id === "" || id === "constructor") return EMPTY_ITEM;
     let item = this.itemCache.get(id);
-    if (item)
-      return item;
+    if (item) return item;
     if (this.dex.getAlias(id)) {
       item = this.get(this.dex.getAlias(id));
       if (item.exists) {
@@ -127,13 +119,11 @@ class DexItems {
     } else {
       item = new Item({ name: id, exists: false });
     }
-    if (item.exists)
-      this.itemCache.set(id, this.dex.deepFreeze(item));
+    if (item.exists) this.itemCache.set(id, this.dex.deepFreeze(item));
     return item;
   }
   all() {
-    if (this.allCache)
-      return this.allCache;
+    if (this.allCache) return this.allCache;
     const items = [];
     for (const id in this.dex.data.Items) {
       items.push(this.getByID(id));

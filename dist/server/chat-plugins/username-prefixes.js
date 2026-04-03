@@ -28,15 +28,13 @@ const PREFIXES_FILE = "config/chat-plugins/username-prefixes.json";
 const PREFIX_DURATION = 10 * 24 * 60 * 60 * 1e3;
 class PrefixManager {
   constructor() {
-    if (!Chat.oldPlugins["username-prefixes"])
-      this.refreshConfig(true);
+    if (!Chat.oldPlugins["username-prefixes"]) this.refreshConfig(true);
   }
   save() {
     (0, import_lib.FS)(PREFIXES_FILE).writeUpdate(() => JSON.stringify(Config.forcedprefixes || []));
   }
   refreshConfig(configJustLoaded = false) {
-    if (!Config.forcedprefixes)
-      Config.forcedprefixes = [];
+    if (!Config.forcedprefixes) Config.forcedprefixes = [];
     if (!Array.isArray(Config.forcedprefixes)) {
       const convertedPrefixes = [];
       for (const type in Config.forcedprefixes) {
@@ -55,21 +53,18 @@ class PrefixManager {
     try {
       data = JSON.parse((0, import_lib.FS)(PREFIXES_FILE).readSync());
     } catch (e) {
-      if (e.code !== "ENOENT")
-        throw e;
+      if (e.code !== "ENOENT") throw e;
       return;
     }
     if (data.length) {
       for (const entry of data) {
-        if (Config.forcedprefixes.includes(entry))
-          continue;
+        if (Config.forcedprefixes.includes(entry)) continue;
         Config.forcedprefixes.push(entry);
       }
     }
   }
   addPrefix(prefix, type) {
-    if (!Config.forcedprefixes)
-      Config.forcedprefixes = [];
+    if (!Config.forcedprefixes) Config.forcedprefixes = [];
     const entry = Config.forcedprefixes.find((x) => x.prefix === prefix && x.type === type);
     if (entry) {
       throw new Chat.ErrorMessage(`Username prefix '${prefix}' is already configured to force ${type}.`);
@@ -109,8 +104,7 @@ const commands = {
       this.checkCan("addhtml");
       const isAdding = cmd.includes("add");
       const [prefix, type] = target.split(",").map(toID);
-      if (!prefix || !type)
-        return this.parse(`/help usernameprefix`);
+      if (!prefix || !type) return this.parse(`/help usernameprefix`);
       if (prefix.length > 18) {
         throw new Chat.ErrorMessage(`Specified prefix '${prefix}' is longer than the maximum user ID length.`);
       }

@@ -66,8 +66,7 @@ class RandomGen1Teams extends import_teams.default {
           mbst += Math.floor(((stats["spa"] * 2 + 30 + 63 + 100) * level / 100 + 5) * level / 100);
           mbst += Math.floor((stats["spd"] * 2 + 30 + 63 + 100) * level / 100 + 5);
           mbst += Math.floor((stats["spe"] * 2 + 30 + 63 + 100) * level / 100 + 5);
-          if (mbst >= mbstmin)
-            break;
+          if (mbst >= mbstmin) break;
           level++;
         }
       }
@@ -120,10 +119,8 @@ class RandomGen1Teams extends import_teams.default {
     const pokemonPool = Object.keys(this.getPokemonPool(type, pokemon, isMonotype, Object.keys(this.randomData))[0]);
     while (pokemonPool.length && pokemon.length < this.maxTeamSize) {
       const species = this.dex.species.get(this.sampleNoReplace(pokemonPool));
-      if (!species.exists)
-        continue;
-      if (species.id === "ditto" && this.battleHasDitto)
-        continue;
+      if (!species.exists) continue;
+      if (species.id === "ditto" && this.battleHasDitto) continue;
       const limitFactor = Math.round(this.maxTeamSize / 6) || 1;
       let skip = false;
       if (!isMonotype && !this.forceMonotype) {
@@ -141,8 +138,7 @@ class RandomGen1Teams extends import_teams.default {
       const pokemonWeaknesses = [];
       for (const typeName in weaknessCount) {
         const increaseCount = this.dex.getImmunity(typeName, species) && this.dex.getEffectiveness(typeName, species) > 0;
-        if (!increaseCount)
-          continue;
+        if (!increaseCount) continue;
         if (weaknessCount[typeName] >= 2 * limitFactor) {
           skip = true;
           break;
@@ -168,10 +164,8 @@ class RandomGen1Teams extends import_teams.default {
       for (const weakness of pokemonWeaknesses) {
         weaknessCount[weakness]++;
       }
-      if (this.getLevel(species) === 100)
-        numMaxLevelPokemon++;
-      if (species.id === "ditto")
-        this.battleHasDitto = true;
+      if (this.getLevel(species) === 100) numMaxLevelPokemon++;
+      if (species.id === "ditto") this.battleHasDitto = true;
     }
     while (pokemon.length < this.maxTeamSize && rejectedButNotInvalidPool.length) {
       const species = this.sampleNoReplace(rejectedButNotInvalidPool);
@@ -188,14 +182,12 @@ class RandomGen1Teams extends import_teams.default {
   randomSet(species) {
     const ruleTable = this.dex.formats.getRuleTable(this.format);
     species = this.dex.species.get(species);
-    if (!species.exists)
-      species = this.dex.species.get("pikachu");
+    if (!species.exists) species = this.dex.species.get("pikachu");
     const data = this.randomData[species.id];
     const movePool = data.moves?.slice() || [];
     const moves = /* @__PURE__ */ new Set();
     if (data.comboMoves && data.comboMoves.length <= this.maxMoveCount && this.randomChance(1, 2)) {
-      for (const m of data.comboMoves)
-        moves.add(m);
+      for (const m of data.comboMoves) moves.add(m);
     }
     if (moves.size < this.maxMoveCount && data.exclusiveMoves) {
       moves.add(this.sample(data.exclusiveMoves));
@@ -203,8 +195,7 @@ class RandomGen1Teams extends import_teams.default {
     if (moves.size < this.maxMoveCount && data.essentialMoves) {
       for (const moveid of data.essentialMoves) {
         moves.add(moveid);
-        if (moves.size === this.maxMoveCount)
-          break;
+        if (moves.size === this.maxMoveCount) break;
       }
     }
     while (moves.size < this.maxMoveCount && movePool.length) {
@@ -219,15 +210,13 @@ class RandomGen1Teams extends import_teams.default {
     if (moves.has("substitute")) {
       while (evs.hp > 3) {
         const hp = Math.floor(Math.floor(2 * species.baseStats.hp + ivs.hp + Math.floor(evs.hp / 4) + 100) * level / 100 + 10);
-        if (hp % 4 !== 0)
-          break;
+        if (hp % 4 !== 0) break;
         evs.hp -= 4;
       }
     }
     const noAttackStatMoves = [...moves].every((m) => {
       const move = this.dex.moves.get(m);
-      if (move.damageCallback || move.damage)
-        return true;
+      if (move.damageCallback || move.damage) return true;
       return move.category !== "Physical";
     });
     if (noAttackStatMoves && !moves.has("mimic") && !moves.has("transform") && !ruleTable.has("forceofthefallenmod")) {
@@ -304,8 +293,7 @@ class RandomGen1Teams extends import_teams.default {
       };
       ivs["hp"] = ivs["atk"] % 2 * 16 + ivs["def"] % 2 * 8 + ivs["spe"] % 2 * 4 + ivs["spa"] % 2 * 2;
       for (const iv in ivs) {
-        if (iv === "hp" || iv === "spd")
-          continue;
+        if (iv === "hp" || iv === "spd") continue;
         ivs[iv] *= 2;
       }
       ivs["spd"] = ivs["spa"];
@@ -320,8 +308,7 @@ class RandomGen1Teams extends import_teams.default {
       let mbst = 0;
       for (const statName of Object.keys(baseStats)) {
         mbst += calcStat(statName);
-        if (statName === "hp")
-          mbst += 5;
+        if (statName === "hp") mbst += 5;
       }
       let level;
       if (this.adjustLevel) {
@@ -331,15 +318,12 @@ class RandomGen1Teams extends import_teams.default {
         while (level < 100) {
           for (const statName of Object.keys(baseStats)) {
             mbst += calcStat(statName, level);
-            if (statName === "hp")
-              mbst += 5;
+            if (statName === "hp") mbst += 5;
           }
-          if (mbst >= mbstmin)
-            break;
+          if (mbst >= mbstmin) break;
           level++;
         }
-        if (level > 100)
-          level = 100;
+        if (level > 100) level = 100;
       }
       team.push({
         name: species.baseSpecies,

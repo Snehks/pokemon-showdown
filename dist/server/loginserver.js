@@ -36,8 +36,7 @@ class TimeoutError extends Error {
 }
 TimeoutError.prototype.name = TimeoutError.name;
 function parseJSON(json) {
-  if (json.startsWith("]"))
-    json = json.substr(1);
+  if (json.startsWith("]")) json = json.substr(1);
   const data = { error: null, json: null };
   try {
     data.json = JSON.parse(json);
@@ -71,7 +70,7 @@ class LoginServerInstance {
           act: action,
           serverid: Config.serverid,
           servertoken: Config.servertoken,
-          nocache: new Date().getTime()
+          nocache: (/* @__PURE__ */ new Date()).getTime()
         }
       });
       const json = parseJSON(buffer);
@@ -103,16 +102,14 @@ class LoginServerInstance {
     });
   }
   requestTimerPoke() {
-    if (this.openRequests || this.requestTimer || !this.requestQueue.length)
-      return;
+    if (this.openRequests || this.requestTimer || !this.requestQueue.length) return;
     this.requestTimer = setTimeout(() => void this.makeRequests(), LOGIN_SERVER_BATCH_TIME);
   }
   async makeRequests() {
     this.requestTimer = null;
     const requests = this.requestQueue;
     this.requestQueue = [];
-    if (!requests.length)
-      return;
+    if (!requests.length) return;
     const resolvers = [];
     const dataList = [];
     for (const [data, resolve] of requests) {
@@ -126,7 +123,7 @@ class LoginServerInstance {
         body: {
           serverid: Config.serverid,
           servertoken: Config.servertoken,
-          nocache: new Date().getTime(),
+          nocache: (/* @__PURE__ */ new Date()).getTime(),
           json: JSON.stringify(dataList)
         },
         timeout: LOGIN_SERVER_TIMEOUT
@@ -136,8 +133,7 @@ class LoginServerInstance {
         buffer = "stream interrupt";
       }
       if (!data) {
-        if (buffer.includes("<"))
-          buffer = "invalid response";
+        if (buffer.includes("<")) buffer = "invalid response";
         throw new Error(buffer);
       }
       for (const [i, resolve] of resolvers.entries()) {
@@ -167,8 +163,7 @@ class LoginServerInstance {
     this.requestTimerPoke();
   }
   getLog() {
-    if (!this.lastRequest)
-      return this.requestLog;
+    if (!this.lastRequest) return this.requestLog;
     return `${this.requestLog} (${Chat.toDurationString(Date.now() - this.lastRequest)} since last request)`;
   }
 }

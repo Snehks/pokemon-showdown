@@ -94,8 +94,7 @@ class RandomGen2Teams extends import_teams.default {
   cullMovePool(types, moves, abilities = {}, counter, movePool, teamDetails, species, isLead, preferredType, role) {
     let hasHiddenPower = false;
     for (const move of moves) {
-      if (move.startsWith("hiddenpower"))
-        hasHiddenPower = true;
+      if (move.startsWith("hiddenpower")) hasHiddenPower = true;
     }
     if (hasHiddenPower) {
       let movePoolHasHiddenPower = true;
@@ -110,8 +109,7 @@ class RandomGen2Teams extends import_teams.default {
         }
       }
     }
-    if (moves.size + movePool.length <= this.maxMoveCount)
-      return;
+    if (moves.size + movePool.length <= this.maxMoveCount) return;
     if (moves.size === this.maxMoveCount - 2) {
       const unpairedMoves = [...movePool];
       for (const pair of MOVE_PAIRS) {
@@ -133,22 +131,16 @@ class RandomGen2Teams extends import_teams.default {
       }
     }
     if (teamDetails.spikes) {
-      if (movePool.includes("spikes"))
-        this.fastPop(movePool, movePool.indexOf("spikes"));
-      if (moves.size + movePool.length <= this.maxMoveCount)
-        return;
+      if (movePool.includes("spikes")) this.fastPop(movePool, movePool.indexOf("spikes"));
+      if (moves.size + movePool.length <= this.maxMoveCount) return;
     }
     if (teamDetails.rapidSpin) {
-      if (movePool.includes("rapidspin"))
-        this.fastPop(movePool, movePool.indexOf("rapidspin"));
-      if (moves.size + movePool.length <= this.maxMoveCount)
-        return;
+      if (movePool.includes("rapidspin")) this.fastPop(movePool, movePool.indexOf("rapidspin"));
+      if (moves.size + movePool.length <= this.maxMoveCount) return;
     }
     if (teamDetails.statusCure) {
-      if (movePool.includes("healbell"))
-        this.fastPop(movePool, movePool.indexOf("healbell"));
-      if (moves.size + movePool.length <= this.maxMoveCount)
-        return;
+      if (movePool.includes("healbell")) this.fastPop(movePool, movePool.indexOf("healbell"));
+      if (moves.size + movePool.length <= this.maxMoveCount) return;
     }
     const incompatiblePairs = [
       // These moves don't mesh well with other aspects of the set
@@ -162,10 +154,8 @@ class RandomGen2Teams extends import_teams.default {
       ["fireblast", "flamethrower"],
       ["thunder", "thunderbolt"]
     ];
-    for (const pair of incompatiblePairs)
-      this.incompatibleMoves(moves, movePool, pair[0], pair[1]);
-    if (!role.includes("Bulky"))
-      this.incompatibleMoves(moves, movePool, ["rest", "sleeptalk"], "roar");
+    for (const pair of incompatiblePairs) this.incompatibleMoves(moves, movePool, pair[0], pair[1]);
+    if (!role.includes("Bulky")) this.incompatibleMoves(moves, movePool, ["rest", "sleeptalk"], "roar");
   }
   // Generate random moveset for a given species, role, preferred type.
   randomMoveset(types, abilities, teamDetails, species, isLead, movePool, preferredType, role) {
@@ -203,8 +193,7 @@ class RandomGen2Teams extends import_teams.default {
       return moves;
     }
     const runEnforcementChecker = (checkerName) => {
-      if (!this.moveEnforcementCheckers[checkerName])
-        return false;
+      if (!this.moveEnforcementCheckers[checkerName]) return false;
       return this.moveEnforcementCheckers[checkerName](
         movePool,
         moves,
@@ -297,8 +286,7 @@ class RandomGen2Teams extends import_teams.default {
         }
       }
       while (runEnforcementChecker(type)) {
-        if (!stabMoves.length)
-          break;
+        if (!stabMoves.length) break;
         const moveid = this.sampleNoReplace(stabMoves);
         counter = this.addMove(
           moveid,
@@ -438,8 +426,7 @@ class RandomGen2Teams extends import_teams.default {
       const attackingMoves = [];
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
-        if (!this.noStab.includes(moveid) && move.category !== "Status")
-          attackingMoves.push(moveid);
+        if (!this.noStab.includes(moveid) && move.category !== "Status") attackingMoves.push(moveid);
       }
       if (attackingMoves.length) {
         const moveid = this.sample(attackingMoves);
@@ -465,8 +452,7 @@ class RandomGen2Teams extends import_teams.default {
           const move = this.dex.moves.get(moveid);
           const moveType = this.getMoveType(move, species, abilities, preferredType);
           if (!this.noStab.includes(moveid) && (move.basePower || move.basePowerCallback)) {
-            if (currentAttackType !== moveType)
-              coverageMoves.push(moveid);
+            if (currentAttackType !== moveType) coverageMoves.push(moveid);
           }
         }
         if (coverageMoves.length) {
@@ -534,22 +520,14 @@ class RandomGen2Teams extends import_teams.default {
     return moves;
   }
   getItem(ability, types, moves, counter, teamDetails, species, isLead, preferredType, role) {
-    if (species.id === "ditto")
-      return "Metal Powder";
-    if (species.id === "marowak")
-      return "Thick Club";
-    if (species.id === "pikachu")
-      return "Light Ball";
-    if (moves.has("thief"))
-      return "";
-    if (moves.has("flail"))
-      return "Pink Bow";
-    if (moves.has("reversal"))
-      return "Black Belt";
-    if (moves.has("rest") && !moves.has("sleeptalk") && !role.includes("Bulky"))
-      return "Mint Berry";
-    if (moves.has("bellydrum") && !counter.get("recovery") && this.randomChance(1, 2))
-      return "Miracle Berry";
+    if (species.id === "ditto") return "Metal Powder";
+    if (species.id === "marowak") return "Thick Club";
+    if (species.id === "pikachu") return "Light Ball";
+    if (moves.has("thief")) return "";
+    if (moves.has("flail")) return "Pink Bow";
+    if (moves.has("reversal")) return "Black Belt";
+    if (moves.has("rest") && !moves.has("sleeptalk") && !role.includes("Bulky")) return "Mint Berry";
+    if (moves.has("bellydrum") && !counter.get("recovery") && this.randomChance(1, 2)) return "Miracle Berry";
     return "Leftovers";
   }
   randomSet(species, teamDetails = {}, isLead = false) {
@@ -582,17 +560,14 @@ class RandomGen2Teams extends import_teams.default {
     const level = this.getLevel(species);
     let hasHiddenPower = false;
     for (const move of moves) {
-      if (move.startsWith("hiddenpower"))
-        hasHiddenPower = true;
+      if (move.startsWith("hiddenpower")) hasHiddenPower = true;
     }
     if (hasHiddenPower) {
       let hpType;
       for (const move of moves) {
-        if (move.startsWith("hiddenpower"))
-          hpType = move.substr(11);
+        if (move.startsWith("hiddenpower")) hpType = move.substr(11);
       }
-      if (!hpType)
-        throw new Error(`hasHiddenPower is true, but no Hidden Power move was found.`);
+      if (!hpType) throw new Error(`hasHiddenPower is true, but no Hidden Power move was found.`);
       const hpIVs = {
         dragon: { def: 28 },
         ice: { def: 26 },
@@ -614,19 +589,15 @@ class RandomGen2Teams extends import_teams.default {
       for (iv in hpIVs[hpType]) {
         ivs[iv] = hpIVs[hpType][iv];
       }
-      if (ivs.atk === 28 || ivs.atk === 24)
-        ivs.hp = 14;
-      if (ivs.def === 28 || ivs.def === 24)
-        ivs.hp -= 8;
+      if (ivs.atk === 28 || ivs.atk === 24) ivs.hp = 14;
+      if (ivs.def === 28 || ivs.def === 24) ivs.hp -= 8;
     }
     while (evs.hp > 1) {
       const hp = Math.floor(Math.floor(2 * species.baseStats.hp + ivs.hp + Math.floor(evs.hp / 4) + 100) * level / 100 + 10);
       if (moves.has("substitute") && item !== "Leftovers") {
-        if (hp % 4 > 0)
-          break;
+        if (hp % 4 > 0) break;
       } else if (moves.has("bellydrum") && item !== "Leftovers") {
-        if (hp % 2 === 0)
-          break;
+        if (hp % 2 === 0) break;
       } else {
         break;
       }
@@ -663,12 +634,10 @@ class RandomGen2Teams extends import_teams.default {
       const monsArrayA = Array.isArray(pair[0]) ? pair[0] : [pair[0]];
       const monsArrayB = Array.isArray(pair[1]) ? pair[1] : [pair[1]];
       if (monsArrayB.includes(species.id)) {
-        if (pokemon.some((m) => monsArrayA.includes(m.speciesId)))
-          return false;
+        if (pokemon.some((m) => monsArrayA.includes(m.speciesId))) return false;
       }
       if (monsArrayA.includes(species.id)) {
-        if (pokemon.some((m) => monsArrayB.includes(m.speciesId)))
-          return false;
+        if (pokemon.some((m) => monsArrayB.includes(m.speciesId))) return false;
       }
     }
     return true;

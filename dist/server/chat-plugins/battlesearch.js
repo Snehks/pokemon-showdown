@@ -67,8 +67,7 @@ async function runBattleSearch(userids, month, tierid, turnLimit) {
     }
     for (const line of output.stdout.split("\n").reverse()) {
       const [file, raw] = import_lib.Utils.splitFirst(line, ":");
-      if (!raw || !line)
-        continue;
+      if (!raw || !line) continue;
       const data = JSON.parse(raw);
       const day = file.split("/")[3];
       if (!results[day]) {
@@ -84,14 +83,11 @@ async function runBattleSearch(userids, month, tierid, turnLimit) {
       const p1id = toID(data.p1);
       const p2id = toID(data.p2);
       if (userids.length > 1) {
-        if (userids.filter((item) => [p1id, p2id].includes(item)).length < userids.length)
-          continue;
+        if (userids.filter((item) => [p1id, p2id].includes(item)).length < userids.length) continue;
       } else {
-        if (!(p1id === userid || p2id === userid))
-          continue;
+        if (!(p1id === userid || p2id === userid)) continue;
       }
-      if (turnLimit && data.turns > turnLimit)
-        continue;
+      if (turnLimit && data.turns > turnLimit) continue;
       if (!results[day]) {
         results[day] = {
           totalBattles: 0,
@@ -106,21 +102,17 @@ async function runBattleSearch(userids, month, tierid, turnLimit) {
       const winnerid = toID(data.winner);
       const loser = winnerid === p1id ? p2id : p1id;
       if (userids.includes(winnerid)) {
-        if (!results[day].totalWins[winnerid])
-          results[day].totalWins[winnerid] = 0;
+        if (!results[day].totalWins[winnerid]) results[day].totalWins[winnerid] = 0;
         results[day].totalWins[winnerid]++;
       } else if (data.winner) {
-        if (!results[day].totalLosses[loser])
-          results[day].totalLosses[loser] = 0;
+        if (!results[day].totalLosses[loser]) results[day].totalLosses[loser] = 0;
         results[day].totalLosses[loser]++;
       } else {
         results[day].totalTies++;
       }
       for (const id of userids) {
-        if (!results[day].totalLosses[id])
-          results[day].totalLosses[id] = 0;
-        if (!results[day].totalWins[id])
-          results[day].totalWins[id] = 0;
+        if (!results[day].totalLosses[id]) results[day].totalLosses[id] = 0;
+        if (!results[day].totalWins[id]) results[day].totalWins[id] = 0;
       }
       const outcomes = results[day].totalOutcomes;
       if (outcomes) {
@@ -128,8 +120,7 @@ async function runBattleSearch(userids, month, tierid, turnLimit) {
       }
       const foe = userids.length > 1 ? null : userid === toID(data.p1) ? toID(data.p2) : toID(data.p1);
       if (foe) {
-        if (!results[day].timesBattled[foe])
-          results[day].timesBattled[foe] = 0;
+        if (!results[day].timesBattled[foe]) results[day].timesBattled[foe] = 0;
         results[day].timesBattled[foe]++;
       }
     }
@@ -144,14 +135,11 @@ async function runBattleSearch(userids, month, tierid, turnLimit) {
       const p1id = toID(data.p1);
       const p2id = toID(data.p2);
       if (userids.length > 1) {
-        if (userids.filter((item) => item === p1id || item === p2id).length < userids.length)
-          continue;
+        if (userids.filter((item) => item === p1id || item === p2id).length < userids.length) continue;
       } else {
-        if (!(p1id === userid || p2id === userid))
-          continue;
+        if (!(p1id === userid || p2id === userid)) continue;
       }
-      if (turnLimit && data.turns > turnLimit)
-        continue;
+      if (turnLimit && data.turns > turnLimit) continue;
       if (!results[day]) {
         results[day] = {
           totalBattles: 0,
@@ -166,21 +154,17 @@ async function runBattleSearch(userids, month, tierid, turnLimit) {
       const winnerid = toID(data.winner);
       const loser = winnerid === p1id ? p2id : p1id;
       if (userids.includes(winnerid)) {
-        if (!results[day].totalWins[winnerid])
-          results[day].totalWins[winnerid] = 0;
+        if (!results[day].totalWins[winnerid]) results[day].totalWins[winnerid] = 0;
         results[day].totalWins[winnerid]++;
       } else if (data.winner) {
-        if (!results[day].totalLosses[loser])
-          results[day].totalLosses[loser] = 0;
+        if (!results[day].totalLosses[loser]) results[day].totalLosses[loser] = 0;
         results[day].totalLosses[loser]++;
       } else {
         results[day].totalTies++;
       }
       for (const id of userids) {
-        if (!results[day].totalLosses[id])
-          results[day].totalLosses[id] = 0;
-        if (!results[day].totalWins[id])
-          results[day].totalWins[id] = 0;
+        if (!results[day].totalLosses[id]) results[day].totalLosses[id] = 0;
+        if (!results[day].totalWins[id]) results[day].totalWins[id] = 0;
       }
       const outcomes = results[day].totalOutcomes;
       if (outcomes) {
@@ -188,8 +172,7 @@ async function runBattleSearch(userids, month, tierid, turnLimit) {
       }
       const foe = userids.length > 1 ? null : userid === p1id ? p2id : p1id;
       if (foe) {
-        if (!results[day].timesBattled[foe])
-          results[day].timesBattled[foe] = 0;
+        if (!results[day].timesBattled[foe]) results[day].timesBattled[foe] = 0;
         results[day].timesBattled[foe]++;
       }
     }
@@ -211,8 +194,7 @@ function buildResults(data, userids, month, tierid, turnLimit) {
     const outcomes = [];
     for (const day in data) {
       const curOutcomes = data[day].totalOutcomes;
-      if (curOutcomes)
-        outcomes.push(...curOutcomes);
+      if (curOutcomes) outcomes.push(...curOutcomes);
     }
     buf += `<table><tbody><tr><h3 style="margin: 5px auto">Full summary</h3></tr>`;
     buf += `<tr><th>Won</th><th>Lost</th><th>Turns</th></tr>`;
@@ -258,7 +240,7 @@ async function rustBattleSearch(context, targetUser, daysString, format) {
     throw new Chat.ErrorMessage(`No user specified.`);
   }
   const { connection, user } = context;
-  const currentDayOfMonth = new Date().getDate();
+  const currentDayOfMonth = (/* @__PURE__ */ new Date()).getDate();
   if (days < 1 || days > 15) {
     throw new Chat.ErrorMessage(`Days must be between 1 and 15. To search longer ranges, use psbattletools manually on sim3.`);
   }
@@ -314,15 +296,13 @@ async function rustBattleSearch(context, targetUser, daysString, format) {
 async function fsBattleSearch(connection, userids, month, tierid, turnLimit) {
   userids = userids.map(toID);
   const user = connection.user;
-  if (!user.can("forcewin"))
-    return connection.popup(`/battlesearch - Access Denied`);
+  if (!user.can("forcewin")) return connection.popup(`/battlesearch - Access Denied`);
   const response = await PM.query({ userids, turnLimit, month, tierid });
   connection.send(buildResults(response, userids, month, tierid, turnLimit));
 }
 const pages = {
   async battlesearch(args, user, connection) {
-    if (!user.named)
-      return Rooms.RETRY_AFTER_LOGIN;
+    if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
     this.checkCan("forcewin");
     if (Config.nobattlesearch === true) {
       throw new Chat.ErrorMessage(`Battlesearch has been temporarily disabled due to load issues.`);
@@ -332,8 +312,7 @@ const pages = {
     }
     const [ids, rawLimit, month, formatid, confirmation] = import_lib.Utils.splitFirst(this.pageid.slice(18), "--", 5);
     let turnLimit = parseInt(rawLimit);
-    if (isNaN(turnLimit))
-      turnLimit = void 0;
+    if (isNaN(turnLimit)) turnLimit = void 0;
     const userids = ids.split("-");
     if (!ids || turnLimit && turnLimit < 1) {
       return user.popup(`Some arguments are missing or invalid for battlesearch. Use /battlesearch to start over.`);
@@ -368,8 +347,7 @@ const pages = {
       tier
     ]).map((tier) => {
       const format = Dex.formats.get(tier);
-      if (format?.exists)
-        tier = format.name;
+      if (format?.exists) tier = format.name;
       if (tier.startsWith("gen")) {
         return `[Gen ${tier.substring(3, 4)}] ${tier.substring(4)}`;
       }
@@ -394,8 +372,7 @@ const pages = {
     if (toID(confirmation) !== "confirm") {
       buf += `<p>Are you sure you want to run a battle search for for ${tierid} battles on ${month} `;
       buf += `where the ${userids.length > 1 ? `user(s) ${userids.join(", ")} were players` : `the user ${userid} was a player`}`;
-      if (turnLimit)
-        buf += ` and the battle lasted less than ${turnLimit} turn${Chat.plural(turnLimit)}`;
+      if (turnLimit) buf += ` and the battle lasted less than ${turnLimit} turn${Chat.plural(turnLimit)}`;
       buf += `?</p><p><a href="/view-battlesearch-${userids.join("-")}--${turnLimit}--${month}--${tierid}--confirm" target="replace"><button class="button notifying">Yes, run the battle search</button></a> <a href="/view-battlesearch-${userids.join("-")}--${turnLimit}--${month}--${tierid}" target="replace"><button class="button">No, go back</button></a></p>`;
       return `${buf}</div>`;
     }
@@ -405,8 +382,7 @@ const pages = {
 };
 const commands = {
   battlesearch(target, room, user, connection) {
-    if (!target.trim())
-      return this.parse("/help battlesearch");
+    if (!target.trim()) return this.parse("/help battlesearch");
     this.checkCan("forcewin");
     const parts = target.split(",");
     let turnLimit;

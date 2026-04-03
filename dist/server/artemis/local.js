@@ -107,18 +107,34 @@ const PM = new import_lib.ProcessManager.StreamProcessManager(
     }
   }
 );
-const _LocalClassifier = class {
+class LocalClassifier {
   constructor() {
     this.enabled = false;
     this.requests = /* @__PURE__ */ new Map();
     this.lastTask = 0;
     this.readyPromise = null;
-    _LocalClassifier.classifiers.push(this);
+    LocalClassifier.classifiers.push(this);
     void this.setupProcesses();
   }
+  static {
+    this.PM = PM;
+  }
+  static {
+    this.ATTRIBUTES = {
+      sexual_explicit: {},
+      severe_toxicity: {},
+      toxicity: {},
+      obscene: {},
+      identity_attack: {},
+      insult: {},
+      threat: {}
+    };
+  }
+  static {
+    this.classifiers = [];
+  }
   static destroy() {
-    for (const classifier of this.classifiers)
-      void classifier.destroy();
+    for (const classifier of this.classifiers) void classifier.destroy();
     return this.PM.destroy();
   }
   async setupProcesses() {
@@ -140,8 +156,7 @@ const _LocalClassifier = class {
     }
   }
   async listen() {
-    if (!this.stream)
-      return null;
+    if (!this.stream) return null;
     for await (const chunk of this.stream) {
       const [rawTaskId, data] = import_lib.Utils.splitFirst(chunk, "\n");
       const task = parseInt(rawTaskId);
@@ -153,14 +168,12 @@ const _LocalClassifier = class {
     }
   }
   destroy() {
-    _LocalClassifier.classifiers.splice(_LocalClassifier.classifiers.indexOf(this), 1);
+    LocalClassifier.classifiers.splice(LocalClassifier.classifiers.indexOf(this), 1);
     return this.stream?.destroy();
   }
   async classify(text) {
-    if (this.readyPromise)
-      await this.readyPromise;
-    if (!this.stream)
-      return null;
+    if (this.readyPromise) await this.readyPromise;
+    if (!this.stream) return null;
     const taskId = this.lastTask++;
     const data = await new Promise((resolve) => {
       this.requests.set(taskId, resolve);
@@ -175,19 +188,7 @@ ${text}`);
   static start(processCount) {
     start(processCount);
   }
-};
-let LocalClassifier = _LocalClassifier;
-LocalClassifier.PM = PM;
-LocalClassifier.ATTRIBUTES = {
-  sexual_explicit: {},
-  severe_toxicity: {},
-  toxicity: {},
-  obscene: {},
-  identity_attack: {},
-  insult: {},
-  threat: {}
-};
-LocalClassifier.classifiers = [];
+}
 if (!PM.isParentProcess) {
   ConfigLoader.ensureLoaded();
   global.Monitor = {

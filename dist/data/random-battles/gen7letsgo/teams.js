@@ -41,6 +41,7 @@ class RandomLetsGoTeams extends import_teams.RandomGen8Teams {
   }
   shouldCullMove(move, types, moves, abilities, counter, movePool, teamDetails) {
     switch (move.id) {
+      // Set up once and only if we have the moves for it
       case "bulkup":
       case "swordsdance":
         return {
@@ -65,6 +66,7 @@ class RandomLetsGoTeams extends import_teams.RandomGen8Teams {
           cull: counter.damagingMoves.size < 2 && !counter.setupType,
           isSetup: !counter.setupType
         };
+      // Bad after setup
       case "dragontail":
         return { cull: !!counter.setupType || !!counter.get("speedsetup") || ["encore", "roar", "whirlwind"].some((m) => moves.has(m)) };
       case "fakeout":
@@ -82,6 +84,7 @@ class RandomLetsGoTeams extends import_teams.RandomGen8Teams {
         return { cull: counter.damagingMoves.size > 1 || !!counter.setupType };
       case "stealthrock":
         return { cull: !!counter.setupType || !!counter.get("speedsetup") || !!teamDetails.stealthRock };
+      // Bit redundant to have both
       case "leechlife":
       case "substitute":
         return { cull: moves.has("uturn") };
@@ -106,11 +109,9 @@ class RandomLetsGoTeams extends import_teams.RandomGen8Teams {
       case "surf":
         return { cull: moves.has("hydropump") || moves.has("scald") };
     }
-    if (move.priority !== 0 && !!counter.get("speedsetup"))
-      return { cull: true };
+    if (move.priority !== 0 && !!counter.get("speedsetup")) return { cull: true };
     if (move.category === "Physical" && counter.setupType === "Special" || move.category === "Special" && counter.setupType === "Physical") {
-      if (!types.has(move.type) || counter.get("stab") > 1 || counter.get(move.category) < 2)
-        return { cull: true };
+      if (!types.has(move.type) || counter.get("stab") > 1 || counter.get(move.category) < 2) return { cull: true };
     }
     return { cull: false };
   }
@@ -145,8 +146,7 @@ class RandomLetsGoTeams extends import_teams.RandomGen8Teams {
             cull = true;
           } else {
             for (const type of types) {
-              if (this.moveEnforcementCheckers[type]?.(movePool, moves, [], types, counter, species, teamDetails))
-                cull = true;
+              if (this.moveEnforcementCheckers[type]?.(movePool, moves, [], types, counter, species, teamDetails)) cull = true;
             }
           }
         }
@@ -157,8 +157,7 @@ class RandomLetsGoTeams extends import_teams.RandomGen8Teams {
       }
     } while (moves.size < this.maxMoveCount && movePool.length);
     const ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
-    if (!counter.get("Physical") && !moves.has("transform"))
-      ivs.atk = 0;
+    if (!counter.get("Physical") && !moves.has("transform")) ivs.atk = 0;
     const requiredItem = species.requiredItem || (species.requiredItems ? this.sample(species.requiredItems) : null);
     return {
       name: species.baseSpecies,
@@ -191,10 +190,8 @@ class RandomLetsGoTeams extends import_teams.RandomGen8Teams {
     const teamDetails = {};
     while (pokemonPool.length && pokemon.length < this.maxTeamSize) {
       const species = this.dex.species.get(this.sampleNoReplace(pokemonPool));
-      if (!species.exists)
-        continue;
-      if (baseFormes[species.baseSpecies])
-        continue;
+      if (!species.exists) continue;
+      if (baseFormes[species.baseSpecies]) continue;
       const types = species.types;
       let skip = false;
       for (const type of species.types) {
@@ -203,11 +200,9 @@ class RandomLetsGoTeams extends import_teams.RandomGen8Teams {
           break;
         }
       }
-      if (skip)
-        continue;
+      if (skip) continue;
       const typeCombo = types.slice().sort().join();
-      if (!this.forceMonotype && typeComboCount[typeCombo] >= 1)
-        continue;
+      if (!this.forceMonotype && typeComboCount[typeCombo] >= 1) continue;
       const set = this.randomSet(species, teamDetails);
       pokemon.push(set);
       baseFormes[species.baseSpecies] = 1;
@@ -223,10 +218,8 @@ class RandomLetsGoTeams extends import_teams.RandomGen8Teams {
       } else {
         typeComboCount[typeCombo] = 1;
       }
-      if (set.moves.includes("stealthrock"))
-        teamDetails.stealthRock = 1;
-      if (set.moves.includes("rapidspin"))
-        teamDetails.rapidSpin = 1;
+      if (set.moves.includes("stealthrock")) teamDetails.stealthRock = 1;
+      if (set.moves.includes("rapidspin")) teamDetails.rapidSpin = 1;
     }
     return pokemon;
   }

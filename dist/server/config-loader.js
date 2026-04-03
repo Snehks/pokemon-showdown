@@ -65,8 +65,7 @@ const CONFIG_PATH = (0, import_lib.FS)("./config/config.js").path;
 const errors = [];
 function load(invalidate = false) {
   if (global.Config) {
-    if (!invalidate)
-      return global.Config;
+    if (!invalidate) return global.Config;
     delete require.cache[CONFIG_PATH];
   }
   const config = { ...defaults, ...require(CONFIG_PATH) };
@@ -91,8 +90,7 @@ function load(invalidate = false) {
   }
   for (const [preset, values] of FLAG_PRESETS) {
     if (process.argv.includes(preset)) {
-      for (const value of values)
-        config[value] = true;
+      for (const value of values) config[value] = true;
     }
   }
   cacheSubProcesses(config);
@@ -113,15 +111,14 @@ function cacheSubProcesses(config) {
       pushError("error", `Invalid \`subprocesses\` specification. Use any of 0, 1, or a plain old object.`);
     }
   }
-  config.subprocessescache ?? (config.subprocessescache = {});
+  config.subprocessescache ??= {};
   const deprecatedKeys = [];
   if ("workers" in config) {
     deprecatedKeys.push("workers");
     config.subprocessescache.network = config.workers;
   }
   for (const processType of processTypes) {
-    if (processType === "network")
-      continue;
+    if (processType === "network") continue;
     const compatKey = `${processType}processes`;
     if (compatKey in config) {
       deprecatedKeys.push(compatKey);
@@ -163,8 +160,7 @@ Please ensure that you update your config.js to the new format (see config-examp
     if (cachedGroups[symbol] === "processing") {
       throw new Error(`Cyclic inheritance in group config for symbol "${symbol}"`);
     }
-    if (cachedGroups[symbol] === true)
-      return;
+    if (cachedGroups[symbol] === true) return;
     for (const key in groupData) {
       if (isPermission(key)) {
         const jurisdiction = groupData[key];
@@ -179,10 +175,8 @@ Please ensure that you update your config.js to the new format (see config-examp
       const inheritGroup = groups[groupData["inherit"]];
       cacheGroup(groupData["inherit"], inheritGroup);
       for (const key in inheritGroup) {
-        if (key in groupData)
-          continue;
-        if (!isPermission(key))
-          continue;
+        if (key in groupData) continue;
+        if (!isPermission(key)) continue;
         groupData[key] = inheritGroup[key];
       }
       delete groupData["inherit"];
@@ -238,8 +232,7 @@ function checkRipgrepAvailability() {
   return Config.ripgrepmodlog;
 }
 function pushError(logLevel, msg) {
-  if (process.send)
-    return;
+  if (process.send) return;
   errors.push([logLevel, `[CONFIG] ${msg}`]);
 }
 function flushLog() {
@@ -252,8 +245,7 @@ function ensureLoaded() {
 }
 function watch() {
   (0, import_lib.FS)("config/config.js").onModify(() => {
-    if (!Config.watchconfig)
-      return;
+    if (!Config.watchconfig) return;
     try {
       load(true);
       flushLog();

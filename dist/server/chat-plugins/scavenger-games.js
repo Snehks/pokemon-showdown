@@ -42,15 +42,11 @@ class Leaderboard {
   }
   addPoints(name, aspect, points, noUpdate) {
     const userid = toID(name);
-    if (!userid || userid === "constructor" || !points)
-      return this;
-    if (!this.data[userid])
-      this.data[userid] = { name };
-    if (!this.data[userid][aspect])
-      this.data[userid][aspect] = 0;
+    if (!userid || userid === "constructor" || !points) return this;
+    if (!this.data[userid]) this.data[userid] = { name };
+    if (!this.data[userid][aspect]) this.data[userid][aspect] = 0;
     this.data[userid][aspect] += points;
-    if (!noUpdate)
-      this.data[userid].name = name;
+    if (!noUpdate) this.data[userid].name = name;
     return this;
   }
   visualize(sortBy, userid) {
@@ -89,19 +85,15 @@ const TWISTS = {
     id: "perfectscore",
     desc: "Players who finish the hunt without submitting a single wrong answer get a shoutout!",
     onLeave(player) {
-      if (!this.leftGame)
-        this.leftGame = [];
+      if (!this.leftGame) this.leftGame = [];
       this.leftGame.push(player.id);
     },
     onSubmitPriority: 1,
     onSubmit(player, value) {
       const currentQuestion = player.currentQuestion;
-      if (!player.answers)
-        player.answers = {};
-      if (!player.answers[currentQuestion])
-        player.answers[currentQuestion] = [];
-      if (player.answers[currentQuestion].includes(value))
-        return;
+      if (!player.answers) player.answers = {};
+      if (!player.answers[currentQuestion]) player.answers[currentQuestion] = [];
+      if (player.answers[currentQuestion].includes(value)) return;
       player.answers[currentQuestion].push(value);
     },
     onComplete(player, time, blitz) {
@@ -110,8 +102,7 @@ const TWISTS = {
     },
     onAfterEndPriority: 1,
     onAfterEnd(isReset) {
-      if (isReset)
-        return;
+      if (isReset) return;
       const perfect = this.completed.filter((entry) => entry.isPerfect).map((entry) => entry.name);
       if (perfect.length) {
         this.announce(import_lib.Utils.html`${Chat.toListString(perfect)} ${perfect.length > 1 ? "have" : "has"} completed the hunt without a single wrong answer!`);
@@ -152,8 +143,7 @@ const TWISTS = {
     },
     onAfterEndPriority: 1,
     onAfterEnd(isReset) {
-      if (isReset)
-        return;
+      if (isReset) return;
       const noSkip = this.completed.filter((entry) => entry.noSkip).map((entry) => entry.name);
       if (noSkip.length) {
         this.announce(import_lib.Utils.html`${Chat.toListString(noSkip)} ${noSkip.length > 1 ? "have" : "has"} completed the hunt without skipping the last question!`);
@@ -191,21 +181,17 @@ const TWISTS = {
     id: "spamfilter",
     desc: "Every wrong answer adds 30 seconds to your final time!",
     onIncorrectAnswer(player, value) {
-      if (!player.incorrect)
-        player.incorrect = [];
+      if (!player.incorrect) player.incorrect = [];
       const id = `${player.currentQuestion}-${value}`;
-      if (player.incorrect.includes(id))
-        return;
+      if (player.incorrect.includes(id)) return;
       player.incorrect.push(id);
     },
     onComplete(player, time, blitz) {
       const seconds = toSeconds(time);
-      if (!player.incorrect)
-        return { name: player.name, total: seconds, blitz, time, original_time: time };
+      if (!player.incorrect) return { name: player.name, total: seconds, blitz, time, original_time: time };
       const total = seconds + 30 * player.incorrect.length;
       const finalTime = Chat.toDurationString(total * 1e3, { hhmmss: true });
-      if (total > 60)
-        blitz = false;
+      if (total > 60) blitz = false;
       return { name: player.name, total, blitz, time: finalTime, original_time: time };
     },
     onConfirmCompletion(player, time, blitz, place, result) {
@@ -274,8 +260,7 @@ const TWISTS = {
           return true;
         }
       }
-      if (!this.startTimes[user.id])
-        this.startTimes[user.id] = Date.now();
+      if (!this.startTimes[user.id]) this.startTimes[user.id] = Date.now();
       if (this.addPlayer(user)) {
         this.cacheUserIps(user);
         delete this.leftHunt[user.id];
@@ -332,10 +317,8 @@ const TWISTS = {
     },
     onIncorrectAnswer(player, value) {
       const curr = player.currentQuestion;
-      if (!this.incorrect[curr][value])
-        this.incorrect[curr][value] = [];
-      if (this.incorrect[curr][value].includes(player.id))
-        return;
+      if (!this.incorrect[curr][value]) this.incorrect[curr][value] = [];
+      if (this.incorrect[curr][value].includes(player.id)) return;
       this.incorrect[curr][value].push(player.id);
     },
     onSubmitPriority: 1,
@@ -351,8 +334,7 @@ const TWISTS = {
       this.questions = this.questions.slice(0, -1);
     },
     onAfterEnd(isReset) {
-      if (isReset)
-        return;
+      if (isReset) return;
       const buffer = [];
       for (const [idx, data] of this.incorrect.entries()) {
         let collection = [];
@@ -365,8 +347,7 @@ const TWISTS = {
         const matchedPlayers = [];
         for (const playerid in this.guesses) {
           const guesses = this.guesses[playerid];
-          if (matches.includes(guesses[idx]))
-            matchedPlayers.push(playerid);
+          if (matches.includes(guesses[idx])) matchedPlayers.push(playerid);
         }
         const matchDisplay = matches.length ? matches.join(", ") : "No wrong answers!";
         const playerDisplay = matches.length ? matchedPlayers.length ? `- ${matchedPlayers.join(", ")}` : "- No one guessed correctly!" : "";
@@ -384,15 +365,12 @@ const TWISTS = {
     },
     onCorrectAnswer(player, value) {
       const curr = player.currentQuestion;
-      if (!this.correct[curr][value])
-        this.correct[curr][value] = [];
-      if (this.correct[curr][value].includes(player.id))
-        return;
+      if (!this.correct[curr][value]) this.correct[curr][value] = [];
+      if (this.correct[curr][value].includes(player.id)) return;
       this.correct[curr][value].push(player.id);
     },
     onAfterEnd(isReset) {
-      if (isReset)
-        return;
+      if (isReset) return;
       const buffer = [];
       for (const [idx, data] of this.correct.entries()) {
         const list = Object.entries(data).map(([value, players]) => ({ players, count: players.length, value }));
@@ -422,10 +400,8 @@ const TWISTS = {
       }
     },
     onEditQuestion(questionNumber, questionAnswer, value) {
-      if (questionAnswer === "question")
-        questionAnswer = "hint";
-      if (!["hint", "answer"].includes(questionAnswer))
-        return false;
+      if (questionAnswer === "question") questionAnswer = "hint";
+      if (!["hint", "answer"].includes(questionAnswer)) return false;
       let answer = [];
       if (questionAnswer === "answer") {
         answer = value.split(";").map((p) => p.trim());
@@ -456,8 +432,7 @@ const TWISTS = {
     },
     onIncorrectAnswer(player, value) {
       const curr = player.currentQuestion;
-      if (!this.guesses[curr][player.id])
-        this.guesses[curr][player.id] = /* @__PURE__ */ new Set();
+      if (!this.guesses[curr][player.id]) this.guesses[curr][player.id] = /* @__PURE__ */ new Set();
       this.guesses[curr][player.id].add((0, import_scavengers.sanitizeAnswer)(value));
       throw new Chat.ErrorMessage("That is not the answer - try again!");
     },
@@ -469,47 +444,39 @@ const TWISTS = {
         mines.push(mineSet.map((mine) => ({ mine: mine.substr(1), users: [] })));
       }
       for (const player of Object.values(this.playerTable)) {
-        if (!player)
-          continue;
+        if (!player) continue;
         if (player.mines) {
           for (const { index, mine } of player.mines) {
             mines[index].find((obj) => obj.mine === mine)?.users.push(player.name);
           }
         }
       }
-      for (const mineSet of mines)
-        mineSet.sort();
+      for (const mineSet of mines) mineSet.sort();
       this.announce(
         `The ${this.gameType ? `${this.gameType} ` : ""}scavenger hunt by ${hosts} was ended ${endedBy ? "by " + import_lib.Utils.escapeHTML(endedBy.name) : "automatically"}.<br />${this.completed.slice(0, sliceIndex).map((p, i) => `${import_lib.Utils.formatOrder(i + 1)} place: <em>${import_lib.Utils.escapeHTML(p.name)}</em> <span style="color: lightgreen;">[${p.time}]</span>.<br />`).join("")}${this.completed.length > sliceIndex ? `Consolation Prize: ${this.completed.slice(sliceIndex).map((e) => `<em>${import_lib.Utils.escapeHTML(e.name)}</em> <span style="color: lightgreen;">[${e.time}]</span>`).join(", ")}<br />` : ""}<br /><details style="cursor: pointer;"><summary>Solution: </summary><br />${this.questions.map((q, i) => `${i + 1}) ${this.formatOutput(q.hint)} <span style="color: lightgreen">[<em>${import_lib.Utils.escapeHTML(q.answer.join(" / "))}</em>]</span><br/><details style="cursor: pointer;"><summary>Mines: </summary>${mines[i].map(({ mine, users }) => import_lib.Utils.escapeHTML(`${mine}: ${users.join(" / ") || "-"}`)).join("<br />")}</details>`).join("<br />")}</details>`
       );
       return true;
     },
     onEnd(isReset) {
-      if (isReset)
-        return;
+      if (isReset) return;
       for (const [q, guessObj] of this.guesses.entries()) {
         const mines = this.mines[q];
         for (const [playerId, guesses] of Object.entries(guessObj)) {
           const player = this.playerTable[playerId];
-          if (!player)
-            continue;
-          if (!player.mines)
-            player.mines = [];
+          if (!player) continue;
+          if (!player.mines) player.mines = [];
           player.mines.push(...mines.filter((mine) => guesses.has((0, import_scavengers.sanitizeAnswer)(mine))).map((mine) => ({ index: q, mine: mine.substr(1) })));
         }
       }
     },
     onAfterEndPriority: 1,
     onAfterEnd(isReset) {
-      if (isReset)
-        return;
+      if (isReset) return;
       const noMines = [];
       for (const { name } of this.completed) {
         const player = this.playerTable[toID(name)];
-        if (!player)
-          continue;
-        if (!player.mines?.length)
-          noMines.push(name);
+        if (!player) continue;
+        if (!player.mines?.length) noMines.push(name);
       }
       if (noMines.length) {
         this.announce(import_lib.Utils.html`${Chat.toListString(noMines)} ${noMines.length > 1 ? "have" : "has"} completed the hunt without hitting a single mine!`);
@@ -668,23 +635,19 @@ const MODES = {
       isGameMode: true,
       onLoad() {
         const game = this.room.scavgame;
-        if (game.round === 0)
-          return;
+        if (game.round === 0) return;
         const maxTime = Math.max(...game.jumpstart);
         this.jumpstartTimers = [];
         this.answerLock = true;
         for (const [i, time] of game.jumpstart.entries()) {
-          if (!game.completed[i])
-            break;
+          if (!game.completed[i]) break;
           this.jumpstartTimers[i] = setTimeout(() => {
             const target = game.completed.shift();
-            if (!target)
-              return;
+            if (!target) return;
             const staffHost = Users.get(this.staffHostId);
             const targetUser = Users.get(target);
             if (targetUser) {
-              if (staffHost)
-                staffHost.sendTo(this.room, `${targetUser.name} has received their first hint early.`);
+              if (staffHost) staffHost.sendTo(this.room, `${targetUser.name} has received their first hint early.`);
               targetUser.sendTo(
                 this.room,
                 `|raw|<strong>The first hint to the next hunt is:</strong> <div style="overflow:auto; max-height: 50vh"> ${this.formatOutput(this.questions[0].hint)}</div>`
@@ -759,8 +722,7 @@ const MODES = {
       const team = this.getPlayerTeam(player);
       for (const userid of team.players) {
         const user = Users.getExact(userid);
-        if (!user?.connected)
-          continue;
+        if (!user?.connected) continue;
         user.sendTo(this.room, `|raw|<div class="infobox">${message}</div>`);
       }
     },
@@ -781,8 +743,7 @@ const MODES = {
       const question = hunt.getQuestion(team.question);
       for (const userid of team.players) {
         const user = Users.getExact(userid);
-        if (!user)
-          continue;
+        if (!user) continue;
         user.sendTo(this.room, question);
       }
       team.answers = [];
@@ -798,20 +759,15 @@ const MODES = {
         const game = this.room.scavgame;
         const team = game.getPlayerTeam(user);
         const player = this.playerTable[user.id];
-        if (!player || !team)
-          return;
-        if (player.currentQuestion !== team.question - 1)
-          player.currentQuestion = team.question - 1;
-        if (team.completed)
-          player.completed = true;
+        if (!player || !team) return;
+        if (player.currentQuestion !== team.question - 1) player.currentQuestion = team.question - 1;
+        if (team.completed) player.completed = true;
       },
       onSendQuestion(player) {
         const game = this.room.scavgame;
         const team = game.getPlayerTeam(player);
-        if (!team)
-          return;
-        if (player.currentQuestion !== team.question - 1)
-          player.currentQuestion = team.question - 1;
+        if (!team) return;
+        if (player.currentQuestion !== team.question - 1) player.currentQuestion = team.question - 1;
         if (team.completed) {
           player.completed = true;
           player.sendRoom("Your team has already completed the hunt!");
@@ -820,15 +776,12 @@ const MODES = {
       },
       onConnect(user) {
         const player = this.playerTable[user.id];
-        if (!player)
-          return;
+        if (!player) return;
         const game = this.room.scavgame;
         const team = game.getPlayerTeam(player);
         if (team) {
-          if (player.currentQuestion !== team.question - 1)
-            player.currentQuestion = team.question - 1;
-          if (team.completed)
-            player.completed = true;
+          if (player.currentQuestion !== team.question - 1) player.currentQuestion = team.question - 1;
+          if (team.completed) player.completed = true;
         }
       },
       onJoin(user) {
@@ -862,16 +815,11 @@ const MODES = {
       onAnySubmit(player, value) {
         const game = this.room.scavgame;
         const team = game.getPlayerTeam(player);
-        if (!team)
-          return true;
-        if (player.currentQuestion !== team.question - 1)
-          player.currentQuestion = team.question - 1;
-        if (team.completed)
-          player.completed = true;
-        if (player.completed)
-          return;
-        if (team.answers.includes(value))
-          return;
+        if (!team) return true;
+        if (player.currentQuestion !== team.question - 1) player.currentQuestion = team.question - 1;
+        if (team.completed) player.completed = true;
+        if (player.completed) return;
+        if (team.answers.includes(value)) return;
         game.teamAnnounce(player, import_lib.Utils.html`${player.name} has guessed "${value}".`);
         team.answers.push(value);
       },
@@ -911,19 +859,15 @@ class ScavengerGameTemplate {
     this.timer = null;
   }
   destroy(force) {
-    if (this.timer)
-      clearTimeout(this.timer);
+    if (this.timer) clearTimeout(this.timer);
     const game = this.room.getGame(import_scavengers.ScavengerHunt);
-    if (force && game)
-      game.onEnd(false);
+    if (force && game) game.onEnd(false);
     this.room.scavgame = null;
   }
   eliminate(userid) {
-    if (!this.playerlist?.includes(userid))
-      return false;
+    if (!this.playerlist?.includes(userid)) return false;
     this.playerlist = this.playerlist.filter((pid) => pid !== userid);
-    if (this.leaderboard)
-      delete this.leaderboard.data[userid];
+    if (this.leaderboard) delete this.leaderboard.data[userid];
     return true;
   }
   announce(msg) {
@@ -932,10 +876,8 @@ class ScavengerGameTemplate {
 }
 const LoadGame = function(room, gameid) {
   let game = MODES[gameid];
-  if (!game)
-    return false;
-  if (typeof game === "string")
-    game = MODES[game];
+  if (!game) return false;
+  if (typeof game === "string") game = MODES[game];
   const base = new ScavengerGameTemplate(room);
   const scavgame = Object.assign(base, import_lib.Utils.deepClone(game));
   if (scavgame.leaderboard) {

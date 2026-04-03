@@ -27,15 +27,12 @@ const Scripts = {
   pokemon: {
     inherit: true,
     getStat(statName, unboosted, unmodified, fastReturn) {
-      if (statName === "hp")
-        throw new Error("Please read `maxhp` directly");
+      if (statName === "hp") throw new Error("Please read `maxhp` directly");
       let stat = this.storedStats[statName];
       if (!unboosted) {
         let boost = this.boosts[statName];
-        if (boost > 6)
-          boost = 6;
-        if (boost < -6)
-          boost = -6;
+        if (boost > 6) boost = 6;
+        if (boost < -6) boost = -6;
         if (boost >= 0) {
           const boostTable = [1, 1.5, 2, 2.5, 3, 3.5, 4];
           stat = Math.floor(stat * boostTable[boost]);
@@ -53,8 +50,7 @@ const Scripts = {
         }
       }
       stat = this.battle.clampIntRange(stat, 1, 999);
-      if (fastReturn)
-        return stat;
+      if (fastReturn) return stat;
       if (!unboosted) {
         if (statName === "def" && this.side.sideConditions["reflect"] || statName === "spd" && this.side.sideConditions["lightscreen"]) {
           stat *= 2;
@@ -83,8 +79,7 @@ const Scripts = {
       }
       let hitResult = this.battle.singleEvent("PrepareHit", move, {}, target, pokemon, move);
       if (!hitResult) {
-        if (hitResult === false)
-          this.battle.add("-fail", target);
+        if (hitResult === false) this.battle.add("-fail", target);
         return false;
       }
       this.battle.runEvent("PrepareHit", pokemon, target, move);
@@ -125,8 +120,7 @@ const Scripts = {
       }
       hitResult = this.battle.runEvent("TryHit", target, pokemon, move);
       if (!hitResult) {
-        if (hitResult === false)
-          this.battle.add("-fail", target);
+        if (hitResult === false) this.battle.add("-fail", target);
         return false;
       }
       let accuracy = move.accuracy;
@@ -166,8 +160,7 @@ const Scripts = {
         accuracy = this.battle.runEvent("Accuracy", target, pokemon, move, accuracy);
       }
       accuracy = this.battle.runEvent("ModifyAccuracy", target, pokemon, move, accuracy);
-      if (accuracy !== true)
-        accuracy = Math.max(accuracy, 0);
+      if (accuracy !== true) accuracy = Math.max(accuracy, 0);
       if (move.alwaysHit) {
         accuracy = true;
       } else {
@@ -196,24 +189,18 @@ const Scripts = {
         const isSleepUsable = move.sleepUsable || this.dex.moves.get(move.sourceEffect).sleepUsable;
         let i;
         for (i = 0; i < hits && target.hp && pokemon.hp; i++) {
-          if (pokemon.status === "slp" && !isSleepUsable)
-            break;
+          if (pokemon.status === "slp" && !isSleepUsable) break;
           move.hit = i + 1;
-          if (move.hit === hits)
-            move.lastHit = true;
+          if (move.hit === hits) move.lastHit = true;
           moveDamage = this.moveHit(target, pokemon, move);
-          if (moveDamage === false)
-            break;
-          if (nullDamage && (moveDamage || moveDamage === 0 || moveDamage === void 0))
-            nullDamage = false;
+          if (moveDamage === false) break;
+          if (nullDamage && (moveDamage || moveDamage === 0 || moveDamage === void 0)) nullDamage = false;
           damage = moveDamage || 0;
           move.totalDamage += damage;
           this.battle.eachEvent("Update");
         }
-        if (i === 0)
-          return 1;
-        if (nullDamage)
-          damage = false;
+        if (i === 0) return 1;
+        if (nullDamage) damage = false;
         this.battle.add("-hitcount", target, i);
       } else {
         damage = this.moveHit(target, pokemon, move);
@@ -222,8 +209,7 @@ const Scripts = {
       if (move.category !== "Status") {
         target.gotAttacked(move, damage, pokemon);
       }
-      if (move.ohko)
-        this.battle.add("-ohko");
+      if (move.ohko) this.battle.add("-ohko");
       this.battle.singleEvent("AfterMoveSecondary", move, null, target, pokemon, move);
       this.battle.runEvent("AfterMoveSecondary", target, pokemon, move);
       if (move.recoil && move.totalDamage && (pokemon.side.pokemonLeft > 1 || target.side.pokemonLeft > 1 || target.hp)) {
@@ -259,16 +245,14 @@ const Scripts = {
         return move.damage;
       }
       move.category = this.battle.getCategory(move);
-      if (!move.type)
-        move.type = "???";
+      if (!move.type) move.type = "???";
       const type = move.type;
       let basePower = move.basePower;
       if (move.basePowerCallback) {
         basePower = move.basePowerCallback.call(this.battle, source, target, move);
       }
       if (!basePower) {
-        if (basePower === 0)
-          return;
+        if (basePower === 0) return;
         return basePower;
       }
       basePower = this.battle.clampIntRange(basePower, 1);
@@ -296,8 +280,7 @@ const Scripts = {
           basePower *= move.basePowerModifier;
         }
       }
-      if (!basePower)
-        return 0;
+      if (!basePower) return 0;
       basePower = this.battle.clampIntRange(basePower, 1);
       let level = source.level;
       if (move.allies) {
@@ -312,8 +295,7 @@ const Scripts = {
       let unboosted = false;
       let noburndrop = false;
       if (isCrit) {
-        if (!suppressMessages)
-          this.battle.add("-crit", target);
+        if (!suppressMessages) this.battle.add("-crit", target);
         if (attacker.boosts[atkType] <= defender.boosts[defType]) {
           unboosted = true;
           noburndrop = true;
@@ -348,8 +330,7 @@ const Scripts = {
       damage *= attack;
       damage = Math.floor(damage / defense);
       damage = Math.floor(damage / 50);
-      if (isCrit)
-        damage *= 2;
+      if (isCrit) damage *= 2;
       damage = Math.floor(this.battle.runEvent("ModifyDamage", attacker, defender, move, damage));
       damage = this.battle.clampIntRange(damage, 1, 997);
       damage += 2;
@@ -363,16 +344,14 @@ const Scripts = {
       }
       const totalTypeMod = target.runEffectiveness(move);
       if (totalTypeMod > 0) {
-        if (!suppressMessages)
-          this.battle.add("-supereffective", target);
+        if (!suppressMessages) this.battle.add("-supereffective", target);
         damage *= 2;
         if (totalTypeMod >= 2) {
           damage *= 2;
         }
       }
       if (totalTypeMod < 0) {
-        if (!suppressMessages)
-          this.battle.add("-resisted", target);
+        if (!suppressMessages) this.battle.add("-resisted", target);
         damage = Math.floor(damage / 2);
         if (totalTypeMod <= -2) {
           damage = Math.floor(damage / 2);
@@ -397,17 +376,12 @@ const Scripts = {
    */
   boost(boost, target, source = null, effect = null) {
     if (this.event) {
-      if (!target)
-        target = this.event.target;
-      if (!source)
-        source = this.event.source;
-      if (!effect)
-        effect = this.effect;
+      if (!target) target = this.event.target;
+      if (!source) source = this.event.source;
+      if (!effect) effect = this.effect;
     }
-    if (typeof effect === "string")
-      effect = this.dex.conditions.get(effect);
-    if (!target?.hp)
-      return 0;
+    if (typeof effect === "string") effect = this.dex.conditions.get(effect);
+    if (!target?.hp) return 0;
     let success = null;
     boost = this.runEvent("TryBoost", target, source, effect, { ...boost });
     let i;
@@ -445,11 +419,9 @@ const Scripts = {
    * uses self-destruct or explosion, I can use this to determine who should win.
    */
   faintMessages(lastFirst) {
-    if (this.ended)
-      return;
+    if (this.ended) return;
     const length = this.faintQueue.length;
-    if (!length)
-      return false;
+    if (!length) return false;
     if (lastFirst) {
       this.faintQueue.unshift(this.faintQueue[this.faintQueue.length - 1]);
       this.faintQueue.pop();
@@ -461,8 +433,7 @@ const Scripts = {
       if (!pokemon.fainted && this.runEvent("BeforeFaint", pokemon, faintData.source, faintData.effect)) {
         this.add("faint", pokemon);
         pokemon.side.pokemonLeft--;
-        if (pokemon.side.totalFainted < 100)
-          pokemon.side.totalFainted++;
+        if (pokemon.side.totalFainted < 100) pokemon.side.totalFainted++;
         this.runEvent("Faint", pokemon, faintData.source, faintData.effect);
         this.singleEvent("End", pokemon.getAbility(), pokemon.abilityState, pokemon);
         pokemon.clearVolatile(false);

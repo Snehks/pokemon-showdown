@@ -72,8 +72,7 @@ class BattleStream extends import_lib.Streams.ObjectReadWriteStream {
         return;
       }
     }
-    if (this.battle)
-      this.battle.sendUpdates();
+    if (this.battle) this.battle.sendUpdates();
   }
   _writeLines(chunk) {
     for (const line of chunk.split("\n")) {
@@ -104,14 +103,11 @@ ${data}`);
       case "start":
         const options = JSON.parse(message);
         options.send = (t, data) => {
-          if (Array.isArray(data))
-            data = data.join("\n");
+          if (Array.isArray(data)) data = data.join("\n");
           this.pushMessage(t, data);
-          if (t === "end" && !this.keepAlive)
-            this.pushEnd();
+          if (t === "end" && !this.keepAlive) this.pushEnd();
         };
-        if (this.debug)
-          options.debug = true;
+        if (this.debug) options.debug = true;
         this.battle = new import_battle.Battle(options);
         break;
       case "player":
@@ -172,22 +168,17 @@ ${data}`);
           const toID = battle.toID;
           const player = (input) => {
             input = toID(input);
-            if (/^p[1-9]$/.test(input))
-              return battle.sides[parseInt(input.slice(1)) - 1];
-            if (/^[1-9]$/.test(input))
-              return battle.sides[parseInt(input) - 1];
+            if (/^p[1-9]$/.test(input)) return battle.sides[parseInt(input.slice(1)) - 1];
+            if (/^[1-9]$/.test(input)) return battle.sides[parseInt(input) - 1];
             for (const side2 of battle.sides) {
-              if (toID(side2.name) === input)
-                return side2;
+              if (toID(side2.name) === input) return side2;
             }
             return null;
           };
           const pokemon = (side2, input) => {
-            if (typeof side2 === "string")
-              side2 = player(side2);
+            if (typeof side2 === "string") side2 = player(side2);
             input = toID(input);
-            if (/^[1-9]$/.test(input))
-              return side2.pokemon[parseInt(input) - 1];
+            if (/^[1-9]$/.test(input)) return side2.pokemon[parseInt(input) - 1];
             return side2.pokemon.find((p) => p.baseSpecies.id === input || p.species.id === input);
           };
           let result = eval(message);
@@ -240,13 +231,11 @@ ${team}`);
     }
   }
   _writeEnd() {
-    if (!this.atEOF)
-      this.pushEnd();
+    if (!this.atEOF) this.pushEnd();
     this._destroy();
   }
   _destroy() {
-    if (this.battle)
-      this.battle.destroy();
+    if (this.battle) this.battle.destroy();
   }
 }
 function getPlayerStreams(stream) {
@@ -334,15 +323,11 @@ class BattlePlayer {
     }
   }
   receiveLine(line) {
-    if (this.debug)
-      console.log(line);
-    if (!line.startsWith("|"))
-      return;
+    if (this.debug) console.log(line);
+    if (!line.startsWith("|")) return;
     const [cmd, rest] = splitFirst(line.slice(1), "|");
-    if (cmd === "request")
-      return this.receiveRequest(JSON.parse(rest));
-    if (cmd === "error")
-      return this.receiveError(new Error(rest));
+    if (cmd === "request") return this.receiveRequest(JSON.parse(rest));
+    if (cmd === "error") return this.receiveError(new Error(rest));
     this.log.push(line);
   }
   receiveError(error) {
@@ -361,8 +346,7 @@ class BattleTextStream extends import_lib.Streams.ReadWriteStream {
   }
   async _listen() {
     for await (let message2 of this.battleStream) {
-      if (!message2.endsWith("\n"))
-        message2 += "\n";
+      if (!message2.endsWith("\n")) message2 += "\n";
       this.push(message2 + "\n");
     }
     this.pushEnd();

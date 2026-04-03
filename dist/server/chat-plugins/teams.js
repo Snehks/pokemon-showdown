@@ -95,15 +95,13 @@ const TeamsHandler = new class {
           (pokemon) => team.some((set) => toID(set.species) === toID(pokemon))
         );
       }
-      if (!match)
-        return false;
+      if (!match) return false;
       if (search.moves?.length) {
         match = search.moves.some(
           (move) => team.some((set) => set.moves.some((m) => toID(m) === toID(move)))
         );
       }
-      if (!match)
-        return false;
+      if (!match) return false;
       if (search.abilities?.length) {
         match = search.abilities.some(
           (ability) => team.some((set) => toID(set.ability) === toID(ability))
@@ -114,8 +112,7 @@ const TeamsHandler = new class {
   }
   isOMNickname(nickname) {
     if (Dex.species.get(nickname).exists) {
-      if (toID(nickname) === "cathy")
-        return "cathy";
+      if (toID(nickname) === "cathy") return "cathy";
       return Dex.species.get(nickname).name;
     } else if (Dex.items.get(nickname).exists) {
       return Dex.items.get(nickname).name;
@@ -248,9 +245,8 @@ const TeamsHandler = new class {
       connection.popup("Invalid team provided.");
       return null;
     }
-    team.privacy || (team.privacy = null);
-    if (team.privacy === true)
-      team.privacy = existing?.private || TeamsHandler.generatePassword();
+    team.privacy ||= null;
+    if (team.privacy === true) team.privacy = existing?.private || TeamsHandler.generatePassword();
     if (isUpdate && existing) {
       const differenceExists = existing.team !== team.packedTeam || team.name && team.name !== existing.title || format.id !== existing.format || existing.private !== team.privacy;
       if (!differenceExists) {
@@ -270,7 +266,7 @@ const TeamsHandler = new class {
       const loaded = await teamsTable.queryOne()`INSERT INTO teams (${{
         ownerid: user.id,
         team: team.packedTeam,
-        date: new Date().toISOString(),
+        date: (/* @__PURE__ */ new Date()).toISOString(),
         format: format.id,
         views: 0,
         title: team.name,
@@ -281,8 +277,7 @@ const TeamsHandler = new class {
   }
   generatePassword(len = 20) {
     let pw = "";
-    for (let i = 0; i < len; i++)
-      pw += ALPHABET[crypto.randomInt(0, ALPHABET.length - 1)];
+    for (let i = 0; i < len; i++) pw += ALPHABET[crypto.randomInt(0, ALPHABET.length - 1)];
     return pw;
   }
   updateViews(teamid) {
@@ -294,8 +289,7 @@ const TeamsHandler = new class {
   }
   preview(teamData, user, isFull = false) {
     let buf = import_lib.Utils.html`<strong>${teamData.title || `Untitled ${teamData.teamid}`}`;
-    if (teamData.private)
-      buf += ` (Private)`;
+    if (teamData.private) buf += ` (Private)`;
     buf += `</strong><br />`;
     buf += `<small>Uploaded by: <strong>${teamData.ownerid}</strong></small><br />`;
     buf += `<small>Uploaded on: ${Chat.toTimestamp(teamData.date, { human: true })}</small><br />`;
@@ -356,8 +350,7 @@ const TeamsHandler = new class {
   }
   validateAccess(conn, popup = false) {
     const user = conn.user;
-    if (!user)
-      throw new Chat.Interruption();
+    if (!user) throw new Chat.Interruption();
     const err = (message) => {
       if (popup) {
         conn.popup(message);
@@ -368,12 +361,10 @@ const TeamsHandler = new class {
     if (!Config.usepostgres || !Config.usepostgresteams) {
       err(`The teams database is currently disabled.`);
     }
-    if (user.locked || user.semilocked)
-      err("You cannot use the teams database while locked.");
-    if (!user.autoconfirmed)
-      err(
-        `To use the teams database, you must be autoconfirmed, which means being registered for at least one week and winning one rated game.`
-      );
+    if (user.locked || user.semilocked) err("You cannot use the teams database while locked.");
+    if (!user.autoconfirmed) err(
+      `To use the teams database, you must be autoconfirmed, which means being registered for at least one week and winning one rated game.`
+    );
     if (!Users.globalAuth.atLeast(user, Config.usepostgresteams)) {
       err("You cannot currently use the teams database.");
     }
@@ -470,19 +461,16 @@ const commands = {
     async delete(target, room, user, connection) {
       TeamsHandler.validateAccess(connection, true);
       const teamid = Number(toID(target));
-      if (isNaN(teamid))
-        return this.popupReply(`Invalid team ID.`);
+      if (isNaN(teamid)) return this.popupReply(`Invalid team ID.`);
       const teamData = await TeamsHandler.get(teamid);
-      if (!teamData)
-        return this.popupReply(`Team not found.`);
+      if (!teamData) return this.popupReply(`Team not found.`);
       if (teamData.ownerid !== user.id && !user.can("rangeban")) {
         throw new Chat.ErrorMessage("You cannot delete teams you do not own.");
       }
       await TeamsHandler.delete(teamid);
       this.popupReply(`Team ${teamid} deleted.`);
       for (const page of connection.openPages || /* @__PURE__ */ new Set()) {
-        if (page.startsWith("teams-"))
-          this.refreshPage(page);
+        if (page.startsWith("teams-")) this.refreshPage(page);
       }
     },
     async setprivacy(target, room, user, connection) {
@@ -503,8 +491,7 @@ const commands = {
         return this.popupReply(`Invalid privacy setting.`);
       }
       const team = await TeamsHandler.get(teamId);
-      if (!team)
-        return this.popupReply(`Team not found.`);
+      if (!team) return this.popupReply(`Team not found.`);
       if (team.ownerid !== user.id && !user.can("rangeban")) {
         return this.popupReply(`You cannot change privacy for a team you don't own.`);
       }
@@ -545,13 +532,11 @@ const pages = {
   },
   teams: {
     async all(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
       TeamsHandler.validateAccess(connection);
       const targetUserid = toID(query.shift()) || user.id;
       let count = Number(query.shift()) || 10;
-      if (count > MAX_TEAMS)
-        count = MAX_TEAMS;
+      if (count > MAX_TEAMS) count = MAX_TEAMS;
       this.title = `[Teams] ${targetUserid}`;
       const teams = await TeamsHandler.list(targetUserid, count, user.id !== targetUserid);
       let buf = `<div class="ladder pad"><h2>${targetUserid}'s last ${Chat.count(count, "teams")}</h2>`;
@@ -574,15 +559,12 @@ const pages = {
       return buf;
     },
     async filtered(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
-      if (!teamsTable)
-        return `<div class="message-error">This feature is disabled.</div>`;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
+      if (!teamsTable) return `<div class="message-error">This feature is disabled.</div>`;
       const type = query.shift() || "";
       TeamsHandler.validateAccess(connection);
       let count = Number(query.shift()) || 50;
-      if (count > MAX_TEAMS)
-        count = MAX_TEAMS;
+      if (count > MAX_TEAMS) count = MAX_TEAMS;
       let teams = [], title = "";
       const buttons = {
         views: `<button class="button" name="send" value="/teams mostviews">Sort by most views</button>`,
@@ -610,8 +592,7 @@ const pages = {
       return buf;
     },
     async view(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
       TeamsHandler.validateAccess(connection);
       const rawTeamid = toID(query.shift() || "");
       const password = toID(query.shift());
@@ -636,8 +617,7 @@ const pages = {
       return `<div class="ladder pad">` + TeamsHandler.renderTeam(team, user) + "</div>";
     },
     upload(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
       TeamsHandler.validateAccess(connection);
       this.title = `[Upload Team]`;
       let buf = `<div class="ladder pad"><h2>Upload a team</h2>${refresh(this)}<hr />`;
@@ -655,8 +635,7 @@ const pages = {
       return buf;
     },
     async edit(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
       TeamsHandler.validateAccess(connection);
       const teamID = toID(query.shift() || "");
       if (!teamID.length) {
@@ -692,8 +671,7 @@ const pages = {
       return buf;
     },
     async searchpublic(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
       TeamsHandler.validateAccess(connection, true);
       this.title = "[Teams] Search";
       let buf = '<div class="pad">';
@@ -752,8 +730,7 @@ const pages = {
       return buf;
     },
     async searchpersonal(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
       this.pageid = "view-teams-searchpersonal";
       return pages.teams.searchpublic.call(
         this,
@@ -763,10 +740,8 @@ const pages = {
       );
     },
     async browse(query, user, connection) {
-      if (!user.named)
-        return Rooms.RETRY_AFTER_LOGIN;
-      if (!teamsTable)
-        return `<div class="message-error">This feature is disabled.</div>`;
+      if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
+      if (!teamsTable) return `<div class="message-error">This feature is disabled.</div>`;
       TeamsHandler.validateAccess(connection, true);
       const sorter = toID(query.shift()) || "latest";
       let count = Number(toID(query.shift())) || 50;

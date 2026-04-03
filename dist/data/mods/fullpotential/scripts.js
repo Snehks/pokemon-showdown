@@ -25,8 +25,7 @@ const Scripts = {
   gen: 9,
   actions: {
     getDamage(source, target, move, suppressMessages) {
-      if (typeof move === "string")
-        move = this.dex.getActiveMove(move);
+      if (typeof move === "string") move = this.dex.getActiveMove(move);
       if (typeof move === "number") {
         const basePower2 = move;
         move = new Dex.Move({
@@ -40,10 +39,8 @@ const Scripts = {
       if (!target.runImmunity(move, !suppressMessages)) {
         return false;
       }
-      if (move.ohko)
-        return target.maxhp;
-      if (move.damageCallback)
-        return move.damageCallback.call(this.battle, source, target);
+      if (move.ohko) return target.maxhp;
+      if (move.damageCallback) return move.damageCallback.call(this.battle, source, target);
       if (move.damage === "level") {
         return source.level;
       } else if (move.damage) {
@@ -53,8 +50,7 @@ const Scripts = {
       if (move.basePowerCallback) {
         basePower = move.basePowerCallback.call(this.battle, source, target, move);
       }
-      if (!basePower)
-        return basePower === 0 ? void 0 : basePower;
+      if (!basePower) return basePower === 0 ? void 0 : basePower;
       basePower = this.battle.clampIntRange(basePower, 1);
       let critMult;
       let critRatio = this.battle.runEvent("ModifyCritRatio", source, target, move, move.critRatio || 0);
@@ -80,8 +76,7 @@ const Scripts = {
         moveHit.crit = this.battle.runEvent("CriticalHit", target, null, move);
       }
       basePower = this.battle.runEvent("BasePower", source, target, move, basePower, true);
-      if (!basePower)
-        return 0;
+      if (!basePower) return 0;
       basePower = this.battle.clampIntRange(basePower, 1);
       if (!source.volatiles["dynamax"] && move.isMax || move.isMax && this.dex.moves.get(move.baseMove).isMax) {
         basePower = 0;
@@ -115,8 +110,7 @@ const Scripts = {
         }
         attack = attacker.calculateStat(attackStat, atkBoosts, 1, source);
         attack = this.battle.runEvent("Modify" + statTable[attackStat], source, target, move, attack);
-        if (attack > maxAttack)
-          maxAttack = attack;
+        if (attack > maxAttack) maxAttack = attack;
       }
       let defense = defender.calculateStat(defenseStat, defBoosts, 1, target);
       defense = this.battle.runEvent("Modify" + statTable[defenseStat], target, source, move, defense);

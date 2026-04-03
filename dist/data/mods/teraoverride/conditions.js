@@ -25,8 +25,7 @@ const Conditions = {
   frz: {
     inherit: true,
     onBeforeMove(pokemon, target, move) {
-      if (move.flags["defrost"] && !(move.id === "burnup" && !pokemon.hasType(pokemon.teraType)))
-        return;
+      if (move.flags["defrost"] && !(move.id === "burnup" && !pokemon.hasType(pokemon.teraType))) return;
       if (this.randomChance(1, 5)) {
         pokemon.cureStatus();
         return;
@@ -70,8 +69,7 @@ const Conditions = {
   raindance: {
     inherit: true,
     onWeatherModifyDamage(damage, attacker, defender, move) {
-      if (defender.hasItem("utilityumbrella"))
-        return;
+      if (defender.hasItem("utilityumbrella")) return;
       if (move.type === this.effectState.source.teraType) {
         this.debug("rain water boost");
         return this.chainModify(0.75);
@@ -85,8 +83,7 @@ const Conditions = {
         this.debug("Sunny Day Hydro Steam boost");
         return this.chainModify(1.5);
       }
-      if (defender.hasItem("utilityumbrella"))
-        return;
+      if (defender.hasItem("utilityumbrella")) return;
       if (move.type === this.effectState.source.teraType) {
         this.debug("Sunny Day fire boost");
         return this.chainModify(0.75);

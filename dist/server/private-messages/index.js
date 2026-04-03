@@ -55,8 +55,7 @@ const PrivateMessages = new class {
   async sendOffline(to, from, message, context) {
     await this.checkCanSend(to, from);
     const result = await PM.transaction("send", [toID(from), toID(to), message]);
-    if (result.error)
-      throw new Chat.ErrorMessage(result.error);
+    if (result.error) throw new Chat.ErrorMessage(result.error);
     if (typeof from === "object") {
       from.send(`|pm|${this.getIdentity(from)}|${this.getIdentity(to)}|${message} __[sent offline]__`);
     }
@@ -115,18 +114,15 @@ const PrivateMessages = new class {
   }
   checkCanUse(user, options = { forceBool: false, isLogin: false }) {
     if (!this.offlineIsEnabled) {
-      if (options.forceBool)
-        return false;
+      if (options.forceBool) return false;
       throw new Chat.ErrorMessage(`Offline PMs are currently disabled.`);
     }
     if (!(options.isLogin ? user.registered : user.autoconfirmed)) {
-      if (options.forceBool)
-        return false;
+      if (options.forceBool) return false;
       throw new Chat.ErrorMessage("To use offline messaging you must be autoconfirmed, which means being registered for at least one week and winning one rated game.");
     }
     if (!Users.globalAuth.atLeast(user, Config.usesqlitepms)) {
-      if (options.forceBool)
-        return false;
+      if (options.forceBool) return false;
       throw new Chat.ErrorMessage("You do not have the needed rank to send offline PMs.");
     }
     return true;
@@ -156,13 +152,11 @@ const PrivateMessages = new class {
     return `${Users.globalAuth.get(toID(user))}${user}`;
   }
   nextClear() {
-    if (!PM.isParentProcess)
-      return null;
+    if (!PM.isParentProcess) return null;
     const time = Date.now();
-    const nextMidnight = new Date();
+    const nextMidnight = /* @__PURE__ */ new Date();
     nextMidnight.setHours(24, 0, 0, 0);
-    if (this.clearInterval)
-      clearTimeout(this.clearInterval);
+    if (this.clearInterval) clearTimeout(this.clearInterval);
     this.clearInterval = setTimeout(() => {
       void this.clearOffline();
       void this.clearSeen();
@@ -175,11 +169,9 @@ const PrivateMessages = new class {
   }
   send(message, user, pmTarget, onlyRecipient = null) {
     const buf = `|pm|${user.getIdentity()}|${pmTarget.getIdentity()}|${message}`;
-    if (onlyRecipient)
-      return onlyRecipient.send(buf);
+    if (onlyRecipient) return onlyRecipient.send(buf);
     user.send(buf);
-    if (pmTarget !== user)
-      pmTarget.send(buf);
+    if (pmTarget !== user) pmTarget.send(buf);
     pmTarget.lastPM = user.id;
     user.lastPM = pmTarget.id;
   }
@@ -196,8 +188,7 @@ const PrivateMessages = new class {
     buf += `<h2>PMs received offline in the last ${Chat.toDurationString(SEEN_EXPIRY_TIME)}</h2>`;
     const sortedPMs = {};
     for (const curPM of all) {
-      if (!sortedPMs[curPM.sender])
-        sortedPMs[curPM.sender] = [];
+      if (!sortedPMs[curPM.sender]) sortedPMs[curPM.sender] = [];
       sortedPMs[curPM.sender].push(curPM);
     }
     for (const k in sortedPMs) {

@@ -37,7 +37,13 @@ var import_lib = require("../lib");
  * @license MIT
  */
 const ladderCaches = /* @__PURE__ */ new Map();
-const _LadderStore = class {
+class LadderStore {
+  static {
+    this.formatsListPrefix = "|,LL";
+  }
+  static {
+    this.ladderCaches = ladderCaches;
+  }
   constructor(formatid) {
     this.formatid = formatid;
     this.ladder = null;
@@ -45,8 +51,7 @@ const _LadderStore = class {
     this.saving = false;
   }
   getLadder() {
-    if (!this.ladderPromise)
-      this.ladderPromise = this.load();
+    if (!this.ladderPromise) this.ladderPromise = this.load();
     return this.ladderPromise;
   }
   /**
@@ -66,8 +71,7 @@ const _LadderStore = class {
       const ladder = [];
       for (const dataLine of data.split("\n").slice(1)) {
         const line = dataLine.trim();
-        if (!line)
-          continue;
+        if (!line) continue;
         const row = line.split("	");
         ladder.push([toID(row[1]), Number(row[0]), row[1], Number(row[2]), Number(row[3]), Number(row[4]), row[5]]);
       }
@@ -85,8 +89,7 @@ const _LadderStore = class {
    * call this.
    */
   async save() {
-    if (this.saving)
-      return;
+    if (this.saving) return;
     this.saving = true;
     const ladder = await this.getLadder();
     if (!ladder.length) {
@@ -108,12 +111,10 @@ const _LadderStore = class {
    * the ladder array if it doesn't already exist.
    */
   indexOfUser(username, createIfNeeded = false) {
-    if (!this.ladder)
-      throw new Error(`Must be called with ladder loaded`);
+    if (!this.ladder) throw new Error(`Must be called with ladder loaded`);
     const userid = toID(username);
     for (const [i, user] of this.ladder.entries()) {
-      if (user[0] === userid)
-        return i;
+      if (user[0] === userid) return i;
     }
     if (createIfNeeded) {
       const index = this.ladder.length;
@@ -135,8 +136,7 @@ const _LadderStore = class {
     buf += `<table>`;
     buf += `<tr><th>` + ["", "Username", '<abbr title="Elo rating">Elo</abbr>', "W", "L", "T"].join(`</th><th>`) + `</th></tr>`;
     for (const [i, row] of ladder.entries()) {
-      if (prefix && !row[0].startsWith(prefix))
-        continue;
+      if (prefix && !row[0].startsWith(prefix)) continue;
       buf += `<tr><td>` + [
         i + 1,
         row[2],
@@ -182,7 +182,7 @@ const _LadderStore = class {
     } else {
       row[5]++;
     }
-    row[6] = `${new Date()}`;
+    row[6] = `${/* @__PURE__ */ new Date()}`;
   }
   /**
    * Update the Elo rating for two players after a battle, and display
@@ -212,58 +212,45 @@ const _LadderStore = class {
       p1newElo = ladder[p1index][1];
       p2newElo = ladder[p2index][1];
       let newIndex = p1index;
-      while (newIndex > 0 && ladder[newIndex - 1][1] <= p1newElo)
-        newIndex--;
-      while (newIndex === p1index || ladder[newIndex] && ladder[newIndex][1] > p1newElo)
-        newIndex++;
+      while (newIndex > 0 && ladder[newIndex - 1][1] <= p1newElo) newIndex--;
+      while (newIndex === p1index || ladder[newIndex] && ladder[newIndex][1] > p1newElo) newIndex++;
       if (newIndex !== p1index && newIndex !== p1index + 1) {
         const row = ladder.splice(p1index, 1)[0];
-        if (newIndex > p1index)
-          newIndex--;
-        if (p2index > p1index)
-          p2index--;
+        if (newIndex > p1index) newIndex--;
+        if (p2index > p1index) p2index--;
         ladder.splice(newIndex, 0, row);
-        if (p2index >= newIndex)
-          p2index++;
+        if (p2index >= newIndex) p2index++;
       }
       newIndex = p2index;
-      while (newIndex > 0 && ladder[newIndex - 1][1] <= p2newElo)
-        newIndex--;
-      while (newIndex === p2index || ladder[newIndex] && ladder[newIndex][1] > p2newElo)
-        newIndex++;
+      while (newIndex > 0 && ladder[newIndex - 1][1] <= p2newElo) newIndex--;
+      while (newIndex === p2index || ladder[newIndex] && ladder[newIndex][1] > p2newElo) newIndex++;
       if (newIndex !== p2index && newIndex !== p2index + 1) {
         const row = ladder.splice(p2index, 1)[0];
-        if (newIndex > p2index)
-          newIndex--;
+        if (newIndex > p2index) newIndex--;
         ladder.splice(newIndex, 0, row);
       }
       const p1 = Users.getExact(p1name);
-      if (p1)
-        p1.mmrCache[formatid] = +p1newElo;
+      if (p1) p1.mmrCache[formatid] = +p1newElo;
       const p2 = Users.getExact(p2name);
-      if (p2)
-        p2.mmrCache[formatid] = +p2newElo;
+      if (p2) p2.mmrCache[formatid] = +p2newElo;
       void this.save();
       if (!room.battle) {
         Monitor.warn(`room expired before ladder update was received`);
         return [p1score, null, null];
       }
       let reasons = `${Math.round(p1newElo) - Math.round(p1elo)} for ${p1score > 0.9 ? "winning" : p1score < 0.1 ? "losing" : "tying"}`;
-      if (!reasons.startsWith("-"))
-        reasons = "+" + reasons;
+      if (!reasons.startsWith("-")) reasons = "+" + reasons;
       room.addRaw(
         import_lib.Utils.html`${p1name}'s rating: ${Math.round(p1elo)} &rarr; <strong>${Math.round(p1newElo)}</strong><br />(${reasons})`
       );
       reasons = `${Math.round(p2newElo) - Math.round(p2elo)} for ${p2score > 0.9 ? "winning" : p2score < 0.1 ? "losing" : "tying"}`;
-      if (!reasons.startsWith("-"))
-        reasons = "+" + reasons;
+      if (!reasons.startsWith("-")) reasons = "+" + reasons;
       room.addRaw(
         import_lib.Utils.html`${p2name}'s rating: ${Math.round(p2elo)} &rarr; <strong>${Math.round(p2newElo)}</strong><br />(${reasons})`
       );
       room.update();
     } catch (e) {
-      if (!room.battle)
-        return [p1score, null, null];
+      if (!room.battle) return [p1score, null, null];
       room.addRaw(`There was an error calculating rating changes:`);
       room.add(e.stack);
       room.update();
@@ -276,8 +263,7 @@ const _LadderStore = class {
   async visualize(username) {
     const ladder = await this.getLadder();
     const index = this.indexOfUser(username, false);
-    if (index < 0)
-      return "";
+    if (index < 0) return "";
     const ratings = ladder[index];
     const output = `<tr><td>${this.formatid}</td><td><strong>${Math.round(ratings[1])}</strong></td>`;
     return `${output}<td>${ratings[3]}</td><td>${ratings[4]}</td><td>${ratings[3] + ratings[4]}</td></tr>`;
@@ -309,13 +295,10 @@ const _LadderStore = class {
     const ratings = [];
     for (const format of Dex.formats.all()) {
       if (format.searchShow) {
-        ratings.push(new _LadderStore(format.id).visualize(username));
+        ratings.push(new LadderStore(format.id).visualize(username));
       }
     }
     return Promise.all(ratings);
   }
-};
-let LadderStore = _LadderStore;
-LadderStore.formatsListPrefix = "|,LL";
-LadderStore.ladderCaches = ladderCaches;
+}
 //# sourceMappingURL=ladders-local.js.map

@@ -32,8 +32,7 @@ const Scripts = {
         if (move.ohko) {
           if (!target.isSemiInvulnerable()) {
             accuracy = 30;
-            if (move.ohko !== true)
-              move.ohko = pokemon.teraType;
+            if (move.ohko !== true) move.ohko = pokemon.teraType;
             if (move.ohko === pokemon.teraType && this.battle.gen >= 7 && !pokemon.hasType(pokemon.teraType)) {
               accuracy = 20;
             }
@@ -73,8 +72,7 @@ const Scripts = {
           if (move.smartTarget) {
             move.smartTarget = false;
           } else {
-            if (!move.spreadHit)
-              this.battle.attrLastMove("[miss]");
+            if (!move.spreadHit) this.battle.attrLastMove("[miss]");
             this.battle.add("-miss", pokemon, target);
           }
           if (!move.ohko && pokemon.hasItem("blunderpolicy") && pokemon.useItem()) {

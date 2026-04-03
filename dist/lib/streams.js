@@ -86,14 +86,10 @@ class ReadStream {
         this.nodeReadableStream.pause();
       };
     }
-    if (options.read)
-      this._read = options.read;
-    if (options.pause)
-      this._pause = options.pause;
-    if (options.destroy)
-      this._destroy = options.destroy;
-    if (options.encoding)
-      this.encoding = options.encoding;
+    if (options.read) this._read = options.read;
+    if (options.pause) this._pause = options.pause;
+    if (options.destroy) this._destroy = options.destroy;
+    if (options.encoding) this.encoding = options.encoding;
     if (options.buffer !== void 0) {
       this.push(options.buffer);
       this.pushEnd();
@@ -118,21 +114,18 @@ class ReadStream {
     this.buf = newBuf;
   }
   ensureCapacity(additionalCapacity) {
-    if (this.bufEnd + additionalCapacity <= this.bufCapacity)
-      return;
+    if (this.bufEnd + additionalCapacity <= this.bufCapacity) return;
     const capacity = this.bufEnd - this.bufStart + additionalCapacity;
     if (capacity <= this.bufCapacity) {
       return this.moveBuf();
     }
     let newCapacity = this.bufCapacity * 2;
-    while (newCapacity < capacity)
-      newCapacity *= 2;
+    while (newCapacity < capacity) newCapacity *= 2;
     this.expandBuf(newCapacity);
   }
   push(buf, encoding = this.encoding) {
     let size;
-    if (this.atEOF)
-      return;
+    if (this.atEOF) return;
     if (typeof buf === "string") {
       size = Buffer.byteLength(buf, encoding);
       this.ensureCapacity(size);
@@ -143,8 +136,7 @@ class ReadStream {
       buf.copy(this.buf, this.bufEnd);
     }
     this.bufEnd += size;
-    if (this.bufSize > this.readSize && size * 2 < this.bufSize)
-      this._pause();
+    if (this.bufSize > this.readSize && size * 2 < this.bufSize) this._pause();
     this.resolvePush();
   }
   pushEnd() {
@@ -152,18 +144,15 @@ class ReadStream {
     this.resolvePush();
   }
   pushError(err, recoverable) {
-    if (!this.errorBuf)
-      this.errorBuf = [];
+    if (!this.errorBuf) this.errorBuf = [];
     this.errorBuf.push(err);
-    if (!recoverable)
-      this.atEOF = true;
+    if (!recoverable) this.atEOF = true;
     this.resolvePush();
   }
   readError() {
     if (this.errorBuf) {
       const err = this.errorBuf.shift();
-      if (!this.errorBuf.length)
-        this.errorBuf = null;
+      if (!this.errorBuf.length) this.errorBuf = null;
       throw err;
     }
   }
@@ -173,8 +162,7 @@ class ReadStream {
     }
   }
   resolvePush() {
-    if (!this.nextPushResolver)
-      throw new Error(`Push after end of read stream`);
+    if (!this.nextPushResolver) throw new Error(`Push after end of read stream`);
     this.nextPushResolver();
     if (this.atEOF) {
       this.nextPushResolver = null;
@@ -203,25 +191,21 @@ class ReadStream {
    */
   loadIntoBuffer(byteCount = null, readError) {
     this[readError ? "readError" : "peekError"]();
-    if (byteCount === 0)
-      return;
+    if (byteCount === 0) return;
     this.readSize = Math.max(
       byteCount === true ? this.bufSize + 1 : byteCount === null ? 1 : byteCount,
       this.readSize
     );
     if (!this.errorBuf && !this.atEOF && this.bufSize < this.readSize) {
       let bytes = this.readSize - this.bufSize;
-      if (bytes === Infinity || byteCount === null || byteCount === true)
-        bytes = null;
+      if (bytes === Infinity || byteCount === null || byteCount === true) bytes = null;
       return this.doLoad(bytes, readError);
     }
   }
   async doLoad(chunkSize, readError) {
     while (!this.errorBuf && !this.atEOF && this.bufSize < this.readSize) {
-      if (chunkSize)
-        void this._read(chunkSize);
-      else
-        void this._read();
+      if (chunkSize) void this._read(chunkSize);
+      else void this._read();
       await this.nextPush;
       this[readError ? "readError" : "peekError"]();
     }
@@ -232,26 +216,18 @@ class ReadStream {
       byteCount = null;
     }
     const maybeLoad = this.loadIntoBuffer(byteCount);
-    if (maybeLoad)
-      return maybeLoad.then(() => this.peek(byteCount, encoding));
-    if (!this.bufSize && byteCount !== 0)
-      return null;
-    if (byteCount === null)
-      return this.buf.toString(encoding, this.bufStart, this.bufEnd);
-    if (byteCount > this.bufSize)
-      byteCount = this.bufSize;
+    if (maybeLoad) return maybeLoad.then(() => this.peek(byteCount, encoding));
+    if (!this.bufSize && byteCount !== 0) return null;
+    if (byteCount === null) return this.buf.toString(encoding, this.bufStart, this.bufEnd);
+    if (byteCount > this.bufSize) byteCount = this.bufSize;
     return this.buf.toString(encoding, this.bufStart, this.bufStart + byteCount);
   }
   peekBuffer(byteCount = null) {
     const maybeLoad = this.loadIntoBuffer(byteCount);
-    if (maybeLoad)
-      return maybeLoad.then(() => this.peekBuffer(byteCount));
-    if (!this.bufSize && byteCount !== 0)
-      return null;
-    if (byteCount === null)
-      return this.buf.slice(this.bufStart, this.bufEnd);
-    if (byteCount > this.bufSize)
-      byteCount = this.bufSize;
+    if (maybeLoad) return maybeLoad.then(() => this.peekBuffer(byteCount));
+    if (!this.bufSize && byteCount !== 0) return null;
+    if (byteCount === null) return this.buf.slice(this.bufStart, this.bufEnd);
+    if (byteCount > this.bufSize) byteCount = this.bufSize;
     return this.buf.slice(this.bufStart, this.bufStart + byteCount);
   }
   async read(byteCount = null, encoding = this.encoding) {
@@ -279,10 +255,8 @@ class ReadStream {
     return new ObjectReadStream({
       async read() {
         const next = await byteStream.read(byteCount);
-        if (typeof next === "string")
-          this.push(next);
-        else
-          this.pushEnd();
+        if (typeof next === "string") this.push(next);
+        else this.pushEnd();
       }
     });
   }
@@ -291,10 +265,8 @@ class ReadStream {
     return new ObjectReadStream({
       async read() {
         const next = await byteStream.readLine();
-        if (typeof next === "string")
-          this.push(next);
-        else
-          this.pushEnd();
+        if (typeof next === "string") this.push(next);
+        else this.pushEnd();
       }
     });
   }
@@ -303,10 +275,8 @@ class ReadStream {
     return new ObjectReadStream({
       async read() {
         const next = await byteStream.readDelimitedBy(delimiter);
-        if (typeof next === "string")
-          this.push(next);
-        else
-          this.pushEnd();
+        if (typeof next === "string") this.push(next);
+        else this.pushEnd();
       }
     });
   }
@@ -330,8 +300,7 @@ class ReadStream {
       await this.loadIntoBuffer(true);
       idx = this.buf.indexOf(symbol, this.bufStart, encoding);
     }
-    if (idx >= this.bufEnd)
-      return -1;
+    if (idx >= this.bufEnd) return -1;
     return idx - this.bufStart;
   }
   async readAll(encoding = this.encoding) {
@@ -341,8 +310,7 @@ class ReadStream {
     return this.peek(Infinity, encoding);
   }
   async readDelimitedBy(symbol, encoding = this.encoding) {
-    if (this.atEOF && !this.bufSize)
-      return null;
+    if (this.atEOF && !this.bufSize) return null;
     const idx = await this.indexOf(symbol, encoding);
     if (idx < 0) {
       return this.readAll(encoding);
@@ -353,19 +321,16 @@ class ReadStream {
     }
   }
   async readLine(encoding = this.encoding) {
-    if (!encoding)
-      throw new Error(`readLine must have an encoding`);
+    if (!encoding) throw new Error(`readLine must have an encoding`);
     let line = await this.readDelimitedBy("\n", encoding);
-    if (line?.endsWith("\r"))
-      line = line.slice(0, -1);
+    if (line?.endsWith("\r")) line = line.slice(0, -1);
     return line;
   }
   destroy() {
     this.atEOF = true;
     this.bufStart = 0;
     this.bufEnd = 0;
-    if (this.nextPushResolver)
-      this.resolvePush();
+    if (this.nextPushResolver) this.resolvePush();
     return this._destroy();
   }
   async next(byteCount = null) {
@@ -377,8 +342,7 @@ class ReadStream {
     while (next = await this.next(), !next.done) {
       await outStream.write(next.value);
     }
-    if (!options.noEnd)
-      return outStream.writeEnd();
+    if (!options.noEnd) return outStream.writeEnd();
   }
 }
 class WriteStream {
@@ -397,12 +361,10 @@ class WriteStream {
       this.nodeWritableStream = nodeStream;
       options.write = function(data) {
         const result = this.nodeWritableStream.write(data);
-        if (result !== false)
-          return void 0;
+        if (result !== false) return void 0;
         if (!this.drainListeners.length) {
           this.nodeWritableStream.once("drain", () => {
-            for (const listener of this.drainListeners)
-              listener();
+            for (const listener of this.drainListeners) listener();
             this.drainListeners = [];
           });
         }
@@ -418,10 +380,8 @@ class WriteStream {
         };
       }
     }
-    if (options.write)
-      this._write = options.write;
-    if (options.writeEnd)
-      this._writeEnd = options.writeEnd;
+    if (options.write) this._write = options.write;
+    if (options.writeEnd) this._writeEnd = options.writeEnd;
   }
   write(chunk) {
     return this._write(chunk);
@@ -456,12 +416,10 @@ class ReadWriteStream extends ReadStream {
       this.nodeWritableStream = nodeStream;
       options.write = function(data) {
         const result = this.nodeWritableStream.write(data);
-        if (result !== false)
-          return void 0;
+        if (result !== false) return void 0;
         if (!this.drainListeners.length) {
           this.nodeWritableStream.once("drain", () => {
-            for (const listener of this.drainListeners)
-              listener();
+            for (const listener of this.drainListeners) listener();
             this.drainListeners = [];
           });
         }
@@ -477,10 +435,8 @@ class ReadWriteStream extends ReadStream {
         };
       }
     }
-    if (options.write)
-      this._write = options.write;
-    if (options.writeEnd)
-      this._writeEnd = options.writeEnd;
+    if (options.write) this._write = options.write;
+    if (options.writeEnd) this._writeEnd = options.writeEnd;
   }
   write(chunk) {
     return this._write(chunk);
@@ -544,23 +500,18 @@ class ObjectReadStream {
         }
       };
     }
-    if (options.read)
-      this._read = options.read;
-    if (options.pause)
-      this._pause = options.pause;
-    if (options.destroy)
-      this._destroy = options.destroy;
+    if (options.read) this._read = options.read;
+    if (options.pause) this._pause = options.pause;
+    if (options.destroy) this._destroy = options.destroy;
     if (options.buffer !== void 0) {
       this.buf = options.buffer.slice();
       this.pushEnd();
     }
   }
   push(elem) {
-    if (this.atEOF)
-      return;
+    if (this.atEOF) return;
     this.buf.push(elem);
-    if (this.buf.length > this.readSize && this.buf.length >= 16)
-      void this._pause();
+    if (this.buf.length > this.readSize && this.buf.length >= 16) void this._pause();
     this.resolvePush();
   }
   pushEnd() {
@@ -568,18 +519,15 @@ class ObjectReadStream {
     this.resolvePush();
   }
   pushError(err, recoverable) {
-    if (!this.errorBuf)
-      this.errorBuf = [];
+    if (!this.errorBuf) this.errorBuf = [];
     this.errorBuf.push(err);
-    if (!recoverable)
-      this.atEOF = true;
+    if (!recoverable) this.atEOF = true;
     this.resolvePush();
   }
   readError() {
     if (this.errorBuf) {
       const err = this.errorBuf.shift();
-      if (!this.errorBuf.length)
-        this.errorBuf = null;
+      if (!this.errorBuf.length) this.errorBuf = null;
       throw err;
     }
   }
@@ -589,8 +537,7 @@ class ObjectReadStream {
     }
   }
   resolvePush() {
-    if (!this.nextPushResolver)
-      throw new Error(`Push after end of read stream`);
+    if (!this.nextPushResolver) throw new Error(`Push after end of read stream`);
     this.nextPushResolver();
     if (this.atEOF) {
       this.nextPushResolver = null;
@@ -609,10 +556,8 @@ class ObjectReadStream {
   }
   async loadIntoBuffer(count = 1, readError) {
     this[readError ? "readError" : "peekError"]();
-    if (count === true)
-      count = this.buf.length + 1;
-    if (this.buf.length >= count)
-      return;
+    if (count === true) count = this.buf.length + 1;
+    if (this.buf.length >= count) return;
     this.readSize = Math.max(count, this.readSize);
     while (!this.errorBuf && !this.atEOF && this.buf.length < this.readSize) {
       const readResult = this._read();
@@ -625,17 +570,14 @@ class ObjectReadStream {
     }
   }
   async peek() {
-    if (this.buf.length)
-      return this.buf[0];
+    if (this.buf.length) return this.buf[0];
     await this.loadIntoBuffer();
     return this.buf[0];
   }
   async read() {
-    if (this.buf.length)
-      return this.buf.shift();
+    if (this.buf.length) return this.buf.shift();
     await this.loadIntoBuffer(1, true);
-    if (!this.buf.length)
-      return null;
+    if (!this.buf.length) return null;
     return this.buf.shift();
   }
   async peekArray(count = null) {
@@ -668,11 +610,9 @@ class ObjectReadStream {
     return this;
   }
   async next() {
-    if (this.buf.length)
-      return { value: this.buf.shift(), done: false };
+    if (this.buf.length) return { value: this.buf.shift(), done: false };
     await this.loadIntoBuffer(1, true);
-    if (!this.buf.length)
-      return { value: void 0, done: true };
+    if (!this.buf.length) return { value: void 0, done: true };
     return { value: this.buf.shift(), done: false };
   }
   async pipeTo(outStream, options = {}) {
@@ -680,8 +620,7 @@ class ObjectReadStream {
     while (next = await this.next(), !next.done) {
       await outStream.write(next.value);
     }
-    if (!options.noEnd)
-      return outStream.writeEnd();
+    if (!options.noEnd) return outStream.writeEnd();
   }
 }
 class ObjectWriteStream {
@@ -714,10 +653,8 @@ class ObjectWriteStream {
         };
       }
     }
-    if (options.write)
-      this._write = options.write;
-    if (options.writeEnd)
-      this._writeEnd = options.writeEnd;
+    if (options.write) this._write = options.write;
+    if (options.writeEnd) this._writeEnd = options.writeEnd;
   }
   write(elem) {
     if (elem === null) {
@@ -743,10 +680,8 @@ class ObjectReadWriteStream extends ObjectReadStream {
     this.isReadable = true;
     this.isWritable = true;
     this.nodeWritableStream = null;
-    if (options.write)
-      this._write = options.write;
-    if (options.writeEnd)
-      this._writeEnd = options.writeEnd;
+    if (options.write) this._write = options.write;
+    if (options.writeEnd) this._writeEnd = options.writeEnd;
   }
   write(elem) {
     return this._write(elem);

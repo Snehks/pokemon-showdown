@@ -137,20 +137,16 @@ const Monitor = new class {
   error(text) {
     const room = Rooms.get("development") || Rooms.get("staff") || Rooms.get("lobby");
     room?.add(`|error|${text}`).update();
-    if (Config.loglevel <= 3)
-      console.error(text);
+    if (Config.loglevel <= 3) console.error(text);
   }
   debug(text) {
-    if (Config.loglevel <= 1)
-      console.log(text);
+    if (Config.loglevel <= 1) console.log(text);
   }
   warn(text) {
-    if (Config.loglevel <= 3)
-      console.log(text);
+    if (Config.loglevel <= 3) console.log(text);
   }
   notice(text) {
-    if (Config.loglevel <= 2)
-      console.log(text);
+    if (Config.loglevel <= 2) console.log(text);
   }
   logWithLevel(level, text) {
     switch (level) {
@@ -186,8 +182,7 @@ const Monitor = new class {
    * Counts a connection. Returns true if the connection should be terminated for abuse.
    */
   countConnection(ip, name = "") {
-    if (Config.noipchecks || Config.nothrottle)
-      return false;
+    if (Config.noipchecks || Config.nothrottle) return false;
     const [count, duration] = this.connections.increment(ip, 30 * 60 * 1e3);
     if (count === 500) {
       this.adminlog(`[ResourceMonitor] IP ${ip} banned for cflooding (${count} times in ${Chat.toDurationString(duration)}${name ? ": " + name : ""})`);
@@ -209,8 +204,7 @@ const Monitor = new class {
    * terminated for abuse.
    */
   countBattle(ip, name = "") {
-    if (Config.noipchecks || Config.nothrottle)
-      return false;
+    if (Config.noipchecks || Config.nothrottle) return false;
     const [count, duration] = this.battles.increment(ip, 30 * 60 * 1e3);
     if (duration < 5 * 60 * 1e3 && count % 30 === 0) {
       this.adminlog(`[ResourceMonitor] IP ${ip} has battled ${count} times in the last ${Chat.toDurationString(duration)}${name ? ": " + name : ""})`);
@@ -226,13 +220,10 @@ const Monitor = new class {
    * Counts team validations. Returns true if too many.
    */
   countPrepBattle(ip, connection) {
-    if (Config.noipchecks || Config.nothrottle)
-      return false;
+    if (Config.noipchecks || Config.nothrottle) return false;
     const count = this.battlePreps.increment(ip, 3 * 60 * 1e3)[0];
-    if (count <= 12)
-      return false;
-    if (count < 120 && Punishments.isSharedIp(ip))
-      return false;
+    if (count <= 12) return false;
+    if (count < 120 && Punishments.isSharedIp(ip)) return false;
     connection.popup("Due to high load, you are limited to 12 battles and team validations every 3 minutes.");
     return true;
   }
@@ -240,10 +231,8 @@ const Monitor = new class {
    * Counts concurrent battles. Returns true if too many.
    */
   countConcurrentBattle(count, connection) {
-    if (Config.noipchecks || Config.nothrottle)
-      return false;
-    if (count <= 5)
-      return false;
+    if (Config.noipchecks || Config.nothrottle) return false;
+    if (count <= 5) return false;
     connection.popup(`Due to high load, you are limited to 5 games at the same time.`);
     return true;
   }
@@ -251,8 +240,7 @@ const Monitor = new class {
    * Counts group chat creation. Returns true if too much.
    */
   countGroupChat(ip) {
-    if (Config.noipchecks)
-      return false;
+    if (Config.noipchecks) return false;
     const count = this.groupChats.increment(ip, 60 * 60 * 1e3)[0];
     return count > 4;
   }
@@ -260,21 +248,17 @@ const Monitor = new class {
    * Counts commands that use HTTPs requests. Returns true if too many.
    */
   countNetRequests(ip) {
-    if (Config.noipchecks || Config.nothrottle)
-      return false;
+    if (Config.noipchecks || Config.nothrottle) return false;
     const [count] = this.netRequests.increment(ip, 1 * 60 * 1e3);
-    if (count <= 10)
-      return false;
-    if (count < 120 && Punishments.isSharedIp(ip))
-      return false;
+    if (count <= 10) return false;
+    if (count < 120 && Punishments.isSharedIp(ip)) return false;
     return true;
   }
   /**
    * Counts ticket creation. Returns true if too much.
    */
   countTickets(ip) {
-    if (Config.noipchecks || Config.nothrottle)
-      return false;
+    if (Config.noipchecks || Config.nothrottle) return false;
     const count = this.tickets.increment(ip, 60 * 60 * 1e3)[0];
     if (Punishments.isSharedIp(ip)) {
       return count >= 20;
@@ -332,14 +316,11 @@ const Monitor = new class {
           bytes += 8;
           break;
         case "object":
-          if (!objectCache.has(value))
-            objectCache.add(value);
+          if (!objectCache.has(value)) objectCache.add(value);
           if (Array.isArray(value)) {
-            for (const el of value)
-              stack.push(el);
+            for (const el of value) stack.push(el);
           } else {
-            for (const i in value)
-              stack.push(value[i]);
+            for (const i in value) stack.push(value[i]);
           }
           break;
       }
@@ -363,11 +344,9 @@ const Monitor = new class {
         env: { GIT_INDEX_FILE: index.path }
       };
       let [code, stdout, stderr] = await this.sh(`git add -A`, options);
-      if (code || stderr)
-        return;
+      if (code || stderr) return;
       [code, stdout, stderr] = await this.sh(`git write-tree`, options);
-      if (code || stderr)
-        return;
+      if (code || stderr) return;
       hash = stdout.trim();
       await this.sh(`git reset`, options);
       await index.unlinkIfExists();

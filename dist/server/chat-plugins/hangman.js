@@ -88,8 +88,7 @@ class Hangman extends Rooms.SimpleRoomGame {
       throw new Chat.ErrorMessage(`Guesses must be ${MAX_HANGMAN_LENGTH} or fewer letters \u2013 "${word}" is too long.`);
     }
     for (const guessid of this.guesses) {
-      if (normalized === toID(guessid))
-        throw new Chat.ErrorMessage(`Your guess "${word}" has already been guessed.`);
+      if (normalized === toID(guessid)) throw new Chat.ErrorMessage(`Your guess "${word}" has already been guessed.`);
     }
     if (sanitized.length > 1) {
       if (!this.guessWord(sanitized, user.name)) {
@@ -105,8 +104,7 @@ class Hangman extends Rooms.SimpleRoomGame {
   }
   guessLetter(letter, guesser) {
     letter = letter.toUpperCase();
-    if (this.guesses.includes(letter))
-      return false;
+    if (this.guesses.includes(letter)) return false;
     if (this.word.toUpperCase().includes(letter)) {
       for (let i = 0; i < this.word.length; i++) {
         if (this.word[i].toUpperCase() === letter) {
@@ -135,12 +133,10 @@ class Hangman extends Rooms.SimpleRoomGame {
     const ourWord = toID(this.word.replace(/[0-9]+/g, ""));
     const guessedWord = toID(word.replace(/[0-9]+/g, ""));
     const wordSoFar = this.wordSoFar.filter((letter) => /[a-zA-Z_]/.test(letter)).join("").toLowerCase();
-    if (ourWord.length !== guessedWord.length)
-      return false;
+    if (ourWord.length !== guessedWord.length) return false;
     for (let i = 0; i < ourWord.length; i++) {
       if (wordSoFar.charAt(i) === "_") {
-        if (this.letterGuesses.some((guess) => guess.toLowerCase().startsWith(guessedWord.charAt(i))))
-          return false;
+        if (this.letterGuesses.some((guess) => guess.toLowerCase().startsWith(guessedWord.charAt(i)))) return false;
       } else if (wordSoFar.charAt(i) !== guessedWord.charAt(i)) {
         return false;
       }
@@ -184,8 +180,7 @@ class Hangman extends Rooms.SimpleRoomGame {
       escapedWord = escapedWord.map((letter, index) => letter === "_" ? `<font color="#7af87a">${word.charAt(index)}</font>` : letter);
     }
     const wordString = escapedWord.join("").replace(DIACRITICS_AFTER_UNDERSCORE, "_");
-    if (this.hint)
-      output += import_lib.Utils.html`<div>(Hint: ${this.hint})</div>`;
+    if (this.hint) output += import_lib.Utils.html`<div>(Hint: ${this.hint})</div>`;
     output += `<p style="font-weight:bold;font-size:12pt;letter-spacing:3pt">${wordString}</p>`;
     if (this.guesses.length) {
       if (this.letterGuesses.length) {
@@ -236,8 +231,7 @@ class Hangman extends Rooms.SimpleRoomGame {
       this.save();
     }
     let phrases = Object.keys(hangmanData[room]);
-    if (!phrases.length)
-      throw new Chat.ErrorMessage(`The room ${room} has no saved hangman words.`);
+    if (!phrases.length) throw new Chat.ErrorMessage(`The room ${room} has no saved hangman words.`);
     if (tag) {
       tag = toID(tag);
       phrases = phrases.filter((key) => hangmanData[room][key].tags?.map(toID).includes(tag));
@@ -254,16 +248,14 @@ class Hangman extends Rooms.SimpleRoomGame {
   }
   static validateParams(params) {
     const phrase = params[0].normalize("NFD").trim().replace(/_/g, "\uFF3F");
-    if (!phrase.length)
-      throw new Chat.ErrorMessage("Enter a valid word");
+    if (!phrase.length) throw new Chat.ErrorMessage("Enter a valid word");
     if (phrase.length > MAX_HANGMAN_LENGTH) {
       throw new Chat.ErrorMessage(`Phrase must be less than ${MAX_HANGMAN_LENGTH} characters long.`);
     }
     if (phrase.split(" ").some((w) => w.length > MAX_INDIVIDUAL_WORD_LENGTH)) {
       throw new Chat.ErrorMessage(`Each word in the phrase must be less than ${MAX_INDIVIDUAL_WORD_LENGTH} characters long.`);
     }
-    if (!/[a-zA-Z]/.test(phrase))
-      throw new Chat.ErrorMessage("Word must contain at least one letter.");
+    if (!/[a-zA-Z]/.test(phrase)) throw new Chat.ErrorMessage("Word must contain at least one letter.");
     let hint;
     if (params.length > 1) {
       hint = params.slice(1).join(",").trim();
@@ -281,17 +273,13 @@ const commands = {
       room = this.requireRoom();
       target = target.trim();
       const text = this.filter(target);
-      if (target !== text)
-        throw new Chat.ErrorMessage("You are not allowed to use filtered words in hangmans.");
+      if (target !== text) throw new Chat.ErrorMessage("You are not allowed to use filtered words in hangmans.");
       const params = text.split(",");
       this.checkCan("minigame", null, room);
-      if (room.settings.hangmanDisabled)
-        throw new Chat.ErrorMessage("Hangman is disabled for this room.");
+      if (room.settings.hangmanDisabled) throw new Chat.ErrorMessage("Hangman is disabled for this room.");
       this.checkChat();
-      if (room.game)
-        throw new Chat.ErrorMessage(`There is already a game of ${room.game.title} in progress in this room.`);
-      if (!params)
-        throw new Chat.ErrorMessage("No word entered.");
+      if (room.game) throw new Chat.ErrorMessage(`There is already a game of ${room.game.title} in progress in this room.`);
+      if (!params) throw new Chat.ErrorMessage("No word entered.");
       const { phrase, hint } = Hangman.validateParams(params);
       const game = new Hangman(room, user, phrase, hint);
       room.game = game;
@@ -302,8 +290,7 @@ const commands = {
     createhelp: ["/hangman create [word], [hint] - Makes a new hangman game. Requires: % @ # ~"],
     guess(target, room, user) {
       const word = this.filter(target);
-      if (word !== target)
-        throw new Chat.ErrorMessage(`You may not use filtered words in guesses.`);
+      if (word !== target) throw new Chat.ErrorMessage(`You may not use filtered words in guesses.`);
       this.parse(`/choose ${target}`);
     },
     guesshelp: [
@@ -344,8 +331,7 @@ const commands = {
     display(target, room, user) {
       room = this.requireRoom();
       const game = this.requireGame(Hangman);
-      if (!this.runBroadcast())
-        return;
+      if (!this.runBroadcast()) return;
       room.update();
       game.display(user, this.broadcasting);
     },
@@ -369,14 +355,11 @@ const commands = {
     addrandom(target, room, user) {
       room = this.requireRoom();
       this.checkCan("mute", null, room);
-      if (!hangmanData[room.roomid])
-        hangmanData[room.roomid] = {};
-      if (!target)
-        return this.parse("/help hangman");
+      if (!hangmanData[room.roomid]) hangmanData[room.roomid] = {};
+      if (!target) return this.parse("/help hangman");
       const args = target.split(target.includes("|") ? "|" : ",");
       const { phrase } = Hangman.validateParams(args);
-      if (!hangmanData[room.roomid][phrase])
-        hangmanData[room.roomid][phrase] = { hints: [] };
+      if (!hangmanData[room.roomid][phrase]) hangmanData[room.roomid][phrase] = { hints: [] };
       args.shift();
       hangmanData[room.roomid][phrase].hints.push(...args);
       Hangman.save();
@@ -388,8 +371,7 @@ const commands = {
       room = this.requireRoom();
       this.checkCan("mute", null, room);
       let [word, ...hints] = target.split(",");
-      if (!toID(target) || !word)
-        return this.parse("/help hangman");
+      if (!toID(target) || !word) return this.parse("/help hangman");
       for (const [i, hint] of hints.entries()) {
         if (hint.startsWith("room:")) {
           const newID = hint.slice(5);
@@ -443,8 +425,7 @@ const commands = {
       if (!hangmanData[room.roomid][term]) {
         throw new Chat.ErrorMessage(`Term ${term} not found.`);
       }
-      if (!hangmanData[room.roomid][term].tags)
-        hangmanData[room.roomid][term].tags = [];
+      if (!hangmanData[room.roomid][term].tags) hangmanData[room.roomid][term].tags = [];
       for (const [i, tag] of tags.entries()) {
         if (hangmanData[room.roomid][term].tags.includes(tag)) {
           this.errorReply(`The tag ${tag} is already on the term ${term} and has been skipped.`);

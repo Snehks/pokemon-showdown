@@ -37,8 +37,7 @@ class LadderTracker {
     this.format = toID(config.format);
     this.prefix = toID(config.prefix);
     this.rating = config.rating || 0;
-    if (config.deadline)
-      this.setDeadline(config.deadline, false);
+    if (config.deadline) this.setDeadline(config.deadline, false);
     this.users = new Set(config.users);
     this.leaderboard = { lookup: /* @__PURE__ */ new Map() };
     this.showdiffs = config.showdiffs || false;
@@ -49,17 +48,14 @@ class LadderTracker {
     return trackers[room];
   }
   addHTML(msg, box = false) {
-    if (box)
-      msg = `<div class="infobox">${msg}</div>`;
+    if (box) msg = `<div class="infobox">${msg}</div>`;
     this.room.add(`|html|${msg}`).update();
   }
   setDeadline(argument, save = true) {
     const date = new Date(argument);
-    if (!+date)
-      throw new Chat.ErrorMessage(`Invalid date: ${argument}`);
+    if (!+date) throw new Chat.ErrorMessage(`Invalid date: ${argument}`);
     this.deadline = date;
-    if (this.final)
-      clearTimeout(this.final);
+    if (this.final) clearTimeout(this.final);
     const timeDiff = +this.deadline - Date.now() - 500;
     if (timeDiff >= Number.MAX_SAFE_INTEGER) {
       throw new Chat.ErrorMessage("Deadline is too far away. Please wait and set it later.");
@@ -68,11 +64,10 @@ class LadderTracker {
       this.stop();
       this.captureFinalLeaderboard();
     }, timeDiff);
-    if (save)
-      LadderTracker.save();
+    if (save) LadderTracker.save();
   }
   async captureFinalLeaderboard() {
-    const now = new Date();
+    const now = /* @__PURE__ */ new Date();
     if (now < this.deadline) {
       process.nextTick(this.captureFinalLeaderboard.bind(this));
       return;
@@ -85,13 +80,11 @@ class LadderTracker {
     const skipid = this.lastid;
     const roomid = battle.roomid;
     const [rating, rmsg] = this.getRating(battle);
-    if (!this.tracking(battle, rating) || skipid && skipid >= roomid)
-      return;
+    if (!this.tracking(battle, rating) || skipid && skipid >= roomid) return;
     const style = (p) => this.stylePlayer(p);
     const msg = `Battle started between ${style(battle.p1.name)} and ${style(battle.p2.name)}`;
     this.addHTML(`<a href="/${roomid}" class="ilink">${msg}. ${rmsg}</a></div>`, true);
-    if (!this.lastid || this.lastid < roomid)
-      this.lastid = roomid;
+    if (!this.lastid || this.lastid < roomid) this.lastid = roomid;
   }
   formatTimeRemaining(ms, round) {
     let s = ms / 1e3;
@@ -110,24 +103,18 @@ class LadderTracker {
       }
     }
     const time = [];
-    if (h > 0)
-      time.push(`${h} hour${h === 1 ? "" : "s"}`);
-    if (m > 0)
-      time.push(`${m} minute${m === 1 ? "" : "s"}`);
-    if (s > 0)
-      time.push(`${s} second${s === 1 ? "" : "s"}`);
+    if (h > 0) time.push(`${h} hour${h === 1 ? "" : "s"}`);
+    if (m > 0) time.push(`${m} minute${m === 1 ? "" : "s"}`);
+    if (s > 0) time.push(`${s} second${s === 1 ? "" : "s"}`);
     return time.join(" ");
   }
   getRating(battle) {
     const p1 = this.leaderboard.lookup.get(toID(battle.p1.name));
     const p2 = this.leaderboard.lookup.get(toID(battle.p2.name));
-    if (p1 && p2)
-      return this.averageRating(p1.elo, p2.elo);
+    if (p1 && p2) return this.averageRating(p1.elo, p2.elo);
     const minElo = Math.floor(battle.rated);
-    if (p1 && p1.elo > minElo)
-      return this.averageRating(p1.elo, minElo);
-    if (p2 && p2.elo > minElo)
-      return this.averageRating(p2.elo, minElo);
+    if (p1 && p1.elo > minElo) return this.averageRating(p1.elo, minElo);
+    if (p2 && p2.elo > minElo) return this.averageRating(p2.elo, minElo);
     return [minElo, `(min rating: ${minElo})`];
   }
   averageRating(a, b) {
@@ -139,8 +126,7 @@ class LadderTracker {
   }
   tracking(battle, rating) {
     const minElo = Math.floor(Number(battle.rated) || 0);
-    if (battle.format !== this.config.format)
-      return false;
+    if (battle.format !== this.config.format) return false;
     if (!minElo || minElo < 1e3) {
       return false;
     }
@@ -161,12 +147,10 @@ class LadderTracker {
     return false;
   }
   leaderboardCooldown(now) {
-    if (!this.cooldown)
-      return true;
+    if (!this.cooldown) return true;
     const wait = Math.floor((+now - +this.cooldown) / MINUTE);
     const lines = this.changed ? this.lines.them : this.lines.total;
-    if (lines < 5 && wait < 3)
-      return false;
+    if (lines < 5 && wait < 3) return false;
     const factor = this.changed ? 6 : 1;
     return factor * (wait + lines) >= 60;
   }
@@ -196,8 +180,7 @@ class LadderTracker {
       if (e.name === "SyntaxError") {
         response = { toplist: [] };
       } else {
-        if (display)
-          throw new Chat.ErrorMessage("Failed to fetch leaderboard. Try again later.");
+        if (display) throw new Chat.ErrorMessage("Failed to fetch leaderboard. Try again later.");
         return leaderboard;
       }
     }
@@ -211,8 +194,7 @@ class LadderTracker {
         glickodev: Math.round(data.rprd)
       };
       this.leaderboard.lookup.set(data.userid, entry);
-      if (!data.userid.startsWith(this.prefix))
-        continue;
+      if (!data.userid.startsWith(this.prefix)) continue;
       entry.rank = leaderboard.length + 1;
       leaderboard.push(entry);
     }
@@ -226,8 +208,7 @@ class LadderTracker {
   static getTracker(context) {
     const room = context.requireRoom();
     const t = this.get(room);
-    if (!t)
-      throw new Chat.ErrorMessage(`There is no active ladder tracker in this room.`);
+    if (!t) throw new Chat.ErrorMessage(`There is no active ladder tracker in this room.`);
     return t;
   }
   static save() {
@@ -282,28 +263,23 @@ class LadderTracker {
       } else {
         elo = current[newrank - 1].elo;
       }
-      if (oldrank !== newrank)
-        diffs.set(id, [player.name, elo, oldrank, newrank]);
+      if (oldrank !== newrank) diffs.set(id, [player.name, elo, oldrank, newrank]);
     }
     const currentN = num ? current.slice(0, num) : current;
     for (const [i, player] of currentN.entries()) {
       const id = toID(player.name);
       const newrank = i + 1;
       let oldrank = last.findIndex((e) => toID(e.name) === id) + 1;
-      if (!oldrank)
-        oldrank = Infinity;
-      if (oldrank !== newrank)
-        diffs.set(id, [player.name, player.elo, oldrank, newrank]);
+      if (!oldrank) oldrank = Infinity;
+      if (oldrank !== newrank) diffs.set(id, [player.name, player.elo, oldrank, newrank]);
     }
     return diffs;
   }
   trackChanges(leaderboard, display) {
-    if (!this.leaderboard.current || !this.config.cutoff)
-      return;
+    if (!this.leaderboard.current || !this.config.cutoff) return;
     const n = this.config.cutoff;
     const diffs = this.getDiffs(this.leaderboard.current, leaderboard, n * FACTOR);
-    if (!diffs.size)
-      return;
+    if (!diffs.size) return;
     const sorted = Array.from(diffs.values()).sort((a, b) => a[3] - b[3]);
     const messages = [];
     for (const [name, elo, oldrank, newrank] of sorted) {
@@ -318,23 +294,20 @@ class LadderTracker {
         messages.push(`${symbol}<b>${rank}.</b> ${message}`);
       }
     }
-    if (display)
-      this.addHTML(messages.join(" "));
+    if (display) this.addHTML(messages.join(" "));
   }
   setPrefix(prefix, save = true) {
     const oldPrefix = this.prefix;
     this.prefix = toID(prefix);
     if (oldPrefix !== prefix) {
-      if (save)
-        LadderTracker.save();
+      if (save) LadderTracker.save();
       this.togglePrefix(oldPrefix);
     }
   }
   togglePrefix(oldPrefix) {
     if (!this.room.settings.isPrivate) {
       try {
-        if (oldPrefix)
-          import_username_prefixes.prefixManager.removePrefix(oldPrefix, "privacy");
+        if (oldPrefix) import_username_prefixes.prefixManager.removePrefix(oldPrefix, "privacy");
       } catch {
       }
       try {
@@ -344,15 +317,12 @@ class LadderTracker {
     }
   }
   start() {
-    if (this.started)
-      return;
+    if (this.started) return;
     this.togglePrefix();
     this.started = setInterval(async () => {
       const leaderboard = await this.getLeaderboard();
-      if (!leaderboard.length)
-        return;
-      if (this.leaderboard)
-        this.trackChanges(leaderboard, this.showdiffs);
+      if (!leaderboard.length) return;
+      if (this.leaderboard) this.trackChanges(leaderboard, this.showdiffs);
       this.leaderboard.current = leaderboard;
     }, INTERVAL);
   }
@@ -456,8 +426,7 @@ const commands = {
     remaining: "deadline",
     deadline(target, room, user, sf, cmd) {
       const tracker = LadderTracker.getTracker(this);
-      if (!tracker)
-        return;
+      if (!tracker) return;
       if (target) {
         this.checkCan("mute", null, tracker.room);
         const date = new Date(target);
@@ -469,22 +438,19 @@ const commands = {
       } else {
         this.runBroadcast();
       }
-      this.sendReplyBox(tracker.getDeadline(new Date()));
+      this.sendReplyBox(tracker.getDeadline(/* @__PURE__ */ new Date()));
     },
     elo: "rating",
     rating(target, room, user, sf, cmd) {
       room = this.requireRoom();
       const tracker = LadderTracker.get(room);
       this.runBroadcast();
-      if (!tracker)
-        return this.errorReply(`There is no active ladder tracker for this room.`);
+      if (!tracker) return this.errorReply(`There is no active ladder tracker for this room.`);
       const rating = Number(target);
       if (target) {
-        if (!rating)
-          return this.errorReply("Invalid rating.");
+        if (!rating) return this.errorReply("Invalid rating.");
         this.checkCan("mute", null, room);
-        if (rating < 1e3)
-          return this.errorReply("Invalid rating. Must be a number above 1000.");
+        if (rating < 1e3) return this.errorReply("Invalid rating. Must be a number above 1000.");
         tracker.rating = rating;
         tracker.config.rating = rating;
         LadderTracker.save();
@@ -497,12 +463,10 @@ const commands = {
     },
     cutoff(target, room, user, sf, cmd) {
       const tracker = LadderTracker.getTracker(this);
-      if (!tracker)
-        return;
+      if (!tracker) return;
       const rating = Number(target);
       if (target) {
-        if (!rating)
-          return this.errorReply("Invalid cutoff.");
+        if (!rating) return this.errorReply("Invalid cutoff.");
         this.checkCan("mute", null, tracker.room);
         tracker.config.cutoff = rating;
         LadderTracker.save();

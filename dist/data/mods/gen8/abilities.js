@@ -93,8 +93,7 @@ const Abilities = {
   battlebond: {
     inherit: true,
     onSourceAfterFaint(length, target, source, effect) {
-      if (source.bondTriggered)
-        return;
+      if (source.bondTriggered) return;
       if (effect?.effectType !== "Move") {
         return;
       }
@@ -550,12 +549,10 @@ const Abilities = {
   libero: {
     inherit: true,
     onPrepareHit(source, target, move) {
-      if (move.hasBounced || move.flags["futuremove"] || move.sourceEffect === "snatch" || move.callsMove)
-        return;
+      if (move.hasBounced || move.flags["futuremove"] || move.sourceEffect === "snatch" || move.callsMove) return;
       const type = move.type;
       if (type && type !== "???" && source.getTypes().join() !== type) {
-        if (!source.setType(type))
-          return;
+        if (!source.setType(type)) return;
         this.add("-start", source, "typechange", type, "[from] ability: Libero");
       }
     },
@@ -772,12 +769,10 @@ const Abilities = {
   protean: {
     inherit: true,
     onPrepareHit(source, target, move) {
-      if (move.hasBounced || move.flags["futuremove"] || move.sourceEffect === "snatch" || move.callsMove)
-        return;
+      if (move.hasBounced || move.flags["futuremove"] || move.sourceEffect === "snatch" || move.callsMove) return;
       const type = move.type;
       if (type && type !== "???" && source.getTypes().join() !== type) {
-        if (!source.setType(type))
-          return;
+        if (!source.setType(type)) return;
         this.add("-start", source, "typechange", type, "[from] ability: Protean");
       }
     },

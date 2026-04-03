@@ -106,17 +106,14 @@ async function importGen(gen, index) {
   const imports = [];
   const dex = import_dex.Dex.forFormat(`gen${gen}ou`);
   for (const id in dex.data.Pokedex) {
-    if (!eligible(dex, id))
-      continue;
+    if (!eligible(dex, id)) continue;
     const species = dex.species.get(id);
-    if (species.battleOnly)
-      continue;
+    if (species.battleOnly) continue;
     imports.push(importSmogonSets(dex.species.get(id).name, gen, smogonSetsByFormat, numByFormat));
   }
   await Promise.all(imports);
   for (const { format, gen: g } of FORMATS.values()) {
-    if (g !== gen)
-      continue;
+    if (g !== gen) continue;
     if (smogonSetsByFormat[format.id] && Object.keys(smogonSetsByFormat[format.id]).length) {
       data[format.id] = {};
       data[format.id]["dex"] = smogonSetsByFormat[format.id];
@@ -129,8 +126,7 @@ async function importGen(gen, index) {
       }
     }
     const stats = await getStatisticsURL(index, format);
-    if (!stats)
-      continue;
+    if (!stats) continue;
     try {
       const statistics = smogon.Statistics.process(await request(stats.url));
       const sets = importUsageBasedSets(gen, format, statistics, stats.count);
@@ -147,50 +143,34 @@ async function importGen(gen, index) {
 }
 function eligible(dex, id) {
   const gen = toGen(dex, id);
-  if (!gen || gen > dex.gen)
-    return false;
+  if (!gen || gen > dex.gen) return false;
   const species = dex.species.get(id);
-  if (["Mega", "Primal", "Ultra"].some((f) => species.forme.startsWith(f)))
-    return true;
+  if (["Mega", "Primal", "Ultra"].some((f) => species.forme.startsWith(f))) return true;
   const unique = ["darmanitan", "meloetta", "greninja", "zygarde"];
   const similar = ["pichu", "pikachu", "genesect", "basculin", "magearna", "keldeo", "vivillon"];
-  if (species.battleOnly && !unique.some((f) => id.startsWith(f)))
-    return false;
+  if (species.battleOnly && !unique.some((f) => id.startsWith(f))) return false;
   const capNFE = species.isNonstandard === "CAP" && species.nfe;
   return !id.endsWith("totem") && !capNFE && !similar.some((f) => id.startsWith(f) && id !== f);
 }
 function toGen(dex, name) {
   const pokemon = dex.species.get(name);
-  if (pokemon.isNonstandard === "LGPE")
-    return 7;
-  if (!pokemon.exists || pokemon.isNonstandard && pokemon.isNonstandard !== "CAP")
-    return void 0;
-  if (pokemon.gen)
-    return pokemon.gen;
+  if (pokemon.isNonstandard === "LGPE") return 7;
+  if (!pokemon.exists || pokemon.isNonstandard && pokemon.isNonstandard !== "CAP") return void 0;
+  if (pokemon.gen) return pokemon.gen;
   const n = pokemon.num;
-  if (n > 905)
-    return 9;
-  if (n > 810)
-    return 8;
-  if (n > 721)
-    return 7;
-  if (n > 649)
-    return 6;
-  if (n > 493)
-    return 5;
-  if (n > 386)
-    return 4;
-  if (n > 251)
-    return 3;
-  if (n > 151)
-    return 2;
-  if (n > 0)
-    return 1;
+  if (n > 905) return 9;
+  if (n > 810) return 8;
+  if (n > 721) return 7;
+  if (n > 649) return 6;
+  if (n > 493) return 5;
+  if (n > 386) return 4;
+  if (n > 251) return 3;
+  if (n > 151) return 2;
+  if (n > 0) return 1;
 }
 async function importSmogonSets(pokemon, gen, setsByFormat, numByFormat) {
   const analysesByFormat = await getAnalysesByFormat(pokemon, gen);
-  if (!analysesByFormat)
-    return;
+  if (!analysesByFormat) return;
   for (const [format, analyses] of analysesByFormat.entries()) {
     const dex = import_dex.Dex.forFormat(format);
     let setsForPokemon = setsByFormat[format.id];
@@ -199,8 +179,7 @@ async function importSmogonSets(pokemon, gen, setsByFormat, numByFormat) {
       setsByFormat[format.id] = setsForPokemon;
     }
     let baseSpecies = dex.species.get(pokemon);
-    if (baseSpecies.baseSpecies !== baseSpecies.name)
-      baseSpecies = dex.species.get(baseSpecies.baseSpecies);
+    if (baseSpecies.baseSpecies !== baseSpecies.name) baseSpecies = dex.species.get(baseSpecies.baseSpecies);
     const battleOnlyFormes = [];
     if (baseSpecies.otherFormes) {
       for (const forme of baseSpecies.otherFormes) {
@@ -217,11 +196,9 @@ async function importSmogonSets(pokemon, gen, setsByFormat, numByFormat) {
         addSmogonSet(dex, format, pokemon, name, set, setsForPokemon, numByFormat);
         for (const battleOnlyForme of battleOnlyFormes) {
           const s = { ...set };
-          if (!format.id.includes("balancedhackmons"))
-            s.ability = battleOnlyForme.abilities[0];
+          if (!format.id.includes("balancedhackmons")) s.ability = battleOnlyForme.abilities[0];
           if (typeof battleOnlyForme.battleOnly !== "string") {
-            if (!battleOnlyForme.battleOnly.includes(pokemon))
-              continue;
+            if (!battleOnlyForme.battleOnly.includes(pokemon)) continue;
             const species = dex.species.get(pokemon);
             const disambiguated = `${name} - ${species.baseForme || species.forme}`;
             addSmogonSet(dex, format, battleOnlyForme.name, disambiguated, s, setsForPokemon, numByFormat, pokemon);
@@ -257,41 +234,33 @@ function movesetToPokemonSet(dex, format, pokemon, set) {
   };
 }
 function toStatsTable(stats, elide = 0) {
-  if (!stats)
-    return void 0;
+  if (!stats) return void 0;
   const s = {};
   let stat;
   for (stat in stats) {
     const val = stats[stat];
-    if (val !== elide)
-      s[stat] = val;
+    if (val !== elide) s[stat] = val;
   }
   return s;
 }
 function fixedAbility(dex, pokemon, ability) {
-  if (dex.gen <= 2)
-    return void 0;
+  if (dex.gen <= 2) return void 0;
   const species = dex.species.get(pokemon);
-  if (ability && !["Mega", "Primal", "Ultra"].some((f) => species.forme.startsWith(f)))
-    return ability;
+  if (ability && !["Mega", "Primal", "Ultra"].some((f) => species.forme.startsWith(f))) return ability;
   return species.abilities[0];
 }
 function validSet(source, dex, format, pokemon, name, set, outOfBattleSpeciesName) {
-  if (skip(dex, format, pokemon, set))
-    return false;
+  if (skip(dex, format, pokemon, set)) return false;
   const pset = toPokemonSet(dex, format, pokemon, set, outOfBattleSpeciesName);
   let invalid = VALIDATORS.get(format.id).validateSet(pset, {});
-  if (!invalid)
-    return true;
+  if (!invalid) return true;
   if (invalid.length === 1 && invalid[0].includes("must be shiny")) {
     set.shiny = true;
     pset.shiny = true;
     invalid = VALIDATORS.get(format.id).validateSet(pset, {});
-    if (!invalid)
-      return true;
+    if (!invalid) return true;
   }
-  if (format.id === "gen4ubers" && invalid.includes(`${pokemon} is banned.`))
-    return true;
+  if (format.id === "gen4ubers" && invalid.includes(`${pokemon} is banned.`)) return true;
   const title = `${format.name}: ${pokemon} (${name})'`;
   const details = `${JSON.stringify(set)} = ${invalid.join(", ")}`;
   console.error(color(`${source} Invalid set ${title}: ${details}`, 90));
@@ -301,12 +270,9 @@ function skip(dex, format, pokemon, set) {
   const { gen } = FORMATS.get(format.id);
   const hasMove = (m) => set.moves?.includes(m);
   const bh = format.id.includes("balancedhackmons");
-  if (pokemon === "Groudon-Primal" && set.item !== "Red Orb")
-    return true;
-  if (pokemon === "Kyogre-Primal" && set.item !== "Blue Orb" && !(bh && gen === 7))
-    return true;
-  if (bh)
-    return false;
+  if (pokemon === "Groudon-Primal" && set.item !== "Red Orb") return true;
+  if (pokemon === "Kyogre-Primal" && set.item !== "Blue Orb" && !(bh && gen === 7)) return true;
+  if (bh) return false;
   if (dex.species.get(pokemon).forme.startsWith("Mega")) {
     if (pokemon === "Rayquaza-Mega") {
       return format.id.includes("ubers") || !hasMove("Dragon Ascent");
@@ -315,16 +281,11 @@ function skip(dex, format, pokemon, set) {
       return !item.megaStone || !Object.values(item.megaStone).includes(pokemon);
     }
   }
-  if (pokemon === "Necrozma-Ultra" && set.item !== "Ultranecrozium Z")
-    return true;
-  if (pokemon === "Greninja-Ash" && set.ability !== "Battle Bond")
-    return true;
-  if (pokemon === "Zygarde-Complete" && set.ability !== "Power Construct")
-    return true;
-  if (pokemon === "Darmanitan-Zen" && set.ability !== "Zen Mode")
-    return true;
-  if (pokemon === "Meloetta-Pirouette" && !hasMove("Relic Song"))
-    return true;
+  if (pokemon === "Necrozma-Ultra" && set.item !== "Ultranecrozium Z") return true;
+  if (pokemon === "Greninja-Ash" && set.ability !== "Battle Bond") return true;
+  if (pokemon === "Zygarde-Complete" && set.ability !== "Power Construct") return true;
+  if (pokemon === "Darmanitan-Zen" && set.ability !== "Zen Mode") return true;
+  if (pokemon === "Meloetta-Pirouette" && !hasMove("Relic Song")) return true;
   return false;
 }
 function toPokemonSet(dex, format, pokemon, set, outOfBattleSpeciesName) {
@@ -351,8 +312,7 @@ function toPokemonSet(dex, format, pokemon, set, outOfBattleSpeciesName) {
   }
   const copy = { species: pokemon, ...set };
   copy.ivs = fillStats(set.ivs, fill);
-  if (!set.evs && dex.gen >= 3 && format.id !== "gen7letsgoou")
-    set.evs = { spe: 1 };
+  if (!set.evs && dex.gen >= 3 && format.id !== "gen7letsgoou") set.evs = { spe: 1 };
   copy.evs = fillStats(set.evs, dex.gen <= 2 ? 252 : 0);
   copy.ability = copy.ability || "None";
   const species = dex.species.get(pokemon);
@@ -419,8 +379,7 @@ async function getAnalysesByFormat(pokemon, gen) {
         t = "battlestadiumsinglesregulationc";
       }
       const f = FORMATS.get(`gen${gen}${SMOGON[t] || t}`);
-      if (f)
-        analysesByFormat.set(f.format, analyses);
+      if (f) analysesByFormat.set(f.format, analyses);
     }
     return analysesByFormat;
   } catch {
@@ -430,19 +389,16 @@ async function getAnalysesByFormat(pokemon, gen) {
 }
 function getLevel(format, level = 0) {
   const ruleTable = import_dex.Dex.formats.getRuleTable(format);
-  if (ruleTable.adjustLevel)
-    return ruleTable.adjustLevel;
+  if (ruleTable.adjustLevel) return ruleTable.adjustLevel;
   const maxLevel = ruleTable.maxLevel;
   const adjustLevelDown = ruleTable.adjustLevelDown || maxLevel;
-  if (!level)
-    level = ruleTable.defaultLevel;
+  if (!level) level = ruleTable.defaultLevel;
   return level > adjustLevelDown ? adjustLevelDown : level;
 }
 async function getStatisticsURL(index, format) {
   const current = index.includes(format.id);
   const latest = await smogon.Statistics.latestDate(format.id, !current);
-  if (!latest)
-    return void 0;
+  if (!latest) return void 0;
   return { url: smogon.Statistics.url(latest.date, format.id, current || 1500), count: latest.count };
 }
 function importUsageBasedSets(gen, format, statistics, count) {
@@ -460,8 +416,7 @@ function importUsageBasedSets(gen, format, statistics, count) {
       if (gen >= 2 && format.id !== "gen7letsgoou") {
         const id = top(stats.Items);
         set.item = dex.items.get(id).name;
-        if (set.item === "nothing")
-          set.item = void 0;
+        if (set.item === "nothing") set.item = void 0;
       }
       if (gen >= 3) {
         const id = top(stats.Abilities);
@@ -469,8 +424,7 @@ function importUsageBasedSets(gen, format, statistics, count) {
         const { nature, evs } = fromSpread(top(stats.Spreads));
         set.nature = nature;
         if (format.id !== "gen7letsgoou") {
-          if (!evs || !Object.keys(evs).length)
-            continue;
+          if (!evs || !Object.keys(evs).length) continue;
           set.evs = evs;
         }
       }
@@ -486,10 +440,8 @@ function importUsageBasedSets(gen, format, statistics, count) {
   return sets;
 }
 function getUsageThreshold(format, count) {
-  if (count < 100)
-    return Infinity;
-  if (count < 400)
-    return 0.05;
+  if (count < 100) return Infinity;
+  if (count < 400) return 0.05;
   return /uber|anythinggoes|doublesou/.test(format.id) ? 0.03 : 0.01;
 }
 const STATS = import_dex.Dex.stats.ids();
@@ -498,19 +450,16 @@ function fromSpread(spread) {
   const evs = {};
   for (const [i, rev] of revs.split("/").entries()) {
     const ev = Number(rev);
-    if (ev)
-      evs[STATS[i]] = ev;
+    if (ev) evs[STATS[i]] = ev;
   }
   return { nature, evs };
 }
 function top(weighted, n = 1) {
-  if (n === 0)
-    return void 0;
+  if (n === 0) return void 0;
   if (n === 1) {
     let max;
     for (const key in weighted) {
-      if (!max || weighted[max] < weighted[key])
-        max = key;
+      if (!max || weighted[max] < weighted[key]) max = key;
     }
     return max;
   }
@@ -549,8 +498,7 @@ function retrying(fn, retries, wait) {
     } catch (err) {
       if (err instanceof RetryableError) {
         attempt++;
-        if (attempt > retries)
-          return Promise.reject(err);
+        if (attempt > retries) return Promise.reject(err);
         const timeout = Math.round(attempt * wait * (1 + Math.random() / 2));
         warn(`Retrying ${args} in ${timeout}ms (${attempt}):`, err);
         return new Promise((resolve) => {

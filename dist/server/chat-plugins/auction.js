@@ -45,8 +45,7 @@ class Team {
   }
   removePlayer(player) {
     const pIndex = this.players.indexOf(player);
-    if (pIndex === -1)
-      return;
+    if (pIndex === -1) return;
     this.players.splice(pIndex, 1);
     delete player.team;
     player.price = 0;
@@ -60,8 +59,7 @@ class Team {
 }
 function parseCredits(amount) {
   let credits = Number(amount.replace(",", "."));
-  if (Math.abs(credits) < 500)
-    credits *= 1e3;
+  if (Math.abs(credits) < 500) credits *= 1e3;
   if (!credits || credits % 500 !== 0) {
     throw new Chat.ErrorMessage(`The amount of credits must be a multiple of 500.`);
   }
@@ -111,18 +109,15 @@ class Auction extends Rooms.SimpleRoomGame {
   addOwners(users) {
     for (const name of users) {
       const user = Users.getExact(name);
-      if (!user)
-        throw new Chat.ErrorMessage(`User "${name}" not found.`);
-      if (this.owners.has(user.id))
-        throw new Chat.ErrorMessage(`${user.name} is already an auction owner.`);
+      if (!user) throw new Chat.ErrorMessage(`User "${name}" not found.`);
+      if (this.owners.has(user.id)) throw new Chat.ErrorMessage(`${user.name} is already an auction owner.`);
       this.owners.add(user.id);
     }
   }
   removeOwners(users) {
     for (const name of users) {
       const id = toID(name);
-      if (!this.owners.has(id))
-        throw new Chat.ErrorMessage(`User "${name}" is not an auction owner.`);
+      if (!this.owners.has(id)) throw new Chat.ErrorMessage(`User "${name}" is not an auction owner.`);
       this.owners.delete(id);
     }
   }
@@ -154,8 +149,7 @@ class Auction extends Rooms.SimpleRoomGame {
       table2 += `</table>`;
       smogonTable2 += `[/TABLE]`;
       buf += `<details><summary>${import_lib.Utils.escapeHTML(team.name)}</summary>${table2}</details><br/>`;
-      if (this.ended)
-        smogonExport += `[SPOILER="${team.name}"]${smogonTable2}[/SPOILER]`;
+      if (this.ended) smogonExport += `[SPOILER="${team.name}"]${smogonTable2}[/SPOILER]`;
     }
     let table = `<table>`;
     let smogonTable = `[TABLE]`;
@@ -198,8 +192,7 @@ class Auction extends Rooms.SimpleRoomGame {
     const tierArrays = /* @__PURE__ */ new Map();
     for (const player of players) {
       for (const tier of player.tiersPlayed) {
-        if (!tierArrays.has(tier))
-          tierArrays.set(tier, []);
+        if (!tierArrays.has(tier)) tierArrays.set(tier, []);
         tierArrays.get(tier).push(player);
       }
     }
@@ -219,11 +212,9 @@ class Auction extends Rooms.SimpleRoomGame {
     buf += `<details><summary>Auction Settings</summary>`;
     buf += `- Minimum bid: <b>${this.minBid.toLocaleString()}</b><br/>`;
     buf += `- Minimum players per team: <b>${this.minPlayers}</b><br/>`;
-    if (this.type !== "snake")
-      buf += `- Maximum players per team: <b>${this.maxPlayers || "N/A"}</b><br/>`;
+    if (this.type !== "snake") buf += `- Maximum players per team: <b>${this.maxPlayers || "N/A"}</b><br/>`;
     buf += `- Nom timer: <b>${this.nomTimeLimit ? `${this.nomTimeLimit}s` : "Off"}</b><br/>`;
-    if (this.type !== "snake")
-      buf += `- Bid timer: <b>${this.bidTimeLimit}s</b><br/>`;
+    if (this.type !== "snake") buf += `- Bid timer: <b>${this.bidTimeLimit}s</b><br/>`;
     buf += `- Auction type: <b>${this.type}</b><br/>`;
     buf += `</details>`;
     return buf;
@@ -251,8 +242,7 @@ class Auction extends Rooms.SimpleRoomGame {
     if (this.state !== "setup") {
       throw new Chat.ErrorMessage(`The minimum bid cannot be changed after the auction has started.`);
     }
-    if (amount > 5e5)
-      throw new Chat.ErrorMessage(`The minimum bid must not exceed 500,000.`);
+    if (amount > 5e5) throw new Chat.ErrorMessage(`The minimum bid must not exceed 500,000.`);
     this.minBid = amount;
   }
   setMinPlayers(amount) {
@@ -265,8 +255,7 @@ class Auction extends Rooms.SimpleRoomGame {
     this.minPlayers = amount;
   }
   setMaxPlayers(amount) {
-    if (this.type === "snake")
-      throw new Chat.ErrorMessage(`You only need to set minplayers for snake drafts.`);
+    if (this.type === "snake") throw new Chat.ErrorMessage(`You only need to set minplayers for snake drafts.`);
     if (this.state !== "setup") {
       throw new Chat.ErrorMessage(`The maximum number of players cannot be changed after the auction has started.`);
     }
@@ -324,19 +313,16 @@ class Auction extends Rooms.SimpleRoomGame {
       for (let i = 0; i < tierData.length; i++) {
         switch (tierData[i].trim().toLowerCase()) {
           case "y":
-            if (!tierNames[i])
-              throw new Chat.ErrorMessage(`Invalid tier data found in the pastebin.`);
+            if (!tierNames[i]) throw new Chat.ErrorMessage(`Invalid tier data found in the pastebin.`);
             tiersPlayed.push(tierNames[i]);
             break;
           case "n":
-            if (!tierNames[i])
-              throw new Chat.ErrorMessage(`Invalid tier data found in the pastebin.`);
+            if (!tierNames[i]) throw new Chat.ErrorMessage(`Invalid tier data found in the pastebin.`);
             tiersNotPlayed.push(tierNames[i]);
             break;
         }
       }
-      if (name.length > 25)
-        throw new Chat.ErrorMessage(`Player names must be 25 characters or less.`);
+      if (name.length > 25) throw new Chat.ErrorMessage(`Player names must be 25 characters or less.`);
       const player = {
         id: toID(name),
         name: name.trim(),
@@ -349,10 +335,8 @@ class Auction extends Rooms.SimpleRoomGame {
     this.auctionPlayers = playerList;
   }
   addAuctionPlayer(name, tiersPlayed = [], tiersNotPlayed = []) {
-    if (this.state === "bid")
-      throw new Chat.ErrorMessage(`Players cannot be added during a nomination.`);
-    if (name.length > 25)
-      throw new Chat.ErrorMessage(`Player names must be 25 characters or less.`);
+    if (this.state === "bid") throw new Chat.ErrorMessage(`Players cannot be added during a nomination.`);
+    if (name.length > 25) throw new Chat.ErrorMessage(`Player names must be 25 characters or less.`);
     if (tiersPlayed.some((tier) => tier.length > 30) || tiersNotPlayed.some((tier) => tier.length > 30)) {
       throw new Chat.ErrorMessage(`Tier names must be 30 characters or less.`);
     }
@@ -367,11 +351,9 @@ class Auction extends Rooms.SimpleRoomGame {
     return player;
   }
   removeAuctionPlayer(name) {
-    if (this.state === "bid")
-      throw new Chat.ErrorMessage(`Players cannot be removed during a nomination.`);
+    if (this.state === "bid") throw new Chat.ErrorMessage(`Players cannot be removed during a nomination.`);
     const player = this.auctionPlayers.get(toID(name));
-    if (!player)
-      throw new Chat.ErrorMessage(`Player "${name}" not found.`);
+    if (!player) throw new Chat.ErrorMessage(`Player "${name}" not found.`);
     player.team?.removePlayer(player);
     this.auctionPlayers.delete(player.id);
     if (this.state !== "setup" && !this.getUndraftedPlayers().length) {
@@ -380,13 +362,11 @@ class Auction extends Rooms.SimpleRoomGame {
     return player;
   }
   assignPlayer(name, teamName) {
-    if (this.state === "bid")
-      throw new Chat.ErrorMessage(`Players cannot be assigned during a nomination.`);
+    if (this.state === "bid") throw new Chat.ErrorMessage(`Players cannot be assigned during a nomination.`);
     const player = this.auctionPlayers.get(toID(name)) || this.addAuctionPlayer(name);
     if (teamName) {
       const team = this.teams.get(toID(teamName));
-      if (!team)
-        throw new Chat.ErrorMessage(`Team "${teamName}" not found.`);
+      if (!team) throw new Chat.ErrorMessage(`Team "${teamName}" not found.`);
       team.addPlayer(player);
       if (this.state !== "setup" && !this.getUndraftedPlayers().length) {
         return this.end("The auction has ended because there are no players remaining in the draft pool.");
@@ -396,10 +376,8 @@ class Auction extends Rooms.SimpleRoomGame {
     }
   }
   addTeam(name) {
-    if (this.state !== "setup")
-      throw new Chat.ErrorMessage(`Teams cannot be added after the auction has started.`);
-    if (name.length > 40)
-      throw new Chat.ErrorMessage(`Team names must be 40 characters or less.`);
+    if (this.state !== "setup") throw new Chat.ErrorMessage(`Teams cannot be added after the auction has started.`);
+    if (name.length > 40) throw new Chat.ErrorMessage(`Team names must be 40 characters or less.`);
     const team = new Team(name, this);
     this.teams.set(team.id, team);
     const teams = [...this.teams.values()];
@@ -407,43 +385,33 @@ class Auction extends Rooms.SimpleRoomGame {
     return team;
   }
   removeTeam(name) {
-    if (this.state !== "setup")
-      throw new Chat.ErrorMessage(`Teams cannot be removed after the auction has started.`);
+    if (this.state !== "setup") throw new Chat.ErrorMessage(`Teams cannot be removed after the auction has started.`);
     const team = this.teams.get(toID(name));
-    if (!team)
-      throw new Chat.ErrorMessage(`Team "${name}" not found.`);
+    if (!team) throw new Chat.ErrorMessage(`Team "${name}" not found.`);
     this.queue = this.queue.filter((t) => t !== team);
     this.teams.delete(team.id);
     return team;
   }
   suspendTeam(name) {
-    if (this.state === "bid")
-      throw new Chat.ErrorMessage(`Teams cannot be suspended during a nomination.`);
+    if (this.state === "bid") throw new Chat.ErrorMessage(`Teams cannot be suspended during a nomination.`);
     const team = this.teams.get(toID(name));
-    if (!team)
-      throw new Chat.ErrorMessage(`Team "${name}" not found.`);
-    if (team.suspended)
-      throw new Chat.ErrorMessage(`Team ${name} is already suspended.`);
-    if (this.nominatingTeam === team)
-      throw new Chat.ErrorMessage(`The nominating team cannot be suspended.`);
+    if (!team) throw new Chat.ErrorMessage(`Team "${name}" not found.`);
+    if (team.suspended) throw new Chat.ErrorMessage(`Team ${name} is already suspended.`);
+    if (this.nominatingTeam === team) throw new Chat.ErrorMessage(`The nominating team cannot be suspended.`);
     team.suspended = true;
     return team;
   }
   unsuspendTeam(name) {
-    if (this.state === "bid")
-      throw new Chat.ErrorMessage(`Teams cannot be unsuspended during a nomination.`);
+    if (this.state === "bid") throw new Chat.ErrorMessage(`Teams cannot be unsuspended during a nomination.`);
     const team = this.teams.get(toID(name));
-    if (!team)
-      throw new Chat.ErrorMessage(`Team "${name}" not found.`);
-    if (!team.suspended)
-      throw new Chat.ErrorMessage(`Team ${name} is not suspended.`);
+    if (!team) throw new Chat.ErrorMessage(`Team "${name}" not found.`);
+    if (!team.suspended) throw new Chat.ErrorMessage(`Team ${name} is not suspended.`);
     team.suspended = false;
     return team;
   }
   addManagers(teamName, users) {
     const team = this.teams.get(toID(teamName));
-    if (!team)
-      throw new Chat.ErrorMessage(`Team "${teamName}" not found.`);
+    if (!team) throw new Chat.ErrorMessage(`Team "${teamName}" not found.`);
     const problemUsers = users.filter((user) => !toID(user) || toID(user).length > 18);
     if (problemUsers.length) {
       throw new Chat.ErrorMessage(`Invalid usernames: ${problemUsers.join(", ")}`);
@@ -468,13 +436,10 @@ class Auction extends Rooms.SimpleRoomGame {
     }
   }
   addCreditsToTeam(teamName, amount) {
-    if (this.type === "snake")
-      throw new Chat.ErrorMessage(`Snake draft does not support credits.`);
-    if (this.state === "bid")
-      throw new Chat.ErrorMessage(`Credits cannot be changed during a nomination.`);
+    if (this.type === "snake") throw new Chat.ErrorMessage(`Snake draft does not support credits.`);
+    if (this.state === "bid") throw new Chat.ErrorMessage(`Credits cannot be changed during a nomination.`);
     const team = this.teams.get(toID(teamName));
-    if (!team)
-      throw new Chat.ErrorMessage(`Team "${teamName}" not found.`);
+    if (!team) throw new Chat.ErrorMessage(`Team "${teamName}" not found.`);
     const newCredits = team.credits + amount;
     if (newCredits <= 0 || newCredits > 1e7) {
       throw new Chat.ErrorMessage(`A team must have between 0 and 10,000,000 credits.`);
@@ -486,10 +451,8 @@ class Auction extends Rooms.SimpleRoomGame {
     return team;
   }
   start() {
-    if (this.state !== "setup")
-      throw new Chat.ErrorMessage(`The auction has already started.`);
-    if (this.teams.size < 2)
-      throw new Chat.ErrorMessage(`The auction needs at least 2 teams to start.`);
+    if (this.state !== "setup") throw new Chat.ErrorMessage(`The auction has already started.`);
+    if (this.teams.size < 2) throw new Chat.ErrorMessage(`The auction needs at least 2 teams to start.`);
     const problemTeams = [...this.teams.values()].filter((t) => t.maxBid() < this.minBid).map((t) => t.name);
     if (problemTeams.length) {
       throw new Chat.ErrorMessage(`The following teams do not have enough credits to draft the minimum amount of players: ${problemTeams.join(", ")}`);
@@ -531,18 +494,14 @@ class Auction extends Rooms.SimpleRoomGame {
     this.startNomTimer();
   }
   nominate(user, target) {
-    if (this.state !== "nom")
-      throw new Chat.ErrorMessage(`You cannot nominate players right now.`);
+    if (this.state !== "nom") throw new Chat.ErrorMessage(`You cannot nominate players right now.`);
     const manager = this.managers.get(user.id);
-    if (!manager || manager.team !== this.nominatingTeam)
-      this.checkOwner(user);
+    if (!manager || manager.team !== this.nominatingTeam) this.checkOwner(user);
     this.lastQueue = this.queue.slice();
     this.lastQueue.unshift(this.lastQueue.pop());
     const player = this.auctionPlayers.get(toID(target));
-    if (!player)
-      throw new Chat.ErrorMessage(`${target} is not a valid player.`);
-    if (player.team)
-      throw new Chat.ErrorMessage(`${player.name} has already been drafted.`);
+    if (!player) throw new Chat.ErrorMessage(`${target} is not a valid player.`);
+    if (player.team) throw new Chat.ErrorMessage(`${player.name} has already been drafted.`);
     this.clearNomTimer();
     this.nominatedPlayer = player;
     if (this.type === "snake") {
@@ -556,8 +515,7 @@ class Auction extends Rooms.SimpleRoomGame {
       this.sendMessage(import_lib.Utils.html`/html <username class="username">${user.name}</username> from team <b>${this.nominatingTeam.name}</b> has nominated <username>${player.name}</username> for auction!`);
       const notifyMsg = import_lib.Utils.html`|notify|${this.room.title} Auction|${player.name} has been nominated!`;
       for (const currManager of this.managers.values()) {
-        if (currManager.team === this.nominatingTeam)
-          continue;
+        if (currManager.team === this.nominatingTeam) continue;
         const curUser = Users.getExact(currManager.id);
         curUser?.sendTo(this.room, notifyMsg);
         curUser?.sendTo(
@@ -570,24 +528,17 @@ class Auction extends Rooms.SimpleRoomGame {
     }
   }
   bid(user, bid) {
-    if (this.state !== "bid")
-      throw new Chat.ErrorMessage(`There are no players up for auction right now.`);
+    if (this.state !== "bid") throw new Chat.ErrorMessage(`There are no players up for auction right now.`);
     const team = this.managers.get(user.id)?.team;
-    if (!team)
-      throw new Chat.ErrorMessage(`Only managers can bid on players.`);
-    if (team.isSuspended())
-      throw new Chat.ErrorMessage(`Your team is suspended and cannot place bids.`);
-    if (bid > team.maxBid())
-      throw new Chat.ErrorMessage(`Your team cannot afford to bid that much.`);
+    if (!team) throw new Chat.ErrorMessage(`Only managers can bid on players.`);
+    if (team.isSuspended()) throw new Chat.ErrorMessage(`Your team is suspended and cannot place bids.`);
+    if (bid > team.maxBid()) throw new Chat.ErrorMessage(`Your team cannot afford to bid that much.`);
     if (this.type === "blind") {
-      if (this.bidsPlaced.has(team))
-        throw new Chat.ErrorMessage(`Your team has already placed a bid.`);
-      if (bid <= this.minBid)
-        throw new Chat.ErrorMessage(`Your bid must be higher than the minimum bid.`);
+      if (this.bidsPlaced.has(team)) throw new Chat.ErrorMessage(`Your team has already placed a bid.`);
+      if (bid <= this.minBid) throw new Chat.ErrorMessage(`Your bid must be higher than the minimum bid.`);
       const msg = `|c:|${Math.floor(Date.now() / 1e3)}|&|/html Your team placed a bid of <b>${bid}</b> on <username>${import_lib.Utils.escapeHTML(this.nominatedPlayer.name)}</username>.`;
       for (const manager of this.managers.values()) {
-        if (manager.team !== team)
-          continue;
+        if (manager.team !== team) continue;
         Users.getExact(manager.id)?.sendTo(this.room, msg);
       }
       if (bid > this.highestBid) {
@@ -599,8 +550,7 @@ class Auction extends Rooms.SimpleRoomGame {
         this.finishCurrentNom();
       }
     } else {
-      if (bid <= this.highestBid)
-        throw new Chat.ErrorMessage(`Your bid must be higher than the current bid.`);
+      if (bid <= this.highestBid) throw new Chat.ErrorMessage(`Your bid must be higher than the current bid.`);
       this.highestBid = bid;
       this.highestBidder = team;
       this.sendBidInfo();
@@ -608,20 +558,16 @@ class Auction extends Rooms.SimpleRoomGame {
     }
   }
   onChatMessage(message, user) {
-    if (this.state !== "bid" || this.type !== "blind")
-      return;
-    if (message.startsWith("."))
-      message = message.slice(1);
+    if (this.state !== "bid" || this.type !== "blind") return;
+    if (message.startsWith(".")) message = message.slice(1);
     if (Number(message.replace(",", "."))) {
       this.bid(user, parseCredits(message));
       return "";
     }
   }
   onLogMessage(message, user) {
-    if (this.state !== "bid" || this.type === "blind")
-      return;
-    if (message.startsWith("."))
-      message = message.slice(1);
+    if (this.state !== "bid" || this.type === "blind") return;
+    if (message.startsWith(".")) message = message.slice(1);
     if (Number(message.replace(",", "."))) {
       this.room.update();
       try {
@@ -636,8 +582,7 @@ class Auction extends Rooms.SimpleRoomGame {
     }
   }
   skipNom() {
-    if (this.state !== "nom")
-      throw new Chat.ErrorMessage(`Nominations cannot be skipped right now.`);
+    if (this.state !== "nom") throw new Chat.ErrorMessage(`Nominations cannot be skipped right now.`);
     this.nominatedPlayer = null;
     this.sendMessage(`**${this.nominatingTeam.name}**'s nomination turn has been skipped!`);
     this.clearNomTimer();
@@ -662,10 +607,8 @@ class Auction extends Rooms.SimpleRoomGame {
     this.next();
   }
   undoLastNom() {
-    if (this.state !== "nom")
-      throw new Chat.ErrorMessage(`Nominations cannot be undone right now.`);
-    if (!this.lastQueue)
-      throw new Chat.ErrorMessage(`Only one nomination can be undone at a time.`);
+    if (this.state !== "nom") throw new Chat.ErrorMessage(`Nominations cannot be undone right now.`);
+    if (!this.lastQueue) throw new Chat.ErrorMessage(`Only one nomination can be undone at a time.`);
     this.queue = this.lastQueue;
     this.lastQueue = null;
     if (this.nominatedPlayer) {
@@ -680,8 +623,7 @@ class Auction extends Rooms.SimpleRoomGame {
     this.room.add("|uhtmlchange|timer|");
   }
   startNomTimer() {
-    if (!this.nomTimeLimit)
-      return;
+    if (!this.nomTimeLimit) return;
     this.clearNomTimer();
     this.sendTimer(false, true);
     this.nomTimer = setInterval(() => this.pokeNomTimer(), 1e3);
@@ -692,8 +634,7 @@ class Auction extends Rooms.SimpleRoomGame {
     this.room.add("|uhtmlchange|timer|");
   }
   startBidTimer() {
-    if (!this.bidTimeLimit)
-      return;
+    if (!this.bidTimeLimit) return;
     this.clearBidTimer();
     this.sendTimer();
     this.bidTimer = setInterval(() => this.pokeBidTimer(), 1e3);
@@ -724,8 +665,7 @@ class Auction extends Rooms.SimpleRoomGame {
     this.setEnded();
     this.sendHTMLBox(this.generateAuctionTable());
     this.sendHTMLBox(this.generatePriceList());
-    if (message)
-      this.sendMessage(message);
+    if (message) this.sendMessage(message);
     this.destroy();
   }
   destroy() {
@@ -739,10 +679,8 @@ const commands = {
     create(target, room, user) {
       room = this.requireRoom();
       this.checkCan("minigame", null, room);
-      if (room.game)
-        throw new Chat.ErrorMessage(`There is already a game of ${room.game.title} in progress in this room.`);
-      if (room.settings.auctionDisabled)
-        throw new Chat.ErrorMessage("Auctions are currently disabled in this room.");
+      if (room.game) throw new Chat.ErrorMessage(`There is already a game of ${room.game.title} in progress in this room.`);
+      if (room.settings.auctionDisabled) throw new Chat.ErrorMessage("Auctions are currently disabled in this room.");
       let startingCredits;
       if (target) {
         startingCredits = parseCredits(target);
@@ -796,8 +734,7 @@ const commands = {
     minbid(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction minbid");
+      if (!target) return this.parse("/help auction minbid");
       const amount = parseCredits(target);
       auction.setMinBid(amount);
       this.addModAction(`${user.name} set the minimum bid to ${amount}.`);
@@ -809,8 +746,7 @@ const commands = {
     minplayers(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction minplayers");
+      if (!target) return this.parse("/help auction minplayers");
       const amount = parseInt(target);
       auction.setMinPlayers(amount);
       this.addModAction(`${user.name} set the minimum number of players to ${amount}.`);
@@ -821,8 +757,7 @@ const commands = {
     maxplayers(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction maxplayers");
+      if (!target) return this.parse("/help auction maxplayers");
       const amount = parseInt(target);
       auction.setMaxPlayers(amount);
       this.addModAction(`${user.name} set the maximum number of players to ${amount}.`);
@@ -833,8 +768,7 @@ const commands = {
     nomtimer(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction nomtimer");
+      if (!target) return this.parse("/help auction nomtimer");
       const seconds = this.meansNo(target) ? 0 : parseInt(target);
       auction.setNomTimeLimit(seconds);
       this.addModAction(`${user.name} set the nomination timer to ${seconds} seconds.`);
@@ -845,8 +779,7 @@ const commands = {
     bidtimer(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction settimer");
+      if (!target) return this.parse("/help auction settimer");
       const seconds = parseInt(target);
       auction.setBidTimeLimit(seconds);
       this.addModAction(`${user.name} set the bid timer to ${seconds} seconds.`);
@@ -857,8 +790,7 @@ const commands = {
     settype(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction settype");
+      if (!target) return this.parse("/help auction settype");
       auction.setType(target);
       this.addModAction(`${user.name} set the auction type to ${toID(target)}.`);
     },
@@ -873,8 +805,7 @@ const commands = {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
       const owners = target.split(",").map((x) => x.trim());
-      if (!owners.length)
-        return this.parse("/help auction addowners");
+      if (!owners.length) return this.parse("/help auction addowners");
       auction.addOwners(owners);
       this.addModAction(`${user.name} added ${Chat.toListString(owners.map((o) => Users.getExact(o).name))} as auction owner${Chat.plural(owners.length)}.`);
     },
@@ -886,8 +817,7 @@ const commands = {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
       const owners = target.split(",").map((x) => x.trim());
-      if (!owners.length)
-        return this.parse("/help auction removeowners");
+      if (!owners.length) return this.parse("/help auction removeowners");
       auction.removeOwners(owners);
       this.addModAction(`${user.name} removed ${Chat.toListString(owners.map((o) => Users.getExact(o)?.name || o))} as auction owner${Chat.plural(owners.length)}.`);
     },
@@ -897,8 +827,7 @@ const commands = {
     async importplayers(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction importplayers");
+      if (!target) return this.parse("/help auction importplayers");
       if (!/^https?:\/\/pastebin\.com\/[a-zA-Z0-9]+$/.test(target)) {
         throw new Chat.ErrorMessage("Invalid pastebin URL.");
       }
@@ -907,8 +836,7 @@ const commands = {
         data = await (0, import_lib.Net)(`https://pastebin.com/raw/${target.split("/").pop()}`).get();
       } catch {
       }
-      if (!data)
-        throw new Chat.ErrorMessage("Error fetching data from pastebin.");
+      if (!data) throw new Chat.ErrorMessage("Error fetching data from pastebin.");
       auction.importPlayers(data);
       this.addModAction(`${user.name} imported the player list from ${target}.`);
     },
@@ -924,8 +852,7 @@ const commands = {
       const tiersPlayed = playedPart.split(",").map((item) => item.trim());
       const tiersNotPlayed = notPlayedPart ? notPlayedPart.split(",").map((item) => item.trim()) : [];
       const name = tiersPlayed.shift();
-      if (!name)
-        return this.parse("/help auction addplayer");
+      if (!name) return this.parse("/help auction addplayer");
       const player = auction.addAuctionPlayer(name, tiersPlayed, tiersNotPlayed);
       this.addModAction(`${user.name} added player ${player.name} to the auction.`);
     },
@@ -935,8 +862,7 @@ const commands = {
     removeplayer(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction removeplayer");
+      if (!target) return this.parse("/help auction removeplayer");
       const player = auction.removeAuctionPlayer(target);
       this.addModAction(`${user.name} removed player ${player.name} from the auction.`);
     },
@@ -947,8 +873,7 @@ const commands = {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
       const [player, team] = target.split(",").map((x) => x.trim());
-      if (!player)
-        return this.parse("/help auction assignplayer");
+      if (!player) return this.parse("/help auction assignplayer");
       if (team) {
         auction.assignPlayer(player, team);
         this.addModAction(`${user.name} assigned player ${player} to team ${team}.`);
@@ -964,8 +889,7 @@ const commands = {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
       const [name, ...managerNames] = target.split(",").map((x) => x.trim());
-      if (!name)
-        return this.parse("/help auction addteam");
+      if (!name) return this.parse("/help auction addteam");
       const team = auction.addTeam(name);
       this.addModAction(`${user.name} added team ${team.name} to the auction.`);
       auction.addManagers(team.name, managerNames);
@@ -976,8 +900,7 @@ const commands = {
     removeteam(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction removeteam");
+      if (!target) return this.parse("/help auction removeteam");
       const team = auction.removeTeam(target);
       this.addModAction(`${user.name} removed team ${team.name} from the auction.`);
     },
@@ -987,8 +910,7 @@ const commands = {
     suspendteam(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction suspendteam");
+      if (!target) return this.parse("/help auction suspendteam");
       const team = auction.suspendTeam(target);
       this.addModAction(`${user.name} suspended team ${team.name}.`);
     },
@@ -999,8 +921,7 @@ const commands = {
     unsuspendteam(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction unsuspendteam");
+      if (!target) return this.parse("/help auction unsuspendteam");
       const team = auction.unsuspendTeam(target);
       this.addModAction(`${user.name} unsuspended team ${team.name}.`);
     },
@@ -1012,8 +933,7 @@ const commands = {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
       const [teamName, ...managerNames] = target.split(",").map((x) => x.trim());
-      if (!teamName || !managerNames.length)
-        return this.parse("/help auction addmanagers");
+      if (!teamName || !managerNames.length) return this.parse("/help auction addmanagers");
       const team = auction.addManagers(teamName, managerNames);
       const managers = managerNames.map((m) => Users.getExact(m)?.name || toID(m));
       this.addModAction(`${user.name} added ${Chat.toListString(managers)} as manager${Chat.plural(managers.length)} for team ${team.name}.`);
@@ -1025,8 +945,7 @@ const commands = {
     removemanagers(target, room, user) {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
-      if (!target)
-        return this.parse("/help auction removemanagers");
+      if (!target) return this.parse("/help auction removemanagers");
       const managerNames = target.split(",").map((x) => x.trim());
       auction.removeManagers(managerNames);
       const managers = managerNames.map((m) => Users.getExact(m)?.name || toID(m));
@@ -1039,8 +958,7 @@ const commands = {
       const auction = this.requireGame(Auction);
       auction.checkOwner(user);
       const [teamName, amount] = target.split(",").map((x) => x.trim());
-      if (!teamName || !amount)
-        return this.parse("/help auction addcredits");
+      if (!teamName || !amount) return this.parse("/help auction addcredits");
       const credits = parseCredits(amount);
       const team = auction.addCreditsToTeam(teamName, credits);
       this.addModAction(`${user.name} ${credits < 0 ? "removed" : "added"} ${Math.abs(credits)} credits ${credits < 0 ? "from" : "to"} team ${team.name}.`);
@@ -1051,8 +969,7 @@ const commands = {
     nom: "nominate",
     nominate(target, room, user) {
       const auction = this.requireGame(Auction);
-      if (!target)
-        return this.parse("/help auction nominate");
+      if (!target) return this.parse("/help auction nominate");
       auction.nominate(user, target);
     },
     nominatehelp: [
@@ -1093,8 +1010,7 @@ const commands = {
     },
     ongoing: "running",
     running() {
-      if (!this.runBroadcast())
-        return;
+      if (!this.runBroadcast()) return;
       const runningAuctions = [...Rooms.rooms.values()].filter((r) => r.getGame(Auction)).map((r) => r.title);
       this.sendReply(`Running auctions: ${runningAuctions.join(", ") || "None"}`);
     },
@@ -1104,8 +1020,7 @@ const commands = {
     }
   },
   auctionhelp() {
-    if (!this.runBroadcast())
-      return;
+    if (!this.runBroadcast()) return;
     this.sendReplyBox(
       `Auction commands<br/>- create [startingcredits]: Creates an auction.<br/>- start: Starts the auction.<br/>- reset: Resets the auction.<br/>- end: Ends the auction.<br/>- running: Shows a list of rooms with running auctions.<br/>- display: Displays the current state of the auction.<br/>- pricelist: Displays the current prices of players by team.<br/>- nom [player]: Nominates a player for auction.<br/>You may use /nom directly without the /auction prefix.<br/>During the bidding phase, all numbers that are sent in the chat will be treated as bids.<br/><br/><details class="readmore"><summary>Configuration Commands</summary>- minbid [amount]: Sets the minimum bid.<br/>- minplayers [amount]: Sets the minimum number of players.<br/>- nomtimer [seconds]: Sets the nomination timer to [seconds] seconds.<br/>- bidtimer [seconds]: Sets the bid timer to [seconds] seconds.<br/>- settype [auction|blind|snake]: Sets the auction type.<br/>- addowners [user1], [user2], ...: Adds users as auction owners.<br/>- removeowners [user1], [user2], ...: Removes users as auction owners.<br/>- importplayers [pastebin url]: Imports a list of players from a pastebin.<br/>- addplayer [name], [tier1], [tier2], ...: Adds a player to the auction.<br/>- removeplayer [name]: Removes a player from the auction.<br/>- assignplayer [player], [team]: Assigns a player to a team. If team is blank, returns player to draft pool.<br/>- addteam [name], [manager1], [manager2], ...: Adds a team to the auction.<br/>- removeteam [name]: Removes the given team from the auction.<br/>- suspendteam [name]: Suspends the given team from the auction.<br/>- unsuspendteam [name]: Unsuspends the given team from the auction.<br/>- addmanagers [team], [user1], [user2], ...: Adds users as managers to a team.<br/>- removemanagers [user1], [user2], ...: Removes users as managers..<br/>- addcredits [team], [amount]: Adds credits to a team.<br/>- skipnom: Skips the current nomination.<br/>- undo: Undoes the last nomination.<br/>- [enable/disable]: Enables or disables auctions from being started in a room.<br/></details>`
     );

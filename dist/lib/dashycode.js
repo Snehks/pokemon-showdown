@@ -50,15 +50,13 @@ function streamWrite(stream, writeBufLength, writeBuf) {
 function streamGetCode(stream) {
   const buf = stream.codeBuf + CODE_MAP.charAt(stream.buf);
   let end2Len = 0;
-  while (buf.charAt(buf.length - 1 - end2Len) === "2")
-    end2Len++;
+  while (buf.charAt(buf.length - 1 - end2Len) === "2") end2Len++;
   return end2Len ? buf.slice(0, -end2Len) : buf;
 }
 function streamPeek(stream, readLength, readMask = 65535 >> 16 - readLength) {
   while (stream.bufLength < readLength && stream.codeBuf.length) {
     const next5Bits = CODE_MAP.indexOf(stream.codeBuf.charAt(0));
-    if (next5Bits < 0)
-      throw new Error("Invalid character in coded buffer");
+    if (next5Bits < 0) throw new Error("Invalid character in coded buffer");
     stream.codeBuf = stream.codeBuf.slice(1);
     stream.buf += next5Bits << stream.bufLength;
     stream.bufLength += 5;
@@ -72,8 +70,7 @@ function streamRead(stream, readLength, readMask = 65535 >> 16 - readLength) {
   return output;
 }
 function encode(str, allowCaps = false) {
-  if (!str)
-    return "0--0";
+  if (!str) return "0--0";
   let safePart = "";
   const unsafeStream = {
     codeBuf: "",
@@ -97,41 +94,36 @@ function encode(str, allowCaps = false) {
       alphaIndex -= 8;
       capBuffer = 0;
     }
-    if (i === str.length)
-      break;
+    if (i === str.length) break;
     if (isLowercase || isUppercase || isNumeric) {
-      if (alphaIndex < 0)
-        throw new Error("alphaIndex should be non-negative here");
+      if (alphaIndex < 0) throw new Error("alphaIndex should be non-negative here");
       if (!isSafe) {
-        if (capBuffer)
-          throw new Error("capBuffer shouldn't exist here");
+        if (capBuffer) throw new Error("capBuffer shouldn't exist here");
         streamWrite(unsafeStream, 2, 0);
         isSafe = true;
       }
       if (isUppercase && !allowCaps) {
         safePart += String.fromCharCode(curCharCode + 32);
         while (alphaIndex >= 8) {
-          if (capBuffer)
-            throw new Error("capBuffer shouldn't exist here");
+          if (capBuffer) throw new Error("capBuffer shouldn't exist here");
           alphaIndex -= 8;
           streamWrite(unsafeStream, 11, 5);
         }
-        if (!capBuffer)
-          capBuffer = 5;
+        if (!capBuffer) capBuffer = 5;
         capBuffer += 1 << alphaIndex + 3;
       } else {
         safePart += str.charAt(i);
       }
-      if (isUppercase || isLowercase)
-        alphaIndex++;
+      if (isUppercase || isLowercase) alphaIndex++;
       continue;
     }
-    if (capBuffer)
-      throw new Error("capBuffer shouldn't exist here");
+    if (capBuffer) throw new Error("capBuffer shouldn't exist here");
     alphaIndex = 0;
     if (isSafe && curCharCode === 32) {
       const nextCharCode = str.charCodeAt(i + 1);
-      if (97 <= nextCharCode && nextCharCode <= 122 || 65 <= nextCharCode && nextCharCode <= 90 || 48 <= nextCharCode && nextCharCode <= 57) {
+      if (97 <= nextCharCode && nextCharCode <= 122 || // a-z
+      65 <= nextCharCode && nextCharCode <= 90 || // A-Z
+      48 <= nextCharCode && nextCharCode <= 57) {
         safePart += "-";
         streamWrite(unsafeStream, 2, 0);
         continue;
@@ -165,11 +157,9 @@ function encode(str, allowCaps = false) {
   if (!safePart) {
     safePart = "0";
     unsafePart = `0${unsafePart}`;
-    if (unsafePart.endsWith("2"))
-      unsafePart = unsafePart.slice(0, -1);
+    if (unsafePart.endsWith("2")) unsafePart = unsafePart.slice(0, -1);
   }
-  if (!unsafePart)
-    return safePart;
+  if (!unsafePart) return safePart;
   return `${safePart}--${unsafePart}`;
 }
 function decode(codedStr) {
@@ -246,8 +236,7 @@ function decode(codedStr) {
         }
         str += curChar;
       } while (curChar);
-      if (isEmpty && i !== lastDashIndex)
-        str += " ";
+      if (isEmpty && i !== lastDashIndex) str += " ";
     }
   }
   return str;

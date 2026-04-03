@@ -78,8 +78,7 @@ const Conditions = {
       return false;
     },
     onAfterMoveSelf(pokemon) {
-      if (pokemon.statusState.time <= 0)
-        pokemon.cureStatus();
+      if (pokemon.statusState.time <= 0) pokemon.cureStatus();
     }
   },
   frz: {

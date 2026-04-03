@@ -79,8 +79,7 @@ const Conditions = {
     name: "frz",
     inherit: true,
     onBeforeMove(pokemon, target, move) {
-      if (move.flags["defrost"])
-        return;
+      if (move.flags["defrost"]) return;
       this.add("cant", pokemon, "frz");
       return false;
     },
@@ -94,13 +93,11 @@ const Conditions = {
       }
     },
     onAfterMoveSecondarySelf(pokemon, target, move) {
-      if (move.flags["defrost"])
-        pokemon.cureStatus();
+      if (move.flags["defrost"]) pokemon.cureStatus();
     },
     onResidualOrder: 7,
     onResidual(pokemon) {
-      if (this.randomChance(25, 256))
-        pokemon.cureStatus();
+      if (this.randomChance(25, 256)) pokemon.cureStatus();
     }
   },
   psn: {
@@ -122,8 +119,7 @@ const Conditions = {
     effectType: "Status",
     onStart(target) {
       this.add("-status", target, "tox");
-      if (!target.volatiles["residualdmg"])
-        target.addVolatile("residualdmg");
+      if (!target.volatiles["residualdmg"]) target.addVolatile("residualdmg");
       target.volatiles["residualdmg"].counter = 0;
     },
     onAfterMoveSelfPriority: 3,
@@ -175,8 +171,7 @@ const Conditions = {
         selfdestruct: move.selfdestruct
       };
       const damage = this.actions.getDamage(pokemon, pokemon, move);
-      if (typeof damage !== "number")
-        throw new Error("Confusion damage not dealt");
+      if (typeof damage !== "number") throw new Error("Confusion damage not dealt");
       this.directDamage(damage);
       return false;
     }
@@ -210,8 +205,7 @@ const Conditions = {
     },
     onEnd(target) {
       delete target.volatiles["confusion"];
-      if (!target.side.getSideCondition("safeguard"))
-        target.addVolatile("confusion");
+      if (!target.side.getSideCondition("safeguard")) target.addVolatile("confusion");
     },
     onLockMove(pokemon) {
       return this.effectState.move;
@@ -269,12 +263,10 @@ const Conditions = {
     },
     onAfterMoveSelfPriority: 100,
     onAfterMoveSelf(pokemon) {
-      if (["brn", "psn", "tox"].includes(pokemon.status))
-        pokemon.volatiles["residualdmg"].counter++;
+      if (["brn", "psn", "tox"].includes(pokemon.status)) pokemon.volatiles["residualdmg"].counter++;
     },
     onAfterSwitchInSelf(pokemon) {
-      if (["brn", "psn", "tox"].includes(pokemon.status))
-        pokemon.volatiles["residualdmg"].counter++;
+      if (["brn", "psn", "tox"].includes(pokemon.status)) pokemon.volatiles["residualdmg"].counter++;
     }
   }
 };

@@ -45,14 +45,21 @@ var import_random_player_ai = require("./random-player-ai");
  *
  * @license MIT
  */
-const _Runner = class {
+class Runner {
+  static {
+    this.AI_OPTIONS = {
+      createAI: (s, o) => new import_random_player_ai.RandomPlayerAI(s, o),
+      move: 0.7,
+      mega: 0.6
+    };
+  }
   constructor(options) {
     this.format = options.format;
     this.prng = import_prng.PRNG.get(options.prng);
-    this.p1options = { ..._Runner.AI_OPTIONS, ...options.p1options };
-    this.p2options = { ..._Runner.AI_OPTIONS, ...options.p2options };
-    this.p3options = { ..._Runner.AI_OPTIONS, ...options.p3options };
-    this.p4options = { ..._Runner.AI_OPTIONS, ...options.p4options };
+    this.p1options = { ...Runner.AI_OPTIONS, ...options.p1options };
+    this.p2options = { ...Runner.AI_OPTIONS, ...options.p2options };
+    this.p3options = { ...Runner.AI_OPTIONS, ...options.p3options };
+    this.p4options = { ...Runner.AI_OPTIONS, ...options.p4options };
     this.input = !!options.input;
     this.output = !!options.output;
     this.error = !!options.error;
@@ -61,8 +68,7 @@ const _Runner = class {
   async run() {
     const battleStream = this.dual ? new DualStream(this.input, this.dual === "debug") : new RawBattleStream(this.input);
     const game = this.runGame(this.format, battleStream);
-    if (!this.error)
-      return game;
+    if (!this.error) return game;
     return game.catch((err) => {
       console.log(`
 ${battleStream.rawInputLog.join("\n")}
@@ -116,8 +122,7 @@ ${battleStream.rawInputLog.join("\n")}
     }
     void streams.omniscient.write(initMessage);
     for await (const chunk of streams.omniscient) {
-      if (this.output)
-        console.log(chunk);
+      if (this.output) console.log(chunk);
     }
     return streams.omniscient.writeEnd();
   }
@@ -132,17 +137,10 @@ ${battleStream.rawInputLog.join("\n")}
     ].join(",");
   }
   getPlayerSpec(name, options) {
-    if (options.team)
-      return { name, team: options.team };
+    if (options.team) return { name, team: options.team };
     return { name, seed: this.newSeed() };
   }
-};
-let Runner = _Runner;
-Runner.AI_OPTIONS = {
-  createAI: (s, o) => new import_random_player_ai.RandomPlayerAI(s, o),
-  move: 0.7,
-  mega: 0.6
-};
+}
 class RawBattleStream extends BattleStreams.BattleStream {
   constructor(input) {
     super();
@@ -150,8 +148,7 @@ class RawBattleStream extends BattleStreams.BattleStream {
     this.rawInputLog = [];
   }
   _write(message) {
-    if (this.input)
-      console.log(message);
+    if (this.input) console.log(message);
     this.rawInputLog.push(message);
     super._write(message);
   }
@@ -171,8 +168,7 @@ class DualStream {
   async read() {
     const control = await this.control.read();
     const test = await this.test.read();
-    if (!this.debug)
-      import_assert.strict.equal(import_state.State.normalizeLog(test), import_state.State.normalizeLog(control));
+    if (!this.debug) import_assert.strict.equal(import_state.State.normalizeLog(test), import_state.State.normalizeLog(control));
     return control;
   }
   write(message) {
@@ -186,8 +182,7 @@ class DualStream {
     this.test._writeEnd();
   }
   compare(end) {
-    if (!this.control.battle || !this.test.battle)
-      return;
+    if (!this.control.battle || !this.test.battle) return;
     const control = this.control.battle.toJSON();
     const test = this.test.battle.toJSON();
     try {
@@ -199,8 +194,7 @@ class DualStream {
       }
       throw new Error(err.message);
     }
-    if (end)
-      return;
+    if (end) return;
     const send = this.test.battle.send;
     this.test.battle = import_battle.Battle.fromJSON(test);
     this.test.battle.restart(send);

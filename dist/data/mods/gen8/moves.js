@@ -61,8 +61,7 @@ const Moves = {
   blizzard: {
     inherit: true,
     onModifyMove(move) {
-      if (this.field.isWeather("hail"))
-        move.accuracy = true;
+      if (this.field.isWeather("hail")) move.accuracy = true;
     }
   },
   boltbeak: {
@@ -567,8 +566,7 @@ const Moves = {
         this.add("-sidestart", side, "move: Sticky Web");
       },
       onSwitchIn(pokemon) {
-        if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots"))
-          return;
+        if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots")) return;
         this.add("-activate", pokemon, "move: Sticky Web");
         this.boost({ spe: -1 }, pokemon, this.effectState.source, this.dex.getActiveMove("stickyweb"));
       }

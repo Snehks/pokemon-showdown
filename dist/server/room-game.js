@@ -42,12 +42,10 @@ module.exports = __toCommonJS(room_game_exports);
 class RoomGamePlayer {
   constructor(user, game, num = 0) {
     this.num = num;
-    if (!user)
-      user = num ? `Player ${num}` : `Player`;
+    if (!user) user = num ? `Player ${num}` : `Player`;
     this.game = game;
     this.name = typeof user === "string" ? user : user.name;
-    if (typeof user === "string")
-      user = null;
+    if (typeof user === "string") user = null;
     this.id = user ? user.id : "";
     if (user && !this.game.isSubGame) {
       user.games.add(this.game.roomid);
@@ -120,16 +118,12 @@ class RoomGame {
   }
   addPlayer(user = null, ...rest) {
     if (typeof user !== "string" && user) {
-      if (user.id in this.playerTable)
-        return null;
+      if (user.id in this.playerTable) return null;
     }
-    if (this.playerCap > 0 && this.playerCount >= this.playerCap)
-      return null;
+    if (this.playerCap > 0 && this.playerCount >= this.playerCap) return null;
     const player = this.makePlayer(user, ...rest);
-    if (!player)
-      return null;
-    if (typeof user === "string")
-      user = null;
+    if (!player) return null;
+    if (typeof user === "string") user = null;
     this.players.push(player);
     if (user) {
       this.playerTable[user.id] = player;
@@ -138,15 +132,12 @@ class RoomGame {
     return player;
   }
   updatePlayer(player, userOrName) {
-    if (!this.allowRenames)
-      return;
+    if (!this.allowRenames) return;
     this.setPlayerUser(player, userOrName);
   }
   setPlayerUser(player, userOrName) {
-    if (this.ended)
-      return;
-    if (player.id === toID(userOrName))
-      return;
+    if (this.ended) return;
+    if (player.id === toID(userOrName)) return;
     if (player.id) {
       delete this.playerTable[player.id];
       const user = Users.getExact(player.id);
@@ -175,8 +166,7 @@ class RoomGame {
   removePlayer(player) {
     this.setPlayerUser(player, null);
     const playerIndex = this.players.indexOf(player);
-    if (playerIndex < 0)
-      return false;
+    if (playerIndex < 0) return false;
     this.players.splice(playerIndex, 1);
     player.destroy();
     this.playerCount--;
@@ -205,11 +195,9 @@ class RoomGame {
    * function.
    */
   setEnded() {
-    if (this.ended)
-      return;
+    if (this.ended) return;
     this.ended = true;
-    if (this.isSubGame)
-      return;
+    if (this.isSubGame) return;
     for (const player of this.players) {
       const user = player.getUser();
       if (user) {
@@ -263,8 +251,7 @@ class RoomGame {
       }
       return;
     }
-    if (!(oldUserid in this.playerTable))
-      return;
+    if (!(oldUserid in this.playerTable)) return;
     if (!user.named) {
       return this.onLeave(user, oldUserid);
     }

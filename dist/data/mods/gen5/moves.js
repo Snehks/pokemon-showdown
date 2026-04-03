@@ -80,8 +80,7 @@ const Moves = {
       onModifyWeight(weighthg, pokemon) {
         if (this.effectState.multiplier) {
           weighthg -= this.effectState.multiplier * 1e3;
-          if (weighthg < 1)
-            weighthg = 1;
+          if (weighthg < 1) weighthg = 1;
           return weighthg;
         }
       }
@@ -118,8 +117,7 @@ const Moves = {
   camouflage: {
     inherit: true,
     onHit(target) {
-      if (!target.setType("Ground"))
-        return false;
+      if (!target.setType("Ground")) return false;
       this.add("-start", target, "typechange", "Ground");
     }
   },
@@ -133,8 +131,7 @@ const Moves = {
     onModifyMove(move, pokemon) {
       if (pokemon.species.name !== "Chatot") {
         const confusion = move.secondaries?.find((secondary) => secondary.volatileStatus === "confusion");
-        if (confusion)
-          confusion.chance = 0;
+        if (confusion) confusion.chance = 0;
       }
     },
     secondary: {
@@ -167,8 +164,7 @@ const Moves = {
         return false;
       }
       const type = this.sample(possibleTypes);
-      if (!target.setType(type))
-        return false;
+      if (!target.setType(type)) return false;
       this.add("-start", target, "typechange", type);
     }
   },
@@ -198,8 +194,7 @@ const Moves = {
   defog: {
     inherit: true,
     onHit(pokemon) {
-      if (!pokemon.volatiles["substitute"])
-        this.boost({ evasion: -1 });
+      if (!pokemon.volatiles["substitute"]) this.boost({ evasion: -1 });
       const sideConditions = ["reflect", "lightscreen", "safeguard", "mist", "spikes", "toxicspikes", "stealthrock"];
       for (const condition of sideConditions) {
         if (pokemon.side.removeSideCondition(condition)) {
@@ -312,8 +307,7 @@ const Moves = {
     inherit: true,
     basePower: 100,
     onTry(source, target) {
-      if (!target.side.addSlotCondition(target, "futuremove"))
-        return false;
+      if (!target.side.addSlotCondition(target, "futuremove")) return false;
       Object.assign(target.side.slotConditions[target.position]["futuremove"], {
         duration: 3,
         move: "futuresight",
@@ -374,8 +368,7 @@ const Moves = {
     inherit: true,
     basePowerCallback(pokemon, target) {
       let power = Math.floor(25 * target.getStat("spe") / Math.max(1, pokemon.getStat("spe"))) + 1;
-      if (power > 150)
-        power = 150;
+      if (power > 150) power = 150;
       this.debug(`BP: ${power}`);
       return power;
     }
@@ -544,8 +537,7 @@ const Moves = {
         if (target !== source && this.effectState.target.hasAlly(target) && this.getCategory(move) === "Special") {
           if (!target.getMoveHitData(move).crit && !move.infiltrates) {
             this.debug("Light Screen weaken");
-            if (this.activePerHalf > 1)
-              return this.chainModify([2703, 4096]);
+            if (this.activePerHalf > 1) return this.chainModify([2703, 4096]);
             return this.chainModify(0.5);
           }
         }
@@ -770,8 +762,7 @@ const Moves = {
         if (target !== source && this.effectState.target.hasAlly(target) && this.getCategory(move) === "Physical") {
           if (!target.getMoveHitData(move).crit && !move.infiltrates) {
             this.debug("Reflect weaken");
-            if (this.activePerHalf > 1)
-              return this.chainModify([2703, 4096]);
+            if (this.activePerHalf > 1) return this.chainModify([2703, 4096]);
             return this.chainModify(0.5);
           }
         }
@@ -843,11 +834,9 @@ const Moves = {
     inherit: true,
     flags: { contact: 1, charge: 1, protect: 1, mirror: 1, gravity: 1, distance: 1, metronome: 1, nosleeptalk: 1 },
     onTryHit(target, source, move) {
-      if (target.fainted)
-        return false;
+      if (target.fainted) return false;
       if (source.removeVolatile(move.id)) {
-        if (target !== source.volatiles["twoturnmove"].source)
-          return false;
+        if (target !== source.volatiles["twoturnmove"].source) return false;
         if (target.hasType("Flying")) {
           this.add("-immune", target);
           this.add("-end", target, "Sky Drop");
@@ -944,8 +933,7 @@ const Moves = {
         target.volatiles["substitute"].hp -= damage;
         source.lastDamage = damage;
         if (target.volatiles["substitute"].hp <= 0) {
-          if (move.ohko)
-            this.add("-ohko");
+          if (move.ohko) this.add("-ohko");
           target.removeVolatile("substitute");
         } else {
           this.add("-activate", target, "Substitute", "[damage]");

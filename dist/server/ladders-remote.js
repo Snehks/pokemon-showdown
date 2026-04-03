@@ -36,6 +36,9 @@ var import_lib = require("../lib");
  * @license MIT
  */
 class LadderStore {
+  static {
+    this.formatsListPrefix = "";
+  }
   constructor(formatid) {
     this.formatid = formatid;
   }
@@ -66,8 +69,7 @@ class LadderStore {
     if (data && !data.errorip) {
       mmr = Number(data);
     }
-    if (isNaN(mmr))
-      return 1e3;
+    if (isNaN(mmr)) return 1e3;
     if (user && user.id === userid) {
       user.mmrCache[formatid] = mmr;
     }
@@ -98,19 +100,15 @@ class LadderStore {
     const p2NewElo = Math.round(this.calculateElo(p2OldElo, 1 - p1score, p1OldElo));
     const p1Act = p1score > 0.9 ? `winning` : p1score < 0.1 ? `losing` : `tying`;
     let p1Reasons = `${p1NewElo - p1OldElo} for ${p1Act}`;
-    if (!p1Reasons.startsWith("-"))
-      p1Reasons = "+" + p1Reasons;
+    if (!p1Reasons.startsWith("-")) p1Reasons = "+" + p1Reasons;
     room.addRaw(import_lib.Utils.html`${p1name}'s rating: ${p1OldElo} &rarr; <strong>${p1NewElo}</strong><br />(${p1Reasons})`);
     const p2Act = p1score > 0.9 || p1score < 0 ? `losing` : p1score < 0.1 ? `winning` : `tying`;
     let p2Reasons = `${p2NewElo - p2OldElo} for ${p2Act}`;
-    if (!p2Reasons.startsWith("-"))
-      p2Reasons = "+" + p2Reasons;
+    if (!p2Reasons.startsWith("-")) p2Reasons = "+" + p2Reasons;
     room.addRaw(import_lib.Utils.html`${p2name}'s rating: ${p2OldElo} &rarr; <strong>${p2NewElo}</strong><br />(${p2Reasons})`);
     room.rated = Math.min(p1NewElo, p2NewElo);
-    if (p1)
-      p1.mmrCache[formatid] = +p1NewElo;
-    if (p2)
-      p2.mmrCache[formatid] = +p2NewElo;
+    if (p1) p1.mmrCache[formatid] = +p1NewElo;
+    if (p2) p2.mmrCache[formatid] = +p2NewElo;
     room.update();
     const [data, error] = await ladderUpdatePromise;
     let problem = false;
@@ -163,5 +161,4 @@ class LadderStore {
     return Math.max(newElo, 1e3);
   }
 }
-LadderStore.formatsListPrefix = "";
 //# sourceMappingURL=ladders-remote.js.map

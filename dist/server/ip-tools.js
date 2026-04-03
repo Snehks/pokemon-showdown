@@ -115,8 +115,7 @@ const IPTools = new class {
    * Return value matches isBlocked when treated as a boolean.
    */
   queryDnsbl(ip) {
-    if (!Config.dnsbl)
-      return Promise.resolve(null);
+    if (!Config.dnsbl) return Promise.resolve(null);
     if (IPTools.dnsblCache.has(ip)) {
       return Promise.resolve(IPTools.dnsblCache.get(ip) || null);
     }
@@ -133,55 +132,44 @@ const IPTools = new class {
     if (ip.includes(":") && !ip.includes(".")) {
       return null;
     }
-    if (ip.startsWith("::ffff:"))
-      ip = ip.slice(7);
-    else if (ip.startsWith("::"))
-      ip = ip.slice(2);
+    if (ip.startsWith("::ffff:")) ip = ip.slice(7);
+    else if (ip.startsWith("::")) ip = ip.slice(2);
     let num = 0;
     const parts = ip.split(".");
-    if (parts.length !== 4)
-      return null;
+    if (parts.length !== 4) return null;
     for (const part of parts) {
       num *= 256;
       const partAsInt = import_lib.Utils.parseExactInt(part);
-      if (isNaN(partAsInt) || partAsInt < 0 || partAsInt > 255)
-        return null;
+      if (isNaN(partAsInt) || partAsInt < 0 || partAsInt > 255) return null;
       num += partAsInt;
     }
     return num;
   }
   numberToIP(num) {
     const ipParts = [];
-    if (num < 0 || num >= 256 ** 4 || num !== Math.trunc(num))
-      return null;
+    if (num < 0 || num >= 256 ** 4 || num !== Math.trunc(num)) return null;
     while (num) {
       const part = num % 256;
       num = (num - part) / 256;
       ipParts.unshift(part.toString());
     }
-    while (ipParts.length < 4)
-      ipParts.unshift("0");
-    if (ipParts.length !== 4)
-      return null;
+    while (ipParts.length < 4) ipParts.unshift("0");
+    if (ipParts.length !== 4) return null;
     return ipParts.join(".");
   }
   getCidrRange(cidr) {
-    if (!cidr)
-      return null;
+    if (!cidr) return null;
     const index = cidr.indexOf("/");
     if (index <= 0) {
       const ip = IPTools.ipToNumber(cidr);
-      if (ip === null)
-        return null;
+      if (ip === null) return null;
       return { minIP: ip, maxIP: ip };
     }
     let low = IPTools.ipToNumber(cidr.slice(0, index));
     const bits = import_lib.Utils.parseExactInt(cidr.slice(index + 1));
-    if (low === null || !bits || bits < 2 || bits > 32)
-      return null;
+    if (low === null || !bits || bits < 2 || bits > 32) return null;
     low &= ~((1 << 32 - bits) - 1);
-    if (low < 0)
-      low += 4294967296;
+    if (low < 0) low += 4294967296;
     const high = low + (1 << 32 - bits) - 1;
     return { minIP: low, maxIP: high };
   }
@@ -190,32 +178,26 @@ const IPTools = new class {
     return IPTools.stringToRange(range) !== null;
   }
   stringToRange(range) {
-    if (!range)
-      return null;
+    if (!range) return null;
     if (range.endsWith("*")) {
       const parts = range.replace(".*", "").split(".");
-      if (parts.length > 3)
-        return null;
+      if (parts.length > 3) return null;
       const [a, b, c] = parts;
       const minIP2 = IPTools.ipToNumber(`${a || "0"}.${b || "0"}.${c || "0"}.0`);
       const maxIP2 = IPTools.ipToNumber(`${a || "255"}.${b || "255"}.${c || "255"}.255`);
-      if (minIP2 === null || maxIP2 === null)
-        return null;
+      if (minIP2 === null || maxIP2 === null) return null;
       return { minIP: minIP2, maxIP: maxIP2 };
     }
     const index = range.indexOf("-");
     if (index <= 0) {
-      if (range.includes("/"))
-        return IPTools.getCidrRange(range);
+      if (range.includes("/")) return IPTools.getCidrRange(range);
       const ip = IPTools.ipToNumber(range);
-      if (ip === null)
-        return null;
+      if (ip === null) return null;
       return { maxIP: ip, minIP: ip };
     }
     const minIP = IPTools.ipToNumber(range.slice(0, index));
     const maxIP = IPTools.ipToNumber(range.slice(index + 1));
-    if (minIP === null || maxIP === null || maxIP < minIP)
-      return null;
+    if (minIP === null || maxIP === null || maxIP < minIP) return null;
     return { minIP, maxIP };
   }
   rangeToString(range, sep = "-") {
@@ -225,8 +207,7 @@ const IPTools = new class {
    * Range management functions *
    ******************************/
   checkPattern(patterns, num) {
-    if (num === null)
-      return false;
+    if (num === null) return false;
     for (const pattern of patterns) {
       if (num >= pattern.minIP && num <= pattern.maxIP) {
         return true;
@@ -240,13 +221,11 @@ const IPTools = new class {
    * in the range.
    */
   checker(rangeString) {
-    if (!rangeString?.length)
-      return () => false;
+    if (!rangeString?.length) return () => false;
     let ranges = [];
     if (typeof rangeString === "string") {
       const rangePatterns = IPTools.stringToRange(rangeString);
-      if (rangePatterns)
-        ranges = [rangePatterns];
+      if (rangePatterns) ranges = [rangePatterns];
     } else {
       ranges = rangeString.map(IPTools.stringToRange).filter((x) => x);
     }
@@ -260,11 +239,9 @@ const IPTools = new class {
     const rows = data.split("\n").map((row) => row.replace("\r", ""));
     const ranges = [];
     for (const row of rows) {
-      if (!row)
-        continue;
+      if (!row) continue;
       let [type, hostOrLowIP, highIP, host] = row.split(",");
-      if (!hostOrLowIP)
-        continue;
+      if (!hostOrLowIP) continue;
       host = removeNohost(host);
       hostOrLowIP = removeNohost(hostOrLowIP);
       switch (type) {
@@ -281,8 +258,7 @@ const IPTools = new class {
           IPTools.mobileHosts.add(hostOrLowIP);
           break;
         case "RANGE":
-          if (!host)
-            continue;
+          if (!host) continue;
           const minIP = IPTools.ipToNumber(hostOrLowIP);
           if (minIP === null) {
             Monitor.error(`Bad IP address in host or proxy file: '${hostOrLowIP}'`);
@@ -294,8 +270,7 @@ const IPTools = new class {
             continue;
           }
           const range = { host: IPTools.urlToHost(host), maxIP, minIP };
-          if (range.maxIP < range.minIP)
-            throw new Error(`Bad range at ${hostOrLowIP}.`);
+          if (range.maxIP < range.minIP) throw new Error(`Bad range at ${hostOrLowIP}.`);
           ranges.push(range);
           break;
       }
@@ -451,15 +426,11 @@ Intersects with: ${IPTools.rangeToString(prev)} (${prev.host})`
    * Range handling functions
    *********************************************************/
   urlToHost(url) {
-    if (url.startsWith("http://"))
-      url = url.slice(7);
-    if (url.startsWith("https://"))
-      url = url.slice(8);
-    if (url.startsWith("www."))
-      url = url.slice(4);
+    if (url.startsWith("http://")) url = url.slice(7);
+    if (url.startsWith("https://")) url = url.slice(8);
+    if (url.startsWith("www.")) url = url.slice(4);
     const slashIndex = url.indexOf("/");
-    if (slashIndex > 0 && url[slashIndex - 1] !== "?")
-      url = url.slice(0, slashIndex);
+    if (slashIndex > 0 && url[slashIndex - 1] !== "?") url = url.slice(0, slashIndex);
     return url;
   }
   sortRanges() {
@@ -467,8 +438,7 @@ Intersects with: ${IPTools.rangeToString(prev)} (${prev.host})`
   }
   getRange(minIP, maxIP) {
     for (const range of IPTools.ranges) {
-      if (range.minIP === minIP && range.maxIP === maxIP)
-        return range;
+      if (range.minIP === minIP && range.maxIP === maxIP) return range;
     }
   }
   addRange(range) {
@@ -493,8 +463,7 @@ Intersects with: ${IPTools.rangeToString(prev)} (${prev.host})`
         return;
       }
       const ipNumber = IPTools.ipToNumber(ip);
-      if (ipNumber === null)
-        throw new Error(`Bad IP address: '${ip}'`);
+      if (ipNumber === null) throw new Error(`Bad IP address: '${ip}'`);
       for (const range of IPTools.ranges) {
         if (ipNumber >= range.minIP && ipNumber <= range.maxIP) {
           resolve(range.host);
@@ -560,12 +529,10 @@ Intersects with: ${IPTools.rangeToString(prev)} (${prev.host})`
     });
   }
   shortenHost(host) {
-    if (host.split(".").pop()?.includes("/"))
-      return host;
+    if (host.split(".").pop()?.includes("/")) return host;
     let dotLoc = host.lastIndexOf(".");
     const tld = host.slice(dotLoc);
-    if (tld === ".uk" || tld === ".au" || tld === ".br")
-      dotLoc = host.lastIndexOf(".", dotLoc - 1);
+    if (tld === ".uk" || tld === ".au" || tld === ".br") dotLoc = host.lastIndexOf(".", dotLoc - 1);
     dotLoc = host.lastIndexOf(".", dotLoc - 1);
     return host.slice(dotLoc + 1);
   }

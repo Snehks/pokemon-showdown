@@ -25,8 +25,7 @@ const transactions = {
   addHistory: (args, env) => {
     const gameHistoryInsertion = env.statements.get(args.gameHistoryInsertion);
     const scoreHistoryInsertion = env.statements.get(args.scoreHistoryInsertion);
-    if (!gameHistoryInsertion || !scoreHistoryInsertion)
-      throw new Error("Statements not found");
+    if (!gameHistoryInsertion || !scoreHistoryInsertion) throw new Error("Statements not found");
     for (const game of args.history) {
       const { lastInsertRowid } = gameHistoryInsertion.run(
         game.mode,
@@ -46,8 +45,7 @@ const transactions = {
     const { oldQuestionText, newQuestionText, newAnswers } = args;
     if (newAnswers) {
       const questionID = env.db.prepare("SELECT question_id FROM trivia_questions WHERE question = ?").get(oldQuestionText)?.question_id;
-      if (!questionID)
-        throw new Error("Question not found");
+      if (!questionID) throw new Error("Question not found");
       env.db.prepare("DELETE FROM trivia_answers WHERE question_id = ?").run(questionID);
       const insert = env.db.prepare("INSERT INTO trivia_answers (question_id, answer) VALUES (?, ?)");
       for (const answer of newAnswers) {
@@ -61,8 +59,7 @@ const transactions = {
   addQuestions: (args, env) => {
     const questionInsertion = env.statements.get(args.questionInsertion);
     const answerInsertion = env.statements.get(args.answerInsertion);
-    if (!questionInsertion || !answerInsertion)
-      throw new Error("Statements not found");
+    if (!questionInsertion || !answerInsertion) throw new Error("Statements not found");
     const isSubmissionForSQLite = Number(args.isSubmission);
     for (const question of args.questions) {
       const { lastInsertRowid } = questionInsertion.run(

@@ -58,12 +58,9 @@ const Abilities = {
   darkaura: {
     inherit: true,
     onAnyBasePower(basePower, source, target, move) {
-      if (target === source || move.category === "Status" || move.type !== source.teraType)
-        return;
-      if (!move.auraBooster?.hasAbility("Dark Aura"))
-        move.auraBooster = this.effectState.target;
-      if (move.auraBooster !== this.effectState.target)
-        return;
+      if (target === source || move.category === "Status" || move.type !== source.teraType) return;
+      if (!move.auraBooster?.hasAbility("Dark Aura")) move.auraBooster = this.effectState.target;
+      if (move.auraBooster !== this.effectState.target) return;
       return this.chainModify([move.hasAuraBreak ? 3072 : 5448, 4096]);
     }
   },
@@ -112,12 +109,9 @@ const Abilities = {
   fairyaura: {
     inherit: true,
     onAnyBasePower(basePower, source, target, move) {
-      if (target === source || move.category === "Status" || move.type !== source.teraType)
-        return;
-      if (!move.auraBooster?.hasAbility("Fairy Aura"))
-        move.auraBooster = this.effectState.target;
-      if (move.auraBooster !== this.effectState.target)
-        return;
+      if (target === source || move.category === "Status" || move.type !== source.teraType) return;
+      if (!move.auraBooster?.hasAbility("Fairy Aura")) move.auraBooster = this.effectState.target;
+      if (move.auraBooster !== this.effectState.target) return;
       return this.chainModify([move.hasAuraBreak ? 3072 : 5448, 4096]);
     }
   },
@@ -160,8 +154,7 @@ const Abilities = {
   flowerveil: {
     inherit: true,
     onAllyTryBoost(boost, target, source, effect) {
-      if (source && target === source || !target.hasType(this.effectState.target.teraType))
-        return;
+      if (source && target === source || !target.hasType(this.effectState.target.teraType)) return;
       let showMsg = false;
       let i;
       for (i in boost) {
@@ -198,18 +191,15 @@ const Abilities = {
     inherit: true,
     onSourceModifyDamage(damage, source, target, move) {
       let mod = 1;
-      if (move.type === target.teraType)
-        mod *= 2;
-      if (move.flags["contact"])
-        mod /= 2;
+      if (move.type === target.teraType) mod *= 2;
+      if (move.flags["contact"]) mod /= 2;
       return this.chainModify(mod);
     }
   },
   galewings: {
     inherit: true,
     onModifyPriority(priority, pokemon, target, move) {
-      if (move?.type === pokemon.teraType && pokemon.hp === pokemon.maxhp)
-        return priority + 1;
+      if (move?.type === pokemon.teraType && pokemon.hp === pokemon.maxhp) return priority + 1;
     }
   },
   galvanize: {
@@ -264,12 +254,10 @@ const Abilities = {
       }
     },
     onAnyRedirectTarget(target, source, source2, move) {
-      if (move.type !== this.effectState.target.teraType || move.flags["pledgecombo"])
-        return;
+      if (move.type !== this.effectState.target.teraType || move.flags["pledgecombo"]) return;
       const redirectTarget = ["randomNormal", "adjacentFoe"].includes(move.target) ? "normal" : move.target;
       if (this.validTarget(this.effectState.target, source, redirectTarget)) {
-        if (move.smartTarget)
-          move.smartTarget = false;
+        if (move.smartTarget) move.smartTarget = false;
         if (this.effectState.target !== target) {
           this.add("-activate", this.effectState.target, "ability: Lightning Rod");
         }
@@ -293,10 +281,8 @@ const Abilities = {
       }
     },
     onFoeMaybeTrapPokemon(pokemon, source) {
-      if (!source)
-        source = this.effectState.target;
-      if (!source || !pokemon.isAdjacent(source))
-        return;
+      if (!source) source = this.effectState.target;
+      if (!source || !pokemon.isAdjacent(source)) return;
       if (!pokemon.knownType || pokemon.hasType(source.teraType)) {
         pokemon.maybeTrapped = true;
       }
@@ -306,8 +292,7 @@ const Abilities = {
     inherit: true,
     onModifyMove(move, pokemon) {
       move.ignoreEvasion = true;
-      if (!move.ignoreImmunity)
-        move.ignoreImmunity = {};
+      if (!move.ignoreImmunity) move.ignoreImmunity = {};
       if (move.ignoreImmunity !== true) {
         move.ignoreImmunity[pokemon.teraType] = true;
       }
@@ -338,7 +323,8 @@ const Abilities = {
         "terrainpulse",
         "weatherball"
       ];
-      if (!(move.isZ && move.category !== "Status") && (!noModifyType.includes(move.id) || this.activeMove?.isMax) && !(move.name === "Tera Blast" && pokemon.terastallized)) {
+      if (!(move.isZ && move.category !== "Status") && // TODO: Figure out actual interaction
+      (!noModifyType.includes(move.id) || this.activeMove?.isMax) && !(move.name === "Tera Blast" && pokemon.terastallized)) {
         move.type = pokemon.teraType;
         move.typeChangerBoosted = this.effect;
       }
@@ -455,8 +441,7 @@ const Abilities = {
       }
     },
     onAllyTryHitSide(target, source, move) {
-      if (source === this.effectState.target || !target.isAlly(source))
-        return;
+      if (source === this.effectState.target || !target.isAlly(source)) return;
       if (move.type === this.effectState.target.teraType) {
         this.boost({ atk: 1 }, this.effectState.target);
       }
@@ -465,8 +450,7 @@ const Abilities = {
   scrappy: {
     inherit: true,
     onModifyMove(move, pokemon) {
-      if (!move.ignoreImmunity)
-        move.ignoreImmunity = {};
+      if (!move.ignoreImmunity) move.ignoreImmunity = {};
       if (move.ignoreImmunity !== true) {
         move.ignoreImmunity[pokemon.teraType] = true;
       }
@@ -515,12 +499,10 @@ const Abilities = {
       }
     },
     onAnyRedirectTarget(target, source, source2, move) {
-      if (move.type !== this.effectState.target.teraType || move.flags["pledgecombo"])
-        return;
+      if (move.type !== this.effectState.target.teraType || move.flags["pledgecombo"]) return;
       const redirectTarget = ["randomNormal", "adjacentFoe"].includes(move.target) ? "normal" : move.target;
       if (this.validTarget(this.effectState.target, source, redirectTarget)) {
-        if (move.smartTarget)
-          move.smartTarget = false;
+        if (move.smartTarget) move.smartTarget = false;
         if (this.effectState.target !== target) {
           this.add("-activate", this.effectState.target, "ability: Storm Drain");
         }

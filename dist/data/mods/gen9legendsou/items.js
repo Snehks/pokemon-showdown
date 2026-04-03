@@ -37,8 +37,7 @@ const Items = {
   zygardite: {
     inherit: true,
     onTakeItem(item, source) {
-      if (source.baseSpecies.baseSpecies === "Zygarde" && source.baseAbility === "powerconstruct" || source.baseSpecies.name === "Zygarde-Mega")
-        return false;
+      if (source.baseSpecies.baseSpecies === "Zygarde" && source.baseAbility === "powerconstruct" || source.baseSpecies.name === "Zygarde-Mega") return false;
       return true;
     }
   }

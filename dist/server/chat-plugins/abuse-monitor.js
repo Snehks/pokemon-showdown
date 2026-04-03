@@ -72,10 +72,8 @@ const NOJOIN_COMMAND_WHITELIST = {
 let migrated = global.Chat?.oldPlugins["abuse-monitor"]?.migrated || false;
 const cache = (() => {
   const plugin = global.Chat?.oldPlugins["abuse-monitor"];
-  if (!plugin?.cache)
-    return {};
-  if (plugin.migrated)
-    return plugin.cache;
+  if (!plugin?.cache) return {};
+  if (plugin.migrated) return plugin.cache;
   for (const k in plugin.cache) {
     const cur = plugin.cache[k];
     if (typeof cur.recommended?.type === "string") {
@@ -105,8 +103,7 @@ const settings = (() => {
   try {
     return { ...defaults, ...JSON.parse((0, import_lib.FS)("config/chat-plugins/nf.json").readSync()) };
   } catch (e) {
-    if (e.code !== "ENOENT")
-      throw e;
+    if (e.code !== "ENOENT") throw e;
     return defaults;
   }
 })();
@@ -125,20 +122,18 @@ const metadata = (() => {
   }
 })();
 function nextMonth(month) {
-  const next = new Date(new Date(`${month}-15`).getTime() + 30 * 24 * 60 * 60 * 1e3);
+  const next = new Date((/* @__PURE__ */ new Date(`${month}-15`)).getTime() + 30 * 24 * 60 * 60 * 1e3);
   return next.toISOString().slice(0, 7);
 }
 function isFlaggedUserid(name, room) {
   const id = (0, import_dex_data.toID)(name);
   const entry = cache[room]?.staffNotified;
-  if (!entry)
-    return false;
+  if (!entry) return false;
   return typeof entry === "string" ? entry === id : entry.includes(id);
 }
 function visualizePunishmentKey(punishment, key) {
   if (key === "secondaryTypes") {
-    if (!punishment.secondaryTypes)
-      return "";
+    if (!punishment.secondaryTypes) return "";
     const keys = import_lib.Utils.sortBy(Object.keys(punishment.secondaryTypes));
     return `${keys.map((k) => `${k}: ${punishment.secondaryTypes[k]}`).join(", ")}`;
   }
@@ -149,20 +144,16 @@ function visualizePunishment(punishment) {
 }
 function displayResolved(review, justSubmitted = false) {
   const user = Users.get(review.staff);
-  if (!user)
-    return;
+  if (!user) return;
   const resolved = review.resolved;
-  if (!resolved)
-    return;
+  if (!resolved) return;
   const prefix = `|pm|~|${user.getIdentity()}|`;
   user.send(
     prefix + `Your Artemis review for <<${review.room}>> was resolved by ${resolved.by}` + (justSubmitted ? "." : `, ${Chat.toDurationString(Date.now() - resolved.time)} ago.`)
   );
-  if (resolved.details)
-    user.send(prefix + `The response was: "${resolved.details}"`);
+  if (resolved.details) user.send(prefix + `The response was: "${resolved.details}"`);
   const idx = reviews[review.staff].findIndex((r) => r.room === review.room);
-  if (idx > -1)
-    reviews[review.staff].splice(idx, 1);
+  if (idx > -1) reviews[review.staff].splice(idx, 1);
   if (!reviews[review.staff].length) {
     delete reviews[review.staff];
   }
@@ -188,29 +179,23 @@ async function searchModlog(query) {
     actionTaker: [],
     action: []
   };
-  if (query.user)
-    search.user.push({ search: query.user, isExact: true });
+  if (query.user) search.user.push({ search: query.user, isExact: true });
   if (query.ip) {
-    if (!Array.isArray(query.ip))
-      query.ip = [query.ip];
+    if (!Array.isArray(query.ip)) query.ip = [query.ip];
     for (const ip of query.ip) {
       search.ip.push({ search: ip });
     }
   }
   const modlog = await Rooms.Modlog.search("global", search);
-  if (!modlog)
-    return 0;
+  if (!modlog) return 0;
   const ignores = metadata.modlogIgnores?.[query.user];
   if (userObj) {
     const validTypes = Array.from(Punishments.punishmentTypes.keys());
     const cacheEntry = {};
     for (const entry of modlog.results) {
-      if (Date.now() - entry.time > MAX_MODLOG_TIME)
-        continue;
-      if (!validTypes.some((k) => entry.action.endsWith(k)))
-        continue;
-      if (!cacheEntry[entry.action])
-        cacheEntry[entry.action] = 0;
+      if (Date.now() - entry.time > MAX_MODLOG_TIME) continue;
+      if (!validTypes.some((k) => entry.action.endsWith(k))) continue;
+      if (!cacheEntry[entry.action]) cacheEntry[entry.action] = 0;
       if (ignores) {
         if (typeof ignores === "string" && new Date(ignores).getTime() < new Date(entry.time).getTime()) {
           continue;
@@ -244,31 +229,25 @@ async function runActions(user, room, message, response) {
   const prevRecommend = roomRecord?.recommended?.[user.id];
   for (const punishment of settings.punishments) {
     if (prevRecommend?.type) {
-      if (PUNISHMENTS.indexOf(punishment.punishment) <= PUNISHMENTS.indexOf(prevRecommend?.type))
-        continue;
+      if (PUNISHMENTS.indexOf(punishment.punishment) <= PUNISHMENTS.indexOf(prevRecommend?.type)) continue;
     }
     for (const type of keys) {
       const num = response[type];
-      if (punishment.type && punishment.type !== type)
-        continue;
-      if (punishment.certainty && punishment.certainty > num)
-        continue;
+      if (punishment.type && punishment.type !== type) continue;
+      if (punishment.certainty && punishment.certainty > num) continue;
       if (punishment.modlogCount) {
         const modlog = await searchModlog({
           user: user.id,
           actions: punishment.modlogActions
         });
-        if (modlog < punishment.modlogCount)
-          continue;
+        if (modlog < punishment.modlogCount) continue;
       }
       if (punishment.secondaryTypes) {
         let matches = 0;
         for (const curType in punishment.secondaryTypes) {
-          if (response[curType] >= punishment.secondaryTypes[curType])
-            matches++;
+          if (response[curType] >= punishment.secondaryTypes[curType]) matches++;
         }
-        if (matches < Object.keys(punishment.secondaryTypes).length)
-          continue;
+        if (matches < Object.keys(punishment.secondaryTypes).length) continue;
       }
       if (punishment.count) {
         let hits = await Chat.database.all(
@@ -277,12 +256,10 @@ async function runActions(user, room, message, response) {
         );
         hits = hits.filter((f) => {
           const date = new Date(f.time);
-          if (date.getFullYear() < 2022)
-            return false;
+          if (date.getFullYear() < 2022) return false;
           return !(date.getFullYear() === 2022 && date.getMonth() <= 4 && date.getDate() <= 17);
         });
-        if (hits.length < punishment.count)
-          continue;
+        if (hits.length < punishment.count) continue;
       }
       recommended.push([punishment.punishment, type, !!punishment.requiresPunishment]);
     }
@@ -294,8 +271,7 @@ async function runActions(user, room, message, response) {
     }
     const [punishment, reason] = recommended[0];
     if (roomRecord) {
-      if (!roomRecord.recommended)
-        roomRecord.recommended = {};
+      if (!roomRecord.recommended) roomRecord.recommended = {};
       roomRecord.recommended[user.id] = { type: punishment, reason: reason.replace(/_/g, " ").toLowerCase() };
     }
     if (user.trusted) {
@@ -315,8 +291,7 @@ async function runActions(user, room, message, response) {
       const notified = roomRecord?.staffNotified;
       if (notified) {
         if (typeof notified === "string") {
-          if (notified === user.id)
-            delete roomRecord.staffNotified;
+          if (notified === user.id) delete roomRecord.staffNotified;
         } else {
           notified.splice(notified.indexOf(user.id), 1);
           if (!notified.length) {
@@ -338,8 +313,7 @@ async function runActions(user, room, message, response) {
   }
 }
 function globalModlog(action, user, note, roomid) {
-  if (typeof roomid === "object")
-    roomid = roomid.roomid;
+  if (typeof roomid === "object") roomid = roomid.roomid;
   user = Users.get(user) || user;
   void Rooms.Modlog.write(roomid || "global", {
     isGlobal: true,
@@ -393,8 +367,7 @@ Reason: ${reason}`;
   } else if (Config.appealurl) {
     appeal += `appeal: <a href="${Config.appealurl}">${Config.appealurl}</a>`;
   }
-  if (appeal)
-    message += `
+  if (appeal) message += `
 
 If you feel that your lock was unjustified, you can ${appeal}.`;
   message += `
@@ -411,11 +384,9 @@ Your lock will expire in a few days.`;
 const punishmentHandlers = {
   report(user, room) {
     for (const k in room.users) {
-      if (k === user.id)
-        continue;
+      if (k === user.id) continue;
       const u = room.users[k];
-      if (room.auth.get(u) !== Users.PLAYER_SYMBOL)
-        continue;
+      if (room.auth.get(u) !== Users.PLAYER_SYMBOL) continue;
       u.sendTo(
         room.roomid,
         `|c|~|/uhtml report,Toxicity has been automatically detected in this battle, please click below if you would like to report it.<br /><a class="button notifying" href="/view-help-request">Make a report</a>`
@@ -439,8 +410,7 @@ const punishmentHandlers = {
     globalModlog("WARN", user, reason, room);
     addGlobalModAction(`${user.name} was warned by Artemis (${reason})`, room);
     const punishments = punishmentCache.get(user) || {};
-    if (!punishments["WARN"])
-      punishments["WARN"] = 0;
+    if (!punishments["WARN"]) punishments["WARN"] = 0;
     punishments["WARN"]++;
     punishmentCache.set(user, punishments);
     room.add(`|c|~|/raw ${DISCLAIMER}`).update();
@@ -460,13 +430,11 @@ function makeScore(roomid, result) {
   const flags = /* @__PURE__ */ new Set();
   for (const type in result) {
     const data = result[type];
-    if (settings.minScore && data < settings.minScore)
-      continue;
+    if (settings.minScore && data < settings.minScore) continue;
     const curScore = score;
     if (settings.specials[type]) {
       for (const k in settings.specials[type]) {
-        if (data < Number(k))
-          continue;
+        if (data < Number(k)) continue;
         const num = settings.specials[type][k];
         if (num === "MAXIMUM") {
           score = calcThreshold(roomid);
@@ -485,14 +453,12 @@ function makeScore(roomid, result) {
         main = type;
       }
     }
-    if (score !== curScore)
-      flags.add(type);
+    if (score !== curScore) flags.add(type);
   }
   return { score, flags: [...flags], main };
 }
 const chatfilter = function(message, user, room) {
-  if (!room?.battle || !["rated", "unrated"].includes(room.battle.challengeType))
-    return;
+  if (!room?.battle || !["rated", "unrated"].includes(room.battle.challengeType)) return;
   const mutes = muted.get(room);
   const muteEntry = mutes?.get(user);
   if (muteEntry) {
@@ -508,10 +474,8 @@ const chatfilter = function(message, user, room) {
       return false;
     }
   }
-  if (settings.disabled)
-    return;
-  if (!Config.perspectiveKey || message.startsWith("!"))
-    return;
+  if (settings.disabled) return;
+  if (!Config.perspectiveKey || message.startsWith("!")) return;
   const roomid = room.roomid;
   void (async () => {
     message = message.trim();
@@ -522,10 +486,8 @@ const chatfilter = function(message, user, room) {
     const response = await classifier.classify(message);
     const { score, flags, main } = makeScore(roomid, response || {});
     if (score) {
-      if (!cache[roomid])
-        cache[roomid] = { users: {} };
-      if (!cache[roomid].users[user.id])
-        cache[roomid].users[user.id] = 0;
+      if (!cache[roomid]) cache[roomid] = { users: {} };
+      if (!cache[roomid].users[user.id]) cache[roomid].users[user.id] = 0;
       cache[roomid].users[user.id] += score;
       let hitThreshold = 0;
       if (cache[roomid].users[user.id] >= calcThreshold(roomid)) {
@@ -569,8 +531,7 @@ function calcThreshold(roomid) {
   const incr = settings.thresholdIncrement;
   let num = settings.threshold;
   const room = Rooms.get(roomid);
-  if (!room?.battle || !incr)
-    return num;
+  if (!room?.battle || !incr) return num;
   if (!incr.minTurns || room.battle.turn >= incr.minTurns) {
     num += Math.floor(room.battle.turn / incr.turns) * incr.amount;
   }
@@ -592,8 +553,7 @@ const handlers = {
     }
   },
   onRoomClose(roomid, user) {
-    if (!roomid.startsWith("view-abusemonitor-view"))
-      return;
+    if (!roomid.startsWith("view-abusemonitor-view")) return;
     const targetId = roomid.slice("view-abusemonitor-view-".length);
     if (cache[targetId]?.claimed === user.id) {
       delete cache[targetId].claimed;
@@ -612,7 +572,7 @@ function getFlaggedRooms() {
   return Object.keys(cache).filter((roomid) => cache[roomid].staffNotified);
 }
 function writeStats(type, entry) {
-  const path = `artemis/${type}/${Chat.toTimestamp(new Date()).split(" ")[0].slice(0, -3)}.jsonl`;
+  const path = `artemis/${type}/${Chat.toTimestamp(/* @__PURE__ */ new Date()).split(" ")[0].slice(0, -3)}.jsonl`;
   try {
     Monitor.logPath(path).parentDir().mkdirpSync();
   } catch {
@@ -620,8 +580,7 @@ function writeStats(type, entry) {
   void Monitor.logPath(path).append(JSON.stringify(entry) + "\n");
 }
 function saveSettings(path) {
-  if (!path)
-    path = "nf";
+  if (!path) path = "nf";
   (0, import_lib.FS)(`config/chat-plugins/${path}.json`).writeUpdate(() => JSON.stringify(settings));
 }
 function saveReviews() {
@@ -672,12 +631,10 @@ const commands = {
     async test(target, room, user) {
       checkAccess(this);
       const text = target;
-      if (!text)
-        return this.parse(`/help abusemonitor`);
+      if (!text) return this.parse(`/help abusemonitor`);
       this.runBroadcast();
       let response = await classifier.classify(text);
-      if (!response)
-        response = {};
+      if (!response) response = {};
       for (const k in settings.replacements) {
         target = target.replace(new RegExp(k, "gi"), settings.replacements[k]);
       }
@@ -690,19 +647,16 @@ const commands = {
         for (const k in response) {
           const descriptors = [];
           if (p.type) {
-            if (p.type !== k)
-              continue;
+            if (p.type !== k) continue;
             descriptors.push("type");
           }
           if (p.certainty) {
-            if (response[k] < p.certainty)
-              continue;
+            if (response[k] < p.certainty) continue;
             descriptors.push("certainty");
           }
           const secondaries = Object.entries(p.secondaryTypes || {});
           if (secondaries.length) {
-            if (!secondaries.every(([sK, sV]) => response[sK] >= sV))
-              continue;
+            if (!secondaries.every(([sK, sV]) => response[sK] >= sV)) continue;
             descriptors.push("secondary");
           }
           if (descriptors.length) {
@@ -732,8 +686,7 @@ const commands = {
     async compare(target) {
       checkAccess(this);
       const [base, against] = import_lib.Utils.splitFirst(target, ",").map((f) => f.trim());
-      if (!(base && against))
-        return this.parse(`/help abusemonitor`);
+      if (!(base && against)) return this.parse(`/help abusemonitor`);
       const colors = {
         "0": "Purple",
         "1": "DodgerBlue",
@@ -765,8 +718,7 @@ const commands = {
     async score(target) {
       checkAccess(this);
       target = target.trim();
-      if (!target)
-        return this.parse(`/help abusemonitor`);
+      if (!target) return this.parse(`/help abusemonitor`);
       const [text, scoreText] = import_lib.Utils.splitFirst(target, ",").map((f) => f.trim());
       const args = Chat.parseArguments(scoreText, ",", { useIDs: false });
       const scores = {};
@@ -786,24 +738,20 @@ const commands = {
         scores[k] = val;
       }
       for (const k in Artemis.RemoteClassifier.ATTRIBUTES) {
-        if (!(k in scores))
-          scores[k] = 0;
+        if (!(k in scores)) scores[k] = 0;
       }
       const response = await classifier.suggestScore(text, scores);
-      if (response.error)
-        throw new Chat.ErrorMessage(response.error);
+      if (response.error) throw new Chat.ErrorMessage(response.error);
       this.sendReply(`Recommendation successfully sent.`);
       Rooms.get("abuselog")?.roomlog(`${this.user.name} used /am score ${target}`);
     },
     toggle(target) {
       checkAccess(this);
       if (this.meansYes(target)) {
-        if (!settings.disabled)
-          throw new Chat.ErrorMessage(`The abuse monitor is already enabled.`);
+        if (!settings.disabled) throw new Chat.ErrorMessage(`The abuse monitor is already enabled.`);
         settings.disabled = false;
       } else if (this.meansNo(target)) {
-        if (settings.disabled)
-          throw new Chat.ErrorMessage(`The abuse monitor is already disabled.`);
+        if (settings.disabled) throw new Chat.ErrorMessage(`The abuse monitor is already disabled.`);
         settings.disabled = true;
       } else {
         throw new Chat.ErrorMessage(`Invalid setting. Must be 'on' or 'off'.`);
@@ -847,8 +795,7 @@ const commands = {
         roomid = roomid.split("-").slice(0, -1).join("-");
       }
       let result = (0, import_dex_data.toID)(rawResult) === "success" ? 1 : (0, import_dex_data.toID)(rawResult) === "failure" ? 0 : null;
-      if (result === null)
-        return this.popupReply(`Invalid result - must be 'success' or 'failure'.`);
+      if (result === null) return this.popupReply(`Invalid result - must be 'success' or 'failure'.`);
       const inserted = await Chat.database.get(`SELECT result FROM perspective_stats WHERE roomid = ?`, [roomid]);
       if (inserted?.result === 1) {
         result = inserted.result;
@@ -889,8 +836,7 @@ const commands = {
       this.checkCan("lock");
       const [roomid, type, rest] = import_lib.Utils.splitFirst(target, ",", 2).map((f) => f.trim());
       const tarRoom = Rooms.get(roomid);
-      if (!tarRoom)
-        return this.popupReply(`The room "${roomid}" does not exist.`);
+      if (!tarRoom) return this.popupReply(`The room "${roomid}" does not exist.`);
       const cmd = NOJOIN_COMMAND_WHITELIST[(0, import_dex_data.toID)(type)];
       if (!cmd) {
         throw new Chat.ErrorMessage(
@@ -909,8 +855,7 @@ const commands = {
     },
     view(target, room, user) {
       target = target.toLowerCase().trim();
-      if (!target)
-        return this.parse(`/help am`);
+      if (!target) return this.parse(`/help am`);
       return this.parse(`/j view-abusemonitor-view-${target}`);
     },
     logs(target) {
@@ -935,8 +880,7 @@ const commands = {
       this.addGlobalModAction(`${user.name} used /abusemonitor respawn`);
     },
     async rescale(target, room, user) {
-      if (!WHITELIST.includes(user.id))
-        this.canUseConsole();
+      if (!WHITELIST.includes(user.id)) this.canUseConsole();
       const examples = target.split(",").filter(Boolean);
       const type = examples.shift()?.toUpperCase().replace(/\s/g, "_") || "";
       if (!(type in Artemis.RemoteClassifier.ATTRIBUTES)) {
@@ -971,10 +915,8 @@ const commands = {
       this.sendReply(`Change average: ${change}`);
       await this.parse(`/am bs prescale`);
       for (const p of settings.punishments) {
-        if (p.type !== type)
-          continue;
-        if (p.certainty)
-          p.certainty = round(p.certainty * change);
+        if (p.type !== type) continue;
+        if (p.certainty) p.certainty = round(p.certainty * change);
         if (p.secondaryTypes) {
           for (const k in p.secondaryTypes) {
             p.secondaryTypes[k] = round(p.secondaryTypes[k] * change);
@@ -999,8 +941,7 @@ const commands = {
       checkAccess(this);
       const { targetUsername, rest } = this.splitUser(target);
       const targetId = (0, import_dex_data.toID)(targetUsername);
-      if (!targetId)
-        return this.parse(`/help abusemonitor`);
+      if (!targetId) return this.parse(`/help abusemonitor`);
       if (user.lastCommand !== `am userclear ${targetId}`) {
         user.lastCommand = `am userclear ${targetId}`;
         throw new Chat.ErrorMessage([
@@ -1023,8 +964,7 @@ const commands = {
     async deletelog(target, room, user) {
       checkAccess(this);
       target = (0, import_dex_data.toID)(target);
-      if (!target)
-        return this.parse(`/help abusemonitor`);
+      if (!target) return this.parse(`/help abusemonitor`);
       const num = parseInt(target);
       if (isNaN(num)) {
         throw new Chat.ErrorMessage(`Invalid log number: ${target}`);
@@ -1052,8 +992,7 @@ const commands = {
     es: "editspecial",
     editspecial(target, room, user) {
       checkAccess(this);
-      if (!(0, import_dex_data.toID)(target))
-        return this.parse(`/help abusemonitor`);
+      if (!(0, import_dex_data.toID)(target)) return this.parse(`/help abusemonitor`);
       let [rawType, rawPercent, rawScore] = target.split(",");
       const type = rawType.toUpperCase().replace(/\s/g, "_");
       rawScore = (0, import_dex_data.toID)(rawScore);
@@ -1081,8 +1020,7 @@ const commands = {
       if (settings.specials[type]?.[percent] && !this.cmd.includes("f")) {
         throw new Chat.ErrorMessage(`That special case already exists. Use /am forceeditspecial to change it.`);
       }
-      if (!settings.specials[type])
-        settings.specials[type] = {};
+      if (!settings.specials[type]) settings.specials[type] = {};
       settings.specials[type][percent] = score;
       saveSettings();
       this.refreshPage("abusemonitor-settings");
@@ -1177,17 +1115,12 @@ const commands = {
       checkAccess(this);
       let buf = settings.punishments.map((punishment) => {
         const line = [];
-        if ("modlogCount" in punishment)
-          line.push(`mlc=${punishment.modlogCount}`);
-        if (punishment.modlogActions)
-          line.push(`${punishment.modlogActions.map((f) => `mla=${f}`).join(", ")}`);
+        if ("modlogCount" in punishment) line.push(`mlc=${punishment.modlogCount}`);
+        if (punishment.modlogActions) line.push(`${punishment.modlogActions.map((f) => `mla=${f}`).join(", ")}`);
         line.push(`p=${punishment.punishment}`);
-        if ("type" in punishment)
-          line.push(`t=${punishment.type}`);
-        if ("count" in punishment)
-          line.push(`c=${punishment.count}`);
-        if ("certainty" in punishment)
-          line.push(`ct=${punishment.certainty}`);
+        if ("type" in punishment) line.push(`t=${punishment.type}`);
+        if ("count" in punishment) line.push(`c=${punishment.count}`);
+        if ("certainty" in punishment) line.push(`ct=${punishment.certainty}`);
         if ("secondaryTypes" in punishment) {
           for (const type in punishment.secondaryTypes) {
             line.push(`st=${type}|${punishment.secondaryTypes[type]}`);
@@ -1195,15 +1128,13 @@ const commands = {
         }
         return line.join(", ");
       }).join("<br />");
-      if (!buf)
-        buf = "None found";
+      if (!buf) buf = "None found";
       this.sendReplyBox(buf);
     },
     ap: "addpunishment",
     addpunishment(target, room, user) {
       checkAccess(this);
-      if (!(0, import_dex_data.toID)(target))
-        return this.parse(`/help am`);
+      if (!(0, import_dex_data.toID)(target)) return this.parse(`/help am`);
       const targets = target.split(",").map((f) => f.trim());
       const punishment = {};
       for (const cur of targets) {
@@ -1324,8 +1255,7 @@ const commands = {
         for (const k in p) {
           const key = k;
           const val = visualizePunishmentKey(punishment, key);
-          if (val && val === visualizePunishmentKey(p, key))
-            matches++;
+          if (val && val === visualizePunishmentKey(p, key)) matches++;
         }
         if (matches === Object.keys(p).length) {
           throw new Chat.ErrorMessage(`This punishment is already stored at ${i + 1}.`);
@@ -1343,8 +1273,7 @@ const commands = {
     deletepunishment(target, room, user) {
       checkAccess(this);
       const idx = parseInt(target) - 1;
-      if (isNaN(idx))
-        throw new Chat.ErrorMessage(`Invalid number.`);
+      if (isNaN(idx)) throw new Chat.ErrorMessage(`Invalid number.`);
       const punishment = settings.punishments[idx];
       if (!punishment) {
         throw new Chat.ErrorMessage(`No punishments exist at index ${idx + 1}.`);
@@ -1401,8 +1330,7 @@ const commands = {
     di: "deleteincrement",
     deleteincrement(target, room, user) {
       checkAccess(this);
-      if (!settings.thresholdIncrement)
-        throw new Chat.ErrorMessage(`The threshold increment is already disabled.`);
+      if (!settings.thresholdIncrement) throw new Chat.ErrorMessage(`The threshold increment is already disabled.`);
       settings.thresholdIncrement = null;
       saveSettings();
       this.refreshPage("abusemonitor-settings");
@@ -1412,7 +1340,7 @@ const commands = {
     async failures(target) {
       checkAccess(this);
       if (!(0, import_dex_data.toID)(target)) {
-        target = Chat.toTimestamp(new Date()).split(" ")[0];
+        target = Chat.toTimestamp(/* @__PURE__ */ new Date()).split(" ")[0];
       }
       const timeNum = new Date(target).getTime();
       if (isNaN(timeNum)) {
@@ -1422,8 +1350,10 @@ const commands = {
         "SELECT * FROM perspective_stats WHERE result = 0 AND timestamp > ? AND timestamp < ?",
         [timeNum, timeNum + 24 * 60 * 60 * 1e3]
       );
-      logs = logs.filter((log) => // proofing against node's stupid date lib
-      Chat.toTimestamp(new Date(log.timestamp)).split(" ")[0] === target);
+      logs = logs.filter((log) => (
+        // proofing against node's stupid date lib
+        Chat.toTimestamp(new Date(log.timestamp)).split(" ")[0] === target
+      ));
       if (!logs.length) {
         throw new Chat.ErrorMessage(`No logs found for that date.`);
       }
@@ -1462,8 +1392,7 @@ const commands = {
         path = `artemis/${target.toLowerCase().replace(/\//g, "-")}`;
       }
       const backup = await (0, import_lib.FS)(`config/chat-plugins/${path}.json`).readIfExists();
-      if (!backup)
-        throw new Chat.ErrorMessage(`No backup settings saved.`);
+      if (!backup) throw new Chat.ErrorMessage(`No backup settings saved.`);
       const backupSettings = JSON.parse(backup);
       Object.assign(settings, backupSettings);
       saveSettings();
@@ -1474,8 +1403,7 @@ const commands = {
     async deletebackup(target, room, user) {
       checkAccess(this);
       target = target.toLowerCase().replace(/\//g, "-");
-      if (!target)
-        throw new Chat.ErrorMessage(`Specify a backup file.`);
+      if (!target) throw new Chat.ErrorMessage(`Specify a backup file.`);
       const path = (0, import_lib.FS)(`config/chat-plugins/artemis/${target}.json`);
       if (!await path.exists()) {
         throw new Chat.ErrorMessage(`Backup '${target}' not found.`);
@@ -1533,10 +1461,8 @@ const commands = {
       return this.parse(`/join view-abusemonitor-reviews`);
     },
     async submitreview(target, room, user) {
-      var _a;
       this.checkCan("lock");
-      if (!target)
-        return this.parse(`/help abusemonitor submitreview`);
+      if (!target) return this.parse(`/help abusemonitor submitreview`);
       const [roomid, reason] = import_lib.Utils.splitFirst(target, ",").map((f) => f.trim());
       const log = await (0, import_helptickets.getBattleLog)((0, import_helptickets.getBattleLinks)(roomid)[0] || "");
       if (!log) {
@@ -1548,7 +1474,7 @@ const commands = {
       if (reason.length < 1 || reason.length > 2e3) {
         return this.popupReply(`Your review must be between 1 and 2000 characters.`);
       }
-      (reviews[_a = user.id] || (reviews[_a] = [])).push({
+      (reviews[user.id] ||= []).push({
         room: roomid,
         details: reason,
         staff: user.id,
@@ -1593,13 +1519,10 @@ const commands = {
     },
     replace(target, room, user) {
       checkAccess(this);
-      if (!target)
-        return this.parse(`/help am`);
+      if (!target) return this.parse(`/help am`);
       const [old, newWord] = target.split(",");
-      if (!old || !newWord)
-        throw new Chat.ErrorMessage(`Invalid arguments - must be [oldWord], [newWord].`);
-      if ((0, import_dex_data.toID)(old) === (0, import_dex_data.toID)(newWord))
-        throw new Chat.ErrorMessage(`The old word and the new word are the same.`);
+      if (!old || !newWord) throw new Chat.ErrorMessage(`Invalid arguments - must be [oldWord], [newWord].`);
+      if ((0, import_dex_data.toID)(old) === (0, import_dex_data.toID)(newWord)) throw new Chat.ErrorMessage(`The old word and the new word are the same.`);
       if (settings.replacements[old]) {
         throw new Chat.ErrorMessage(`The old word '${old}' is already in use (for '${settings.replacements[old]}').`);
       }
@@ -1612,8 +1535,7 @@ const commands = {
     },
     removereplace(target, room, user) {
       checkAccess(this);
-      if (!target)
-        return this.parse(`/help am`);
+      if (!target) return this.parse(`/help am`);
       const replaceTo = settings.replacements[target];
       if (!replaceTo) {
         throw new Chat.ErrorMessage(`${target} is not a currently set replacement.`);
@@ -1643,8 +1565,7 @@ const commands = {
             `Must specify a user and a target date (or modlog entry number).`
           );
         }
-        if (!metadata.modlogIgnores)
-          metadata.modlogIgnores = {};
+        if (!metadata.modlogIgnores) metadata.modlogIgnores = {};
         const num = Number(target);
         if (isNaN(num)) {
           if (!/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(target)) {
@@ -1806,18 +1727,15 @@ const pages = {
       buf += `<details class="readmore"><summary><strong>Chat:</strong></summary><div class="infobox">`;
       const users = new import_lib.Utils.Multiset();
       const logData = await (0, import_helptickets.getBattleLog)(room.roomid, true);
-      if (!logData)
-        return `<div class="pad"><p class="error">No such room.</p></div>`;
+      if (!logData) return `<div class="pad"><p class="error">No such room.</p></div>`;
       for (const line of logData.log) {
         const data = room.log.parseChatLine(line);
-        if (!data)
-          continue;
+        if (!data) continue;
         if (["/log", "/raw"].some((prefix) => data.message.startsWith(prefix))) {
           continue;
         }
         const id = (0, import_dex_data.toID)(data.user);
-        if (!id)
-          continue;
+        if (!id) continue;
         users.add(id);
         buf += `<div class="chat chatmessage">`;
         buf += `<strong style="color: ${import_helptickets.HelpTicket.colorName(id, logData)}">`;
@@ -1917,8 +1835,7 @@ const pages = {
         const { roomid } = log;
         buf += `<tr>`;
         buf += `<td><a href="https://${Config.routes.replays}/${roomid.slice(7)}">${roomid}</a></td>`;
-        if (!userid)
-          buf += `<td>${log.userid}</td>`;
+        if (!userid) buf += `<td>${log.userid}</td>`;
         buf += import_lib.Utils.html`<td>${log.message}</td>`;
         buf += `<td>${Chat.toTimestamp(new Date(log.time))}</td>`;
         buf += `<td>${log.score} (${log.flags.split(",").map(prettifyFlag).join(", ")})</td>`;
@@ -1937,7 +1854,7 @@ const pages = {
     },
     async stats(query, user) {
       checkAccess(this);
-      const dateString = (query.join("-") || Chat.toTimestamp(new Date())).slice(0, 7);
+      const dateString = (query.join("-") || Chat.toTimestamp(/* @__PURE__ */ new Date())).slice(0, 7);
       if (!/^[0-9]{4}-[0-9]{2}$/.test(dateString)) {
         throw new Chat.ErrorMessage(`Invalid date: ${dateString}`);
       }
@@ -1946,13 +1863,13 @@ const pages = {
       buf += `<i class="fa fa-refresh"></i> Refresh</button>`;
       buf += `<h2>Abuse Monitor stats for ${dateString}</h2>`;
       const next = nextMonth(dateString);
-      const prev = new Date(new Date(`${dateString}-15`).getTime() - 30 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 7);
+      const prev = new Date((/* @__PURE__ */ new Date(`${dateString}-15`)).getTime() - 30 * 24 * 60 * 60 * 1e3).toISOString().slice(0, 7);
       buf += `<a class="button" target="replace" href="/view-abusemonitor-stats-${prev}-15">Previous month</a> | `;
       buf += `<a class="button" target="replace" href="/view-abusemonitor-stats-${next}-15">Next month</a>`;
       buf += `<hr />`;
       const logs = await Chat.database.all(
         `SELECT * FROM perspective_stats WHERE timestamp > ? AND timestamp < ?`,
-        [new Date(dateString + "-01").getTime(), new Date(nextMonth(dateString)).getTime()]
+        [(/* @__PURE__ */ new Date(dateString + "-01")).getTime(), new Date(nextMonth(dateString)).getTime()]
       );
       this.title = "[Abuse Monitor] Stats";
       if (!logs.length) {
@@ -1968,8 +1885,7 @@ const pages = {
       const dayStats = {};
       for (const log of logs) {
         const cur = Chat.toTimestamp(new Date(log.timestamp)).split(" ")[0];
-        if (!dayStats[cur])
-          dayStats[cur] = { successes: 0, failures: 0, dead: 0, total: 0 };
+        if (!dayStats[cur]) dayStats[cur] = { successes: 0, failures: 0, dead: 0, total: 0 };
         if (log.result === 2) {
           dead++;
           dayStats[cur].dead++;
@@ -1981,8 +1897,7 @@ const pages = {
           failures++;
           dayStats[cur].failures++;
         }
-        if (!staffStats[log.staff])
-          staffStats[log.staff] = 0;
+        if (!staffStats[log.staff]) staffStats[log.staff] = 0;
         staffStats[log.staff]++;
         dayStats[cur].total++;
       }
@@ -2001,8 +1916,7 @@ const pages = {
       const sortedDays = import_lib.Utils.sortBy(Object.keys(dayStats), (d) => new Date(d).getTime());
       for (const [i, day] of sortedDays.entries()) {
         const cur = dayStats[day];
-        if (!cur.total)
-          continue;
+        if (!cur.total) continue;
         header += `<th>${day.split("-")[2]} (${cur.total})</th>`;
         data += `<td><small>${cur.successes} (${percent(cur.successes, cur.total)}%)`;
         if (cur.failures) {
@@ -2010,8 +1924,7 @@ const pages = {
         } else {
           data += " | 0 (0%)";
         }
-        if (cur.dead)
-          data += ` | ${cur.dead}`;
+        if (cur.dead) data += ` | ${cur.dead}`;
         data += "</small></td>";
         if ((i + 1) % 5 === 0 && sortedDays[i + 1]) {
           buf += `<tr>${header}</tr><tr>${data}</tr>`;
@@ -2035,16 +1948,13 @@ const pages = {
       if (await logPath.exists()) {
         const stream = logPath.createReadStream();
         for await (const line of stream.byLine()) {
-          if (!line.trim())
-            continue;
+          if (!line.trim()) continue;
           const chunk = JSON.parse(line.trim());
           punishmentStats.total++;
-          if (!punishmentStats.types[chunk.punishment])
-            punishmentStats.types[chunk.punishment] = 0;
+          if (!punishmentStats.types[chunk.punishment]) punishmentStats.types[chunk.punishment] = 0;
           punishmentStats.types[chunk.punishment]++;
           const day = Chat.toTimestamp(new Date(chunk.timestamp)).split(" ")[0];
-          if (!punishmentStats.byDay[day])
-            punishmentStats.byDay[day] = { total: 0, inaccurate: 0 };
+          if (!punishmentStats.byDay[day]) punishmentStats.byDay[day] = { total: 0, inaccurate: 0 };
           punishmentStats.byDay[day].total++;
         }
       }
@@ -2052,15 +1962,13 @@ const pages = {
       if (await reviewLogPath.exists()) {
         const stream = reviewLogPath.createReadStream();
         for await (const line of stream.byLine()) {
-          if (!line.trim())
-            continue;
+          if (!line.trim()) continue;
           const chunk = JSON.parse(line.trim());
           if (!chunk.resolved.result) {
             punishmentStats.inaccurate++;
             inaccurate.add(chunk.room);
             const day = Chat.toTimestamp(new Date(chunk.time)).split(" ")[0];
-            if (!punishmentStats.byDay[day])
-              punishmentStats.byDay[day] = { total: 0, inaccurate: 0 };
+            if (!punishmentStats.byDay[day]) punishmentStats.byDay[day] = { total: 0, inaccurate: 0 };
             punishmentStats.byDay[day].inaccurate++;
           }
         }
@@ -2080,8 +1988,7 @@ const pages = {
         const sortedDayStats = import_lib.Utils.sortBy(Object.keys(punishmentStats.byDay), (d) => new Date(d).getTime());
         for (const [i, day] of sortedDayStats.entries()) {
           const cur = punishmentStats.byDay[day];
-          if (!cur.total)
-            continue;
+          if (!cur.total) continue;
           header += `<th>${day.split("-")[2]} (${cur.total})</th>`;
           const curAccurate = cur.total - cur.inaccurate;
           data += `<td><small>${curAccurate} (${percent(curAccurate, cur.total)}%)`;
@@ -2140,8 +2047,7 @@ const pages = {
       if (incr) {
         buf += `<br />Threshold increments: `;
         buf += `Increases ${incr.amount} every ${incr.turns} turns`;
-        if (incr.minTurns)
-          buf += ` after turn ${incr.minTurns}`;
+        if (incr.minTurns) buf += ` after turn ${incr.minTurns}`;
         buf += `<br />`;
       }
       const replacements = Object.keys(settings.replacements);
@@ -2315,19 +2221,15 @@ const pages = {
       buf += import_lib.Utils.html`<div class="chat"><span class="username"><username>${username}:</username></span> ${message}</div>`;
       atLeastOne = true;
     }
-    if (!atLeastOne)
-      buf += `None found.`;
+    if (!atLeastOne) buf += `None found.`;
     return buf;
   }
 };
 const punishmentfilter = (user, punishment) => {
-  if (typeof user === "string")
-    return;
-  if (!Punishments.punishmentTypes.has(punishment.type))
-    return;
+  if (typeof user === "string") return;
+  if (!Punishments.punishmentTypes.has(punishment.type)) return;
   const cacheEntry = punishmentCache.get(user) || {};
-  if (!cacheEntry[punishment.type])
-    cacheEntry[punishment.type] = 0;
+  if (!cacheEntry[punishment.type]) cacheEntry[punishment.type] = 0;
   cacheEntry[punishment.type]++;
 };
 //# sourceMappingURL=abuse-monitor.js.map

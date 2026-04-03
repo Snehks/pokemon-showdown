@@ -88,8 +88,7 @@ const Conditions = {
     },
     onAfterMoveSelfPriority: 3,
     onAfterMoveSelf(pokemon) {
-      if (pokemon.statusState.time <= 0)
-        pokemon.cureStatus();
+      if (pokemon.statusState.time <= 0) pokemon.cureStatus();
     }
   },
   frz: {
@@ -209,8 +208,7 @@ const Conditions = {
       this.effectState.duration = 2;
     },
     onAccuracy(accuracy, target, source, move) {
-      if (source === this.effectState.source)
-        return true;
+      if (source === this.effectState.source) return true;
     },
     onLockMove() {
       return "struggle";
@@ -235,8 +233,7 @@ const Conditions = {
     },
     onStart(target, source, effect) {
       const foe = target.foes()[0];
-      if (!foe)
-        return false;
+      if (!foe) return false;
       this.effectState.move = effect.id;
       this.effectState.totalDuration = this.effectState.duration;
       this.effectState.damage = this.lastDamage;
@@ -328,10 +325,8 @@ const Conditions = {
     // Dig/Fly
     name: "invulnerability",
     onInvulnerability(target, source, move) {
-      if (target === source)
-        return true;
-      if (move.id === "swift" || move.id === "transform")
-        return true;
+      if (target === source) return true;
+      if (move.id === "swift" || move.id === "transform") return true;
       this.add("-message", "The foe " + target.name + " can't be hit while invulnerable!");
       return false;
     }

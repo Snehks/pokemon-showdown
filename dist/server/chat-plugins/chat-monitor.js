@@ -277,8 +277,7 @@ const Filters = new class {
     }, { throttle: force ? 0 : WRITE_THROTTLE_TIME });
   }
   add(filterWord) {
-    if (!filterWord.hits)
-      filterWord.hits = 0;
+    if (!filterWord.hits) filterWord.hits = 0;
     const punishment = Chat.monitors[filterWord.list].punishment;
     if (!filterWord.regex) {
       filterWord.regex = this.generateRegex(
@@ -324,51 +323,42 @@ const Filters = new class {
     try {
       data = (0, import_lib.FS)(LEGACY_MONITOR_FILE).readSync();
     } catch (e) {
-      if (e.code !== "ENOENT")
-        throw e;
+      if (e.code !== "ENOENT") throw e;
     }
-    if (!data)
-      return;
+    if (!data) return;
     const lines = data.split("\n");
-    loop:
-      for (const line of lines) {
-        if (!line || line === "\r")
-          continue;
-        const [location, word, punishment, reason, times, ...rest] = line.split("	").map((param) => param.trim());
-        if (location === "Location")
-          continue;
-        if (!(location && word && punishment))
-          continue;
-        for (const key in Chat.monitors) {
-          if (Chat.monitors[key].location === location && Chat.monitors[key].punishment === punishment) {
-            const replacement = rest[0];
-            const publicReason = rest[1];
-            let regex;
-            if (punishment === "EVASION") {
-              regex = Filters.constructEvasionRegex(word);
-            } else {
-              regex = new RegExp(punishment === "SHORTENER" ? `\\b${word}` : word, replacement ? "igu" : "iu");
-            }
-            const filterWord = { regex, word, hits: parseInt(times) || 0 };
-            if (reason && reason !== "undefined")
-              filterWord.reason = reason;
-            if (publicReason)
-              filterWord.publicReason = publicReason;
-            if (replacement)
-              filterWord.replacement = replacement;
-            filterWords[key].push(filterWord);
-            continue loop;
+    loop: for (const line of lines) {
+      if (!line || line === "\r") continue;
+      const [location, word, punishment, reason, times, ...rest] = line.split("	").map((param) => param.trim());
+      if (location === "Location") continue;
+      if (!(location && word && punishment)) continue;
+      for (const key in Chat.monitors) {
+        if (Chat.monitors[key].location === location && Chat.monitors[key].punishment === punishment) {
+          const replacement = rest[0];
+          const publicReason = rest[1];
+          let regex;
+          if (punishment === "EVASION") {
+            regex = Filters.constructEvasionRegex(word);
+          } else {
+            regex = new RegExp(punishment === "SHORTENER" ? `\\b${word}` : word, replacement ? "igu" : "iu");
           }
+          const filterWord = { regex, word, hits: parseInt(times) || 0 };
+          if (reason && reason !== "undefined") filterWord.reason = reason;
+          if (publicReason) filterWord.publicReason = publicReason;
+          if (replacement) filterWord.replacement = replacement;
+          filterWords[key].push(filterWord);
+          continue loop;
         }
-        Monitor.crashlog(new Error("Couldn't find [location, punishment] pair for a filter word"), "The main process", {
-          location,
-          word,
-          punishment,
-          reason,
-          times,
-          rest
-        });
       }
+      Monitor.crashlog(new Error("Couldn't find [location, punishment] pair for a filter word"), "The main process", {
+        location,
+        word,
+        punishment,
+        reason,
+        times,
+        rest
+      });
+    }
   }
 }();
 Chat.registerMonitor("autolock", {
@@ -379,8 +369,7 @@ Chat.registerMonitor("autolock", {
     const { regex, word, reason, publicReason } = line;
     const match = regex.exec(lcMessage);
     if (match) {
-      if (isStaff)
-        return `${message} __[would be locked: ${word}${reason ? ` (${reason})` : ""}]__`;
+      if (isStaff) return `${message} __[would be locked: ${word}${reason ? ` (${reason})` : ""}]__`;
       message = message.replace(/(https?):\/\//g, "$1__:__//");
       message = message.replace(/\./g, "__.__");
       if (room) {
@@ -407,8 +396,7 @@ Chat.registerMonitor("publicwarn", {
     const { regex, word, reason, publicReason } = line;
     const match = regex.exec(lcMessage);
     if (match) {
-      if (isStaff)
-        return `${message} __[would be filtered in public: ${word}${reason ? ` (${reason})` : ""}]__`;
+      if (isStaff) return `${message} __[would be filtered in public: ${word}${reason ? ` (${reason})` : ""}]__`;
       this.errorReply(`Please do not say '${match[0]}'${publicReason ? ` ${publicReason}` : ``}.`);
       return false;
     }
@@ -422,8 +410,7 @@ Chat.registerMonitor("warn", {
     const { regex, word, reason, publicReason } = line;
     const match = regex.exec(lcMessage);
     if (match) {
-      if (isStaff)
-        return `${message} __[would be filtered: ${word}${reason ? ` (${reason})` : ""}]__`;
+      if (isStaff) return `${message} __[would be filtered: ${word}${reason ? ` (${reason})` : ""}]__`;
       this.errorReply(`Please do not say '${match[0]}'${publicReason ? ` ${publicReason}` : ``}.`);
       return false;
     }
@@ -440,13 +427,11 @@ Chat.registerMonitor("evasion", {
     const match = regex.exec(normalizedMessage);
     if (match) {
       if (match[0] === word && regex.test(message)) {
-        if (isStaff)
-          return `${message} __[would be filtered: ${word}${reason ? ` (${reason})` : ""}]__`;
+        if (isStaff) return `${message} __[would be filtered: ${word}${reason ? ` (${reason})` : ""}]__`;
         this.errorReply(`Do not say '${word}'.`);
         return false;
       }
-      if (isStaff)
-        return `${message} __[would be locked for filter evading: ${match[0]} (${word})]__`;
+      if (isStaff) return `${message} __[would be locked for filter evading: ${match[0]} (${word})]__`;
       message = message.replace(/(https?):\/\//g, "$1__:__//");
       if (room) {
         void Punishments.autolock(
@@ -474,8 +459,7 @@ Chat.registerMonitor("wordfilter", {
     let match = regex.exec(message);
     while (match) {
       let filtered = replacement || "";
-      if (match[0] === match[0].toUpperCase())
-        filtered = filtered.toUpperCase();
+      if (match[0] === match[0].toUpperCase()) filtered = filtered.toUpperCase();
       if (match[0].startsWith(match[0].charAt(0).toUpperCase())) {
         filtered = `${filtered ? filtered.charAt(0).toUpperCase() : ""}${filtered.slice(1)}`;
       }
@@ -498,8 +482,7 @@ Chat.registerMonitor("battlefilter", {
     const { regex, word, reason, publicReason } = line;
     const match = regex.exec(lcMessage);
     if (match) {
-      if (isStaff)
-        return `${message} __[would be filtered: ${word}${reason ? ` (${reason})` : ""}]__`;
+      if (isStaff) return `${message} __[would be filtered: ${word}${reason ? ` (${reason})` : ""}]__`;
       message = message.replace(/(https?):\/\//g, "$1__:__//");
       message = message.replace(/\./g, "__.__");
       if (room) {
@@ -528,8 +511,7 @@ Chat.registerMonitor("shorteners", {
   monitor(line, room, user, message, lcMessage, isStaff) {
     const { regex, word, publicReason } = line;
     if (regex.test(lcMessage)) {
-      if (isStaff)
-        return `${message} __[shortener: ${word}]__`;
+      if (isStaff) return `${message} __[shortener: ${word}]__`;
       this.errorReply(`Please do not use URL shorteners such as '${word}'${publicReason ? ` ${publicReason}` : ``}.`);
       return false;
     }
@@ -542,20 +524,15 @@ const chatfilter = function(message, user, room) {
   const isStaff = isStaffRoom || user.isStaff || !!this.pmTarget?.isStaff;
   for (const list in Chat.monitors) {
     const { location, condition, monitor } = Chat.monitors[list];
-    if (!monitor)
-      continue;
-    if (location === "BATTLES" && !(room?.battle && room.battle.challengeType !== "challenge"))
-      continue;
-    if (location === "PUBLIC" && room && room.settings.isPrivate === true)
-      continue;
+    if (!monitor) continue;
+    if (location === "BATTLES" && !(room?.battle && room.battle.challengeType !== "challenge")) continue;
+    if (location === "PUBLIC" && room && room.settings.isPrivate === true) continue;
     switch (condition) {
       case "notTrusted":
-        if (user.trusted && !isStaffRoom)
-          continue;
+        if (user.trusted && !isStaffRoom) continue;
         break;
       case "notStaff":
-        if (isStaffRoom)
-          continue;
+        if (isStaffRoom) continue;
         break;
     }
     for (const line of Chat.filterWords[list]) {
@@ -575,8 +552,7 @@ const chatfilter = function(message, user, room) {
 };
 const namefilter = (name, user) => {
   const id = toID(name);
-  if (Punishments.namefilterwhitelist.has(id))
-    return name;
+  if (Punishments.namefilterwhitelist.has(id)) return name;
   if (Monitor.forceRenames.has(id)) {
     if (typeof Monitor.forceRenames.get(id) === "number") {
       Monitor.forceRenames.set(id, false);
@@ -587,13 +563,11 @@ const namefilter = (name, user) => {
     }
     return "";
   }
-  if (id === toID(user.trackRename))
-    return "";
+  if (id === toID(user.trackRename)) return "";
   let lcName = name.replace(/\u039d/g, "N").toLowerCase().replace(/[\u200b\u007F\u00AD]/g, "").replace(/\u03bf/g, "o").replace(/\u043e/g, "o").replace(/\u0430/g, "a").replace(/\u0435/g, "e").replace(/\u039d/g, "e");
   lcName = lcName.replace("herapist", "").replace("grape", "").replace("scrape", "");
   for (const list in filterWords) {
-    if (!Chat.monitors[list] || Chat.monitors[list].location === "BATTLES")
-      continue;
+    if (!Chat.monitors[list] || Chat.monitors[list].location === "BATTLES") continue;
     const punishment = Chat.monitors[list].punishment;
     for (const line of filterWords[list]) {
       const regex = punishment === "EVASION" ? Filters.stripWordBoundaries(line.regex) : line.regex;
@@ -618,8 +592,7 @@ const namefilter = (name, user) => {
   return name;
 };
 const loginfilter = (user) => {
-  if (user.namelocked)
-    return;
+  if (user.namelocked) return;
   if (user.trackRename) {
     const manualForceRename = Monitor.forceRenames.has(toID(user.trackRename));
     Rooms.global.notifyRooms(
@@ -638,10 +611,8 @@ const nicknamefilter = (name, user) => {
   let lcName = name.replace(/\u039d/g, "N").toLowerCase().replace(/[\u200b\u007F\u00AD]/g, "").replace(/\u03bf/g, "o").replace(/\u043e/g, "o").replace(/\u0430/g, "a").replace(/\u0435/g, "e").replace(/\u039d/g, "e");
   lcName = lcName.replace("herapist", "").replace("grape", "").replace("scrape", "");
   for (const list in filterWords) {
-    if (!Chat.monitors[list])
-      continue;
-    if (Chat.monitors[list].location === "BATTLES")
-      continue;
+    if (!Chat.monitors[list]) continue;
+    if (Chat.monitors[list].location === "BATTLES") continue;
     for (const line of filterWords[list]) {
       let { regex, word } = line;
       if (Chat.monitors[list].punishment === "EVASION") {
@@ -680,11 +651,9 @@ const statusfilter = (status, user) => {
   let lcStatus = status.replace(/\u039d/g, "N").toLowerCase().replace(/[\u200b\u007F\u00AD]/g, "").replace(/\u03bf/g, "o").replace(/\u043e/g, "o").replace(/\u0430/g, "a").replace(/\u0435/g, "e").replace(/\u039d/g, "e");
   lcStatus = lcStatus.replace("herapist", "").replace("grape", "").replace("scrape", "");
   const impersonationRegex = /\b(?:global|room|upper|senior)?\s*(?:staff|admin|administrator|leader|owner|founder|mod|moderator|driver|voice|operator|sysop|creator)\b/gi;
-  if (!user.can("lock") && impersonationRegex.test(lcStatus))
-    return "";
+  if (!user.can("lock") && impersonationRegex.test(lcStatus)) return "";
   for (const list in filterWords) {
-    if (!Chat.monitors[list])
-      continue;
+    if (!Chat.monitors[list]) continue;
     const punishment = Chat.monitors[list].punishment;
     for (const line of filterWords[list]) {
       const regex = punishment === "EVASION" ? Filters.stripWordBoundaries(line.regex) : line.regex;
@@ -709,22 +678,18 @@ const statusfilter = (status, user) => {
 };
 const pages = {
   filters(query, user, connection) {
-    if (!user.named)
-      return Rooms.RETRY_AFTER_LOGIN;
+    if (!user.named) return Rooms.RETRY_AFTER_LOGIN;
     this.title = "Filters";
     let buf = `<div class="pad ladder"><h2>Filters</h2>`;
-    if (!user.can("addhtml"))
-      this.checkCan("lock");
+    if (!user.can("addhtml")) this.checkCan("lock");
     let content = ``;
     for (const key in Chat.monitors) {
       content += `<tr><th colspan="2"><h3>${Chat.monitors[key].label} <span style="font-size:8pt;">[${key}]</span></h3></tr></th>`;
       if (filterWords[key].length) {
         content += filterWords[key].map(({ regex, word, reason, publicReason, replacement, hits }) => {
           let entry = import_lib.Utils.html`<abbr title="${reason}"><code>${word}</code></abbr>`;
-          if (publicReason)
-            entry += import_lib.Utils.html` <small>(public reason: ${publicReason})</small>`;
-          if (replacement)
-            entry += import_lib.Utils.html` &rArr; ${replacement}`;
+          if (publicReason) entry += import_lib.Utils.html` <small>(public reason: ${publicReason})</small>`;
+          if (replacement) entry += import_lib.Utils.html` &rArr; ${replacement}`;
           return `<tr><td>${entry}</td><td>${hits}</td></tr>`;
         }).join("");
       }
@@ -788,15 +753,13 @@ const commands = {
       }
       const output = `'${filterWord.word}' was added to the ${list} list.`;
       Rooms.get("upperstaff")?.add(output).update();
-      if (room?.roomid !== "upperstaff")
-        this.sendReply(output);
+      if (room?.roomid !== "upperstaff") this.sendReply(output);
     },
     remove(target, room, user) {
       this.checkCan("rangeban");
       let [list, ...words] = target.split(target.includes("\n") ? "\n" : ",").map((param) => param.trim());
       list = toID(list);
-      if (!list || !words.length)
-        throw new Chat.ErrorMessage("Syntax: /filter remove list, words");
+      if (!list || !words.length) throw new Chat.ErrorMessage("Syntax: /filter remove list, words");
       if (!(list in filterWords)) {
         throw new Chat.ErrorMessage(`Invalid list: ${list}. Possible options: ${Object.keys(filterWords).join(", ")}`);
       }
@@ -809,8 +772,7 @@ const commands = {
       Filters.save(true);
       const output = `'${words.join(", ")}' ${Chat.plural(words, "were", "was")} removed from the ${list} list.`;
       Rooms.get("upperstaff")?.add(output).update();
-      if (room?.roomid !== "upperstaff")
-        this.sendReply(output);
+      if (room?.roomid !== "upperstaff") this.sendReply(output);
     },
     "": "view",
     list: "view",
@@ -868,8 +830,7 @@ const commands = {
   allowname(target, room, user) {
     this.checkCan("forcerename");
     target = toID(target);
-    if (!target)
-      throw new Chat.ErrorMessage(`Syntax: /allowname username`);
+    if (!target) throw new Chat.ErrorMessage(`Syntax: /allowname username`);
     if (Punishments.namefilterwhitelist.has(target)) {
       throw new Chat.ErrorMessage(`${target} is already allowed as a username.`);
     }

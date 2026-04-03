@@ -103,8 +103,7 @@ const Moves = {
     ],
     self: {
       onHit(target, source) {
-        if (!source.getItem().isBerry)
-          return;
+        if (!source.getItem().isBerry) return;
         source.eatItem(true);
       }
     },
@@ -188,8 +187,7 @@ const Moves = {
         pokemon.clearBoosts();
       }
       const foe = source.foes()[0];
-      if (!foe)
-        return;
+      if (!foe) return;
       const success = this.boost({ atk: -1, spa: -1 }, foe, source);
       if (!success && !foe.hasAbility("mirrorarmor")) {
         delete move.selfSwitch;
@@ -234,12 +232,9 @@ const Moves = {
     },
     onHit(target, source) {
       let success = false;
-      if (target.addVolatile("partiallytrapped", source))
-        success = true;
-      if (target.addVolatile("leechseed", source))
-        success = true;
-      if (target.addVolatile("healblock", source))
-        success = true;
+      if (target.addVolatile("partiallytrapped", source)) success = true;
+      if (target.addVolatile("leechseed", source)) success = true;
+      if (target.addVolatile("healblock", source)) success = true;
       return success;
     },
     secondary: null,
@@ -263,8 +258,7 @@ const Moves = {
     onPrepareHit(target, source, move) {
       const nresTypes = [];
       for (const i of this.dex.types.names()) {
-        if (i === "Stellar")
-          continue;
+        if (i === "Stellar") continue;
         if (target) {
           const effect = this.dex.getEffectiveness(i, target);
           const immune = !this.dex.getImmunity(i, target);
@@ -273,8 +267,7 @@ const Moves = {
           }
         }
       }
-      if (!nresTypes.length)
-        return;
+      if (!nresTypes.length) return;
       const netType = this.sample(nresTypes);
       const moves = this.dex.moves.all().filter((m) => (![2, 4].includes(this.gen) || !source.moves.includes(m.id)) && (!m.isNonstandard || m.isNonstandard === "Unobtainable") && m.flags["metronome"] && m.type === netType && m.category !== "Status");
       let randomMove = "";
@@ -282,8 +275,7 @@ const Moves = {
         moves.sort((a, b) => a.num - b.num);
         randomMove = this.sample(moves).id;
       }
-      if (!randomMove)
-        return false;
+      if (!randomMove) return false;
       source.side.lastSelectedMove = this.toID(randomMove);
       this.add("-anim", source, "Spite", target);
       this.add("-anim", source, "Grudge", target);
@@ -355,8 +347,7 @@ const Moves = {
         const stats = [];
         let statPlus;
         for (statPlus in pokemon.boosts) {
-          if (statPlus === "accuracy" || statPlus === "evasion" || boostedStats.includes(statPlus))
-            continue;
+          if (statPlus === "accuracy" || statPlus === "evasion" || boostedStats.includes(statPlus)) continue;
           if (pokemon.boosts[statPlus] < 6) {
             stats.push(statPlus);
           }
@@ -417,8 +408,7 @@ const Moves = {
     condition: {
       duration: 5,
       durationCallback(target, source) {
-        if (source?.hasItem("gripclaw"))
-          return 8;
+        if (source?.hasItem("gripclaw")) return 8;
         return this.random(5, 6);
       },
       onStart(target) {
@@ -525,8 +515,7 @@ const Moves = {
           this.add("-heal", ally, ally.getHealth);
           success = true;
         }
-        if (ally.cureStatus())
-          success = true;
+        if (ally.cureStatus()) success = true;
       }
       return success;
     },
@@ -605,8 +594,7 @@ const Moves = {
       if (source.species.name === "Deoxys-Defense") {
         (0, import_scripts.changeSet)(this, source, import_random_teams.ssbSets["Arcueid-Attack"], true);
         let randMove = this.random(3) - 1;
-        if (randMove < 0)
-          randMove = 0;
+        if (randMove < 0) randMove = 0;
         this.actions.useMove(source.moveSlots[randMove].id, target);
       } else {
         (0, import_scripts.changeSet)(this, source, import_random_teams.ssbSets["Arcueid"], true);
@@ -615,15 +603,13 @@ const Moves = {
           const boost = {};
           let statPlus;
           for (statPlus in source.boosts) {
-            if (statPlus === "accuracy" || statPlus === "evasion")
-              continue;
+            if (statPlus === "accuracy" || statPlus === "evasion") continue;
             if (source.boosts[statPlus] < 6) {
               stats.push(statPlus);
             }
           }
           const randomStat = stats.length ? this.sample(stats) : void 0;
-          if (randomStat)
-            boost[randomStat] = 1;
+          if (randomStat) boost[randomStat] = 1;
           this.boost(boost, source, source);
         }
         this.heal(source.baseMaxhp / 2, source);
@@ -686,10 +672,8 @@ const Moves = {
         }
       }
       let falsePositive = false;
-      if (!seTypes.length)
-        seTypes.push("Electric");
-      if (!nveTypes.length)
-        nveTypes.push("Electric");
+      if (!seTypes.length) seTypes.push("Electric");
+      if (!nveTypes.length) nveTypes.push("Electric");
       if (this.randomChance(75, 100)) {
         netType = this.sample(seTypes);
       } else {
@@ -823,19 +807,16 @@ const Moves = {
     pp: 20,
     priority: -6,
     onModifyPriority(priority, source, target, move) {
-      if (source.species.id === "mismagius")
-        return priority + 6;
+      if (source.species.id === "mismagius") return priority + 6;
     },
     flags: { snatch: 1, metronome: 1, protect: 1, failcopycat: 1 },
     priorityChargeCallback(pokemon) {
-      if (pokemon.species.id === "mismagius")
-        return;
+      if (pokemon.species.id === "mismagius") return;
       pokemon.addVolatile("sigilsstorm");
       this.add("-anim", pokemon, "Calm Mind", pokemon);
     },
     beforeMoveCallback(pokemon) {
-      if (pokemon.species.id === "mismagius")
-        return;
+      if (pokemon.species.id === "mismagius") return;
       if (pokemon.volatiles["sigilsstorm"]?.lostFocus) {
         this.add("cant", pokemon, "sigilsstorm", "sigilsstorm");
         this.actions.useMove("trickroom", pokemon);
@@ -859,8 +840,7 @@ const Moves = {
         }
       },
       onTryAddVolatile(status, pokemon) {
-        if (status.id === "flinch")
-          return null;
+        if (status.id === "flinch") return null;
       }
     },
     onTry(source) {
@@ -896,8 +876,7 @@ const Moves = {
           let statPlus;
           const statTarget = chance <= 40 ? target : source;
           for (statPlus in statTarget.boosts) {
-            if (statPlus === "accuracy" || statPlus === "evasion")
-              continue;
+            if (statPlus === "accuracy" || statPlus === "evasion") continue;
             if (chance <= 40 && statTarget.boosts[statPlus] > -6) {
               stats.push(statPlus);
             } else if (chance <= 50 && statTarget.boosts[statPlus] < 6) {
@@ -1002,8 +981,7 @@ const Moves = {
     priority: 0,
     flags: { contact: 1, protect: 1, mirror: 1 },
     onModifyPriority(priority, pokemon, target) {
-      if (!target)
-        return;
+      if (!target) return;
       const move = this.queue.willMove(target)?.moveid;
       if (move && target.moves.indexOf(move) === target.moves.length - 1) {
         this.debug("BSC priority boost");
@@ -1011,8 +989,7 @@ const Moves = {
       }
     },
     onAfterMoveSecondarySelf(pokemon, target, move) {
-      if (!target || target.fainted || target.hp <= 0)
-        this.boost({ atk: 2 }, pokemon, pokemon, move);
+      if (!target || target.fainted || target.hp <= 0) this.boost({ atk: 2 }, pokemon, pokemon, move);
     },
     secondary: null,
     target: "normal",
@@ -1089,10 +1066,8 @@ const Moves = {
       onTryHitPriority: 3,
       onTryHit(target, source, move) {
         if (!move.flags["protect"]) {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id))
-            return;
-          if (move.isZ || move.isMax)
-            target.getMoveHitData(move).zBrokeProtect = true;
+          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
+          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
           return;
         }
         if (move.smartTarget) {
@@ -1107,10 +1082,8 @@ const Moves = {
           }
         }
         let statDebuff = "spe";
-        if (move.category === "Special")
-          statDebuff = "spa";
-        if (move.category === "Physical")
-          statDebuff = "atk";
+        if (move.category === "Special") statDebuff = "spa";
+        if (move.category === "Physical") statDebuff = "atk";
         const success = this.boost({ [statDebuff]: -1 }, source, target, this.dex.getActiveMove("Shatter and Scatter"));
         if (success) {
           target.formeChange("Sableye", this.dex.getActiveMove("Shatter and Scatter"), true);
@@ -1122,10 +1095,8 @@ const Moves = {
       onHit(target, source, move) {
         if (move.isZOrMaxPowered) {
           let statDebuff = "spe";
-          if (move.category === "Special")
-            statDebuff = "spa";
-          if (move.category === "Physical")
-            statDebuff = "atk";
+          if (move.category === "Special") statDebuff = "spa";
+          if (move.category === "Physical") statDebuff = "atk";
           const success = this.boost({ [statDebuff]: -2 }, source, target, this.dex.getActiveMove("Shatter and Scatter"));
           if (success) {
             target.formeChange("Sableye", this.dex.getActiveMove("Shatter and Scatter"), true);
@@ -1207,10 +1178,8 @@ const Moves = {
       onTryHitPriority: 3,
       onTryHit(target, source, move) {
         if (!move.flags["protect"]) {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id))
-            return;
-          if (move.isZ || move.isMax)
-            target.getMoveHitData(move).zBrokeProtect = true;
+          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
+          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
           return;
         }
         if (move.smartTarget) {
@@ -1278,8 +1247,7 @@ const Moves = {
     volatileStatus: "substitute",
     onPrepareHit(pokemon) {
       this.attrLastMove("[anim] Teleport");
-      if (pokemon.status === "slp")
-        pokemon.cureStatus();
+      if (pokemon.status === "slp") pokemon.cureStatus();
     },
     onTry(source, target, move) {
       if (source.volatiles["substitute"] || source.hp <= source.maxhp / 4 || source.maxhp === 1) {
@@ -1287,8 +1255,7 @@ const Moves = {
       }
     },
     onHit(target, source, move) {
-      if (move.volatileStatus)
-        this.directDamage(target.maxhp / 4);
+      if (move.volatileStatus) this.directDamage(target.maxhp / 4);
     },
     onAfterMoveSecondarySelf(source) {
       if (this.canSwitch(source.side)) {
@@ -1435,20 +1402,17 @@ const Moves = {
       const boost = {};
       let statPlus;
       for (statPlus in pokemon.boosts) {
-        if (statPlus === "accuracy" || statPlus === "evasion")
-          continue;
+        if (statPlus === "accuracy" || statPlus === "evasion") continue;
         if (pokemon.boosts[statPlus] < 6) {
           stats.push(statPlus);
         }
       }
       let randomStat = stats.length ? this.sample(stats) : void 0;
-      if (randomStat)
-        boost[randomStat] = 2;
+      if (randomStat) boost[randomStat] = 2;
       stats = [];
       let statMinus;
       for (statMinus in pokemon.boosts) {
-        if (statMinus === "accuracy" || statMinus === "evasion")
-          continue;
+        if (statMinus === "accuracy" || statMinus === "evasion") continue;
         if (pokemon.boosts[statMinus] > -6) {
           stats.push(statMinus);
         }
@@ -1469,8 +1433,7 @@ const Moves = {
       if (this.randomChance(1, 10)) {
         this.add(`c:|${(0, import_scripts.getName)((pokemon.illusion || pokemon).name)}|Ouch! That crash is really getting on my nerves...`);
         this.damage(pokemon.baseMaxhp / 10);
-        if (pokemon.hp <= 0)
-          return;
+        if (pokemon.hp <= 0) return;
       }
       if (this.randomChance(1, 20)) {
         const status = this.sample(["frz", "brn", "psn", "par"]);
@@ -1576,8 +1539,7 @@ const Moves = {
       this.add("-anim", pokemon, "Magnet Rise", pokemon);
     },
     onTry(source, target, move) {
-      if (target.volatiles["smackdown"] || target.volatiles["ingrain"])
-        return false;
+      if (target.volatiles["smackdown"] || target.volatiles["ingrain"]) return false;
       if (this.field.getPseudoWeather("Gravity")) {
         this.add("cant", source, "move: Gravity", move);
         return null;
@@ -1596,10 +1558,8 @@ const Moves = {
     accuracy: 90,
     basePower: 60,
     basePowerCallback(pokemon, target, move) {
-      if (move.hit === 1)
-        return 60;
-      if (move.hit === 2)
-        return 0;
+      if (move.hit === 1) return 60;
+      if (move.hit === 2) return 0;
       return 22;
     },
     category: "Physical",
@@ -1625,8 +1585,7 @@ const Moves = {
       duration: 1,
       noCopy: true,
       onAccuracy(accuracy, target, source, move) {
-        if (move.hit <= 2)
-          return 100;
+        if (move.hit <= 2) return 100;
         return 90;
       }
     },
@@ -1634,16 +1593,14 @@ const Moves = {
       {
         chance: 20,
         onHit(target, source, move) {
-          if (move.hit !== 1)
-            return;
+          if (move.hit !== 1) return;
           target.addVolatile("flinch", source, move);
         }
       },
       {
         chance: 100,
         onHit(target, source, move) {
-          if (move.hit !== 2)
-            return;
+          if (move.hit !== 2) return;
           target.trySetStatus("tox", source, move);
         }
       }
@@ -1700,24 +1657,19 @@ const Moves = {
       this.add("-anim", source, "Blizzard", target);
     },
     onModifyMove(move, pokemon) {
-      if (pokemon.getStat("atk", false, true) > pokemon.getStat("spa", false, true))
-        move.category = "Physical";
+      if (pokemon.getStat("atk", false, true) > pokemon.getStat("spa", false, true)) move.category = "Physical";
     },
     onModifyType(move, pokemon) {
       let type = pokemon.getTypes()[0];
-      if (type === "Bird")
-        type = "???";
-      if (type === "Stellar")
-        type = pokemon.getTypes(false, true)[0];
+      if (type === "Bird") type = "???";
+      if (type === "Stellar") type = pokemon.getTypes(false, true)[0];
       move.type = type;
     },
     onEffectiveness(typeMod, target, type) {
-      if (target?.name === "Kennedy")
-        return 1;
+      if (target?.name === "Kennedy") return 1;
     },
     onHit(target, source, move) {
-      if (source.illusion || source.baseSpecies.baseSpecies !== "Avalugg")
-        return;
+      if (source.illusion || source.baseSpecies.baseSpecies !== "Avalugg") return;
       if (source.volatiles["flipped"]) {
         source.removeVolatile("flipped");
         (0, import_scripts.changeSet)(this, source, import_random_teams.ssbSets["Clem"]);
@@ -1883,8 +1835,7 @@ const Moves = {
       }
     },
     onDisableMove(pokemon) {
-      if (pokemon.species.id === "necrozmaultra")
-        pokemon.disableMove("magicalfocus");
+      if (pokemon.species.id === "necrozmaultra") pokemon.disableMove("magicalfocus");
     },
     self: {
       sideCondition: "reflect"
@@ -1943,8 +1894,7 @@ const Moves = {
     },
     beforeTurnCallback(pokemon) {
       for (const side of this.sides) {
-        if (side.hasAlly(pokemon))
-          continue;
+        if (side.hasAlly(pokemon)) continue;
         side.addSideCondition("trivialpursuit", pokemon);
         const data = side.getSideConditionData("trivialpursuit");
         if (!data.sources) {
@@ -1954,8 +1904,7 @@ const Moves = {
       }
     },
     onModifyMove(move, source, target) {
-      if (target?.beingCalledBack || target?.switchFlag)
-        move.accuracy = true;
+      if (target?.beingCalledBack || target?.switchFlag) move.accuracy = true;
     },
     onTryHit(target, pokemon) {
       target.side.removeSideCondition("trivialpursuit");
@@ -1967,8 +1916,7 @@ const Moves = {
         let alreadyAdded = false;
         pokemon.removeVolatile("destinybond");
         for (const source of this.effectState.sources) {
-          if (!source.isAdjacent(pokemon) || !this.queue.cancelMove(source) || !source.hp)
-            continue;
+          if (!source.isAdjacent(pokemon) || !this.queue.cancelMove(source) || !source.hp) continue;
           if (!alreadyAdded) {
             this.add("-activate", pokemon, "move: Pursuit");
             alreadyAdded = true;
@@ -1988,8 +1936,7 @@ const Moves = {
     },
     onDamagePriority: -20,
     onDamage(damage, target, source, effect) {
-      if (damage >= target.hp)
-        return target.hp - 1;
+      if (damage >= target.hp) return target.hp - 1;
     },
     secondary: null,
     target: "normal",
@@ -2203,14 +2150,12 @@ const Moves = {
       this.add("-anim", source, "Leech Seed", target);
     },
     onHit(target, source) {
-      if (target.hasType("Grass") || target.isProtected())
-        return null;
+      if (target.hasType("Grass") || target.isProtected()) return null;
       target.addVolatile("leechseed", source);
     },
     self: {
       onHit(target, source) {
-        if (source.volatiles["substitute"])
-          return;
+        if (source.volatiles["substitute"]) return;
         if (source.hp <= source.maxhp / 6 || source.maxhp === 1) {
           this.add("-fail", source, "move: Substitute", "[weak]");
         } else {
@@ -2245,8 +2190,7 @@ const Moves = {
       let success = false;
       let i;
       for (i in target.boosts) {
-        if (target.boosts[i] === 0)
-          continue;
+        if (target.boosts[i] === 0) continue;
         target.boosts[i] = -target.boosts[i];
         success = true;
       }
@@ -2561,8 +2505,7 @@ const Moves = {
         target.removeVolatile("wonderwing");
       },
       onDamage(damage, target, source, effect) {
-        if (this.effectState.duration < 2)
-          return;
+        if (this.effectState.duration < 2) return;
         this.add("-activate", source, "move: Wonder Wing");
         return false;
       },
@@ -2596,16 +2539,12 @@ const Moves = {
       this.attrLastMove("[still]");
     },
     onPrepareHit(target, source) {
-      if (!source.terastallized)
-        this.add("-anim", source, "Charge Beam", source);
-      else
-        this.add("-anim", source, "Water Pulse", target);
+      if (!source.terastallized) this.add("-anim", source, "Charge Beam", source);
+      else this.add("-anim", source, "Water Pulse", target);
     },
     onEffectiveness(typeMod, target, type, move) {
-      if (move.type === "Electric")
-        return typeMod + this.dex.getEffectiveness("Water", type);
-      else if (type === "Water" && move.type === "Water")
-        return 1;
+      if (move.type === "Electric") return typeMod + this.dex.getEffectiveness("Water", type);
+      else if (type === "Water" && move.type === "Water") return 1;
     },
     secondary: {
       chance: 100,
@@ -2615,8 +2554,7 @@ const Moves = {
             this.boost({ spa: 1 }, source);
           }
           if (this.randomChance(50, 100)) {
-            if (target.isActive)
-              target.trySetStatus("par", source, this.effect);
+            if (target.isActive) target.trySetStatus("par", source, this.effect);
           }
         } else {
           if (this.randomChance(80, 100)) {
@@ -2680,8 +2618,7 @@ const Moves = {
     secondary: {
       chance: 100,
       onHit(target, source, move) {
-        if (source.isActive)
-          target.addVolatile("trapped", source, move, "trapper");
+        if (source.isActive) target.addVolatile("trapped", source, move, "trapper");
       }
     },
     target: "normal",
@@ -2722,8 +2659,7 @@ const Moves = {
       let depth = 0;
       while (!team.length) {
         team = import_teams.Teams.generate(randFormat, { name: target.side.name });
-        if (depth >= 50)
-          break;
+        if (depth >= 50) break;
         team = team.filter((p) => {
           const baseSpecies = unModdedDex.species.get(p.species);
           const curSpecies = this.dex.species.get(p.species);
@@ -3060,21 +2996,18 @@ const Moves = {
         return false;
       },
       onSetStatus(status, target, source, effect) {
-        if (effect.id === "anfieldatmosphere")
-          return;
+        if (effect.id === "anfieldatmosphere") return;
         if (status.id === "slp" && !target.isSemiInvulnerable()) {
           this.add("-activate", target, "move: Anfield Atmosphere");
           return false;
         }
         for (const pokemon of this.getAllActive()) {
-          if (!pokemon.hp || pokemon.fainted)
-            continue;
+          if (!pokemon.hp || pokemon.fainted) continue;
           pokemon.trySetStatus(status, source, this.effect);
         }
       },
       onTryAddVolatile(status, target) {
-        if (target.isSemiInvulnerable())
-          return;
+        if (target.isSemiInvulnerable()) return;
         if (status.id === "yawn" || status.id === "confusion") {
           this.add("-activate", target, "move: Anfield Atmosphere");
           return null;
@@ -3122,8 +3055,7 @@ const Moves = {
     },
     onHitField(target, source, move) {
       for (const pokemon of this.getAllActive()) {
-        if (pokemon.hp <= 0 || pokemon.fainted)
-          continue;
+        if (pokemon.hp <= 0 || pokemon.fainted) continue;
         pokemon.forceSwitchFlag = true;
       }
     },
@@ -3152,10 +3084,8 @@ const Moves = {
     onHit(target, source, move) {
       this.heal(source.maxhp / 2, source, source, move);
       for (const moveSlot of source.moveSlots) {
-        if (moveSlot.id === move.id)
-          continue;
-        if (moveSlot.pp < moveSlot.maxpp)
-          moveSlot.pp += this.sample([1, 2, 3]);
+        if (moveSlot.id === move.id) continue;
+        if (moveSlot.pp < moveSlot.maxpp) moveSlot.pp += this.sample([1, 2, 3]);
       }
     },
     target: "normal",
@@ -3269,8 +3199,7 @@ const Moves = {
     },
     beforeTurnCallback(pokemon) {
       for (const side of this.sides) {
-        if (side.hasAlly(pokemon))
-          continue;
+        if (side.hasAlly(pokemon)) continue;
         side.addSideCondition("attackofopportunity", pokemon);
         const data = side.getSideConditionData("attackofopportunity");
         if (!data.sources) {
@@ -3299,8 +3228,7 @@ const Moves = {
         let alreadyAdded = false;
         pokemon.removeVolatile("destinybond");
         for (const source of this.effectState.sources) {
-          if (!source.isAdjacent(pokemon) || !this.queue.cancelMove(source) || !source.hp)
-            continue;
+          if (!source.isAdjacent(pokemon) || !this.queue.cancelMove(source) || !source.hp) continue;
           if (!alreadyAdded) {
             this.add("-activate", pokemon, "move: Pursuit");
             alreadyAdded = true;
@@ -3344,8 +3272,7 @@ const Moves = {
     },
     volatileStatus: "riseabove",
     onTry(source, target, move) {
-      if (target.volatiles["smackdown"] || target.volatiles["ingrain"])
-        return false;
+      if (target.volatiles["smackdown"] || target.volatiles["ingrain"]) return false;
       if (this.field.getPseudoWeather("Gravity")) {
         this.add("cant", source, "move: Gravity", move);
         return null;
@@ -3357,8 +3284,7 @@ const Moves = {
         this.add("-start", target, "Rise Above");
       },
       onImmunity(type) {
-        if (type === "Ground")
-          return false;
+        if (type === "Ground") return false;
       },
       onResidualOrder: 6,
       onResidual(pokemon) {
@@ -3519,8 +3445,7 @@ const Moves = {
       this.add("-anim", source, "Clangorous Soulblaze", target);
     },
     onHit(target, source, move) {
-      if (source.terastallized)
-        return;
+      if (source.terastallized) return;
       if (this.randomChance(8, 10)) {
         source.addType("Ice");
         this.add("-start", source, "typeadd", "Ice", "[from] move: Wrath of Frozen Flames");
@@ -3570,10 +3495,8 @@ const Moves = {
       this.attrLastMove("[anim] Salt Cure");
     },
     onHit(target, source) {
-      if (target.getAbility().flags["cantsuppress"])
-        return;
-      if (!target.addVolatile("gastroacid"))
-        return;
+      if (target.getAbility().flags["cantsuppress"]) return;
+      if (!target.addVolatile("gastroacid")) return;
       this.add(`c:|${(0, import_scripts.getName)((source.illusion || source).name)}|Sorry i tried to fix smth but accidentally broke your ability :( will fix it next week`);
     },
     ignoreAbility: true,
@@ -3640,16 +3563,14 @@ const Moves = {
     },
     onHit(target, source, m) {
       let sigMoveName = import_random_teams.ssbSets[(target.illusion || target).name]?.signatureMove;
-      if (!sigMoveName)
-        sigMoveName = target.moveSlots[target.moveSlots.length - 1].id;
+      if (!sigMoveName) sigMoveName = target.moveSlots[target.moveSlots.length - 1].id;
       const move = this.dex.getActiveMove(sigMoveName);
       if (!target || this.queue.willSwitch(target) || target.beingCalledBack || move.flags["failcopycat"] || move.flags["nosketch"]) {
         this.boost({ spa: 1, spd: 1, spe: 1 }, source, source, m);
         return;
       }
       const plagiarismIndex = source.moves.indexOf("plagiarism");
-      if (plagiarismIndex < 0)
-        return false;
+      if (plagiarismIndex < 0) return false;
       this.add(`c:|${(0, import_scripts.getName)((source.illusion || source).name)}|yoink`);
       const plagiarisedMove = {
         move: move.name,
@@ -3723,8 +3644,7 @@ const Moves = {
       this.add("-anim", source, "Ice Spinner", target);
     },
     onEffectiveness(typeMod, target, type) {
-      if (type === "Water")
-        return 1;
+      if (type === "Water") return 1;
     },
     secondary: null,
     target: "normal",
@@ -3754,20 +3674,16 @@ const Moves = {
       const boost = {};
       let statPlus;
       for (statPlus in source.boosts) {
-        if (statPlus === "accuracy" || statPlus === "evasion")
-          continue;
+        if (statPlus === "accuracy" || statPlus === "evasion") continue;
         if (source.boosts[statPlus] < 6) {
           stats.push(statPlus);
         }
       }
       const randomStat = stats.length ? this.sample(stats) : void 0;
       const randomStat2 = stats.length ? this.sample(stats) : void 0;
-      if (randomStat)
-        boost[randomStat] = 2;
-      if (randomStat2 && randomStat === randomStat2)
-        boost[randomStat] = 4;
-      else if (randomStat2)
-        boost[randomStat2] = 2;
+      if (randomStat) boost[randomStat] = 2;
+      if (randomStat2 && randomStat === randomStat2) boost[randomStat] = 4;
+      else if (randomStat2) boost[randomStat2] = 2;
       this.boost(boost, source);
       const result = this.random(3);
       if (result === 0) {
@@ -3825,8 +3741,7 @@ const Moves = {
     accuracy: 100,
     basePower: 50,
     basePowerCallback(pokemon, target, move) {
-      if (pokemon.side.pokemonLeft === 1)
-        return move.basePower + 30;
+      if (pokemon.side.pokemonLeft === 1) return move.basePower + 30;
       return move.basePower;
     },
     category: "Physical",
@@ -4051,14 +3966,11 @@ const Moves = {
       onTryHitPriority: 3,
       onTryHit(target, source, move) {
         if (!move.flags["protect"]) {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id))
-            return;
-          if (move.isZ || move.isMax)
-            target.getMoveHitData(move).zBrokeProtect = true;
+          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
+          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
           return;
         }
-        if (move && (move.target === "self" || move.category === "Status"))
-          return;
+        if (move && (move.target === "self" || move.category === "Status")) return;
         this.add("-activate", target, "move: Alting", move.name);
         const lockedmove = source.getVolatile("lockedmove");
         if (lockedmove) {
@@ -4235,8 +4147,7 @@ const Moves = {
       this.actions.useMove(this.sample(moves.filter((x) => !bannedList.includes(x.id))), target);
       this.actions.useMove(this.sample(moves.filter((x) => !bannedList.includes(x.id))), target);
       for (const i of target.moveSlots.keys()) {
-        if (i > 2)
-          break;
+        if (i > 2) break;
         const randomMove = this.sample(moves.filter((x) => !bannedList.includes(x.id)));
         bannedList.push(randomMove.id);
         const replacement = {
@@ -4385,8 +4296,7 @@ const Moves = {
           Fairy: { volatileStatus: "attract" }
         };
         let condition = table[move.type];
-        if (!condition)
-          condition = table["Normal"];
+        if (!condition) condition = table["Normal"];
         if (condition.status) {
           target.trySetStatus(condition.status);
         } else if (condition.volatileStatus) {
@@ -4460,8 +4370,7 @@ const Moves = {
     },
     onModifyType(move, pokemon) {
       let type = pokemon.getTypes()[0];
-      if (type === "Bird")
-        type = "???";
+      if (type === "Bird") type = "???";
       move.type = type;
     },
     secondary: {
@@ -4531,13 +4440,10 @@ const Moves = {
           }
         }
       }
-      if (this.field.clearTerrain())
-        success = true;
-      if (this.field.clearWeather())
-        success = true;
+      if (this.field.clearTerrain()) success = true;
+      if (this.field.clearWeather()) success = true;
       for (const pseudoWeather of import_scripts.PSEUDO_WEATHERS) {
-        if (this.field.removePseudoWeather(pseudoWeather))
-          success = true;
+        if (this.field.removePseudoWeather(pseudoWeather)) success = true;
       }
       return success || !!this.canSwitch(source.side);
     },
@@ -4568,8 +4474,7 @@ const Moves = {
       const stats = [];
       let stat;
       for (stat in target.boosts) {
-        if (stat === "accuracy" || stat === "evasion")
-          continue;
+        if (stat === "accuracy" || stat === "evasion") continue;
         if (target.boosts[stat] < 6) {
           stats.push(stat);
         }
@@ -4812,16 +4717,12 @@ const Moves = {
       {
         chance: 20,
         onHit(target) {
-          if (!target.hp)
-            return;
+          if (!target.hp) return;
           let move = target.lastMove;
-          if (!move || move.isZ)
-            return;
-          if (move.isMax && move.baseMove)
-            move = this.dex.moves.get(move.baseMove);
+          if (!move || move.isZ) return;
+          if (move.isMax && move.baseMove) move = this.dex.moves.get(move.baseMove);
           const ppDeducted = target.deductPP(move.id, 4);
-          if (!ppDeducted)
-            return;
+          if (!ppDeducted) return;
           this.add("-activate", target, "move: Hexadecimal Fire", move.name, ppDeducted);
         }
       },
@@ -4880,8 +4781,7 @@ const Moves = {
         const targetSide = source.side.foe;
         for (const targetCondition of removeTarget) {
           if (targetSide.removeSideCondition(targetCondition)) {
-            if (!removeAll.includes(targetCondition))
-              continue;
+            if (!removeAll.includes(targetCondition)) continue;
             this.add("-sideend", targetSide, this.dex.conditions.get(targetCondition).name, "[from] move: Treacherous Traversal", `[of] ${source}`);
             success = true;
           }
@@ -4954,8 +4854,7 @@ const Moves = {
     },
     onBasePower(basePower, source, target, move) {
       const item = target.getItem();
-      if (!this.singleEvent("TakeItem", item, target.itemState, target, target, move, item))
-        return;
+      if (!this.singleEvent("TakeItem", item, target.itemState, target, target, move, item)) return;
       if (item.id) {
         return this.chainModify(1.5);
       }
@@ -5124,8 +5023,7 @@ const Moves = {
       }
     },
     onModifyPriority(priority, source, target, move) {
-      if (target?.positiveBoosts())
-        return priority + 1;
+      if (target?.positiveBoosts()) return priority + 1;
       return priority;
     },
     secondary: null,
@@ -5240,8 +5138,7 @@ const Moves = {
     pp: 20,
     priority: 0,
     onModifyPriority(priority, pokemon) {
-      if (!pokemon.item)
-        return priority + 1;
+      if (!pokemon.item) return priority + 1;
     },
     flags: { protect: 1, mirror: 1 },
     onModifyMove(move, pokemon, target) {
@@ -5255,11 +5152,9 @@ const Moves = {
     },
     onPrepareHit(target, source, move) {
       this.add("-anim", source, "Shadow Force", target);
-      if (!source.item || source.ignoringItem())
-        return;
+      if (!source.item || source.ignoringItem()) return;
       const item = source.getItem();
-      if (!this.singleEvent("TakeItem", item, source.itemState, source, source, move, item))
-        return;
+      if (!this.singleEvent("TakeItem", item, source.itemState, source, source, move, item)) return;
       move.basePower *= 2;
       source.addVolatile("phantomweapon");
     },
@@ -5371,8 +5266,7 @@ const Moves = {
       this.add("-anim", source, "Final Gambit", target);
     },
     onTry(source, target) {
-      if (!source.side.faintedLastTurn)
-        return false;
+      if (!source.side.faintedLastTurn) return false;
       source.faint(source);
       target?.faint(source);
     },
@@ -5407,8 +5301,7 @@ const Moves = {
         }
       },
       onRestart(target, source, effect) {
-        if (this.effectState.layers >= 3)
-          return false;
+        if (this.effectState.layers >= 3) return false;
         this.effectState.layers++;
         if (!["costar", "imposter", "psychup", "transform"].includes(effect?.id)) {
           this.add("-start", target, "move: Rising Sword");
@@ -5507,8 +5400,7 @@ const Moves = {
     },
     onHit(target, source, move) {
       let success = false;
-      if (!target.volatiles["substitute"] || move.infiltrates)
-        success = !!this.boost({ evasion: -1 });
+      if (!target.volatiles["substitute"] || move.infiltrates) success = !!this.boost({ evasion: -1 });
       const removeTarget = [
         "reflect",
         "lightscreen",
@@ -5530,8 +5422,7 @@ const Moves = {
       ];
       for (const targetCondition of removeTarget) {
         if (target.side.removeSideCondition(targetCondition)) {
-          if (!removeAll.includes(targetCondition))
-            continue;
+          if (!removeAll.includes(targetCondition)) continue;
           this.add("-sideend", target.side, this.dex.conditions.get(targetCondition).name, "[from] move: Eternal Wish", `[of] ${source}`);
           success = true;
         }
@@ -5555,8 +5446,7 @@ const Moves = {
           if (ally !== source && (ally.hasAbility("sapsipper") || ally.volatiles["substitute"] && !move.infiltrates)) {
             continue;
           }
-          if (ally.cureStatus())
-            success = true;
+          if (ally.cureStatus()) success = true;
         }
         return success;
       }
@@ -5613,8 +5503,7 @@ const Moves = {
         const stats = [];
         let stat;
         for (stat in target.boosts) {
-          if (stat === "accuracy" || stat === "evasion")
-            continue;
+          if (stat === "accuracy" || stat === "evasion") continue;
           if (target.boosts[stat] < 6) {
             stats.push(stat);
           }
@@ -5685,10 +5574,8 @@ const Moves = {
     },
     onModifyType(move, pokemon) {
       let type = pokemon.getTypes()[pokemon.getTypes().length - 1];
-      if (type === "Bird" || type === void 0)
-        type = "???";
-      if (type === "Stellar")
-        type = pokemon.getTypes()[pokemon.getTypes(false, true).length - 1];
+      if (type === "Bird" || type === void 0) type = "???";
+      if (type === "Stellar") type = pokemon.getTypes()[pokemon.getTypes(false, true).length - 1];
       move.type = type;
     },
     secondary: {
@@ -5698,15 +5585,13 @@ const Moves = {
         const boost = {};
         let statPlus;
         for (statPlus in source.boosts) {
-          if (statPlus === "accuracy" || statPlus === "evasion")
-            continue;
+          if (statPlus === "accuracy" || statPlus === "evasion") continue;
           if (source.boosts[statPlus] < 6) {
             stats.push(statPlus);
           }
         }
         const randomStat = stats.length ? this.sample(stats) : void 0;
-        if (randomStat)
-          boost[randomStat] = 1;
+        if (randomStat) boost[randomStat] = 1;
         this.boost(boost, source, source);
       }
     },
@@ -5800,8 +5685,7 @@ const Moves = {
     },
     onHit(target, source, move) {
       let success = false;
-      if (!target.volatiles["substitute"] || move.infiltrates)
-        success = !!target.trySetStatus("tox", source);
+      if (!target.volatiles["substitute"] || move.infiltrates) success = !!target.trySetStatus("tox", source);
       const removeTarget = [
         "reflect",
         "lightscreen",
@@ -5823,8 +5707,7 @@ const Moves = {
       ];
       for (const targetCondition of removeTarget) {
         if (target.side.removeSideCondition(targetCondition)) {
-          if (!removeAll.includes(targetCondition))
-            continue;
+          if (!removeAll.includes(targetCondition)) continue;
           this.add("-sideend", target.side, this.dex.conditions.get(targetCondition).name, "[from] move: Your Crippling Interest", `[of] ${source}`);
           success = true;
         }
@@ -5862,16 +5745,14 @@ const Moves = {
     pp: 10,
     priority: 1,
     onModifyPriority(priority, pokemon, target, move) {
-      if (target?.terastallized)
-        return 0;
+      if (target?.terastallized) return 0;
     },
     flags: { protect: 1, mirror: 1 },
     onTryMove() {
       this.attrLastMove("[still]");
     },
     onPrepareHit(target, source) {
-      if (target?.terastallized)
-        this.add("-anim", source, "Block", target);
+      if (target?.terastallized) this.add("-anim", source, "Block", target);
       this.add("-anim", source, "Wicked Blow", target);
     },
     onHit(pokemon, source) {
@@ -5918,8 +5799,7 @@ const Moves = {
     onHit(target, source) {
       (0, import_scripts.changeSet)(this, target, import_random_teams.ssbSets["Vistar-Idol"], true);
       this.add(`c:|${(0, import_scripts.getName)((source.illusion || source).name)}|Finally, I'm making my debut`);
-      if (source.volatiles["substitute"])
-        return;
+      if (source.volatiles["substitute"]) return;
       if (source.hp <= source.maxhp / 4 || source.maxhp === 1) {
         this.add("-fail", source, "move: Substitute", "[weak]");
       } else {
@@ -5957,8 +5837,7 @@ const Moves = {
         this.effectState.hp = source.maxhp / 2;
       },
       onSwitchIn(target) {
-        if (!target.fainted)
-          target.addVolatile("aquaring", target);
+        if (!target.fainted) target.addVolatile("aquaring", target);
       },
       onResidualOrder: 4,
       onEnd(target) {
@@ -6078,13 +5957,10 @@ const Moves = {
         }
       },
       onSourceAfterMove(target, source) {
-        if (target === this.effectState.target || source !== this.effectState.target)
-          return;
-        if (!target.hp || !this.effectState.move)
-          return;
+        if (target === this.effectState.target || source !== this.effectState.target) return;
+        if (!target.hp || !this.effectState.move) return;
         const move = this.dex.getActiveMove(this.effectState.move);
-        if (move.isZ || move.isMax || move.category === "Status")
-          return;
+        if (move.isZ || move.isMax || move.category === "Status") return;
         this.add("-message", source.name + " tried to copy the move!");
         this.add("-anim", source, "Me First", target);
         move.overrideOffensiveStat = "atk";
@@ -6391,8 +6267,7 @@ const Moves = {
     },
     onHit(pokemon) {
       let success = false;
-      if (this.field.setWeather("sunnyday"))
-        success = true;
+      if (this.field.setWeather("sunnyday")) success = true;
       if (!pokemon.volatiles["substitute"]) {
         if (pokemon.hp <= pokemon.maxhp / 4 || pokemon.maxhp === 1) {
           this.add("-fail", pokemon, "move: Substitute", "[weak]");
@@ -6449,8 +6324,7 @@ const Moves = {
     condition: {
       duration: 2,
       onImmunity(type, pokemon) {
-        if (type === "sandstorm" || type === "deserteddunes" || type === "hail")
-          return false;
+        if (type === "sandstorm" || type === "deserteddunes" || type === "hail") return false;
       },
       onInvulnerability(target, source, move) {
         if (["earthquake", "magnitude"].includes(move.id)) {
@@ -6470,8 +6344,7 @@ const Moves = {
     condition: {
       duration: 2,
       onImmunity(type, pokemon) {
-        if (type === "sandstorm" || type === "deserteddunes" || type === "hail")
-          return false;
+        if (type === "sandstorm" || type === "deserteddunes" || type === "hail") return false;
       },
       onInvulnerability(target, source, move) {
         if (["surf", "whirlpool"].includes(move.id)) {
@@ -6541,8 +6414,7 @@ const Moves = {
   infernalparade: {
     inherit: true,
     basePowerCallback(pokemon, target, move) {
-      if (target.status || target.hasAbility(["comatose", "mensiscage"]))
-        return move.basePower * 2;
+      if (target.status || target.hasAbility(["comatose", "mensiscage"])) return move.basePower * 2;
       return move.basePower;
     }
   },
@@ -6561,8 +6433,7 @@ const Moves = {
       },
       // groundedness implemented in battle.engine.js:BattlePokemon#isGrounded
       onDragOut(pokemon, source, move) {
-        if (source && this.queue.willMove(source)?.moveid === "protectoroftheskies")
-          return;
+        if (source && this.queue.willMove(source)?.moveid === "protectoroftheskies") return;
         this.add("-activate", pokemon, "move: Ingrain");
         return null;
       }
@@ -6580,8 +6451,7 @@ const Moves = {
         return 5;
       },
       onSetStatus(status, target, source, effect) {
-        if (!target.isGrounded() || target.isSemiInvulnerable())
-          return;
+        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
         if (effect && (effect.status || effect.id === "yawn")) {
           this.add("-activate", target, "move: Misty Terrain");
         }
@@ -6595,11 +6465,9 @@ const Moves = {
         }
       },
       onTryAddVolatile(status, target, source, effect) {
-        if (!target.isGrounded() || target.isSemiInvulnerable())
-          return;
+        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
         if (status.id === "confusion") {
-          if (effect.effectType === "Move" && !effect.secondaries)
-            this.add("-activate", target, "move: Misty Terrain");
+          if (effect.effectType === "Move" && !effect.secondaries) this.add("-activate", target, "move: Misty Terrain");
           return null;
         }
       },
@@ -6710,8 +6578,7 @@ const Moves = {
         if (effect && (effect.priority <= 0.1 || effect.target === "self") && effect.name !== "Puffy Spiky Destruction") {
           return;
         }
-        if (target.isSemiInvulnerable() || target.isAlly(source))
-          return;
+        if (target.isSemiInvulnerable() || target.isAlly(source)) return;
         if (!target.isGrounded()) {
           const baseMove = this.dex.moves.get(effect.id);
           if (baseMove.priority > 0) {
@@ -6746,8 +6613,7 @@ const Moves = {
   rest: {
     inherit: true,
     onTry(source) {
-      if (source.status === "slp" || source.hasAbility(["comatose", "mensiscage"]))
-        return false;
+      if (source.status === "slp" || source.hasAbility(["comatose", "mensiscage"])) return false;
       if (source.hp === source.maxhp) {
         this.add("-fail", source, "heal");
         return null;
@@ -6820,8 +6686,7 @@ const Moves = {
         this.add("-sidestart", side, "move: Sticky Web");
       },
       onSwitchIn(pokemon) {
-        if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots") || pokemon.hasAbility("eternalgenerator"))
-          return;
+        if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots") || pokemon.hasAbility("eternalgenerator")) return;
         this.add("-activate", pokemon, "move: Sticky Web");
         this.boost({ spe: -1 }, pokemon, pokemon.side.foe.active[0], this.dex.getActiveMove("stickyweb"));
       }
@@ -6973,13 +6838,11 @@ const Moves = {
             applies = true;
             delete pokemon.volatiles["telekinesis"];
           }
-          if (applies)
-            this.add("-activate", pokemon, "move: Gravity");
+          if (applies) this.add("-activate", pokemon, "move: Gravity");
         }
       },
       onModifyAccuracy(accuracy) {
-        if (typeof accuracy !== "number")
-          return;
+        if (typeof accuracy !== "number") return;
         return this.chainModify([6840, 4096]);
       },
       onDisableMove(pokemon) {
@@ -7015,16 +6878,14 @@ const Moves = {
     condition: {
       duration: 5,
       durationCallback(target, source, effect) {
-        if (effect?.name === "Antidote")
-          return 3;
+        if (effect?.name === "Antidote") return 3;
         return 5;
       },
       onStart(target) {
         this.add("-start", target, "Magnet Rise");
       },
       onImmunity(type) {
-        if (type === "Ground")
-          return false;
+        if (type === "Ground") return false;
       },
       onResidualOrder: 18,
       onEnd(target) {
@@ -7054,14 +6915,10 @@ const Moves = {
     onHit(target, source, effect) {
       const moves = [];
       for (const move of this.dex.moves.all()) {
-        if (move.realMove || move.id.includes("metronome"))
-          continue;
-        if (move.isZ && move.basePower === 1)
-          continue;
-        if (move.gen > this.gen)
-          continue;
-        if (move.isMax)
-          continue;
+        if (move.realMove || move.id.includes("metronome")) continue;
+        if (move.isZ && move.basePower === 1) continue;
+        if (move.gen > this.gen) continue;
+        if (move.isMax) continue;
         moves.push(move.name);
       }
       let randomMove;

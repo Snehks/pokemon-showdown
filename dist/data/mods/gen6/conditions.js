@@ -51,8 +51,7 @@ const Conditions = {
         return;
       }
       const damage = this.actions.getConfusionDamage(pokemon, 40);
-      if (typeof damage !== "number")
-        throw new Error("Confusion damage not dealt");
+      if (typeof damage !== "number") throw new Error("Confusion damage not dealt");
       this.damage(damage, pokemon, pokemon, {
         id: "confused",
         effectType: "Move",

@@ -25,8 +25,7 @@ const Abilities = {
   aerilate: {
     inherit: true,
     onBasePower(basePower, pokemon, target, move) {
-      if (move.typeChangerBoosted === this.effect)
-        return this.chainModify([5325, 4096]);
+      if (move.typeChangerBoosted === this.effect) return this.chainModify([5325, 4096]);
     },
     rating: 4.5
   },
@@ -41,8 +40,7 @@ const Abilities = {
   galewings: {
     inherit: true,
     onModifyPriority(priority, pokemon, target, move) {
-      if (move && move.type === "Flying")
-        return priority + 1;
+      if (move && move.type === "Flying") return priority + 1;
     },
     rating: 4
   },
@@ -68,8 +66,7 @@ const Abilities = {
   magicguard: {
     inherit: true,
     onDamage(damage, target, source, effect) {
-      if (effect.effectType !== "Move")
-        return false;
+      if (effect.effectType !== "Move") return false;
     }
   },
   normalize: {
@@ -92,16 +89,14 @@ const Abilities = {
   pixilate: {
     inherit: true,
     onBasePower(basePower, pokemon, target, move) {
-      if (move.typeChangerBoosted === this.effect)
-        return this.chainModify([5325, 4096]);
+      if (move.typeChangerBoosted === this.effect) return this.chainModify([5325, 4096]);
     },
     rating: 4.5
   },
   refrigerate: {
     inherit: true,
     onBasePower(basePower, pokemon, target, move) {
-      if (move.typeChangerBoosted === this.effect)
-        return this.chainModify([5325, 4096]);
+      if (move.typeChangerBoosted === this.effect) return this.chainModify([5325, 4096]);
     },
     rating: 4.5
   },
@@ -117,13 +112,10 @@ const Abilities = {
     inherit: true,
     onBeforeMovePriority: 11,
     onBeforeMove(attacker, defender, move) {
-      if (attacker.species.baseSpecies !== "Aegislash" || attacker.transformed)
-        return;
-      if (move.category === "Status" && move.id !== "kingsshield")
-        return;
+      if (attacker.species.baseSpecies !== "Aegislash" || attacker.transformed) return;
+      if (move.category === "Status" && move.id !== "kingsshield") return;
       const targetForme = move.id === "kingsshield" ? "Aegislash" : "Aegislash-Blade";
-      if (attacker.species.name !== targetForme)
-        attacker.formeChange(targetForme);
+      if (attacker.species.name !== targetForme) attacker.formeChange(targetForme);
     },
     onModifyMove() {
     }
@@ -133,8 +125,7 @@ const Abilities = {
     onAllyAfterUseItem(item, pokemon) {
       const source = this.effectState.target;
       const myItem = source.takeItem();
-      if (!myItem)
-        return;
+      if (!myItem) return;
       if (!this.singleEvent("TakeItem", myItem, source.itemState, pokemon, source, this.effect, myItem) || !pokemon.setItem(myItem)) {
         source.item = myItem.id;
         return;

@@ -30,8 +30,7 @@ const Moves = {
       if (this.dex.species.get(moveSlotID).exists) {
         type = this.dex.species.get(moveSlotID).types[0];
       }
-      if (target.hasType(type) || !target.setType(type))
-        return false;
+      if (target.hasType(type) || !target.setType(type)) return false;
       this.add("-start", target, "typechange", type);
     }
   },

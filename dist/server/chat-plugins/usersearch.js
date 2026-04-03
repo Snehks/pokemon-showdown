@@ -54,10 +54,8 @@ class SearchUsernames extends Chat.JSX.Component {
       online: []
     };
     for (const curUser of Users.users.values()) {
-      if (!curUser.id.includes(target) || curUser.id.startsWith("guest"))
-        continue;
-      if (Punishments.isGlobalBanned(curUser))
-        continue;
+      if (!curUser.id.includes(target) || curUser.id.startsWith("guest")) continue;
+      if (Punishments.isGlobalBanned(curUser)) continue;
       if (curUser.connected) {
         results.online.push(`${!page ? ONLINE_SYMBOL : ""} ${curUser.name}`);
       } else {
@@ -96,8 +94,7 @@ const commands = {
     this.checkCan("lock");
     target = toID(target);
     if (!target) {
-      if (cmd.includes("page"))
-        return this.parse(`/j view-usersearch`);
+      if (cmd.includes("page")) return this.parse(`/j view-usersearch`);
       return this.parse(`/help usersearch`);
     }
     if (target.length < 3) {
@@ -199,8 +196,7 @@ const pages = {
       for (const curUser of Users.users.values()) {
         for (const term of nameList) {
           if (curUser.id.includes(term) && !curUser.id.startsWith("guest")) {
-            if (!(term in sorted))
-              sorted[term] = 0;
+            if (!(term in sorted)) sorted[term] = 0;
             sorted[term]++;
           }
         }
@@ -210,8 +206,7 @@ const pages = {
         for (const k of import_lib.Utils.sortBy(Object.keys(sorted), (v) => -sorted[v])) {
           buf.push(/* @__PURE__ */ Chat.h("tr", null, /* @__PURE__ */ Chat.h("td", null, k), /* @__PURE__ */ Chat.h("td", null, sorted[k]), /* @__PURE__ */ Chat.h("td", null, /* @__PURE__ */ Chat.h("button", { class: "button", name: "send", value: `/uspage ${k}` }, "Search"))));
         }
-        if (!buf.length)
-          return /* @__PURE__ */ Chat.h("tr", null, /* @__PURE__ */ Chat.h("td", { colSpan: 3, style: { textAlign: "center" } }, "No names found."));
+        if (!buf.length) return /* @__PURE__ */ Chat.h("tr", null, /* @__PURE__ */ Chat.h("td", { colSpan: 3, style: { textAlign: "center" } }, "No names found."));
         return buf;
       })())));
     }

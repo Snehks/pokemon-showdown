@@ -257,8 +257,7 @@ const Moves = {
       this.attrLastMove("[still]");
     },
     onModifyMove(move, pokemon, target) {
-      if (!target)
-        return;
+      if (!target) return;
       const atk = pokemon.getStat("atk", false, true);
       const spa = pokemon.getStat("spa", false, true);
       const def = target.getStat("def", false, true);
@@ -274,12 +273,10 @@ const Moves = {
       this.add("-anim", source, "Water Spout", target);
     },
     onHit(target, source, move) {
-      if (!source.isAlly(target))
-        this.hint(move.category + " Geyser");
+      if (!source.isAlly(target)) this.hint(move.category + " Geyser");
     },
     onAfterSubDamage(damage, target, source, move) {
-      if (!source.isAlly(target))
-        this.hint(move.category + " Geyser");
+      if (!source.isAlly(target)) this.hint(move.category + " Geyser");
     },
     secondary: null,
     target: "normal",
@@ -451,16 +448,14 @@ const Moves = {
         this.add("-sidestart", side, "move: Stealth Rock");
       },
       onSwitchIn(pokemon) {
-        if (pokemon.hasItem("heavydutyboots") && !pokemon.side.getSideCondition("kingofthehill") || pokemon.side.getSideCondition("orderup"))
-          return;
+        if (pokemon.hasItem("heavydutyboots") && !pokemon.side.getSideCondition("kingofthehill") || pokemon.side.getSideCondition("orderup")) return;
         const typeMod = this.clampIntRange(pokemon.runEffectiveness(this.dex.getActiveMove("stealthrock")), -6, 6);
         this.damage(pokemon.maxhp * 2 ** typeMod / 8);
       },
       // iron strike functionality (reapplies stealth rock damage when hit with Iron Strike)
       onHit(pokemon, source, move) {
         if (move.id === "ironstrike") {
-          if (pokemon.hasItem("heavydutyboots"))
-            return;
+          if (pokemon.hasItem("heavydutyboots")) return;
           const typeMod = this.clampIntRange(pokemon.runEffectiveness(this.dex.getActiveMove("stealthrock")), -6, 6);
           this.damage(pokemon.maxhp * 2 ** typeMod / 8);
         }
@@ -489,22 +484,19 @@ const Moves = {
         this.effectState.layers = 1;
       },
       onSideRestart(side) {
-        if (this.effectState.layers >= 3)
-          return false;
+        if (this.effectState.layers >= 3) return false;
         this.add("-sidestart", side, "Spikes");
         this.effectState.layers++;
       },
       onSwitchIn(pokemon) {
-        if ((!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots")) && !pokemon.side.getSideCondition("kingofthehill") || pokemon.side.getSideCondition("orderup"))
-          return;
+        if ((!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots")) && !pokemon.side.getSideCondition("kingofthehill") || pokemon.side.getSideCondition("orderup")) return;
         const damageAmounts = [0, 3, 4, 6];
         this.damage(damageAmounts[this.effectState.layers] * pokemon.maxhp / 24);
       },
       // iron strike functionality
       onHit(pokemon, source, move) {
         if (move.id === "ironstrike") {
-          if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots"))
-            return;
+          if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots")) return;
           const damageAmounts = [0, 3, 4, 6];
           this.damage(damageAmounts[this.effectState.layers] * pokemon.maxhp / 24);
         }
@@ -571,8 +563,7 @@ const Moves = {
       onFaint(pokemon) {
         const side = pokemon.side;
         const dondozo = side.pokemon.find((p) => p.species.name === "Dondozo" && !p.fainted);
-        if (!dondozo)
-          return;
+        if (!dondozo) return;
         this.queue.insertChoice({
           choice: "switch",
           pokemon,
@@ -583,10 +574,8 @@ const Moves = {
     },
     // when order up hits, first checks for volatile ordered to ensure that Order Up has not already been used, then starts orderup side condition and switches Dondozo out
     onHit(target, source, move) {
-      if (source.volatiles["ordered"])
-        return;
-      if (source.species.id === "mew")
-        return;
+      if (source.volatiles["ordered"]) return;
+      if (source.species.id === "mew") return;
       source.side.addSideCondition("orderup");
       source.storedBoosts = { ...source.boosts };
       source.storedVolatiles = {};
@@ -616,14 +605,12 @@ const Moves = {
         this.effectState.layers = 1;
       },
       onSideRestart(side) {
-        if (this.effectState.layers >= 2)
-          return false;
+        if (this.effectState.layers >= 2) return false;
         this.add("-sidestart", side, "move: Toxic Spikes");
         this.effectState.layers++;
       },
       onSwitchIn(pokemon) {
-        if (!pokemon.isGrounded() && !pokemon.side.getSideCondition("kingofthehill"))
-          return;
+        if (!pokemon.isGrounded() && !pokemon.side.getSideCondition("kingofthehill")) return;
         if (pokemon.hasType("Poison")) {
           this.add("-sideend", pokemon.side, "move: Toxic Spikes", `[of] ${pokemon}`);
           pokemon.side.removeSideCondition("toxicspikes");
@@ -643,8 +630,7 @@ const Moves = {
         this.add("-sidestart", side, "move: Sticky Web");
       },
       onSwitchIn(pokemon) {
-        if ((!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots")) && !pokemon.side.getSideCondition("kingofthehill"))
-          return;
+        if ((!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots")) && !pokemon.side.getSideCondition("kingofthehill")) return;
         this.add("-activate", pokemon, "move: Sticky Web");
         this.boost({ spe: -1 }, pokemon, pokemon.side.foe.active[0], this.dex.getActiveMove("stickyweb"));
       }
@@ -759,8 +745,7 @@ const Moves = {
   surgingstrikes: {
     inherit: true,
     beforeMoveCallback(source, target, move) {
-      if (source.species.id === "araquanid")
-        return;
+      if (source.species.id === "araquanid") return;
       if (target) {
         this.effectState.wickedBlowAlreadyUsed = 0;
         this.add("-anim", source, "Techno Blast", target);
@@ -824,8 +809,7 @@ const Moves = {
       const removeTarget = ["reflect", "lightscreen", "auroraveil", "safeguard", "mist", ...removeAll];
       for (const targetCondition of removeTarget) {
         if (target.side.removeSideCondition(targetCondition)) {
-          if (!removeAll.includes(targetCondition))
-            continue;
+          if (!removeAll.includes(targetCondition)) continue;
           this.add("-sideend", target.side, this.dex.conditions.get(targetCondition).name, "[from] move: Defog", `[of] ${source}`);
           success = true;
         }
@@ -1055,10 +1039,8 @@ const Moves = {
       return move.basePower;
     },
     onEffectiveness(typeMod, target, type) {
-      if (type === "Water")
-        return 1;
-      if (type === "Steel")
-        return 1;
+      if (type === "Water") return 1;
+      if (type === "Steel") return 1;
     },
     onTryMove() {
       this.attrLastMove("[still]");
@@ -1117,8 +1099,7 @@ const Moves = {
       onTryHitPriority: 3,
       onTryHit(target, source, move) {
         if (!move.flags["protect"] || move.category === "Status") {
-          if (move.isZ || move.isMax)
-            target.getMoveHitData(move).zBrokeProtect = true;
+          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
           return;
         }
         if (move.smartTarget) {
@@ -1181,10 +1162,8 @@ const Moves = {
     onModifyType(move, pokemon) {
       const types = pokemon.getTypes();
       let type = types[0];
-      if (type === "Bird")
-        type = "???";
-      if (type === "???" && types[1])
-        type = types[1];
+      if (type === "Bird") type = "???";
+      if (type === "???" && types[1]) type = types[1];
       move.type = type;
       if (pokemon.species.name === "Terapagos-Stellar") {
         move.type = "Stellar";
@@ -1284,8 +1263,7 @@ const Moves = {
     basePowerCallback(pokemon, target, move) {
       if (this.field.isWeather("snowscape")) {
         return move.basePower * 1.3;
-      } else
-        return move.basePower;
+      } else return move.basePower;
     }
   },
   crowverload: {
@@ -1483,8 +1461,7 @@ const Moves = {
         }
       },
       onTryAddVolatile(status, target) {
-        if (!target.isGrounded() || target.isSemiInvulnerable())
-          return;
+        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
         if (status.id === "yawn") {
           this.add("-activate", target, "move: Electric Terrain");
           return null;
@@ -1545,19 +1522,16 @@ const Moves = {
         return 5;
       },
       onSetStatus(status, target, source, effect) {
-        if (!target.isGrounded() || target.isSemiInvulnerable())
-          return;
+        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
         if (effect && (effect.status || effect.id === "yawn")) {
           this.add("-activate", target, "move: Misty Terrain");
         }
         return false;
       },
       onTryAddVolatile(status, target, source, effect) {
-        if (!target.isGrounded() || target.isSemiInvulnerable())
-          return;
+        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
         if (status.id === "confusion") {
-          if (effect.effectType === "Move" && !effect.secondaries)
-            this.add("-activate", target, "move: Misty Terrain");
+          if (effect.effectType === "Move" && !effect.secondaries) this.add("-activate", target, "move: Misty Terrain");
           return null;
         }
       },
@@ -1633,8 +1607,7 @@ const Moves = {
     flags: { allyanim: 1, metronome: 1, futuremove: 1 },
     ignoreImmunity: true,
     onTry(source, target) {
-      if (!target.side.addSlotCondition(target, "sinisterarrows"))
-        return false;
+      if (!target.side.addSlotCondition(target, "sinisterarrows")) return false;
       Object.assign(target.side.slotConditions[target.position]["sinisterarrows"], {
         move: "sinisterarrows",
         source,
@@ -1672,8 +1645,7 @@ const Moves = {
           this.hint(`${move.name} did not hit because the target is ${target.fainted ? "fainted" : "the user"}.`);
           return;
         }
-        if (!this.getOverflowedTurnCount())
-          return;
+        if (!this.getOverflowedTurnCount()) return;
         target.removeVolatile("Protect");
         target.removeVolatile("Endure");
         if (data.source.hasAbility("infiltrator") && this.gen >= 6) {
@@ -1752,8 +1724,7 @@ const Moves = {
           if (this.singleEvent("Eat", berry, null, source, source, move)) {
             this.runEvent("EatItem", source, source, move, berry);
           }
-          if (berry.onEat)
-            source.ateBerry = true;
+          if (berry.onEat) source.ateBerry = true;
         }
       }
     },

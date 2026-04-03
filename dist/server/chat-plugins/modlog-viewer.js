@@ -54,16 +54,13 @@ function getMoreButton(roomid, searchCmd, lines, maxLines, onlyPunishments, only
     return "";
   } else {
     let cmd = `/modlog`;
-    if (onlyNotes)
-      cmd = `/modnotes`;
-    if (onlyPunishments)
-      cmd = `/punishlog`;
+    if (onlyNotes) cmd = `/modnotes`;
+    if (onlyPunishments) cmd = `/punishlog`;
     return import_lib.Utils.html`<br /><div style="text-align:center"><button class="button" name="send" value="${cmd} room=${roomid}, ${searchCmd}, ${LINES_SEPARATOR}${newLines}" title="View more results">Older results<br />&#x25bc;</button></div>`;
   }
 }
 function getRoomID(id) {
-  if (id in ALIASES)
-    return ALIASES[id];
+  if (id in ALIASES) return ALIASES[id];
   return id;
 }
 function prettifyResults(resultArray, roomid, search, searchCmd, addModlogLinks, hideIps, maxLines, onlyPunishments, onlyNotes) {
@@ -85,17 +82,13 @@ function prettifyResults(resultArray, roomid, search, searchCmd, addModlogLinks,
   let searchString = ``;
   const excludes = search.note.filter((s) => s.isExclusion).map((s) => s.search) || [];
   const includes = search.note.filter((s) => !s.isExclusion).map((s) => s.search) || [];
-  if (includes.length)
-    searchString += `with a note including any of: ${includes.join(", ")} `;
-  if (excludes.length)
-    searchString += `with a note that does not include any of: ${excludes.join(", ")} `;
-  for (const u of search.user)
-    searchString += `${u.isExclusion ? "not " : ""}taken against ${u.search} `;
+  if (includes.length) searchString += `with a note including any of: ${includes.join(", ")} `;
+  if (excludes.length) searchString += `with a note that does not include any of: ${excludes.join(", ")} `;
+  for (const u of search.user) searchString += `${u.isExclusion ? "not " : ""}taken against ${u.search} `;
   for (const ip of search.ip) {
     searchString += `${ip.isExclusion ? "not " : ""}taken against a user on the IP ${ip.search} `;
   }
-  for (const action of search.action)
-    searchString += `${action.isExclusion ? "not " : ""}of the type ${action.search} `;
+  for (const action of search.action) searchString += `${action.isExclusion ? "not " : ""}of the type ${action.search} `;
   for (const actionTaker of search.actionTaker) {
     searchString += `${actionTaker.isExclusion ? "not " : ""}taken by ${actionTaker.search} `;
   }
@@ -112,17 +105,12 @@ function prettifyResults(resultArray, roomid, search, searchCmd, addModlogLinks,
     let line = `<small>[${timestamp2}] (${entryRoom})</small> ${result.action}`;
     if (result.userid) {
       line += `: [${result.userid}]`;
-      if (result.autoconfirmedID)
-        line += ` ac: [${result.autoconfirmedID}]`;
-      if (result.alts.length)
-        line += ` alts: [${result.alts.join("], [")}]`;
-      if (!hideIps && result.ip)
-        line += ` [${result.ip}]`;
+      if (result.autoconfirmedID) line += ` ac: [${result.autoconfirmedID}]`;
+      if (result.alts.length) line += ` alts: [${result.alts.join("], [")}]`;
+      if (!hideIps && result.ip) line += ` [${result.ip}]`;
     }
-    if (result.loggedBy)
-      line += `: by ${result.loggedBy}`;
-    if (result.note)
-      line += `: ${result.note}`;
+    if (result.loggedBy) line += `: by ${result.loggedBy}`;
+    if (result.note) line += `: ${result.note}`;
     if (dateString2 !== curDate) {
       curDate = dateString2;
       dateString2 = `</p><p>[${dateString2}]<br />`;
@@ -145,7 +133,7 @@ function prettifyResults(resultArray, roomid, search, searchCmd, addModlogLinks,
     );
     return `${dateString2}<small>[${timestamp2}] (${thisRoomID})</small>${line}`;
   }).join(`<br />`);
-  const [dateString, timestamp] = Chat.toTimestamp(new Date(), { human: true }).split(" ");
+  const [dateString, timestamp] = Chat.toTimestamp(/* @__PURE__ */ new Date(), { human: true }).split(" ");
   let preamble;
   const modlogid = roomid + (searchString ? "-" + import_lib.Dashycode.encode(searchString) : "");
   if (searchString) {
@@ -202,11 +190,9 @@ async function getModlog(connection, roomid = "global", search, searchCmd, maxLi
     userSearch.search = toID(userSearch.search);
     search.user[i] = userSearch;
   }
-  if (onlyNotes)
-    search.action.push({ search: "NOTE" });
+  if (onlyNotes) search.action.push({ search: "NOTE" });
   const response = await Rooms.Modlog.search(roomid, search, maxLines, onlyPunishments);
-  if (!response)
-    return connection.popup(`The moderator log is currently disabled.`);
+  if (!response) return connection.popup(`The moderator log is currently disabled.`);
   connection.send(
     prettifyResults(
       response.results,
@@ -220,8 +206,7 @@ async function getModlog(connection, roomid = "global", search, searchCmd, maxLi
       onlyNotes
     )
   );
-  if (timed)
-    connection.popup(`The modlog query took ${response.duration} ms to complete.`);
+  if (timed) connection.popup(`The modlog query took ${response.duration} ms to complete.`);
 }
 const shouldSearchGlobal = ["staff", "adminlog"];
 const commands = {
@@ -273,8 +258,7 @@ const commands = {
       switch (param) {
         case "note":
         case "text":
-          if (!search.note)
-            search.note = [];
+          if (!search.note) search.note = [];
           search.note.push({ search: value, isExclusion });
           break;
         case "user":
@@ -305,8 +289,7 @@ const commands = {
         case "lines":
         case "maxlines":
           lines = parseInt(value);
-          if (isNaN(lines) || lines < 1)
-            throw new Chat.ErrorMessage(`Invalid linecount: '${value}'.`);
+          if (isNaN(lines) || lines < 1) throw new Chat.ErrorMessage(`Invalid linecount: '${value}'.`);
           break;
         default:
           throw new Chat.ErrorMessage([
@@ -316,8 +299,7 @@ const commands = {
       }
     }
     const targetRoom = Rooms.search(roomid);
-    if (targetRoom)
-      roomid = targetRoom.roomid;
+    if (targetRoom) roomid = targetRoom.roomid;
     if (roomid.includes("-")) {
       if (user.can("modlog")) {
         roomid = "global";
@@ -328,10 +310,8 @@ const commands = {
     if (!target && !lines) {
       lines = 20;
     }
-    if (!lines)
-      lines = DEFAULT_RESULTS_LENGTH;
-    if (lines > MAX_RESULTS_LENGTH)
-      lines = MAX_RESULTS_LENGTH;
+    if (!lines) lines = DEFAULT_RESULTS_LENGTH;
+    if (lines > MAX_RESULTS_LENGTH) lines = MAX_RESULTS_LENGTH;
     void getModlog(
       connection,
       roomid,
@@ -352,8 +332,7 @@ const commands = {
   modlogstats(target, room, user) {
     this.checkCan("lock");
     target = toID(target);
-    if (!target)
-      return this.parse(`/help modlogstats`);
+    if (!target) return this.parse(`/help modlogstats`);
     return this.parse(`/join view-modlogstats-${target}`);
   },
   modlogstatshelp: [`/modlogstats [userid] - Fetch all information on that [userid] from the modlog (IPs, alts, etc). Requires: % @ ~`]
@@ -400,13 +379,10 @@ const pages = {
         }
       }
       if (entry.alts) {
-        for (const alt of entry.alts)
-          alts.add(alt);
+        for (const alt of entry.alts) alts.add(alt);
       }
-      if (entry.autoconfirmedID)
-        autoconfirmed.add(entry.autoconfirmedID);
-      if (entry.ip)
-        ips.add(entry.ip);
+      if (entry.autoconfirmedID) autoconfirmed.add(entry.autoconfirmedID);
+      if (entry.ip) ips.add(entry.ip);
     }
     let buf = `<div class="pad"><h2>Modlog information for ${target}</h2><hr />`;
     if (alts.size) {

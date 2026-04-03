@@ -31,11 +31,9 @@ var import_lib = require("../../lib");
  * @license MIT license
  */
 function convertAliasFormat(room) {
-  if (!room.settings.events)
-    return;
+  if (!room.settings.events) return;
   for (const event of Object.values(room.settings.events)) {
-    if (!event.aliases)
-      continue;
+    if (!event.aliases) continue;
     for (const alias of event.aliases) {
       room.settings.events[alias] = { eventID: toID(event.eventName) };
     }
@@ -43,14 +41,11 @@ function convertAliasFormat(room) {
   }
 }
 function formatEvent(room, event, showAliases, showCategories) {
-  const timeRemaining = new Date(event.date).getTime() - new Date().getTime();
+  const timeRemaining = new Date(event.date).getTime() - (/* @__PURE__ */ new Date()).getTime();
   let explanation = timeRemaining.toString();
-  if (!timeRemaining)
-    explanation = "The time remaining for this event is not available";
-  if (timeRemaining < 0)
-    explanation = "This event will start soon";
-  if (event.started)
-    explanation = "This event has started";
+  if (!timeRemaining) explanation = "The time remaining for this event is not available";
+  if (timeRemaining < 0) explanation = "This event will start soon";
+  if (event.started) explanation = "This event has started";
   if (!isNaN(timeRemaining)) {
     explanation = `This event will start in: ${Chat.toDurationString(timeRemaining, { precision: 2 })}`;
   }
@@ -61,41 +56,33 @@ function formatEvent(room, event, showAliases, showCategories) {
   );
   let ret = `<tr title="${explanation}">`;
   ret += import_lib.Utils.html`<td>${event.eventName}</td>`;
-  if (showAliases)
-    ret += import_lib.Utils.html`<td>${aliases.join(", ")}</td>`;
-  if (showCategories)
-    ret += import_lib.Utils.html`<td>${categories.join(", ")}</td>`;
+  if (showAliases) ret += import_lib.Utils.html`<td>${aliases.join(", ")}</td>`;
+  if (showCategories) ret += import_lib.Utils.html`<td>${categories.join(", ")}</td>`;
   ret += `<td>${Chat.formatText(event.desc, true)}</td>`;
   ret += import_lib.Utils.html`<td><time>${event.date}</time></td></tr>`;
   return ret;
 }
 function getAliases(room, eventID) {
-  if (!room.settings.events)
-    return [];
+  if (!room.settings.events) return [];
   const aliases = [];
   for (const aliasID in room.settings.events) {
-    if ("eventID" in room.settings.events[aliasID] && (!eventID || room.settings.events[aliasID].eventID === eventID))
-      aliases.push(aliasID);
+    if ("eventID" in room.settings.events[aliasID] && (!eventID || room.settings.events[aliasID].eventID === eventID)) aliases.push(aliasID);
   }
   return aliases;
 }
 function getAllCategories(room) {
-  if (!room.settings.events)
-    return [];
+  if (!room.settings.events) return [];
   const categories = [];
   for (const categoryID in room.settings.events) {
-    if ("events" in room.settings.events[categoryID])
-      categories.push(categoryID);
+    if ("events" in room.settings.events[categoryID]) categories.push(categoryID);
   }
   return categories;
 }
 function getAllEvents(room) {
-  if (!room.settings.events)
-    return [];
+  if (!room.settings.events) return [];
   const events = [];
   for (const event of Object.values(room.settings.events)) {
-    if ("eventName" in event)
-      events.push(event);
+    if ("eventName" in event) events.push(event);
   }
   return events;
 }
@@ -113,22 +100,18 @@ const commands = {
   roomevents: {
     ""(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       if (!room.settings.events || !Object.keys(room.settings.events).length) {
         throw new Chat.ErrorMessage("There are currently no planned upcoming events for this room.");
       }
-      if (!this.runBroadcast())
-        return;
+      if (!this.runBroadcast()) return;
       convertAliasFormat(room);
       const hasAliases = getAliases(room).length > 0;
       const hasCategories = getAllCategories(room).length > 0;
       let buff = '<table border="1" cellspacing="0" cellpadding="3">';
       buff += "<th>Event Name:</th>";
-      if (hasAliases)
-        buff += "<th>Event Aliases:</th>";
-      if (hasCategories)
-        buff += "<th>Event Categories:</th>";
+      if (hasAliases) buff += "<th>Event Aliases:</th>";
+      if (hasCategories) buff += "<th>Event Categories:</th>";
       buff += "<th>Event Description:</th><th>Event Date:</th>";
       for (const event of getAllEvents(room)) {
         buff += formatEvent(room, event, hasAliases, hasCategories);
@@ -141,11 +124,9 @@ const commands = {
     edit: "add",
     add(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.checkCan("ban", null, room);
-      if (!room.settings.events)
-        room.settings.events = /* @__PURE__ */ Object.create(null);
+      if (!room.settings.events) room.settings.events = /* @__PURE__ */ Object.create(null);
       convertAliasFormat(room);
       const events = room.settings.events;
       const [eventName, date, ...desc] = target.split(target.includes("|") ? "|" : ",");
@@ -154,18 +135,13 @@ const commands = {
       }
       const dateActual = date.trim();
       const descString = desc.join(target.includes("|") ? "|" : ",").trim();
-      if (eventName.trim().length > 50)
-        throw new Chat.ErrorMessage("Event names should not exceed 50 characters.");
-      if (dateActual.length > 150)
-        throw new Chat.ErrorMessage("Event dates should not exceed 150 characters.");
-      if (descString.length > 1e3)
-        throw new Chat.ErrorMessage("Event descriptions should not exceed 1000 characters.");
+      if (eventName.trim().length > 50) throw new Chat.ErrorMessage("Event names should not exceed 50 characters.");
+      if (dateActual.length > 150) throw new Chat.ErrorMessage("Event dates should not exceed 150 characters.");
+      if (descString.length > 1e3) throw new Chat.ErrorMessage("Event descriptions should not exceed 1000 characters.");
       const eventId = getEventID(eventName, room);
-      if (!eventId)
-        throw new Chat.ErrorMessage("Event names must contain at least one alphanumerical character.");
+      if (!eventId) throw new Chat.ErrorMessage("Event names must contain at least one alphanumerical character.");
       const oldEvent = room.settings.events?.[eventId];
-      if (oldEvent && "events" in oldEvent)
-        throw new Chat.ErrorMessage(`"${eventId}" is already the name of a category.`);
+      if (oldEvent && "events" in oldEvent) throw new Chat.ErrorMessage(`"${eventId}" is already the name of a category.`);
       const eventNameActual = oldEvent ? oldEvent.eventName : eventName.trim();
       this.privateModAction(`${user.name} ${oldEvent ? "edited the" : "added a"} roomevent titled "${eventNameActual}".`);
       this.modlog("ROOMEVENT", null, `${oldEvent ? "edited" : "added"} "${eventNameActual}"`);
@@ -179,26 +155,20 @@ const commands = {
     },
     rename(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.checkCan("ban", null, room);
       let [oldName, newName] = target.split(target.includes("|") ? "|" : ",");
-      if (!(oldName && newName))
-        throw new Chat.ErrorMessage("Usage: /roomevents rename [old name], [new name]");
+      if (!(oldName && newName)) throw new Chat.ErrorMessage("Usage: /roomevents rename [old name], [new name]");
       convertAliasFormat(room);
       newName = newName.trim();
       const newID = toID(newName);
       const oldID = getAliases(room).includes(toID(oldName)) ? getEventID(oldName, room) : toID(oldName);
-      if (newID === oldID)
-        throw new Chat.ErrorMessage("The new name must be different from the old one.");
-      if (!newID)
-        throw new Chat.ErrorMessage("Event names must contain at least one alphanumeric character.");
-      if (newName.length > 50)
-        throw new Chat.ErrorMessage("Event names should not exceed 50 characters.");
+      if (newID === oldID) throw new Chat.ErrorMessage("The new name must be different from the old one.");
+      if (!newID) throw new Chat.ErrorMessage("Event names must contain at least one alphanumeric character.");
+      if (newName.length > 50) throw new Chat.ErrorMessage("Event names should not exceed 50 characters.");
       const events = room.settings.events;
       const eventData = events?.[oldID];
-      if (!(eventData && "eventName" in eventData))
-        throw new Chat.ErrorMessage(`There is no event titled "${oldName}".`);
+      if (!(eventData && "eventName" in eventData)) throw new Chat.ErrorMessage(`There is no event titled "${oldName}".`);
       if (events?.[newID]) {
         throw new Chat.ErrorMessage(`"${newName}" is already an event, alias, or category.`);
       }
@@ -213,14 +183,12 @@ const commands = {
     begin: "start",
     start(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.checkCan("ban", null, room);
       if (!room.settings.events || !Object.keys(room.settings.events).length) {
         throw new Chat.ErrorMessage("There are currently no planned upcoming events for this room to start.");
       }
-      if (!target)
-        throw new Chat.ErrorMessage("Usage: /roomevents start [event name]");
+      if (!target) throw new Chat.ErrorMessage("Usage: /roomevents start [event name]");
       convertAliasFormat(room);
       target = toID(target);
       const event = room.settings.events[getEventID(target, room)];
@@ -249,18 +217,15 @@ const commands = {
     delete: "remove",
     remove(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.checkCan("ban", null, room);
       if (!room.settings.events || Object.keys(room.settings.events).length === 0) {
         throw new Chat.ErrorMessage("There are currently no planned upcoming events for this room to remove.");
       }
-      if (!target)
-        throw new Chat.ErrorMessage("Usage: /roomevents remove [event name]");
+      if (!target) throw new Chat.ErrorMessage("Usage: /roomevents remove [event name]");
       const eventID = toID(target);
       convertAliasFormat(room);
-      if (getAliases(room).includes(eventID))
-        throw new Chat.ErrorMessage("To delete aliases, use /roomevents removealias.");
+      if (getAliases(room).includes(eventID)) throw new Chat.ErrorMessage("To delete aliases, use /roomevents removealias.");
       if (!(room.settings.events[eventID] && "eventName" in room.settings.events[eventID])) {
         throw new Chat.ErrorMessage(`There is no event titled '${target}'. Check spelling?`);
       }
@@ -277,13 +242,11 @@ const commands = {
     },
     view(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       if (!room.settings.events || !Object.keys(room.settings.events).length) {
         throw new Chat.ErrorMessage("There are currently no planned upcoming events for this room.");
       }
-      if (!target)
-        throw new Chat.ErrorMessage("Usage: /roomevents view [event name, alias, or category]");
+      if (!target) throw new Chat.ErrorMessage("Usage: /roomevents view [event name, alias, or category]");
       convertAliasFormat(room);
       target = getEventID(target, room);
       let events = [];
@@ -300,25 +263,20 @@ const commands = {
       } else {
         throw new Chat.ErrorMessage(`There is no event or category titled '${target}'. Check spelling?`);
       }
-      if (!this.runBroadcast())
-        return;
+      if (!this.runBroadcast()) return;
       let hasAliases = false;
       let hasCategories = false;
       for (const event of events) {
-        if (getAliases(room, toID(event.eventName)).length)
-          hasAliases = true;
+        if (getAliases(room, toID(event.eventName)).length) hasAliases = true;
       }
       for (const potentialCategory of getAllCategories(room)) {
-        if (events.map((event) => toID(event.eventName)).filter((id) => (room.settings.events?.[potentialCategory]).events.includes(id)).length)
-          hasCategories = true;
+        if (events.map((event) => toID(event.eventName)).filter((id) => (room.settings.events?.[potentialCategory]).events.includes(id)).length) hasCategories = true;
         break;
       }
       let buff = '<table border="1" cellspacing="0" cellpadding="3">';
       buff += "<th>Event Name:</th>";
-      if (hasAliases)
-        buff += "<th>Event Aliases:</th>";
-      if (hasCategories)
-        buff += "<th>Event Categories:</th>";
+      if (hasAliases) buff += "<th>Event Aliases:</th>";
+      if (hasCategories) buff += "<th>Event Categories:</th>";
       buff += "<th>Event Description:</th><th>Event Date:</th>";
       for (const event of events) {
         buff += formatEvent(room, event, hasAliases, hasCategories);
@@ -333,8 +291,7 @@ const commands = {
     alias: "addalias",
     addalias(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.checkCan("ban", null, room);
       const [alias, eventId] = target.split(target.includes("|") ? "|" : ",").map((argument) => toID(argument));
       if (!(alias && eventId)) {
@@ -345,10 +302,8 @@ const commands = {
       }
       convertAliasFormat(room);
       const event = room.settings.events[eventId];
-      if (!(event && "eventName" in event))
-        throw new Chat.ErrorMessage(`There is no event titled "${eventId}".`);
-      if (room.settings.events[alias])
-        throw new Chat.ErrorMessage(`"${alias}" is already an event, alias, or category.`);
+      if (!(event && "eventName" in event)) throw new Chat.ErrorMessage(`There is no event titled "${eventId}".`);
+      if (room.settings.events[alias]) throw new Chat.ErrorMessage(`"${alias}" is already an event, alias, or category.`);
       room.settings.events[alias] = { eventID: eventId };
       this.privateModAction(`${user.name} added an alias "${alias}" for the roomevent "${eventId}".`);
       this.modlog("ROOMEVENT", null, `alias for "${eventId}": "${alias}"`);
@@ -357,12 +312,10 @@ const commands = {
     deletealias: "removealias",
     removealias(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.checkCan("ban", null, room);
       target = toID(target);
-      if (!target)
-        throw new Chat.ErrorMessage("Usage: /roomevents removealias <alias>");
+      if (!target) throw new Chat.ErrorMessage("Usage: /roomevents removealias <alias>");
       if (!room.settings.events || Object.keys(room.settings.events).length === 0) {
         throw new Chat.ErrorMessage(`There are currently no scheduled events.`);
       }
@@ -377,19 +330,16 @@ const commands = {
     },
     addtocategory(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.checkCan("ban", null, room);
       const [eventId, categoryId] = target.split(target.includes("|") ? "|" : ",").map((argument) => toID(argument));
-      if (!(eventId && categoryId))
-        throw new Chat.ErrorMessage("Usage: /roomevents addtocategory [event name], [category].");
+      if (!(eventId && categoryId)) throw new Chat.ErrorMessage("Usage: /roomevents addtocategory [event name], [category].");
       if (!room.settings.events || Object.keys(room.settings.events).length === 0) {
         throw new Chat.ErrorMessage(`There are currently no scheduled events.`);
       }
       convertAliasFormat(room);
       const event = room.settings.events[getEventID(eventId, room)];
-      if (!(event && "eventName" in event))
-        throw new Chat.ErrorMessage(`There is no event or alias titled "${eventId}".`);
+      if (!(event && "eventName" in event)) throw new Chat.ErrorMessage(`There is no event or alias titled "${eventId}".`);
       const category = room.settings.events[categoryId];
       if (category && !("events" in category)) {
         throw new Chat.ErrorMessage(`There is already an event or alias titled "${categoryId}".`);
@@ -408,8 +358,7 @@ const commands = {
     },
     removefromcategory(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.checkCan("ban", null, room);
       const [eventId, categoryId] = target.split(target.includes("|") ? "|" : ",").map((argument) => toID(argument));
       if (!(eventId && categoryId)) {
@@ -420,14 +369,12 @@ const commands = {
       }
       convertAliasFormat(room);
       const event = room.settings.events[getEventID(eventId, room)];
-      if (!(event && "eventName" in event))
-        throw new Chat.ErrorMessage(`There is no event or alias titled "${eventId}".`);
+      if (!(event && "eventName" in event)) throw new Chat.ErrorMessage(`There is no event or alias titled "${eventId}".`);
       const category = room.settings.events[categoryId];
       if (category && !("events" in category)) {
         throw new Chat.ErrorMessage(`There is already an event or alias titled "${categoryId}".`);
       }
-      if (!category)
-        throw new Chat.ErrorMessage(`There is no category titled "${categoryId}".`);
+      if (!category) throw new Chat.ErrorMessage(`There is no category titled "${categoryId}".`);
       if (!category.events.includes(toID(event.eventName))) {
         throw new Chat.ErrorMessage(`The event "${eventId}" isn't in the "${categoryId}" category.`);
       }
@@ -440,18 +387,15 @@ const commands = {
     addcat: "addcategory",
     addcategory(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.checkCan("ban", null, room);
       const categoryId = toID(target);
       if (!target) {
         throw new Chat.ErrorMessage("Usage: /roomevents addcategory [category name]. Categories must contain at least one alphanumeric character.");
       }
       convertAliasFormat(room);
-      if (!room.settings.events)
-        room.settings.events = /* @__PURE__ */ Object.create(null);
-      if (room.settings.events?.[categoryId])
-        throw new Chat.ErrorMessage(`The category "${target}" already exists.`);
+      if (!room.settings.events) room.settings.events = /* @__PURE__ */ Object.create(null);
+      if (room.settings.events?.[categoryId]) throw new Chat.ErrorMessage(`The category "${target}" already exists.`);
       room.settings.events[categoryId] = { events: [] };
       this.privateModAction(`${user.name} added the category "${categoryId}".`);
       this.modlog("ROOMEVENT", null, `category: added "${categoryId}"`);
@@ -463,17 +407,13 @@ const commands = {
     rmcat: "removecategory",
     removecategory(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.checkCan("ban", null, room);
       const categoryId = toID(target);
-      if (!target)
-        throw new Chat.ErrorMessage("Usage: /roomevents removecategory [category name].");
+      if (!target) throw new Chat.ErrorMessage("Usage: /roomevents removecategory [category name].");
       convertAliasFormat(room);
-      if (!room.settings.events)
-        room.settings.events = /* @__PURE__ */ Object.create(null);
-      if (!room.settings.events?.[categoryId])
-        throw new Chat.ErrorMessage(`The category "${target}" doesn't exist.`);
+      if (!room.settings.events) room.settings.events = /* @__PURE__ */ Object.create(null);
+      if (!room.settings.events?.[categoryId]) throw new Chat.ErrorMessage(`The category "${target}" doesn't exist.`);
       delete room.settings.events?.[categoryId];
       this.privateModAction(`${user.name} removed the category "${categoryId}".`);
       this.modlog("ROOMEVENT", null, `category: removed "${categoryId}"`);
@@ -482,14 +422,12 @@ const commands = {
     viewcategories: "categories",
     categories(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       this.runBroadcast();
       const categoryButtons = getAllCategories(room).map(
         (category) => `<button class="button" name="send" value="/roomevents view ${category}">${category}</button>`
       );
-      if (!categoryButtons.length)
-        throw new Chat.ErrorMessage(`There are no roomevent categories in ${room.title}.`);
+      if (!categoryButtons.length) throw new Chat.ErrorMessage(`There are no roomevent categories in ${room.title}.`);
       this.sendReplyBox(`Roomevent categories in ${room.title}: ${categoryButtons.join(" ")}`);
     },
     help(target, room, user) {
@@ -497,8 +435,7 @@ const commands = {
     },
     sortby(target, room, user) {
       room = this.requireRoom();
-      if (!room.persist)
-        throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
+      if (!room.persist) throw new Chat.ErrorMessage("This command is unavailable in temporary rooms.");
       if (!room.settings.events || !Object.keys(room.settings.events).length) {
         throw new Chat.ErrorMessage("There are currently no planned upcoming events for this room.");
       }

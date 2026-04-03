@@ -227,8 +227,7 @@ const Scripts = {
       "snowball"
     ];
     for (const i in this.data.Items) {
-      if (this.data.Items[i].isNonstandard === "CAP" || this.data.Items[i].isNonstandard === "Custom")
-        continue;
+      if (this.data.Items[i].isNonstandard === "CAP" || this.data.Items[i].isNonstandard === "Custom") continue;
       if ([...legalItems, ...votedLegalitems, ...legalBerries].includes(i) || this.data.Items[i].megaStone || this.data.Items[i].onDrive || this.data.Items[i].onPlate && !this.data.Items[i].zMove) {
         this.modData("Items", i).isNonstandard = null;
       } else {
@@ -236,8 +235,7 @@ const Scripts = {
       }
     }
     for (const i in this.data.Moves) {
-      if (this.data.Moves[i].isNonstandard !== "Past")
-        continue;
+      if (this.data.Moves[i].isNonstandard !== "Past") continue;
       this.modData("Moves", i).isNonstandard = null;
     }
   },
@@ -249,14 +247,12 @@ const Scripts = {
       if ((this.battle.gen <= 7 || this.battle.ruleTable.has("+pokemontag:past") || this.battle.ruleTable.has("+pokemontag:future")) && altForme?.isMega && altForme?.requiredMove && pokemon.baseMoves.includes(this.battle.toID(altForme.requiredMove)) && !item.zMove) {
         return altForme.name;
       }
-      if (!item.megaStone)
-        return null;
+      if (!item.megaStone) return null;
       return item.megaStone[species.name];
     },
     runMegaEvo(pokemon) {
       const speciesid = pokemon.canMegaEvo || pokemon.canUltraBurst;
-      if (!speciesid)
-        return false;
+      if (!speciesid) return false;
       pokemon.formeChange(speciesid, pokemon.getItem(), true);
       const wasMega = pokemon.canMegaEvo;
       for (const ally of pokemon.side.pokemon) {

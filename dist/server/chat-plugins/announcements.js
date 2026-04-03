@@ -73,18 +73,14 @@ const commands = {
     create: "new",
     new(target, room, user, connection, cmd, message) {
       room = this.requireRoom();
-      if (!target)
-        return this.parse("/help announcement new");
+      if (!target) return this.parse("/help announcement new");
       target = target.trim();
-      if (room.battle)
-        throw new Chat.ErrorMessage(this.tr`Battles do not support announcements.`);
+      if (room.battle) throw new Chat.ErrorMessage(this.tr`Battles do not support announcements.`);
       const text = this.filter(target);
-      if (target !== text)
-        throw new Chat.ErrorMessage(this.tr`You are not allowed to use filtered words in announcements.`);
+      if (target !== text) throw new Chat.ErrorMessage(this.tr`You are not allowed to use filtered words in announcements.`);
       const supportHTML = cmd === "htmlcreate";
       this.checkCan("minigame", null, room);
-      if (supportHTML)
-        this.checkCan("declare", null, room);
+      if (supportHTML) this.checkCan("declare", null, room);
       this.checkChat();
       if (room.minorActivity) {
         throw new Chat.ErrorMessage(this.tr`There is already a poll or announcement in progress in this room.`);
@@ -100,16 +96,13 @@ const commands = {
     edit(target, room, user, connection, cmd, message) {
       room = this.requireRoom();
       const announcement = this.requireMinorActivity(Announcement);
-      if (!target)
-        return this.parse("/help announcement edit");
+      if (!target) return this.parse("/help announcement edit");
       target = target.trim();
       const text = this.filter(target);
-      if (target !== text)
-        throw new Chat.ErrorMessage(this.tr`You are not allowed to use filtered words in announcements.`);
+      if (target !== text) throw new Chat.ErrorMessage(this.tr`You are not allowed to use filtered words in announcements.`);
       const supportHTML = cmd === "htmledit";
       this.checkCan("minigame", null, room);
-      if (supportHTML)
-        this.checkCan("declare", null, room);
+      if (supportHTML) this.checkCan("declare", null, room);
       this.checkChat();
       const source = supportHTML ? this.checkHTML(Chat.collapseLineBreaksHTML(target)) : Chat.formatText(target, true);
       announcement.source = source;
@@ -126,8 +119,7 @@ const commands = {
       if (target) {
         this.checkCan("minigame", null, room);
         if (target === "clear") {
-          if (!announcement.endTimer())
-            throw new Chat.ErrorMessage(this.tr`There is no timer to clear.`);
+          if (!announcement.endTimer()) throw new Chat.ErrorMessage(this.tr`There is no timer to clear.`);
           return this.add(this.tr`The announcement timer was turned off.`);
         }
         const timeoutMins = parseFloat(target);
@@ -139,8 +131,7 @@ const commands = {
         this.modlog("ANNOUNCEMENT TIMER", null, `${timeoutMins} minutes`);
         return this.privateModAction(`The announcement timer was set to ${timeoutMins} minute${Chat.plural(timeoutMins)} by ${user.name}.`);
       } else {
-        if (!this.runBroadcast())
-          return;
+        if (!this.runBroadcast()) return;
         if (announcement.timeout) {
           return this.sendReply(`The announcement timer is on and will end in ${announcement.timeoutMins} minute${Chat.plural(announcement.timeoutMins)}.`);
         } else {
@@ -169,8 +160,7 @@ const commands = {
     ""(target, room, user, connection) {
       room = this.requireRoom();
       const announcement = this.requireMinorActivity(Announcement);
-      if (!this.runBroadcast())
-        return;
+      if (!this.runBroadcast()) return;
       room.update();
       if (this.broadcasting) {
         announcement.display();

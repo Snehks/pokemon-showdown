@@ -123,8 +123,7 @@ const Rulesets = {
       const legalityList = illegalCombos[species.id];
       const problems = [];
       for (const moveid of set.moves.map(this.toID)) {
-        if (!moveSources[moveid])
-          continue;
+        if (!moveSources[moveid]) continue;
         if (legalityList) {
           const list = moveSources[moveid].filter((x) => !x.includes(legalityList[moveid]));
           if (!list.length) {

@@ -79,13 +79,11 @@ const PM = new import_lib.ProcessManager.QueryProcessManager(
   "abusemonitor-remote",
   module,
   async (text) => {
-    if (isCommon(text) || !limiter.shouldRequest())
-      return null;
+    if (isCommon(text) || !limiter.shouldRequest()) return null;
     if (throttleTime && Date.now() - throttleTime < 1e4) {
       return null;
     }
-    if (throttleTime)
-      throttleTime = null;
+    if (throttleTime) throttleTime = null;
     const requestData = {
       // todo - support 'es', 'it', 'pt', 'fr' - use user.language? room.settings.language...?
       languages: ["en"],
@@ -104,11 +102,9 @@ const PM = new import_lib.ProcessManager.QueryProcessManager(
         timeout: 10 * 1e3
         // 10s
       });
-      if (!raw)
-        return null;
+      if (!raw) return null;
       const data = JSON.parse(raw);
-      if (data.error)
-        throw new Error(data.message);
+      if (data.error) throw new Error(data.message);
       const result = {};
       for (const k in data.attributeScores) {
         const score = data.attributeScores[k];
@@ -127,14 +123,18 @@ const PM = new import_lib.ProcessManager.QueryProcessManager(
   PM_TIMEOUT
 );
 class RemoteClassifier {
+  static {
+    this.PM = PM;
+  }
+  static {
+    this.ATTRIBUTES = ATTRIBUTES;
+  }
   classify(text) {
-    if (!Config.perspectiveKey)
-      return Promise.resolve(null);
+    if (!Config.perspectiveKey) return Promise.resolve(null);
     return PM.query(text);
   }
   async suggestScore(text, data) {
-    if (!Config.perspectiveKey)
-      return Promise.resolve(null);
+    if (!Config.perspectiveKey) return Promise.resolve(null);
     const body = {
       comment: { text },
       attributeScores: {}
@@ -175,8 +175,6 @@ class RemoteClassifier {
     start(processCount);
   }
 }
-RemoteClassifier.PM = PM;
-RemoteClassifier.ATTRIBUTES = ATTRIBUTES;
 if (!PM.isParentProcess) {
   ConfigLoader.ensureLoaded();
   global.Monitor = {

@@ -58,8 +58,7 @@ const Moves = {
           } else if (pokemon.m.scrambled.moves.findIndex((e) => e.inSlot === "Item") >= 0) {
             const isMove = pokemon.m.scrambled.moves.findIndex((e) => e.inSlot === "Item");
             const slotNo = pokemon.moveSlots.findIndex((m) => this.toID(pokemon.m.scrambled.moves[isMove].thing) === m.id);
-            if (slotNo >= 0)
-              pokemon.moveSlots.splice(slotNo, 1);
+            if (slotNo >= 0) pokemon.moveSlots.splice(slotNo, 1);
           }
         }
       },
@@ -106,8 +105,7 @@ const Moves = {
             } else if (mon.m.scrambled.moves.findIndex((e) => e.inSlot === "Item") >= 0) {
               const isMove = mon.m.scrambled.moves.findIndex((e) => e.inSlot === "Item");
               const slotNo = mon.moveSlots.findIndex((m) => this.toID(mon.m.scrambled.moves[isMove].thing) === m.id);
-              if (slotNo >= 0)
-                mon.moveSlots.splice(slotNo, 1);
+              if (slotNo >= 0) mon.moveSlots.splice(slotNo, 1);
             }
           }
         }
@@ -149,8 +147,7 @@ const Moves = {
           } else if (pokemon.m.scrambled.moves.findIndex((e) => e.inSlot === "Ability") >= 0) {
             const isMove = pokemon.m.scrambled.moves.findIndex((e) => e.inSlot === "Ability");
             const slotNo = pokemon.moveSlots.findIndex((m) => this.toID(pokemon.m.scrambled.moves[isMove].thing) === m.id);
-            if (slotNo >= 0)
-              pokemon.moveSlots.splice(slotNo, 1);
+            if (slotNo >= 0) pokemon.moveSlots.splice(slotNo, 1);
           }
         }
       }
@@ -214,13 +211,10 @@ const Moves = {
     inherit: true,
     onHit(target, source) {
       const move = target.lastMove;
-      if (source.transformed || !move || source.moves.includes(move.id))
-        return false;
-      if (move.flags["nosketch"] || move.isZ || move.isMax)
-        return false;
+      if (source.transformed || !move || source.moves.includes(move.id)) return false;
+      if (move.flags["nosketch"] || move.isZ || move.isMax) return false;
       const sketchIndex = source.moves.indexOf("sketch");
-      if (sketchIndex < 0)
-        return false;
+      if (sketchIndex < 0) return false;
       if (this.toID(source.item) === "sketch") {
         source.setItem(move.name);
         this.add("-activate", source, "move: Sketch", move.name);
@@ -256,14 +250,12 @@ const Moves = {
       if (!this.dex.abilities.get(sourceAbility).exists && this.dex.items.get(sourceAbility.id).exists) {
         sourceCanBeSet = this.runEvent("TakeItem", source, source, this.effect, this.dex.items.get(sourceAbility.id));
       }
-      if (!sourceCanBeSet)
-        return sourceCanBeSet;
+      if (!sourceCanBeSet) return sourceCanBeSet;
       let targetCanBeSet = this.runEvent("SetAbility", target, source, this.effect, sourceAbility);
       if (!this.dex.abilities.get(targetAbility).exists && this.dex.items.get(targetAbility.id).exists) {
         targetCanBeSet = this.runEvent("TakeItem", target, source, this.effect, this.dex.items.get(targetAbility.id));
       }
-      if (!targetCanBeSet)
-        return targetCanBeSet;
+      if (!targetCanBeSet) return targetCanBeSet;
     },
     onHit(target, source, move) {
       const targetAbility = target.getAbility();
@@ -312,8 +304,7 @@ const Moves = {
       source.abilityState = this.initEffectState({ id: this.toID(source.ability), target: source });
       target.abilityState = this.initEffectState({ id: this.toID(target.ability), target });
       source.volatileStaleness = void 0;
-      if (!target.isAlly(source))
-        target.volatileStaleness = "external";
+      if (!target.isAlly(source)) target.volatileStaleness = "external";
       this.singleEvent("Start", targetAbility, source.abilityState, source);
       if (targetIsBMM) {
         if (this.dex.items.get(targetAbility.id).exists) {

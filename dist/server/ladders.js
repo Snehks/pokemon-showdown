@@ -39,8 +39,7 @@ class Ladder extends LadderStore {
   async prepBattle(connection, challengeType, team = null, isRated = false) {
     const user = connection.user;
     const userid = user.id;
-    if (team === null)
-      team = user.battleSettings.team;
+    if (team === null) team = user.battleSettings.team;
     if (Rooms.global.lockdown && Rooms.global.lockdown !== "pre") {
       let message = `The server is restarting. Battles will be available again in a few minutes.`;
       if (Rooms.global.lockdown === "ddos") {
@@ -115,8 +114,7 @@ class Ladder extends LadderStore {
       if (uid !== user.id) {
         return null;
       }
-      if (!rating)
-        rating = 1;
+      if (!rating) rating = 1;
     } else {
       if (Ladders.disabled) {
         connection.popup(`The ladder is temporarily disabled due to technical difficulties - you will not receive ladder rating for this game.`);
@@ -143,8 +141,7 @@ class Ladder extends LadderStore {
     const userChalls = Ladders.challenges.get(userid);
     if (userChalls) {
       for (const chall of userChalls) {
-        if (chall.from === userid)
-          return chall;
+        if (chall.from === userid) return chall;
       }
     }
     return null;
@@ -185,8 +182,7 @@ You must be autoconfirmed to challenge them.`
       return false;
     }
     const ready = await this.prepBattle(connection, "challenge");
-    if (!ready)
-      return false;
+    if (!ready) return false;
     const existingChall = Ladders.challenges.search(user.id, targetUser.id);
     if (existingChall) {
       if (existingChall.from === targetUser.id && existingChall.to === user.id && existingChall.format === this.formatid && existingChall.ready) {
@@ -209,8 +205,7 @@ You must be autoconfirmed to challenge them.`
   static async acceptChallenge(connection, chall) {
     const ladder = Ladders(chall.format);
     const ready = await ladder.prepBattle(connection, "challenge");
-    if (!ready)
-      return;
+    if (!ready) return;
     if (Ladders.challenges.remove(chall)) {
       return Ladders.match([chall.ready, ready]);
     }
@@ -218,10 +213,8 @@ You must be autoconfirmed to challenge them.`
   cancelSearch(user) {
     const formatid = toID(this.formatid);
     const formatTable = Ladders.searches.get(formatid);
-    if (!formatTable)
-      return false;
-    if (!formatTable.searches.has(user.id))
-      return false;
+    if (!formatTable) return false;
+    if (!formatTable.searches.has(user.id)) return false;
     formatTable.searches.delete(user.id);
     Ladder.updateSearch(user);
     return true;
@@ -230,8 +223,7 @@ You must be autoconfirmed to challenge them.`
     let cancelCount = 0;
     for (const formatTable of Ladders.searches.values()) {
       const search = formatTable.searches.get(user.id);
-      if (!search)
-        continue;
+      if (!search) continue;
       formatTable.searches.delete(user.id);
       cancelCount++;
     }
@@ -243,8 +235,7 @@ You must be autoconfirmed to challenge them.`
     const user = Users.get(search.userid);
     if (!user?.connected || user.id !== search.userid) {
       const formatTable = Ladders.searches.get(formatid);
-      if (formatTable)
-        formatTable.searches.delete(search.userid);
+      if (formatTable) formatTable.searches.delete(search.userid);
       if (user?.connected) {
         user.popup(`You changed your name and are no longer looking for a battle in ${formatid}`);
         Ladder.updateSearch(user);
@@ -256,8 +247,7 @@ You must be autoconfirmed to challenge them.`
   static getSearches(user) {
     const userSearches = [];
     for (const [formatid, formatTable] of Ladders.searches) {
-      if (formatTable.searches.has(user.id))
-        userSearches.push(formatid);
+      if (formatTable.searches.has(user.id)) userSearches.push(formatid);
     }
     return userSearches;
   }
@@ -280,8 +270,7 @@ You must be autoconfirmed to challenge them.`
       games[roomid] = game.title + (game.allowRenames ? "" : "*");
       atLeastOne = true;
     }
-    if (!atLeastOne)
-      games = null;
+    if (!atLeastOne) games = null;
     const searching = Ladders.getSearches(user);
     (connection || user).send(`|updatesearch|` + JSON.stringify({
       searching,
@@ -291,8 +280,7 @@ You must be autoconfirmed to challenge them.`
   hasSearch(user) {
     const formatid = toID(this.formatid);
     const formatTable = Ladders.searches.get(formatid);
-    if (!formatTable)
-      return false;
+    if (!formatTable) return false;
     return formatTable.searches.has(user.id);
   }
   /**
@@ -300,8 +288,7 @@ You must be autoconfirmed to challenge them.`
    * before creating a search for a battle.
    */
   async searchBattle(user, connection) {
-    if (!user.connected)
-      return;
+    if (!user.connected) return;
     const format = Dex.formats.get(this.formatid);
     if (!format.searchShow) {
       connection.popup(`Error: Your format ${format.id} is not ladderable.`);
@@ -309,10 +296,8 @@ You must be autoconfirmed to challenge them.`
     }
     const oldUserid = user.id;
     const search = await this.prepBattle(connection, format.rated ? "rated" : "unrated", null, format.rated !== false);
-    if (oldUserid !== user.id)
-      return;
-    if (!search)
-      return;
+    if (oldUserid !== user.id) return;
+    if (!search) return;
     this.addSearch(search, user);
   }
   /**
@@ -322,18 +307,15 @@ You must be autoconfirmed to challenge them.`
     const formatid = toID(this.formatid);
     const users = matches.map(([ready, user]) => user);
     const userids = users.map((user) => user.id);
-    if (new Set(users).size !== users.length)
-      return false;
+    if (new Set(users).size !== users.length) return false;
     if (Config.noipchecks) {
       users[0].lastMatch = users[1].id;
       users[1].lastMatch = users[0].id;
       return true;
     }
-    if (new Set(users.map((user) => user.latestIp)).size !== users.length)
-      return false;
+    if (new Set(users.map((user) => user.latestIp)).size !== users.length) return false;
     for (const user of users) {
-      if (userids.includes(user.lastMatch))
-        return false;
+      if (userids.includes(user.lastMatch)) return false;
     }
     let searchRange = 100;
     const times = matches.map(([search]) => search.time);
@@ -342,13 +324,10 @@ You must be autoconfirmed to challenge them.`
       searchRange = 50;
     }
     searchRange += elapsed / 300;
-    if (searchRange > 300)
-      searchRange = 300 + (searchRange - 300) / 10;
-    if (searchRange > 600)
-      searchRange = 600;
+    if (searchRange > 300) searchRange = 300 + (searchRange - 300) / 10;
+    if (searchRange > 600) searchRange = 600;
     const ratings = matches.map(([search]) => search.rating);
-    if (Math.max(...ratings) - Math.min(...ratings) > searchRange)
-      return false;
+    if (Math.max(...ratings) - Math.min(...ratings) > searchRange) return false;
     matches[0][1].lastMatch = matches[1][1].id;
     matches[1][1].lastMatch = matches[0][1].id;
     return true;
@@ -373,15 +352,13 @@ You must be autoconfirmed to challenge them.`
     const matches = [newSearch];
     for (const search of formatTable.searches.values()) {
       const searcher = this.getSearcher(search);
-      if (!searcher)
-        continue;
+      if (!searcher) continue;
       const matched = this.matchmakingOK([[search, searcher], [newSearch, user]]);
       if (matched) {
         matches.push(search);
       }
       if (matches.length >= formatTable.playerCount) {
-        for (const matchedSearch of matches)
-          formatTable.searches.delete(matchedSearch.userid);
+        for (const matchedSearch of matches) formatTable.searches.delete(matchedSearch.userid);
         Ladder.match(matches);
         return;
       }
@@ -396,21 +373,18 @@ You must be autoconfirmed to challenge them.`
    */
   static periodicMatch() {
     for (const [formatid, formatTable] of Ladders.searches) {
-      if (formatTable.playerCount > 2)
-        continue;
+      if (formatTable.playerCount > 2) continue;
       const matchmaker = Ladders(formatid);
       let longest = null;
       for (const search of formatTable.searches.values()) {
         if (!longest) {
           const longestSearcher2 = matchmaker.getSearcher(search);
-          if (!longestSearcher2)
-            continue;
+          if (!longestSearcher2) continue;
           longest = [search, longestSearcher2];
           continue;
         }
         const searcher = matchmaker.getSearcher(search);
-        if (!searcher)
-          continue;
+        if (!searcher) continue;
         const [longestSearch, longestSearcher] = longest;
         const matched = matchmaker.matchmakingOK([[search, searcher], [longestSearch, longestSearcher]]);
         if (matched) {
@@ -424,8 +398,7 @@ You must be autoconfirmed to challenge them.`
   }
   static match(readies) {
     const formatid = readies[0].formatid;
-    if (readies.some((ready) => ready.formatid !== formatid))
-      throw new Error(`Format IDs don't match`);
+    if (readies.some((ready) => ready.formatid !== formatid)) throw new Error(`Format IDs don't match`);
     const players = [];
     let missingUser = null;
     let minRating = Infinity;
@@ -442,8 +415,7 @@ You must be autoconfirmed to challenge them.`
         hidden: ready.settings.hidden,
         inviteOnly: ready.settings.inviteOnly
       });
-      if (ready.rating < minRating)
-        minRating = ready.rating;
+      if (ready.rating < minRating) minRating = ready.rating;
     }
     if (missingUser) {
       for (const ready of readies) {
