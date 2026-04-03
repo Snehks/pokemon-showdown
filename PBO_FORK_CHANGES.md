@@ -225,7 +225,7 @@ games where bag items are used before any attacks.
 | Block non-move healing | `onTryHeal` | Grassy Terrain, Leftovers, Aqua Ring, Ingrain, etc. — all blocked (prevents players exploiting terrain to heal the boss) |
 | Status immunity | `onSetStatus` | Cannot gain any status condition |
 | Move blocking | `onTryHit` | Blocks 31 specific moves (trapping, OHKO, status theft, type-changing, etc.) — includes Magic Powder, Trick-or-Treat, Forest's Curse |
-| Ability suppression | `onStart` | Gastro Acids all non-Dynahax foes on entry |
+| Item theft protection | `onTakeItem` | Blocks foe item theft (Magician, Pickpocket) |
 | Drain nullification | `onSourceTryHeal` | Draining moves heal 0 HP |
 | Unswappable | `flags` | Can't be traced, skill swapped, entrained, or suppressed |
 

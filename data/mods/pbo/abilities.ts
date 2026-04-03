@@ -63,14 +63,10 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 			}
 		},
 
-		// Gastro Acid all non-Dynahax foes on entry
-		// Mirrors: hasGastroAcidChangeableAbility
-		onStart(pokemon) {
-			for (const foe of pokemon.adjacentFoes()) {
-				if (foe.ability !== 'dynahax') {
-					foe.addVolatile('gastroacid');
-				}
-			}
+		// Block foe item theft (Magician, Pickpocket)
+		// Mirrors: vetoesAbility(DYNAMAX_IGNORE_ABILITY_LIST) for item-stealing abilities
+		onTakeItem(item: object, pokemon: object, source: object) {
+			if (source && source !== pokemon) return false;
 		},
 
 		// Draining moves heal 0 HP

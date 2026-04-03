@@ -7,34 +7,82 @@ const FORMAT = 'gen9pbonpcnationaldex';
 
 let battle;
 
-describe('Dynahax [Gastro Acid / Drain / Flags]', () => {
+describe('Dynahax [Ability Coexistence / Item Theft / Drain / Flags]', () => {
 	afterEach(() => {
 		battle.destroy();
 	});
 
-	it('should Gastro Acid non-Dynahax foes on entry', () => {
+	// ── Player abilities should work normally vs Dynahax ──
+
+	it('should NOT suppress foe abilities (Drought activates normally)', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Torkoal', ability: 'drought', moves: ['splash'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+		]);
+		assert(battle.field.isWeather('sunnyday'));
+	});
+
+	it('should NOT suppress foe abilities (Poison Heal heals normally)', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Gliscor', ability: 'poisonheal', moves: ['splash'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+		]);
+		battle.p1.active[0].setStatus('tox');
+		battle.p1.active[0].hp = battle.p1.active[0].maxhp - 100;
+		const hpBefore = battle.p1.active[0].hp;
+		battle.makeChoices('move splash', 'move splash');
+		assert(battle.p1.active[0].hp > hpBefore);
+	});
+
+	it('should NOT suppress foe abilities (Intimidate lowers Dynahax attack)', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
 			[{ species: 'Gyarados', ability: 'intimidate', moves: ['splash'] }],
 			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
 		]);
-		assert(battle.p1.active[0].volatiles['gastroacid'] !== undefined);
+		assert.equal(battle.p2.active[0].boosts.atk, -1);
 	});
 
-	it('should not Gastro Acid a fellow Dynahax user', () => {
-		battle = common.createBattle({ formatid: FORMAT }, [
-			[{ species: 'Gyarados', ability: 'dynahax', moves: ['splash'] }],
-			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
-		]);
-		assert.equal(battle.p1.active[0].volatiles['gastroacid'], undefined);
-	});
+	// ── Iron Barbs / Rough Skin blocked by onDamage (non-move), not Gastro Acid ──
 
-	it('should suppress Iron Barbs via Gastro Acid', () => {
+	it('should block Iron Barbs recoil damage to Dynahax', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
 			[{ species: 'Ferrothorn', ability: 'ironbarbs', moves: ['splash'] }],
-			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['firefang'] }],
 		]);
-		assert(battle.p1.active[0].volatiles['gastroacid'] !== undefined);
+		battle.makeChoices('move splash', 'move firefang');
+		assert.fullHP(battle.p2.active[0]);
 	});
+
+	it('should block Rough Skin recoil damage to Dynahax', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Garchomp', ability: 'roughskin', moves: ['splash'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['dragonclaw'] }],
+		]);
+		battle.makeChoices('move splash', 'move dragonclaw');
+		assert.fullHP(battle.p2.active[0]);
+	});
+
+	// ── Item theft protection (Magician, Pickpocket) ──
+
+	it('should block Magician from stealing Dynahax item', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Delphox', ability: 'magician', moves: ['psyshock'] }],
+			[{ species: 'Blissey', ability: 'dynahax', item: 'leftovers', moves: ['splash'] }],
+		]);
+		battle.makeChoices('move psyshock', 'move splash');
+		assert.equal(battle.p2.active[0].item, 'leftovers');
+	});
+
+	it('should block Pickpocket from stealing Dynahax item', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Weavile', ability: 'pickpocket', moves: ['splash'] }],
+			[{ species: 'Charizard', ability: 'dynahax', item: 'leftovers', moves: ['dragonclaw'] }],
+		]);
+		battle.makeChoices('move splash', 'move dragonclaw');
+		assert.equal(battle.p2.active[0].item, 'leftovers');
+	});
+
+	// ── Drain nullification ──
 
 	it('should nullify Drain Punch healing', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
@@ -65,6 +113,8 @@ describe('Dynahax [Gastro Acid / Drain / Flags]', () => {
 		battle.makeChoices('move oblivionwing', 'move splash');
 		assert.equal(battle.p1.active[0].hp, 1);
 	});
+
+	// ── Protection flags ──
 
 	it('should have all required protection flags', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
