@@ -27,14 +27,12 @@ const Abilities = {
     // Mirrors: cancelsStatusEffectDamage, cancelsWeatherEffectAffect,
     //          shouldLifeOrbRecoil, shouldTakeItemDamage
     onDamage(damage, target, source, effect) {
-      if (effect.effectType !== "Move")
-        return false;
+      if (effect.effectType !== "Move") return false;
     },
     // Block all non-move healing (Grassy Terrain, Leftovers, Aqua Ring, etc.)
     // Mirrors: canPokemonGainHpFromTerrain → false, getModifiedRestorationHpFromItem → 1
     onTryHeal(damage, target, source, effect) {
-      if (effect && effect.effectType !== "Move")
-        return 0;
+      if (effect && effect.effectType !== "Move") return 0;
     },
     // [PBO] Max/G-Max moves used natively have basePower 10 in move data.
     // Boost to 130 (standard G-Max power derived from ~90 BP base moves).
@@ -49,11 +47,20 @@ const Abilities = {
       this.add("-immune", target, "[from] ability: Dynahax");
       return false;
     },
+    // Disable self-targeting moves that bypass onTryHit (which only fires on the target).
+    // Destiny Bond / Grudge target the user, not the boss, so onTryHit never sees them.
+    // Pattern: same as Imprison's onFoeDisableMove.
+    onFoeDisableMove(pokemon) {
+      for (const moveSlot of pokemon.moveSlots) {
+        if (moveSlot.id === "destinybond" || moveSlot.id === "grudge") {
+          pokemon.disableMove(moveSlot.id);
+        }
+      }
+    },
     // Block specific status moves, trapping moves, and OHKO moves
     // Mirrors: defenderPreventsMoveExecution (DYNAMAX_IGNORE_MOVE_LIST)
     onTryHit(target, source, move) {
-      if (target === source)
-        return;
+      if (target === source) return;
       const blocked = /* @__PURE__ */ new Set([
         "soak",
         "magicpowder",
@@ -105,8 +112,7 @@ const Abilities = {
     // Draining moves heal 0 HP
     // Mirrors: getHpToAbsorb → 1 (we use chainModify(0) which floors to 0)
     onSourceTryHeal(damage, target, source, effect) {
-      if (effect?.id === "drain")
-        return this.chainModify(0);
+      if (effect?.id === "drain") return this.chainModify(0);
     },
     // Can't be traced, skill swapped, etc.
     flags: {

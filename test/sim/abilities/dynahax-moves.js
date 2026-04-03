@@ -115,13 +115,12 @@ describe('Dynahax [Blocked Moves]', () => {
 		assert.fullHP(battle.p2.active[0]);
 	});
 
-	it('should block Destiny Bond', () => {
+	it('should disable Destiny Bond for foes', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
-			[{ species: 'Smeargle', ability: 'owntempo', moves: ['destinybond'] }],
-			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+			[{ species: 'Smeargle', ability: 'owntempo', moves: ['destinybond', 'tackle'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['flamethrower'] }],
 		]);
-		battle.makeChoices('move destinybond', 'move splash');
-		assert.equal(battle.p1.active[0].volatiles['destinybond'], undefined);
+		assert.cantMove(() => battle.makeChoices('move destinybond', 'move flamethrower'), 'Smeargle', 'Destiny Bond', true);
 	});
 
 	it('should block Heal Pulse', () => {
@@ -219,12 +218,11 @@ describe('Dynahax [Blocked Moves]', () => {
 		assert.false.fainted(battle.p2.active[0]);
 	});
 
-	it('should block Grudge', () => {
+	it('should disable Grudge for foes', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
-			[{ species: 'Smeargle', ability: 'owntempo', moves: ['grudge'] }],
-			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+			[{ species: 'Smeargle', ability: 'owntempo', moves: ['grudge', 'tackle'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['flamethrower'] }],
 		]);
-		battle.makeChoices('move grudge', 'move splash');
-		assert.equal(battle.p1.active[0].volatiles['grudge'], undefined);
+		assert.cantMove(() => battle.makeChoices('move grudge', 'move flamethrower'), 'Smeargle', 'Grudge', true);
 	});
 });

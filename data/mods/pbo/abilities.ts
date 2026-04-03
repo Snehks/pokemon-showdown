@@ -33,6 +33,17 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 			return false;
 		},
 
+		// Disable self-targeting moves that bypass onTryHit (which only fires on the target).
+		// Destiny Bond / Grudge target the user, not the boss, so onTryHit never sees them.
+		// Pattern: same as Imprison's onFoeDisableMove.
+		onFoeDisableMove(pokemon) {
+			for (const moveSlot of pokemon.moveSlots) {
+				if (moveSlot.id === 'destinybond' || moveSlot.id === 'grudge') {
+					pokemon.disableMove(moveSlot.id);
+				}
+			}
+		},
+
 		// Block specific status moves, trapping moves, and OHKO moves
 		// Mirrors: defenderPreventsMoveExecution (DYNAMAX_IGNORE_MOVE_LIST)
 		onTryHit(target, source, move) {
