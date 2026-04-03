@@ -97,6 +97,27 @@ describe('Metronome (item)', () => {
 		assert.bounded(damage, [80, 95], `Solar Beam should be Metronome 1 boosted`);
 	});
 
+	it(`[PBO] should not reset the multiplier when using a bag item`, () => {
+		battle = common.createBattle({formatid: 'gen9pbostandardbattle'}, [[
+			{species: 'wynaut', level: 100, item: 'metronome', moves: ['psystrike']},
+		], [
+			{species: 'cleffa', level: 100, evs: {hp: 252}, ability: 'shellarmor', moves: ['sleeptalk']},
+		]]);
+
+		// Turn 1: Psystrike (base damage, Metronome starts tracking)
+		battle.makeChoices();
+		const cleffa = battle.p2.active[0];
+		const hpAfterFirstAttack = cleffa.hp;
+
+		// Turn 2: Use a potion instead of a move — should NOT reset the chain
+		battle.makeChoices('useitem p1a potion 50', 'move 1');
+
+		// Turn 3: Psystrike again — should still get Metronome 1 boost
+		battle.makeChoices();
+		const damage = hpAfterFirstAttack - cleffa.hp;
+		assert.bounded(damage, [115, 137]);
+	});
+
 	it(`should use called moves to determine the Metronome multiplier`, () => {
 		battle = common.createBattle([[
 			{ species: 'goomy', item: 'metronome', moves: ['copycat', 'surf'] },
