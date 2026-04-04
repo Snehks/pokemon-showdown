@@ -22,6 +22,16 @@ __export(abilities_exports, {
 });
 module.exports = __toCommonJS(abilities_exports);
 const Abilities = {
+  // [PBO] Fix: vanilla onEnd emits |-end|fallenundefined when Kingambit leads
+  // with no fainted allies (effectState.fallen is never set by onStart).
+  supremeoverlord: {
+    inherit: true,
+    onEnd(pokemon) {
+      if (this.effectState.fallen) {
+        this.add("-end", pokemon, `fallen${this.effectState.fallen}`, "[silent]");
+      }
+    }
+  },
   dynahax: {
     // Block ALL non-move damage (weather ticks, status ticks, Life Orb, hazards, item damage, etc.)
     // Mirrors: cancelsStatusEffectDamage, cancelsWeatherEffectAffect,
