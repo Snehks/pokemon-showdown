@@ -1955,11 +1955,17 @@ class Battle {
     stat = tr(tr(2 * stat + set.ivs[statName] + tr(set.evs[statName] / 4)) * set.level / 100 + 5);
     const nature = this.dex.natures.get(set.nature);
     if (nature.plus === statName) {
-      stat = this.ruleTable.has("overflowstatmod") ? Math.min(stat, 595) : stat;
-      stat = tr(tr(stat * 110, 16) / 100);
+      if (this.ruleTable.has("overflowstatmod")) {
+        stat = tr(stat * 110 / 100);
+      } else {
+        stat = tr(tr(stat * 110, 16) / 100);
+      }
     } else if (nature.minus === statName) {
-      stat = this.ruleTable.has("overflowstatmod") ? Math.min(stat, 728) : stat;
-      stat = tr(tr(stat * 90, 16) / 100);
+      if (this.ruleTable.has("overflowstatmod")) {
+        stat = tr(stat * 90 / 100);
+      } else {
+        stat = tr(tr(stat * 90, 16) / 100);
+      }
     }
     return stat;
   }

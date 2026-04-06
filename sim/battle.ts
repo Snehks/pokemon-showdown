@@ -2366,11 +2366,17 @@ export class Battle {
 		// Natures are calculated with 16-bit truncation.
 		// This only affects Eternatus-Eternamax in Pure Hackmons.
 		if (nature.plus === statName) {
-			stat = this.ruleTable.has('overflowstatmod') ? Math.min(stat, 595) : stat;
-			stat = tr(tr(stat * 110, 16) / 100);
+			if (this.ruleTable.has('overflowstatmod')) {
+				stat = tr(stat * 110 / 100);
+			} else {
+				stat = tr(tr(stat * 110, 16) / 100);
+			}
 		} else if (nature.minus === statName) {
-			stat = this.ruleTable.has('overflowstatmod') ? Math.min(stat, 728) : stat;
-			stat = tr(tr(stat * 90, 16) / 100);
+			if (this.ruleTable.has('overflowstatmod')) {
+				stat = tr(stat * 90 / 100);
+			} else {
+				stat = tr(tr(stat * 90, 16) / 100);
+			}
 		}
 		return stat;
 	}
