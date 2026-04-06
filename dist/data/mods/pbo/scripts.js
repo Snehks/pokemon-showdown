@@ -396,7 +396,22 @@ const PBO_EVENT_FORMS = [
   ["whimsicottc", "whimsicott", "Whimsicott-C", "C"],
   ["xurkitreec", "xurkitree", "Xurkitree-C", "C"],
   ["xurkitreec4", "xurkitree", "Xurkitree-C4", "C4"],
-  ["yveltalh4", "yveltal", "Yveltal-H4", "H4"]
+  ["yveltalh4", "yveltal", "Yveltal-H4", "H4"],
+  // Easter E5 Forms (2026)
+  ["altariae5", "altaria", "Altaria-E5", "E5"],
+  ["altariamegae5", "altariamega", "Altaria-Mega-E5", "E5"],
+  ["arcaninee5", "arcanine", "Arcanine-E5", "E5"],
+  ["breloome5", "breloom", "Breloom-E5", "E5"],
+  ["cinderacee5", "cinderace", "Cinderace-E5", "E5"],
+  ["dianciee5", "diancie", "Diancie-E5", "E5"],
+  ["dianciemegae5", "dianciemega", "Diancie-Mega-E5", "E5"],
+  ["diggersbye5", "diggersby", "Diggersby-E5", "E5"],
+  ["dragonitee5", "dragonite", "Dragonite-E5", "E5"],
+  ["genesecte5", "genesect", "Genesect-E5", "E5"],
+  ["meloettae5", "meloetta", "Meloetta-E5", "E5"],
+  ["serperiore5", "serperior", "Serperior-E5", "E5"],
+  ["sneaslere5", "sneasler", "Sneasler-E5", "E5"],
+  ["virizione5", "virizion", "Virizion-E5", "E5"]
 ];
 const Scripts = {
   gen: 9,
