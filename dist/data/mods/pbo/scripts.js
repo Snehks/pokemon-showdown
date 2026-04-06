@@ -399,7 +399,6 @@ const PBO_EVENT_FORMS = [
   ["yveltalh4", "yveltal", "Yveltal-H4", "H4"],
   // Easter E5 Forms (2026)
   ["altariae5", "altaria", "Altaria-E5", "E5"],
-  ["altariamegae5", "altariamega", "Altaria-Mega-E5", "E5"],
   ["arcaninee5", "arcanine", "Arcanine-E5", "E5"],
   ["breloome5", "breloom", "Breloom-E5", "E5"],
   ["cinderacee5", "cinderace", "Cinderace-E5", "E5"],
