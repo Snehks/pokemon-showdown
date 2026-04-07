@@ -70,8 +70,8 @@ const Conditions = {
   },
   sandstorm: {
     inherit: true,
-    onModifySpD() {
-    }
+    onModifySpD: void 0
+    // no inherit
   }
 };
 //# sourceMappingURL=conditions.js.map

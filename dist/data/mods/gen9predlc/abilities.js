@@ -36,10 +36,10 @@ const Abilities = {
   },
   illuminate: {
     inherit: true,
-    onTryBoost() {
-    },
-    onModifyMove() {
-    },
+    onTryBoost: void 0,
+    // no inherit
+    onModifyMove: void 0,
+    // no inherit
     flags: {},
     rating: 0
   },

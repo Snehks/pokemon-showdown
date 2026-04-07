@@ -58,24 +58,19 @@ const Moves = {
     inherit: true,
     onTry(source, target) {
       const action = this.queue.willMove(target);
-      if (!action || action.choice !== "move" || // @ts-expect-error modded
-      !action.linked && action.move.category === "Status" && action.move.id !== "mefirst") {
-        this.attrLastMove("[still]");
-        this.add("-fail", source);
-        return null;
-      }
-      if (target.volatiles.mustrecharge && target.volatiles.mustrecharge.duration < 2) {
-        this.attrLastMove("[still]");
-        this.add("-fail", source);
-        return null;
-      }
-      if (action.linked) {
-        for (const linkedMove of action.linked) {
-          if (linkedMove.category !== "Status" || linkedMove.id === "mefirst") return;
+      if (!action || action.choice !== "move") return false;
+      if (!action.linked) {
+        const move = action.move;
+        if (move.category === "Status" && move.id !== "mefirst") {
+          return false;
         }
-        this.attrLastMove("[still]");
-        this.add("-fail", source);
-        return null;
+      } else {
+        if (action.linked.every((move) => move.category === "Status" && move.id !== "mefirst")) {
+          return false;
+        }
+      }
+      if (target.volatiles["mustrecharge"] && target.volatiles["mustrecharge"].duration < 2) {
+        return false;
       }
     }
   },
@@ -83,24 +78,19 @@ const Moves = {
     inherit: true,
     onTry(source, target) {
       const action = this.queue.willMove(target);
-      if (!action || action.choice !== "move" || // @ts-expect-error modded
-      !action.linked && action.move.category === "Status" && action.move.id !== "mefirst") {
-        this.attrLastMove("[still]");
-        this.add("-fail", source);
-        return null;
-      }
-      if (target.volatiles.mustrecharge && target.volatiles.mustrecharge.duration < 2) {
-        this.attrLastMove("[still]");
-        this.add("-fail", source);
-        return null;
-      }
-      if (action.linked) {
-        for (const linkedMove of action.linked) {
-          if (linkedMove.category !== "Status" || linkedMove.id === "mefirst") return;
+      if (!action || action.choice !== "move") return false;
+      if (!action.linked) {
+        const move = action.move;
+        if (move.category === "Status" && move.id !== "mefirst") {
+          return false;
         }
-        this.attrLastMove("[still]");
-        this.add("-fail", source);
-        return null;
+      } else {
+        if (action.linked.every((move) => move.category === "Status" && move.id !== "mefirst")) {
+          return false;
+        }
+      }
+      if (target.volatiles["mustrecharge"] && target.volatiles["mustrecharge"].duration < 2) {
+        return false;
       }
     }
   },
@@ -108,24 +98,19 @@ const Moves = {
     inherit: true,
     onTry(source, target) {
       const action = this.queue.willMove(target);
-      if (!action || action.choice !== "move" || action.move.priority < 0.1 || // @ts-expect-error modded
-      !action.linked && action.move.category === "Status" && action.move.id !== "mefirst") {
-        this.attrLastMove("[still]");
-        this.add("-fail", source);
-        return null;
-      }
-      if (target.volatiles.mustrecharge && target.volatiles.mustrecharge.duration < 2) {
-        this.attrLastMove("[still]");
-        this.add("-fail", source);
-        return null;
-      }
-      if (action.linked) {
-        for (const linkedMove of action.linked) {
-          if (linkedMove.category !== "Status" || linkedMove.id === "mefirst") return;
+      if (!action || action.choice !== "move") return false;
+      if (!action.linked) {
+        const move = action.move;
+        if (move.priority < 0.1 || move.category === "Status") {
+          return false;
         }
-        this.attrLastMove("[still]");
-        this.add("-fail", source);
-        return null;
+      } else {
+        if (action.linked.every((move) => move.priority < 0.1 || move.category === "Status")) {
+          return false;
+        }
+      }
+      if (target.volatiles["mustrecharge"] && target.volatiles["mustrecharge"].duration < 2) {
+        return false;
       }
     }
   },

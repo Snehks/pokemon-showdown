@@ -63,19 +63,31 @@ const Abilities = {
     onSwitchIn(pokemon) {
       this.add("-ability", pokemon, "Neutralizing Gas");
       pokemon.abilityState.ending = false;
-      if (pokemon.m.innates) {
+      const strongWeathers = ["desolateland", "primordialsea", "deltastream"];
+      if (pokemon.m.innates && !pokemon.hasItem("Ability Shield")) {
         for (const innate of pokemon.m.innates) {
           if (this.dex.abilities.get(innate).flags["cantsuppress"] || innate === "neutralizinggas") continue;
           pokemon.removeVolatile("ability:" + innate);
         }
       }
       for (const target of this.getAllActive()) {
+        if (target === pokemon) continue;
+        if (target.hasItem("Ability Shield")) {
+          this.add("-block", target, "item: Ability Shield");
+          continue;
+        }
+        if (target.volatiles["commanding"]) {
+          continue;
+        }
         if (target.illusion) {
           this.singleEvent("End", this.dex.abilities.get("Illusion"), target.abilityState, target, pokemon, "neutralizinggas");
         }
         if (target.volatiles["slowstart"]) {
           delete target.volatiles["slowstart"];
           this.add("-end", target, "Slow Start", "[silent]");
+        }
+        if (strongWeathers.includes(target.getAbility().id)) {
+          this.singleEvent("End", this.dex.abilities.get(target.getAbility().id), target.abilityState, target, pokemon, "neutralizinggas");
         }
         if (target.m.innates) {
           for (const innate of target.m.innates) {
@@ -86,6 +98,12 @@ const Abilities = {
       }
     },
     onEnd(source) {
+      if (source.transformed) return;
+      for (const pokemon of this.getAllActive()) {
+        if (pokemon !== source && pokemon.hasAbility("Neutralizing Gas")) {
+          return;
+        }
+      }
       this.add("-end", source, "ability: Neutralizing Gas");
       if (source.abilityState.ending) return;
       source.abilityState.ending = true;
@@ -93,10 +111,16 @@ const Abilities = {
       this.speedSort(sortedActive);
       for (const pokemon of sortedActive) {
         if (pokemon !== source) {
+          if (pokemon.getAbility().flags["cantsuppress"]) continue;
+          if (pokemon.hasItem("abilityshield")) continue;
           this.singleEvent("Start", pokemon.getAbility(), pokemon.abilityState, pokemon);
+          if (pokemon.ability === "gluttony") {
+            pokemon.abilityState.gluttony = false;
+          }
           if (pokemon.m.innates) {
             for (const innate of pokemon.m.innates) {
               if (pokemon.volatiles["ability:" + innate]) continue;
+              if (innate === "gluttony") pokemon.abilityState.gluttony = false;
               pokemon.addVolatile("ability:" + innate, pokemon);
             }
           }

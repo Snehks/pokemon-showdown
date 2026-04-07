@@ -1,9 +1,7 @@
 "use strict";
-var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -17,14 +15,6 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var database_exports = {};
 __export(database_exports, {
@@ -38,8 +28,16 @@ __export(database_exports, {
   isSQL: () => isSQL
 });
 module.exports = __toCommonJS(database_exports);
-var mysql = __toESM(require("mysql2"));
-var pg = __toESM(require("pg"));
+let mysqlRuntime;
+let pgRuntime;
+try {
+  mysqlRuntime = require("mysql2");
+} catch {
+}
+try {
+  pgRuntime = require("pg");
+} catch {
+}
 function isSQL(value) {
   return value instanceof SQLStatement || // assorted safety checks to be sure it'll actually work (theoretically preventing certain attacks)
   value?.constructor.name === "SQLStatement" && (Array.isArray(value.sql) && Array.isArray(value.values));
@@ -228,12 +226,13 @@ class DatabaseTable {
 }
 class MySQLDatabase extends Database {
   constructor(config) {
+    if (!mysqlRuntime) throw new Error(`Install the 'mysql2' module to use a MySQL database`);
     const prefix = config.prefix || "";
     if (config.prefix) {
       config = { ...config };
       delete config.prefix;
     }
-    super(mysql.createPool(config), prefix);
+    super(mysqlRuntime.createPool(config), prefix);
     this.type = "mysql";
   }
   _resolveSQL(query) {
@@ -271,12 +270,14 @@ class MySQLDatabase extends Database {
     return this._query(sql, values);
   }
   escapeId(id) {
-    return mysql.escapeId(id);
+    if (!mysqlRuntime) throw new Error(`Install the 'mysql2' module to use a MySQL database`);
+    return mysqlRuntime.escapeId(id);
   }
 }
 class PGDatabase extends Database {
   constructor(config) {
-    super(config ? new pg.Pool(config) : null);
+    if (!pgRuntime) throw new Error(`Install the 'pg' module to use a Postgres database`);
+    super(config ? new pgRuntime.Pool(config) : null);
     this.type = "pg";
   }
   _resolveSQL(query) {
@@ -302,7 +303,8 @@ class PGDatabase extends Database {
     return this.connection.query(query, values).then((res) => ({ affectedRows: res.rowCount }));
   }
   escapeId(id) {
-    return pg.escapeIdentifier(id);
+    if (!pgRuntime) throw new Error(`Install the 'pg' module to use a Postgres database`);
+    return pgRuntime.escapeIdentifier(id);
   }
 }
 //# sourceMappingURL=database.js.map

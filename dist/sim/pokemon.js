@@ -412,6 +412,10 @@ class Pokemon {
     }
     return null;
   }
+  getMoveSlot(slotIndex) {
+    if (slotIndex < 0 || slotIndex >= this.moveSlots.length) return null;
+    return this.moveSlots[slotIndex];
+  }
   getMoveHitData(move) {
     if (!move.moveHitData) move.moveHitData = {};
     const slot = this.getSlot();
@@ -616,13 +620,21 @@ class Pokemon {
    * Don't use it for "soft locks" like Choice Band.
    */
   getLockedMove() {
-    const lockedMove = this.battle.runEvent("LockMove", this);
+    const lockedMove = this.battle.priorityEvent("LockMove", this);
+    return lockedMove === true ? null : lockedMove;
+  }
+  /**
+   * Moves that lock you when you select the Fight button, but don't prevent you from switching out.
+   * Those are Gen 1 trapping moves, Gen 1 and 2 Bide, and Gen 2-4 Encore. Gen 1 freeze and sleep also semi-lock you.
+   */
+  getSemiLockedMove(restrictData) {
+    if (restrictData && this.maybeLocked) return null;
+    const lockedMove = this.battle.priorityEvent("SemiLockMove", this);
     return lockedMove === true ? null : lockedMove;
   }
   getMoves(lockedMove, restrictData) {
     if (lockedMove) {
       lockedMove = (0, import_dex.toID)(lockedMove);
-      this.trapped = true;
       if (lockedMove === "recharge") {
         return [{
           move: "Recharge",
@@ -727,19 +739,34 @@ class Pokemon {
     return result;
   }
   getMoveRequestData() {
-    let lockedMove = this.maybeLocked ? null : this.getLockedMove();
+    let lockedMove = this.getLockedMove();
+    const hardLocked = !!lockedMove;
+    if (lockedMove) {
+      this.trapped = true;
+    } else {
+      lockedMove = this.maybeLocked ? null : this.getSemiLockedMove(true);
+    }
     const isLastActive = this.isLastActive();
     const canSwitchIn = this.battle.canSwitch(this.side) > 0;
     let moves = this.getMoves(lockedMove, isLastActive);
-    if (!moves.length) {
+    if (this.battle.gen === 1 && !lockedMove && (["frz", "slp"].includes(this.status) || this.volatiles["partiallytrapped"] && !this.maybeLocked)) {
+      moves = [{ move: "Fight", id: "fight" }];
+      lockedMove = "fight";
+    } else if (!moves.length) {
       moves = [{ move: "Struggle", id: "struggle", target: "randomNormal", disabled: false }];
       lockedMove = "struggle";
     }
     const data = {
       moves
     };
-    if (isLastActive) {
-      this.maybeDisabled = this.maybeDisabled && !lockedMove;
+    if (hardLocked || !isLastActive) {
+      this.maybeDisabled = false;
+      this.maybeLocked = false;
+      this.maybeTrapped = false;
+      if (hardLocked || canSwitchIn) {
+        if (this.trapped) data.trapped = true;
+      }
+    } else {
       this.maybeLocked = this.maybeLocked || this.maybeDisabled;
       if (this.maybeDisabled) {
         data.maybeDisabled = this.maybeDisabled;
@@ -754,13 +781,6 @@ class Pokemon {
           data.maybeTrapped = true;
         }
       }
-    } else {
-      this.maybeDisabled = false;
-      this.maybeLocked = false;
-      if (canSwitchIn) {
-        if (this.trapped) data.trapped = true;
-      }
-      this.maybeTrapped = false;
     }
     if (!lockedMove) {
       if (this.canMegaEvo) data.canMegaEvo = true;
@@ -1083,14 +1103,7 @@ class Pokemon {
       accuracy: 0,
       evasion: 0
     };
-    if (this.battle.gen === 1 && this.baseMoves.includes("mimic") && !this.transformed) {
-      const moveslot = this.baseMoves.indexOf("mimic");
-      const mimicPP = this.moveSlots[moveslot] ? this.moveSlots[moveslot].pp : 16;
-      this.moveSlots = this.baseMoveSlots.slice();
-      this.moveSlots[moveslot].pp = mimicPP;
-    } else {
-      this.moveSlots = this.baseMoveSlots.slice();
-    }
+    this.moveSlots = this.baseMoveSlots.slice();
     this.transformed = false;
     this.ability = this.baseAbility;
     this.hpType = this.baseHpType;
@@ -1639,6 +1652,7 @@ class Pokemon {
       case "primordialsea":
         if (this.hasItem("utilityumbrella")) return "";
     }
+    if (this.hasAbility("megasol") && this.battle.activePokemon === this) return "sunnyday";
     return weather;
   }
   runEffectiveness(move) {

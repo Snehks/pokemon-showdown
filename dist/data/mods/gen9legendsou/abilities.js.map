@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../data/mods/gen9legendsou/abilities.ts"],
+  "sourcesContent": ["export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTable = {\n\tdragonize: {\n\t\tinherit: true,\n\t\tisNonstandard: null,\n\t},\n\tmegasol: {\n\t\tinherit: true,\n\t\tisNonstandard: null,\n\t},\n};\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,YAAyE;AAAA,EACrF,WAAW;AAAA,IACV,SAAS;AAAA,IACT,eAAe;AAAA,EAChB;AAAA,EACA,SAAS;AAAA,IACR,SAAS;AAAA,IACT,eAAe;AAAA,EAChB;AACD;",
+  "names": []
+}

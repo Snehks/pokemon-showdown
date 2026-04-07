@@ -61,21 +61,20 @@ const Scripts = {
   // BattlePokemon scripts.
   pokemon: {
     inherit: true,
-    // In gen 1, a Pokémon can have two instances of the same move using Mimic
-    // we need to make sure to deduct PP from a move that has PP left
-    deductPP(move, amount, target) {
-      move = this.battle.dex.moves.get(move);
-      for (let i = 0; i < 2; i++) {
-        for (const ppData of this.moveSlots) {
-          if (ppData.id !== move.id) continue;
-          ppData.used = true;
-          if (!ppData.pp && i === 0) continue;
-          if (!amount) amount = 1;
-          ppData.pp -= amount;
-          return amount;
-        }
+    deductPP(move, amount) {
+      const ppData = this.getMoveSlot(this.side.lastSelectedMoveSlot);
+      if (!ppData) return 0;
+      ppData.used = true;
+      if (!amount) amount = 1;
+      ppData.pp -= amount;
+      if (ppData.pp < 0) {
+        this.battle.hint("In Gen 1, if a Pok\xE9mon is forced to use a move with 0 PP, the move will underflow to have 63 PP.");
       }
-      return 0;
+      ppData.pp = (ppData.pp % 64 + 64) % 64;
+      if (ppData.virtual && !this.transformed) {
+        this.baseMoveSlots[this.side.lastSelectedMoveSlot].pp = ppData.pp;
+      }
+      return amount;
     },
     getStat(statName, unmodified) {
       if (statName === "hp") throw new Error("Please read `maxhp` directly");
@@ -178,37 +177,54 @@ const Scripts = {
           move = this.battle.dex.getActiveMove(changedMove);
         }
       }
-      if (move.id === "recharge" && !pokemon.volatiles["mustrecharge"] && !pokemon.volatiles["partiallytrapped"]) {
-        move = this.battle.dex.getActiveMove("hyperbeam");
-        this.battle.hint(`In Gen 1, partial trapping moves like Wrap remove Hyper Beam recharges. If the target would have recharged, it will automatically use Hyper Beam instead.`, true);
+      const abortMove = () => {
+        this.battle.clearActiveMove(true);
+        this.battle.runEvent("AfterMoveSelf", pokemon, target, move);
+      };
+      if (move.id === "cannotmove") {
+        if (pokemon.status === "slp") {
+          this.battle.hint(
+            "In Gen 1, if a Pok\xE9mon spends a turn partially trapped and switches to a Pok\xE9mon that is asleep, the sleep counter will not decrease until you select a move with a different Pok\xE9mon."
+          );
+        } else if (pokemon.getLockedMove()) {
+          this.battle.hint(
+            "In Gen 1, when Haze cures the sleep/freeze status of a Pok\xE9mon during a multi-turn move, that Pok\xE9mon will become soft-locked."
+          );
+        } else if (pokemon.getSemiLockedMove()) {
+          this.battle.hint(
+            "In Gen 1, when Haze cures the sleep/freeze status of a Pok\xE9mon during Bide, the move execution will never resolve."
+          );
+        }
+        abortMove();
+        return;
       }
       if (target?.subFainted) target.subFainted = null;
       this.battle.setActiveMove(move, pokemon, target);
       if (pokemon.moveThisTurn || !this.battle.runEvent("BeforeMove", pokemon, target, move)) {
-        this.battle.clearActiveMove(true);
-        this.battle.runEvent("AfterMoveSelf", pokemon, target, move);
+        abortMove();
         return;
       }
       if (move.beforeMoveCallback?.call(this.battle, pokemon, target, move)) {
-        this.battle.clearActiveMove(true);
+        abortMove();
         return;
       }
-      const lockedMove = pokemon.getLockedMove();
-      if (lockedMove) sourceEffect = move;
-      if (!lockedMove || pokemon.volatiles["twoturnmove"]) {
-        const ppMove = pokemon.volatiles["twoturnmove"]?.ppMove || move.id;
-        pokemon.deductPP(ppMove, null, target);
-        const moveSlot = pokemon.getMoveData(ppMove);
-        if (moveSlot && moveSlot.pp < 0) {
-          moveSlot.pp += 64;
-          this.battle.hint("In Gen 1, if a pokemon is forced to use a move with 0 PP, the move will underflow to have 63 PP.");
+      if (move.id !== "struggle") {
+        const lockedMove = pokemon.getLockedMove() || pokemon.getSemiLockedMove();
+        if (lockedMove) sourceEffect = move;
+        if (!lockedMove && !TWO_TURN_MOVES.includes(move.id) || pokemon.volatiles["twoturnmove"]) {
+          const moveSlot = pokemon.getMoveSlot(pokemon.side.lastSelectedMoveSlot);
+          if (moveSlot) pokemon.deductPP(moveSlot.id, null, target);
+        }
+        if (!lockedMove && move.id !== pokemon.getMoveSlot(pokemon.side.lastSelectedMoveSlot)?.id) {
+          this.battle.hint("Desync Clause Mod activated!");
+          this.battle.hint(
+            "In Gen 1, a Pok\xE9mon might default to using a move that doesn't match the move of the slot it last selected."
+          );
+          abortMove();
+          return;
         }
       }
       this.useMove(move, pokemon, { target, sourceEffect });
-      if (pokemon.volatiles["twoturnmove"]) {
-        pokemon.deductPP(move, -1, target);
-        pokemon.volatiles["twoturnmove"].ppMove = move.id;
-      }
     },
     // This function deals with AfterMoveSelf events.
     // This leads with partial trapping moves shenanigans after the move has been used.
@@ -223,6 +239,16 @@ const Scripts = {
         target = pokemon;
       }
       if (sourceEffect) move.sourceEffect = sourceEffect.id;
+      if (sourceEffect?.id === "metronome" || sourceEffect?.id === "mirrormove") {
+        if (TWO_TURN_MOVES.includes(move.id)) {
+          const moveSlot = pokemon.getMoveSlot(pokemon.side.lastSelectedMoveSlot);
+          if (moveSlot) pokemon.deductPP(moveSlot.id, -1, target);
+        }
+        if (pokemon.transformed && pokemon.side.lastSelectedMoveSlot < pokemon.baseMoveSlots.length) {
+          pokemon.baseMoveSlots[pokemon.side.lastSelectedMoveSlot].pp += 1;
+          pokemon.baseMoveSlots[pokemon.side.lastSelectedMoveSlot].pp %= 64;
+        }
+      }
       this.battle.singleEvent("ModifyMove", move, null, pokemon, target, move, move);
       if (baseMove.target !== move.target) {
         target = this.battle.getRandomTarget(pokemon, move);
@@ -389,7 +415,7 @@ const Scripts = {
           let i;
           for (i = 0; i < hits && target.hp && pokemon.hp; i++) {
             move.hit = i + 1;
-            if (move.hit === hits) move.lastHit = true;
+            move.lastHit = move.hit === hits;
             moveDamage = this.moveHit(target, pokemon, move);
             if (moveDamage === false) break;
             damage = moveDamage || 0;

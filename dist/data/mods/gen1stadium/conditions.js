@@ -122,8 +122,8 @@ const Conditions = {
   },
   flinch: {
     inherit: true,
-    onStart() {
-    }
+    onStart: void 0
+    // no inherit
   },
   partiallytrapped: {
     name: "partiallytrapped",

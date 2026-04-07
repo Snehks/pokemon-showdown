@@ -31,6 +31,15 @@ const Scripts = {
       this.battle.runEvent("SwitchIn", pokemon);
       if (this.battle.gen <= 2) {
         for (const poke of this.battle.getAllActive()) poke.lastMove = null;
+        if (this.battle.gen === 1) pokemon.side.lastSelectedMoveSlot = 0;
+        for (const poke of pokemon.foes()) {
+          if (poke.volatiles["partialtrappinglock"] && poke.moveSlots[poke.side.lastSelectedMoveSlot].id === "metronome") {
+            poke.side.lastSelectedMove = "metronome";
+            if (this.battle.queue.willMove(poke)) {
+              this.battle.queue.changeAction(poke, { choice: "move", poke, moveid: "metronome" });
+            }
+          }
+        }
         if (!pokemon.side.faintedThisTurn && pokemon.draggedIn !== this.battle.turn) {
           this.battle.runEvent("AfterSwitchInSelf", pokemon);
         }

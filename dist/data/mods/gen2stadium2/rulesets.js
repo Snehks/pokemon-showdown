@@ -28,7 +28,8 @@ const Rulesets = {
       "Obtainable",
       "Team Preview",
       "Exact HP Mod",
-      "Cancel Mod"
+      "Cancel Mod",
+      "Beat Up Nicknames Mod"
     ]
   },
   standard: {

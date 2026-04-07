@@ -139,8 +139,8 @@ const Conditions = {
   },
   lockedmove: {
     inherit: true,
-    onAfterMove() {
-    }
+    onAfterMove: void 0
+    // no inherit
   },
   choicelock: {
     inherit: true,

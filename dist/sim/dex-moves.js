@@ -35,9 +35,9 @@ class DataMove extends import_dex_data.BasicEffect {
     this.accuracy = data.accuracy;
     this.critRatio = Number(data.critRatio) || 1;
     this.baseMoveType = import_utils.Utils.getString(data.baseMoveType) || this.type;
-    this.secondary = data.secondary || null;
-    this.secondaries = data.secondaries || this.secondary && [this.secondary] || null;
-    this.hasSheerForce = !!(data.hasSheerForce && !this.secondaries);
+    this.secondary = data.secondary || void 0;
+    this.secondaries = data.secondaries || this.secondary && [this.secondary] || void 0;
+    this.hasSheerForceBoost = data.hasSheerForceBoost || false;
     this.priority = Number(data.priority) || 0;
     this.category = data.category;
     this.overrideOffensiveStat = data.overrideOffensiveStat || void 0;

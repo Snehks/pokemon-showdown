@@ -2143,7 +2143,7 @@ function runMovesearch(target, cmd2, message, isTest) {
       }
       for (const flag in alts.flags) {
         if (flag === "secondary") {
-          if (!(move.secondary || move.secondaries || move.hasSheerForce) === !alts.flags[flag]) {
+          if (!(move.secondary || move.secondaries || move.hasSheerForceBoost) === !alts.flags[flag]) {
             matched = true;
             break;
           }

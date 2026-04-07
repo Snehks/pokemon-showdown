@@ -26,8 +26,18 @@ const Scripts = {
   gen: 3,
   checkWin(faintData) {
     if (this.sides.every((side) => !side.pokemonLeft)) {
-      this.win(faintData ? faintData.target.side : null);
-      return true;
+      let isSelfKo = false;
+      if (faintData?.effect) {
+        isSelfKo = isSelfKo || this.dex.moves.getByID(faintData?.effect?.id).selfdestruct !== void 0;
+        isSelfKo = isSelfKo || this.dex.moves.getByID(faintData?.effect?.id).recoil !== void 0;
+      }
+      if (isSelfKo) {
+        this.win(faintData ? faintData.target.side : null);
+        return true;
+      } else {
+        this.win(void 0);
+        return true;
+      }
     }
     for (const side of this.sides) {
       if (!side.foePokemonLeft()) {

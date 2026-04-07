@@ -83,10 +83,10 @@ const Conditions = {
       this.add("cant", pokemon, "frz");
       return false;
     },
-    onModifyMove() {
-    },
-    onDamagingHit() {
-    },
+    onModifyMove: void 0,
+    // no inherit
+    onDamagingHit: void 0,
+    // no inherit
     onAfterMoveSecondary(target, source, move) {
       if (move.secondary && move.secondary.status === "brn" || move.statusRoll === "brn") {
         target.cureStatus();
@@ -207,7 +207,7 @@ const Conditions = {
       delete target.volatiles["confusion"];
       if (!target.side.getSideCondition("safeguard")) target.addVolatile("confusion");
     },
-    onLockMove(pokemon) {
+    onLockMove() {
       return this.effectState.move;
     },
     onMoveAborted(pokemon) {

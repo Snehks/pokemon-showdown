@@ -44,6 +44,7 @@ const Rulesets = {
     ruleset: [
       "Obtainable",
       "Nickname Clause",
+      "Beat Up Nicknames Mod",
       "+Unreleased",
       "Sleep Clause Mod",
       "OHKO Clause",

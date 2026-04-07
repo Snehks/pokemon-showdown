@@ -1744,7 +1744,7 @@ const commands = {
         this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/Grapo_Sprites">Grapo</a>)`);
       }
       if (OFFICIAL_AVATARS_FIFTY.has(avatar)) {
-        this.sendReply(`|raw|(${this.tr`Artist: `}Fifty Shades of Rez)`);
+        this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://www.smogon.com/forums/members/537330/">Fifty Shades of Rez</a>)`);
       }
       if (OFFICIAL_AVATARS_HORO.has(avatar)) {
         this.sendReply(`|raw|(${this.tr`Artist: `}Horo)`);
@@ -1772,11 +1772,8 @@ const commands = {
     if (target.startsWith("#")) return this.parse(`/avatarusers ${target}`);
     const targetUser = this.broadcasting && !target ? null : this.getUserOrSelf(target);
     const targetUserids = targetUser ? /* @__PURE__ */ new Set([targetUser.id, ...targetUser.previousIDs]) : target ? /* @__PURE__ */ new Set([toID(target)]) : null;
-    if (targetUserids && targetUser !== user && !user.can("alts")) {
-      throw new Chat.ErrorMessage("You don't have permission to look at another user's avatars!");
-    }
     const out = [];
-    if (targetUserids) {
+    if (targetUserids && (targetUser === user || user.can("alts"))) {
       const hasButton = !this.broadcasting && targetUser === user;
       for (const id of targetUserids) {
         const allowed = customAvatars[id]?.allowed;

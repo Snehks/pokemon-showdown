@@ -41,7 +41,8 @@ const Moves = {
   },
   doubleironbash: {
     inherit: true,
-    isNonstandard: null
+    isNonstandard: null,
+    flags: { contact: 1, protect: 1, mirror: 1, punch: 1, minimize: 1 }
   },
   floatyfall: {
     inherit: true,

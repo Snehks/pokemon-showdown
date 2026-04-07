@@ -128,8 +128,7 @@ const Scripts = {
           return;
         }
       }
-      let lockedMove = this.battle.runEvent("LockMove", pokemon);
-      if (lockedMove === true) lockedMove = false;
+      const lockedMove = pokemon.getLockedMove() || pokemon.getSemiLockedMove();
       if (!lockedMove && (!pokemon.volatiles["partialtrappinglock"] || pokemon.volatiles["partialtrappinglock"].locked !== target)) {
         pokemon.deductPP(move, null, target);
       } else {
@@ -312,7 +311,7 @@ const Scripts = {
           let i;
           for (i = 0; i < hits && target.hp && pokemon.hp; i++) {
             move.hit = i + 1;
-            if (move.hit === hits) move.lastHit = true;
+            move.lastHit = move.hit === hits;
             moveDamage = this.moveHit(target, pokemon, move);
             if (moveDamage === false) break;
             damage = moveDamage || 0;

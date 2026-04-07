@@ -1000,7 +1000,7 @@ class RoomBattle extends import_room_game.RoomGame {
       return;
     }
     if (!connection) return;
-    const playerForms = this.players.map((player) => player.id ? `<form><label>Player ${player.num}: <strong>${player.name}</strong></label></form>` : player.invite ? `<form data-submitsend="/msgroom ${this.roomid},/uninvitebattle ${player.invite}"><label>Player ${player.num}: <strong>${player.invite}</strong> (invited) <button>Uninvite</button></label></form>` : `<form data-submitsend="/msgroom ${this.roomid},/invitebattle {username}, p${player.num}"><label>Player ${player.num}: <input name="username" class="textbox" placeholder="Username" /></label> <button class="button">Add Player</button></form>`);
+    const playerForms = this.players.map((player) => player.id ? `<form><label>Player ${player.num}: <strong>${player.name}</strong></label></form>` : player.invite ? `<form data-submitsend="/msgroom ${this.roomid},/uninvitebattle ${player.invite}"><label>Player ${player.num}: <strong>${player.invite}</strong> (invited) <button type="submit">Uninvite</button></label></form>` : `<form data-submitsend="/msgroom ${this.roomid},/invitebattle {username}, p${player.num}"><label>Player ${player.num}: <input name="username" class="textbox" placeholder="Username" /></label> <button class="button" type="submit">Add Player</button></form>`);
     if (this.gameType === "multi") {
       [playerForms[1], playerForms[2]] = [playerForms[2], playerForms[1]];
       playerForms.splice(2, 0, "&mdash; vs &mdash;");

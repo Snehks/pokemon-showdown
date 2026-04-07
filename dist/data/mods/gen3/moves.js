@@ -45,10 +45,7 @@ const Moves = {
   },
   astonish: {
     inherit: true,
-    basePowerCallback(pokemon, target) {
-      if (target.volatiles["minimize"]) return 60;
-      return 30;
-    }
+    flags: { contact: 1, protect: 1, mirror: 1, metronome: 1, minimize: 1 }
   },
   beatup: {
     inherit: true,
@@ -63,6 +60,9 @@ const Moves = {
       duration: 1,
       onModifySpAPriority: -101,
       onModifySpA(atk, pokemon, defender, move) {
+        if (!this.ruleTable.has("beatupnicknamesmod")) {
+          this.add("-activate", pokemon, "move: Beat Up", "[of] " + move.allies[0].name);
+        }
         this.event.modifier = 1;
         return this.dex.species.get(move.allies.shift().set.species).baseStats.atk;
       },
@@ -78,18 +78,9 @@ const Moves = {
     accuracy: 100,
     priority: 0,
     condition: {
-      duration: 3,
-      onLockMove: "bide",
-      onStart(pokemon) {
-        this.effectState.totalDamage = 0;
-        this.add("-start", pokemon, "move: Bide");
-      },
-      onDamagePriority: -101,
-      onDamage(damage, target, source, move) {
-        if (!move || move.effectType !== "Move" || !source) return;
-        this.effectState.totalDamage += damage;
-        this.effectState.lastDamageSource = source;
-      },
+      inherit: true,
+      onAfterSetStatus: void 0,
+      // no inherit
       onBeforeMove(pokemon, target, move) {
         if (this.effectState.duration === 1) {
           this.add("-end", pokemon, "move: Bide");
@@ -126,19 +117,13 @@ const Moves = {
           return false;
         }
         this.add("-activate", pokemon, "move: Bide");
-      },
-      onMoveAborted(pokemon) {
-        pokemon.removeVolatile("bide");
-      },
-      onEnd(pokemon) {
-        this.add("-end", pokemon, "move: Bide", "[silent]");
       }
     }
   },
   blizzard: {
     inherit: true,
-    onModifyMove() {
-    }
+    onModifyMove: void 0
+    // no inherit
   },
   brickbreak: {
     inherit: true,
@@ -150,7 +135,8 @@ const Moves = {
   },
   charge: {
     inherit: true,
-    boosts: null
+    boosts: void 0
+    // no inherit
   },
   conversion: {
     inherit: true,
@@ -196,17 +182,13 @@ const Moves = {
   counter: {
     inherit: true,
     condition: {
-      duration: 1,
-      noCopy: true,
-      onStart(target, source, move) {
-        this.effectState.slot = null;
-        this.effectState.damage = 0;
-      },
-      onRedirectTargetPriority: -1,
+      inherit: true,
       onRedirectTarget(target, source, source2) {
         if (source !== this.effectState.target || !this.effectState.slot) return;
         return this.getAtSlot(this.effectState.slot);
       },
+      onDamagingHit: void 0,
+      // no inherit
       onDamagePriority: -101,
       onDamage(damage, target, source, effect) {
         if (effect.effectType === "Move" && !source.isAlly(target) && (effect.category === "Physical" || effect.id === "hiddenpower")) {
@@ -237,48 +219,15 @@ const Moves = {
     inherit: true,
     accuracy: 55,
     flags: { protect: 1, mirror: 1, bypasssub: 1, metronome: 1 },
-    volatileStatus: "disable",
     condition: {
+      inherit: true,
       durationCallback() {
         return this.random(2, 6);
       },
-      noCopy: true,
-      onStart(pokemon) {
-        if (!this.queue.willMove(pokemon)) {
-          this.effectState.duration++;
-        }
-        if (!pokemon.lastMove) {
-          return false;
-        }
-        for (const moveSlot of pokemon.moveSlots) {
-          if (moveSlot.id === pokemon.lastMove.id) {
-            if (!moveSlot.pp) {
-              return false;
-            } else {
-              this.add("-start", pokemon, "Disable", moveSlot.move);
-              this.effectState.move = pokemon.lastMove.id;
-              return;
-            }
-          }
-        }
-        return false;
-      },
-      onEnd(pokemon) {
-        this.add("-end", pokemon, "move: Disable");
-      },
-      onBeforeMove(attacker, defender, move) {
-        if (move.id === this.effectState.move) {
-          this.add("cant", attacker, "Disable", move);
-          return false;
-        }
-      },
-      onDisableMove(pokemon) {
-        for (const moveSlot of pokemon.moveSlots) {
-          if (moveSlot.id === this.effectState.move) {
-            pokemon.disableMove(moveSlot.id);
-          }
-        }
-      }
+      "onResidualOrder": void 0,
+      // no inherit
+      "onResidualSubOrder": void 0
+      // no inherit
     }
   },
   dive: {
@@ -322,49 +271,15 @@ const Moves = {
     inherit: true,
     volatileStatus: "encore",
     condition: {
+      inherit: true,
       durationCallback() {
         return this.random(3, 7);
-      },
-      onStart(target, source) {
-        const moveSlot = target.lastMove ? target.getMoveData(target.lastMove.id) : null;
-        if (!target.lastMove || target.lastMove.flags["failencore"] || !moveSlot || moveSlot.pp <= 0) {
-          return false;
-        }
-        this.effectState.move = target.lastMove.id;
-        this.add("-start", target, "Encore");
-      },
-      onOverrideAction(pokemon) {
-        return this.effectState.move;
-      },
-      onResidualOrder: 10,
-      onResidualSubOrder: 14,
-      onResidual(target) {
-        const moveSlot = target.getMoveData(this.effectState.move);
-        if (moveSlot && moveSlot.pp <= 0) {
-          target.removeVolatile("encore");
-        }
-      },
-      onEnd(target) {
-        this.add("-end", target, "Encore");
-      },
-      onDisableMove(pokemon) {
-        if (!this.effectState.move || !pokemon.hasMove(this.effectState.move)) {
-          return;
-        }
-        for (const moveSlot of pokemon.moveSlots) {
-          if (moveSlot.id !== this.effectState.move) {
-            pokemon.disableMove(moveSlot.id);
-          }
-        }
       }
     }
   },
   extrasensory: {
     inherit: true,
-    basePowerCallback(pokemon, target) {
-      if (target.volatiles["minimize"]) return 160;
-      return 80;
-    }
+    flags: { protect: 1, mirror: 1, metronome: 1, minimize: 1 }
   },
   fakeout: {
     inherit: true,
@@ -407,14 +322,14 @@ const Moves = {
   followme: {
     inherit: true,
     volatileStatus: void 0,
+    // no inherit
     slotCondition: "followme",
     condition: {
-      duration: 1,
+      inherit: true,
       onStart(target, source, effect) {
         this.add("-singleturn", target, "move: Follow Me");
         this.effectState.slot = target.getSlot();
       },
-      onFoeRedirectTargetPriority: 1,
       onFoeRedirectTarget(target, source, source2, move) {
         const userSlot = this.getAtSlot(this.effectState.slot);
         if (this.validTarget(userSlot, source, move.target)) {
@@ -512,17 +427,13 @@ const Moves = {
   mirrorcoat: {
     inherit: true,
     condition: {
-      duration: 1,
-      noCopy: true,
-      onStart(target, source, move) {
-        this.effectState.slot = null;
-        this.effectState.damage = 0;
-      },
-      onRedirectTargetPriority: -1,
+      inherit: true,
       onRedirectTarget(target, source, source2) {
         if (source !== this.effectState.target || !this.effectState.slot) return;
         return this.getAtSlot(this.effectState.slot);
       },
+      onDamagingHit: void 0,
+      // no inherit
       onDamagePriority: -101,
       onDamage(damage, target, source, effect) {
         if (effect.effectType === "Move" && !source.isAlly(target) && effect.category === "Special" && effect.id !== "hiddenpower") {
@@ -535,8 +446,8 @@ const Moves = {
   mirrormove: {
     inherit: true,
     flags: { metronome: 1, failencore: 1, nosleeptalk: 1, noassist: 1 },
-    onTryHit() {
-    },
+    onTryHit: void 0,
+    // no inherit
     onHit(pokemon) {
       const noMirror = [
         "assist",
@@ -579,10 +490,7 @@ const Moves = {
   },
   needlearm: {
     inherit: true,
-    basePowerCallback(pokemon, target) {
-      if (target.volatiles["minimize"]) return 120;
-      return 60;
-    }
+    flags: { contact: 1, protect: 1, mirror: 1, metronome: 1, minimize: 1 }
   },
   nightmare: {
     inherit: true,
@@ -720,28 +628,15 @@ const Moves = {
     inherit: true,
     flags: { protect: 1, bypasssub: 1, metronome: 1 },
     condition: {
+      inherit: true,
       duration: 2,
-      onStart(target) {
-        this.add("-start", target, "move: Taunt");
-      },
-      onResidualOrder: 10,
-      onResidualSubOrder: 15,
+      durationCallback: void 0,
+      // no inherit
       onEnd(target) {
         this.add("-end", target, "move: Taunt", "[silent]");
       },
-      onDisableMove(pokemon) {
-        for (const moveSlot of pokemon.moveSlots) {
-          if (this.dex.moves.get(moveSlot.move).category === "Status") {
-            pokemon.disableMove(moveSlot.id);
-          }
-        }
-      },
-      onBeforeMove(attacker, defender, move) {
-        if (move.category === "Status") {
-          this.add("cant", attacker, "move: Taunt", move);
-          return false;
-        }
-      }
+      onBeforeMovePriority: void 0
+      // no inherit
     }
   },
   teeterdance: {
@@ -755,35 +650,9 @@ const Moves = {
   uproar: {
     inherit: true,
     condition: {
-      onStart(target) {
-        this.add("-start", target, "Uproar");
-        this.effectState.duration = this.random(2, 6);
-      },
-      onResidual(target) {
-        if (target.volatiles["throatchop"]) {
-          target.removeVolatile("uproar");
-          return;
-        }
-        if (target.lastMove && target.lastMove.id === "struggle") {
-          delete target.volatiles["uproar"];
-        }
-        this.add("-start", target, "Uproar", "[upkeep]");
-      },
-      onResidualOrder: 10,
-      onResidualSubOrder: 11,
-      onEnd(target) {
-        this.add("-end", target, "Uproar");
-      },
-      onLockMove: "uproar",
-      onAnySetStatus(status, pokemon) {
-        if (status.id === "slp") {
-          if (pokemon === this.effectState.target) {
-            this.add("-fail", pokemon, "slp", "[from] Uproar", "[msg]");
-          } else {
-            this.add("-fail", pokemon, "slp", "[from] Uproar");
-          }
-          return null;
-        }
+      inherit: true,
+      durationCallback() {
+        return this.random(2, 6);
       }
     }
   },
@@ -793,11 +662,13 @@ const Moves = {
   },
   volttackle: {
     inherit: true,
-    secondary: null
+    secondary: void 0
+    // no inherit
   },
   waterfall: {
     inherit: true,
-    secondary: null
+    secondary: void 0
+    // no inherit
   },
   weatherball: {
     inherit: true,

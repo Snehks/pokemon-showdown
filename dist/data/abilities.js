@@ -1014,6 +1014,34 @@ const Abilities = {
     rating: 3.5,
     num: 88
   },
+  dragonize: {
+    isNonstandard: "Future",
+    onModifyTypePriority: -1,
+    onModifyType(move, pokemon) {
+      const noModifyType = [
+        "judgment",
+        "multiattack",
+        "naturalgift",
+        "revelationdance",
+        "technoblast",
+        "terrainpulse",
+        "weatherball"
+      ];
+      if (move.type === "Normal" && (!noModifyType.includes(move.id) || this.activeMove?.isMax) && !(move.isZ && move.category !== "Status") && !(move.name === "Tera Blast" && pokemon.terastallized)) {
+        move.type = "Dragon";
+        move.typeChangerBoosted = this.effect;
+      }
+    },
+    onBasePowerPriority: 23,
+    onBasePower(basePower, pokemon, target, move) {
+      if (move.typeChangerBoosted === this.effect) return this.chainModify([4915, 4096]);
+    },
+    flags: {},
+    name: "Dragonize",
+    rating: 4,
+    num: 312
+    // TODO confirm with generation shift
+  },
   dragonsmaw: {
     onModifyAtkPriority: 5,
     onModifyAtk(atk, attacker, defender, move) {
@@ -2472,6 +2500,15 @@ const Abilities = {
     name: "Mega Launcher",
     rating: 3,
     num: 178
+  },
+  megasol: {
+    isNonstandard: "Future",
+    flags: {},
+    name: "Mega Sol",
+    rating: 3,
+    num: 311
+    // TODO confirm with generation shift
+    // Partially implemented in Pokemon.effectiveWeather() in sim/pokemon.ts
   },
   merciless: {
     onModifyCritRatio(critRatio, source, target) {
@@ -4068,7 +4105,7 @@ const Abilities = {
   },
   sheerforce: {
     onModifyMove(move, pokemon) {
-      if (move.secondaries) {
+      if (move.secondaries && !move.hasSheerForceBoost) {
         delete move.secondaries;
         delete move.self;
         if (move.id === "clangoroussoulblaze") delete move.selfBoost;
@@ -4077,7 +4114,7 @@ const Abilities = {
     },
     onBasePowerPriority: 21,
     onBasePower(basePower, pokemon, target, move) {
-      if (move.hasSheerForce) return this.chainModify([5325, 4096]);
+      if (move.hasSheerForce || move.hasSheerForceBoost) return this.chainModify([5325, 4096]);
     },
     flags: {},
     name: "Sheer Force",

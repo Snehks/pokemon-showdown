@@ -59,8 +59,8 @@ const Moves = {
   autotomize: {
     inherit: true,
     volatileStatus: "autotomize",
-    onHit(pokemon) {
-    },
+    onHit: void 0,
+    // no inherit
     condition: {
       noCopy: true,
       // doesn't get copied by Baton Pass
@@ -101,6 +101,10 @@ const Moves = {
   block: {
     inherit: true,
     flags: { protect: 1, reflectable: 1, mirror: 1, metronome: 1 }
+  },
+  bodyslam: {
+    inherit: true,
+    flags: { contact: 1, protect: 1, mirror: 1, nonsky: 1, metronome: 1 }
   },
   bounce: {
     inherit: true,
@@ -179,8 +183,8 @@ const Moves = {
   },
   cottonspore: {
     inherit: true,
-    onTryHit() {
-    },
+    onTryHit: void 0,
+    // no inherit
     target: "normal"
   },
   covet: {
@@ -222,6 +226,10 @@ const Moves = {
   drainpunch: {
     inherit: true,
     flags: { contact: 1, protect: 1, mirror: 1, punch: 1, metronome: 1 }
+  },
+  dragonrush: {
+    inherit: true,
+    flags: { contact: 1, protect: 1, mirror: 1, metronome: 1 }
   },
   dreameater: {
     inherit: true,
@@ -291,10 +299,7 @@ const Moves = {
     inherit: true,
     basePower: 20,
     condition: {
-      duration: 2,
-      onStart() {
-        this.effectState.multiplier = 1;
-      },
+      inherit: true,
       onRestart() {
         if (this.effectState.multiplier < 8) {
           this.effectState.multiplier <<= 1;
@@ -393,6 +398,10 @@ const Moves = {
       }
       return success;
     }
+  },
+  heatcrash: {
+    inherit: true,
+    flags: { contact: 1, protect: 1, mirror: 1, nonsky: 1, metronome: 1 }
   },
   heatwave: {
     inherit: true,
@@ -508,8 +517,8 @@ const Moves = {
   knockoff: {
     inherit: true,
     basePower: 20,
-    onBasePower() {
-    }
+    onBasePower: void 0
+    // no inherit
   },
   leafstorm: {
     inherit: true,
@@ -526,13 +535,7 @@ const Moves = {
   lightscreen: {
     inherit: true,
     condition: {
-      duration: 5,
-      durationCallback(target, source, effect) {
-        if (source?.hasItem("lightclay")) {
-          return 8;
-        }
-        return 5;
-      },
+      inherit: true,
       onAnyModifyDamage(damage, source, target, move) {
         if (target !== source && this.effectState.target.hasAlly(target) && this.getCategory(move) === "Special") {
           if (!target.getMoveHitData(move).crit && !move.infiltrates) {
@@ -541,14 +544,6 @@ const Moves = {
             return this.chainModify(0.5);
           }
         }
-      },
-      onSideStart(side) {
-        this.add("-sidestart", side, "move: Light Screen");
-      },
-      onSideResidualOrder: 26,
-      onSideResidualSubOrder: 2,
-      onSideEnd(side) {
-        this.add("-sideend", side, "move: Light Screen");
       }
     }
   },
@@ -559,24 +554,7 @@ const Moves = {
   magiccoat: {
     inherit: true,
     condition: {
-      duration: 1,
-      onStart(target, source, effect) {
-        this.add("-singleturn", target, "move: Magic Coat");
-        if (effect?.effectType === "Move") {
-          this.effectState.pranksterBoosted = effect.pranksterBoosted;
-        }
-      },
-      onTryHitPriority: 2,
-      onTryHit(target, source, move) {
-        if (target === source || move.hasBounced || !move.flags["reflectable"] || target.isSemiInvulnerable()) {
-          return;
-        }
-        const newMove = this.dex.getActiveMove(move.id);
-        newMove.hasBounced = true;
-        newMove.pranksterBoosted = this.effectState.pranksterBoosted;
-        this.actions.useMove(newMove, target, { target: source });
-        return null;
-      },
+      inherit: true,
       onAllyTryHitSide(target, source, move) {
         if (target.isAlly(source) || move.hasBounced || !move.flags["reflectable"]) {
           return;
@@ -619,12 +597,9 @@ const Moves = {
     inherit: true,
     pp: 20,
     condition: {
-      noCopy: true,
-      onSourceModifyDamage(damage, source, target, move) {
-        if (["stomp", "steamroller"].includes(move.id)) {
-          return this.chainModify(2);
-        }
-      }
+      inherit: true,
+      onAccuracy: void 0
+      // no inherit
     }
   },
   moonlight: {
@@ -638,6 +613,7 @@ const Moves = {
   mudsport: {
     inherit: true,
     pseudoWeather: void 0,
+    // no inherit
     volatileStatus: "mudsport",
     condition: {
       noCopy: true,
@@ -655,8 +631,8 @@ const Moves = {
   },
   naturepower: {
     inherit: true,
-    onTryHit() {
-    },
+    onTryHit: void 0,
+    // no inherit
     onHit(pokemon) {
       this.actions.useMove("earthquake", pokemon);
     },
@@ -688,8 +664,8 @@ const Moves = {
   },
   poisonpowder: {
     inherit: true,
-    onTryHit() {
-    }
+    onTryHit: void 0
+    // no inherit
   },
   powergem: {
     inherit: true,
@@ -723,11 +699,7 @@ const Moves = {
       source.addVolatile("stall");
     },
     condition: {
-      duration: 1,
-      onSideStart(target, source) {
-        this.add("-singleturn", source, "Quick Guard");
-      },
-      onTryHitPriority: 4,
+      inherit: true,
       onTryHit(target, source, effect) {
         if (effect && (effect.id === "feint" || this.dex.moves.get(effect.id).priority <= 0)) {
           return;
@@ -751,13 +723,7 @@ const Moves = {
   reflect: {
     inherit: true,
     condition: {
-      duration: 5,
-      durationCallback(target, source, effect) {
-        if (source?.hasItem("lightclay")) {
-          return 8;
-        }
-        return 5;
-      },
+      inherit: true,
       onAnyModifyDamage(damage, source, target, move) {
         if (target !== source && this.effectState.target.hasAlly(target) && this.getCategory(move) === "Physical") {
           if (!target.getMoveHitData(move).crit && !move.infiltrates) {
@@ -766,14 +732,6 @@ const Moves = {
             return this.chainModify(0.5);
           }
         }
-      },
-      onSideStart(side) {
-        this.add("-sidestart", side, "Reflect");
-      },
-      onSideResidualOrder: 26,
-      onSideResidualSubOrder: 1,
-      onSideEnd(side) {
-        this.add("-sideend", side, "Reflect");
       }
     }
   },
@@ -854,8 +812,8 @@ const Moves = {
   },
   sleeppowder: {
     inherit: true,
-    onTryHit() {
-    }
+    onTryHit: void 0
+    // no inherit
   },
   smellingsalts: {
     inherit: true,
@@ -886,8 +844,8 @@ const Moves = {
   },
   spore: {
     inherit: true,
-    onTryHit() {
-    }
+    onTryHit: void 0
+    // no inherit
   },
   stormthrow: {
     inherit: true,
@@ -905,18 +863,13 @@ const Moves = {
   },
   stunspore: {
     inherit: true,
-    onTryHit() {
-    }
+    onTryHit: void 0
+    // no inherit
   },
   substitute: {
     inherit: true,
     condition: {
-      onStart(target) {
-        this.add("-start", target, "Substitute");
-        this.effectState.hp = Math.floor(target.maxhp / 4);
-        delete target.volatiles["partiallytrapped"];
-      },
-      onTryPrimaryHitPriority: -1,
+      inherit: true,
       onTryPrimaryHit(target, source, move) {
         if (target === source || move.flags["bypasssub"]) {
           return;
@@ -947,9 +900,6 @@ const Moves = {
         this.singleEvent("AfterSubDamage", move, null, target, source, move, damage);
         this.runEvent("AfterSubDamage", target, source, move, damage);
         return this.HIT_SUBSTITUTE;
-      },
-      onEnd(target) {
-        this.add("-end", target, "Substitute");
       }
     }
   },
@@ -1007,8 +957,8 @@ const Moves = {
   },
   toxic: {
     inherit: true,
-    onPrepareHit() {
-    }
+    onPrepareHit: void 0
+    // no inherit
   },
   uproar: {
     inherit: true,
@@ -1037,6 +987,7 @@ const Moves = {
   watersport: {
     inherit: true,
     pseudoWeather: void 0,
+    // no inherit
     volatileStatus: "watersport",
     condition: {
       noCopy: true,

@@ -32,8 +32,8 @@ const Items = {
   },
   dragonscale: {
     inherit: true,
-    onModifyDamage() {
-    }
+    onModifyDamage: void 0
+    // no inherit
   }
 };
 //# sourceMappingURL=items.js.map

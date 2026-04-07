@@ -55,30 +55,30 @@ const Items = {
   },
   choiceband: {
     inherit: true,
-    onStart() {
-    },
-    onModifyMove() {
-    },
+    onStart: void 0,
+    // no inherit
+    onModifyMove: void 0,
+    // no inherit
     onAfterMove(pokemon) {
       pokemon.addVolatile("choicelock");
     }
   },
   choicescarf: {
     inherit: true,
-    onStart() {
-    },
-    onModifyMove() {
-    },
+    onStart: void 0,
+    // no inherit
+    onModifyMove: void 0,
+    // no inherit
     onAfterMove(pokemon) {
       pokemon.addVolatile("choicelock");
     }
   },
   choicespecs: {
     inherit: true,
-    onStart() {
-    },
-    onModifyMove() {
-    },
+    onStart: void 0,
+    // no inherit
+    onModifyMove: void 0,
+    // no inherit
     onAfterMove(pokemon) {
       pokemon.addVolatile("choicelock");
     }
@@ -100,8 +100,8 @@ const Items = {
   },
   custapberry: {
     inherit: true,
-    onFractionalPriority() {
-    },
+    onFractionalPriority: void 0,
+    // no inherit
     onBeforeTurn(pokemon) {
       if (pokemon.hp <= pokemon.maxhp / 4 || pokemon.hp <= pokemon.maxhp / 2 && pokemon.ability === "gluttony") {
         const action = this.queue.willMove(pokemon);
@@ -173,8 +173,8 @@ const Items = {
   },
   focussash: {
     inherit: true,
-    onDamage() {
-    },
+    onDamage: void 0,
+    // no inherit
     onTryHit(target, source, move) {
       if (target !== source && target.hp === target.maxhp) {
         target.addVolatile("focussash");
@@ -216,8 +216,8 @@ const Items = {
   },
   ironball: {
     inherit: true,
-    onEffectiveness() {
-    }
+    onEffectiveness: void 0
+    // no inherit
   },
   ironplate: {
     inherit: true,
@@ -459,10 +459,10 @@ const Items = {
   },
   lifeorb: {
     inherit: true,
-    onModifyDamage() {
-    },
-    onAfterMoveSecondarySelf() {
-    },
+    onModifyDamage: void 0,
+    // no inherit
+    onAfterMoveSecondarySelf: void 0,
+    // no inherit
     onBasePower(basePower, user, target) {
       if (!target.volatiles["substitute"]) {
         user.addVolatile("lifeorb");
@@ -484,10 +484,10 @@ const Items = {
   },
   lightball: {
     inherit: true,
-    onModifyAtk() {
-    },
-    onModifySpA() {
-    },
+    onModifyAtk: void 0,
+    // no inherit
+    onModifySpA: void 0,
+    // no inherit
     onBasePower(basePower, pokemon) {
       if (pokemon.species.name === "Pikachu") {
         return this.chainModify(2);
@@ -542,11 +542,7 @@ const Items = {
   metronome: {
     inherit: true,
     condition: {
-      onStart(pokemon) {
-        this.effectState.numConsecutive = 0;
-        this.effectState.lastMove = "";
-      },
-      onTryMovePriority: -2,
+      inherit: true,
       onTryMove(pokemon, target, move) {
         if (!pokemon.hasItem("metronome")) {
           pokemon.removeVolatile("metronome");
@@ -559,6 +555,8 @@ const Items = {
         }
         this.effectState.lastMove = move.id;
       },
+      onModifyDamage: void 0,
+      // no inherit
       onModifyDamagePhase2(damage, source, target, move) {
         return damage * (1 + this.effectState.numConsecutive / 10);
       }
@@ -567,7 +565,7 @@ const Items = {
   micleberry: {
     inherit: true,
     condition: {
-      duration: 2,
+      inherit: true,
       onSourceModifyAccuracyPriority: 3,
       onSourceModifyAccuracy(accuracy, target, source) {
         this.add("-enditem", source, "Micle Berry");

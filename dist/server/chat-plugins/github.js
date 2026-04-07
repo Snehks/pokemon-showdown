@@ -32,7 +32,7 @@ const STAFF_REPOS = Config.staffrepos || [
   "Pokemon-Showdown-Dex",
   "pokemon-showdown-loginserver"
 ];
-const COOLDOWN = 10 * 60 * 1e3;
+const COOLDOWN = 60 * 60 * 1e3;
 const gitData = JSON.parse((0, import_lib.FS)("config/chat-plugins/github.json").readIfExistsSync() || "{}");
 const GitHub = new class {
   constructor() {

@@ -25,8 +25,8 @@ const Moves = {
   allyswitch: {
     inherit: true,
     // Prevents setting the volatile used to check for Ally Switch failure
-    onPrepareHit() {
-    }
+    onPrepareHit: void 0
+    // no inherit
   },
   anchorshot: {
     inherit: true,
@@ -83,19 +83,7 @@ const Moves = {
   charge: {
     inherit: true,
     condition: {
-      onStart(pokemon, source, effect) {
-        this.add("-start", pokemon, "Charge");
-      },
-      onRestart(pokemon, source, effect) {
-        this.add("-start", pokemon, "Charge");
-      },
-      onBasePowerPriority: 9,
-      onBasePower(basePower, attacker, defender, move) {
-        if (move.type === "Electric") {
-          this.debug("charge boost");
-          return this.chainModify(2);
-        }
-      },
+      inherit: true,
       onMoveAborted(pokemon, target, move) {
         if (move.id !== "charge") {
           pokemon.removeVolatile("charge");
@@ -105,9 +93,6 @@ const Moves = {
         if (move.id !== "charge") {
           pokemon.removeVolatile("charge");
         }
-      },
-      onEnd(pokemon) {
-        this.add("-end", pokemon, "Charge", "[silent]");
       }
     }
   },
@@ -562,9 +547,7 @@ const Moves = {
   stickyweb: {
     inherit: true,
     condition: {
-      onSideStart(side) {
-        this.add("-sidestart", side, "move: Sticky Web");
-      },
+      inherit: true,
       onSwitchIn(pokemon) {
         if (!pokemon.isGrounded() || pokemon.hasItem("heavydutyboots")) return;
         this.add("-activate", pokemon, "move: Sticky Web");

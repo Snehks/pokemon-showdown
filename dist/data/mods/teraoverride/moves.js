@@ -584,7 +584,7 @@ const Moves = {
         if (!target.isGrounded()) {
           const baseMove = this.dex.moves.get(effect.id);
           if (baseMove.priority > 0) {
-            this.hint("Psychic Terrain doesn't affect Pok\xE9mon immune to Ground.");
+            this.hint("Psychic Terrain doesn't affect airborne Pok\xE9mon.");
           }
           return;
         }

@@ -25,7 +25,8 @@ const Moves = {
   ancientpower: {
     inherit: true,
     category: "Physical",
-    secondary: null,
+    secondary: void 0,
+    // no inherit
     // Ancient Power is physical and boosts on-kill
     onAfterMoveSecondarySelf(pokemon, target, move) {
       if (!target || target.fainted || target.hp <= 0) {
@@ -66,7 +67,6 @@ const Moves = {
       this.add("-anim", source, "Crunch", target);
       this.add("-anim", source, "Rock Slide", target);
     },
-    secondary: null,
     target: "normal",
     type: "Rock",
     contestType: "Clever",
@@ -82,7 +82,6 @@ const Moves = {
     pp: 10,
     priority: 0,
     flags: { contact: 1, protect: 1, mirror: 1, metronome: 1 },
-    secondary: null,
     target: "normal",
     type: "Poison",
     contestType: "Tough",
@@ -222,7 +221,6 @@ const Moves = {
         this.field.setWeather("snowscape");
       }
     },
-    secondary: null,
     target: "normal",
     type: "Ice",
     contestType: "Clever",
@@ -278,7 +276,6 @@ const Moves = {
     onAfterSubDamage(damage, target, source, move) {
       if (!source.isAlly(target)) this.hint(move.category + " Geyser");
     },
-    secondary: null,
     target: "normal",
     type: "Water",
     desc: "This move is Special + no contact if it would be stronger.",
@@ -305,7 +302,6 @@ const Moves = {
       target.addVolatile("encore");
     },
     weather: "raindance",
-    secondary: null,
     target: "normal",
     type: "Water",
     zMove: { boost: { spe: 1 } },
@@ -365,7 +361,6 @@ const Moves = {
       this.add("-anim", source, "Ivy Cudgel Rock", target);
       this.add("-anim", source, "Splash");
     },
-    secondary: null,
     target: "normal",
     type: "Rock",
     contestType: "Beautiful",
@@ -388,7 +383,6 @@ const Moves = {
     onPrepareHit(target, source, move) {
       this.add("-anim", source, "Metal Claw", target);
     },
-    secondary: null,
     target: "normal",
     type: "Steel",
     contestType: "Beautiful",
@@ -417,7 +411,8 @@ const Moves = {
   },
   thunderouskick: {
     inherit: true,
-    secondary: null,
+    secondary: void 0,
+    // no inherit
     onHit(target, source, move) {
       const randomNum = this.random(2);
       if (randomNum === 0) {
@@ -461,7 +456,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "foeSide",
     type: "Rock",
     zMove: { boost: { def: 1 } },
@@ -502,7 +496,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "foeSide",
     type: "Ground",
     zMove: { boost: { def: 1 } },
@@ -588,8 +581,7 @@ const Moves = {
       }
       source.switchFlag = true;
     },
-    secondary: null,
-    hasSheerForce: true,
+    hasSheerForceBoost: true,
     target: "normal",
     type: "Dragon",
     desc: "Dondozo eats a mon on the user's team, KOing it. Dondozo then gains a stat boost depending on the eaten mon's highest stat: +3 Attack for Atk/SpA, +2 Def/+2 SpD for Def/SpD, and +3 Speed for Speed.",
@@ -653,7 +645,6 @@ const Moves = {
       this.add("-anim", source, "Spirit Shackle", target);
     },
     flags: { contact: 1, protect: 1, mirror: 1, metronome: 1 },
-    secondary: null,
     target: "normal",
     type: "Ghost",
     contestType: "Clever",
@@ -682,7 +673,6 @@ const Moves = {
       }
     },
     flags: { contact: 1, protect: 1, mirror: 1, metronome: 1 },
-    secondary: null,
     target: "normal",
     type: "Fighting",
     contestType: "Clever",
@@ -824,7 +814,6 @@ const Moves = {
       return success;
     },
     flags: { protect: 1, mirror: 1, metronome: 1, wind: 1 },
-    secondary: null,
     target: "allAdjacentFoes",
     type: "Dragon",
     contestType: "Cool",
@@ -844,7 +833,6 @@ const Moves = {
       this.add("-start", target, "typechange", "Steel");
     },
     flags: { protect: 1, mirror: 1, metronome: 1, bullet: 1 },
-    secondary: null,
     target: "normal",
     type: "Steel",
     contestType: "Cool",
@@ -881,7 +869,8 @@ const Moves = {
       this.add("-anim", source, "Extreme Speed", target);
       this.add("-anim", source, "Thunder", target);
     },
-    secondary: null,
+    secondary: void 0,
+    // no inherit
     desc: "Nearly always goes first.",
     shortDesc: "Nearly always goes first."
   },
@@ -924,7 +913,6 @@ const Moves = {
     },
     flags: { contact: 1, protect: 1, mirror: 1, metronome: 1 },
     selfSwitch: true,
-    secondary: null,
     target: "normal",
     type: "Fire",
     contestType: "Cute",
@@ -1054,7 +1042,6 @@ const Moves = {
     pp: 10,
     priority: 0,
     flags: { contact: 1, protect: 1, mirror: 1, metronome: 1 },
-    secondary: null,
     target: "normal",
     type: "Rock",
     contestType: "Tough",
@@ -1149,7 +1136,6 @@ const Moves = {
     priority: 0,
     flags: { protect: 1, mirror: 1, metronome: 1 },
     drain: [1, 2],
-    secondary: null,
     target: "normal",
     type: "Fire",
     zMove: { basePower: 160 },
@@ -1184,7 +1170,6 @@ const Moves = {
     pp: 10,
     priority: 0,
     flags: { contact: 1, protect: 1, mirror: 1, metronome: 1 },
-    secondary: null,
     target: "normal",
     type: "Grass",
     contestType: "Tough",
@@ -1250,7 +1235,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "self",
     type: "Normal",
     zMove: { effect: "clearnegativeboost" },
@@ -1292,7 +1276,6 @@ const Moves = {
     },
     flags: { protect: 1, mirror: 1, metronome: 1 },
     multihit: [10, 10],
-    secondary: null,
     target: "normal",
     type: "Dark",
     zMove: { basePower: 140 },
@@ -1341,7 +1324,6 @@ const Moves = {
       return null;
     },
     callsMove: true,
-    secondary: null,
     target: "normal",
     type: "Normal",
     contestType: "Beautiful",
@@ -1368,7 +1350,6 @@ const Moves = {
         return priority + 1;
       }
     },
-    secondary: null,
     target: "normal",
     type: "Fairy",
     contestType: "Cool",
@@ -1395,7 +1376,6 @@ const Moves = {
         return priority + 1;
       }
     },
-    secondary: null,
     target: "normal",
     type: "Electric",
     contestType: "Cool",
@@ -1423,7 +1403,6 @@ const Moves = {
         this.boost({ spe: 1 }, source, source);
       }
     },
-    secondary: null,
     target: "normal",
     type: "Psychic",
     contestType: "Cool",
@@ -1590,7 +1569,6 @@ const Moves = {
       this.add("-anim", source, "Explosion", target);
       this.add("-anim", source, "Mind Blown", target);
     },
-    secondary: null,
     target: "normal",
     type: "Normal",
     contestType: "Cute",
@@ -1667,7 +1645,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "normal",
     type: "Ghost",
     contestType: "Clever",
@@ -1735,7 +1712,6 @@ const Moves = {
       this.add("-anim", source, "Curse", target);
       this.add("-anim", source, "Bug Bite", target);
     },
-    secondary: null,
     target: "normal",
     type: "Ghost",
     contestType: "Cute",

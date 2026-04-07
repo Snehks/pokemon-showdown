@@ -417,10 +417,10 @@ const Abilities = {
   },
   heatproof: {
     inherit: true,
-    onSourceModifyAtk() {
-    },
-    onSourceModifySpA() {
-    },
+    onSourceModifyAtk: void 0,
+    // no inherit
+    onSourceModifySpA: void 0,
+    // no inherit
     onSourceBasePowerPriority: 18,
     onSourceBasePower(basePower, attacker, defender, move) {
       if (move.type === "Fire") {
@@ -472,10 +472,10 @@ const Abilities = {
   },
   illuminate: {
     inherit: true,
-    onTryBoost() {
-    },
-    onModifyMove() {
-    },
+    onTryBoost: void 0,
+    // no inherit
+    onModifyMove: void 0,
+    // no inherit
     flags: {},
     rating: 0
   },

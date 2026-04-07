@@ -28,6 +28,7 @@ const Rulesets = {
       "Obtainable",
       "HP Percentage Mod",
       "Cancel Mod",
+      "Beat Up Nicknames Mod",
       "Endless Battle Clause"
     ]
   },
@@ -45,7 +46,7 @@ const Rulesets = {
   },
   flatrules: {
     inherit: true,
-    ruleset: ["Obtainable", "Species Clause", "Nickname Clause", "Item Clause = 1", "Adjust Level Down = 50", "Picked Team Size = Auto", "Cancel Mod"]
+    ruleset: ["Obtainable", "Species Clause", "Nickname Clause", "Beat Up Nicknames Mod", "Item Clause = 1", "Adjust Level Down = 50", "Picked Team Size = Auto", "Cancel Mod"]
   },
   teampreview: {
     inherit: true,

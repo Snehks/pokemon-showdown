@@ -28,8 +28,8 @@ const Items = {
   },
   blackbelt: {
     inherit: true,
-    onModifyAtk() {
-    },
+    onModifyAtk: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Fighting") {
         return damage * 1.1;
@@ -38,8 +38,8 @@ const Items = {
   },
   blackglasses: {
     inherit: true,
-    onModifySpA() {
-    },
+    onModifySpA: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Dark") {
         return damage * 1.1;
@@ -56,8 +56,8 @@ const Items = {
   },
   charcoal: {
     inherit: true,
-    onModifySpA() {
-    },
+    onModifySpA: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Fire") {
         return damage * 1.1;
@@ -66,8 +66,8 @@ const Items = {
   },
   dragonfang: {
     inherit: true,
-    onModifySpA() {
-    }
+    onModifySpA: void 0
+    // no inherit
   },
   dragonscale: {
     inherit: true,
@@ -92,8 +92,8 @@ const Items = {
   },
   hardstone: {
     inherit: true,
-    onModifyAtk() {
-    },
+    onModifyAtk: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Rock") {
         return damage * 1.1;
@@ -223,8 +223,8 @@ const Items = {
   lightball: {
     inherit: true,
     // In Gen 2 this happens in stat calculation directly.
-    onModifySpA() {
-    }
+    onModifySpA: void 0
+    // no inherit
   },
   loveball: {
     inherit: true,
@@ -245,8 +245,8 @@ const Items = {
   },
   magnet: {
     inherit: true,
-    onModifySpA() {
-    },
+    onModifySpA: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Electric") {
         return damage * 1.1;
@@ -255,8 +255,8 @@ const Items = {
   },
   metalcoat: {
     inherit: true,
-    onModifyAtk() {
-    },
+    onModifyAtk: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Steel") {
         return damage * 1.1;
@@ -266,15 +266,15 @@ const Items = {
   metalpowder: {
     inherit: true,
     // In Gen 2 this happens in stat calculation directly.
-    onModifyDef() {
-    },
-    onModifySpD() {
-    }
+    onModifyDef: void 0,
+    // no inherit
+    onModifySpD: void 0
+    // no inherit
   },
   miracleseed: {
     inherit: true,
-    onModifySpA() {
-    },
+    onModifySpA: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Grass") {
         return damage * 1.1;
@@ -287,8 +287,8 @@ const Items = {
   },
   mysticwater: {
     inherit: true,
-    onModifySpA() {
-    },
+    onModifySpA: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Water") {
         return damage * 1.1;
@@ -297,8 +297,8 @@ const Items = {
   },
   nevermeltice: {
     inherit: true,
-    onModifySpA() {
-    },
+    onModifySpA: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Ice") {
         return damage * 1.1;
@@ -307,8 +307,8 @@ const Items = {
   },
   poisonbarb: {
     inherit: true,
-    onModifyAtk() {
-    },
+    onModifyAtk: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Poison") {
         return damage * 1.1;
@@ -317,8 +317,8 @@ const Items = {
   },
   sharpbeak: {
     inherit: true,
-    onModifyAtk() {
-    },
+    onModifyAtk: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Flying") {
         return damage * 1.1;
@@ -327,8 +327,8 @@ const Items = {
   },
   silverpowder: {
     inherit: true,
-    onModifyAtk() {
-    },
+    onModifyAtk: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Bug") {
         return damage * 1.1;
@@ -337,8 +337,8 @@ const Items = {
   },
   softsand: {
     inherit: true,
-    onModifyAtk() {
-    },
+    onModifyAtk: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Ground") {
         return damage * 1.1;
@@ -347,8 +347,8 @@ const Items = {
   },
   spelltag: {
     inherit: true,
-    onModifyAtk() {
-    },
+    onModifyAtk: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Ghost") {
         return damage * 1.1;
@@ -371,13 +371,13 @@ const Items = {
   thickclub: {
     inherit: true,
     // In Gen 2 this happens in stat calculation directly.
-    onModifyAtk() {
-    }
+    onModifyAtk: void 0
+    // no inherit
   },
   twistedspoon: {
     inherit: true,
-    onModifySpA() {
-    },
+    onModifySpA: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Psychic") {
         return damage * 1.1;
@@ -422,8 +422,8 @@ const Items = {
   },
   pinkbow: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Normal") {
         return damage * 1.1;
@@ -433,8 +433,8 @@ const Items = {
   },
   polkadotbow: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyDamage(damage, source, target, move) {
       if (move?.type === "Normal") {
         return damage * 1.1;

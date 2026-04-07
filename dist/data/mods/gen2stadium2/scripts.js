@@ -191,7 +191,7 @@ const Scripts = {
         for (i = 0; i < hits && target.hp && pokemon.hp; i++) {
           if (pokemon.status === "slp" && !isSleepUsable) break;
           move.hit = i + 1;
-          if (move.hit === hits) move.lastHit = true;
+          move.lastHit = move.hit === hits;
           moveDamage = this.moveHit(target, pokemon, move);
           if (moveDamage === false) break;
           if (nullDamage && (moveDamage || moveDamage === 0 || moveDamage === void 0)) nullDamage = false;

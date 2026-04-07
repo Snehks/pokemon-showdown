@@ -53,8 +53,8 @@ const Abilities = {
   innerfocus: {
     inherit: true,
     rating: 1,
-    onTryBoost() {
-    }
+    onTryBoost: void 0
+    // no inherit
   },
   moody: {
     inherit: true,
@@ -83,28 +83,23 @@ const Abilities = {
   },
   oblivious: {
     inherit: true,
-    onTryBoost() {
-    }
+    onTryBoost: void 0
+    // no inherit
   },
   owntempo: {
     inherit: true,
-    onTryBoost() {
-    }
+    onTryBoost: void 0
+    // no inherit
   },
   rattled: {
-    onDamagingHit(damage, target, source, move) {
-      if (["Dark", "Bug", "Ghost"].includes(move.type)) {
-        this.boost({ spe: 1 });
-      }
-    },
-    name: "Rattled",
-    rating: 1.5,
-    num: 155
+    inherit: true,
+    onAfterBoost: void 0
+    // no inherit
   },
   scrappy: {
     inherit: true,
-    onTryBoost() {
-    }
+    onTryBoost: void 0
+    // no inherit
   },
   slowstart: {
     inherit: true,

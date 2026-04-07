@@ -77,8 +77,8 @@ const Abilities = {
         move.type = "Normal";
       }
     },
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     rating: -1
   },
   parentalbond: {
@@ -117,8 +117,8 @@ const Abilities = {
       const targetForme = move.id === "kingsshield" ? "Aegislash" : "Aegislash-Blade";
       if (attacker.species.name !== targetForme) attacker.formeChange(targetForme);
     },
-    onModifyMove() {
-    }
+    onModifyMove: void 0
+    // no inherit
   },
   symbiosis: {
     inherit: true,

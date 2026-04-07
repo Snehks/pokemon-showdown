@@ -159,9 +159,13 @@ class ModdedDex {
     const mod = this.formats.get(format).mod;
     return dexes[mod || BASE_MOD].includeData();
   }
-  modData(dataType, id) {
+  /** `force` is needed to mod data defined by the mod itself (for instance,
+   * if you want to use modData and pokedex.ts on the same pokemon. */
+  modData(dataType, id, force) {
     if (this.isBase) return this.data[dataType][id];
-    if (this.data[dataType][id] !== dexes[this.parentMod].data[dataType][id]) return this.data[dataType][id];
+    if (!force && this.data[dataType][id] !== dexes[this.parentMod].data[dataType][id]) {
+      return this.data[dataType][id];
+    }
     return this.data[dataType][id] = import_utils.Utils.deepClone(this.data[dataType][id]);
   }
   effectToString() {
@@ -598,6 +602,13 @@ class ModdedDex {
             childTypedData[entryId] = parentTypedData[entryId];
           } else if (childTypedData[entryId]?.inherit) {
             delete childTypedData[entryId].inherit;
+            if (childTypedData[entryId].condition?.inherit) {
+              delete childTypedData[entryId].condition.inherit;
+              childTypedData[entryId].condition = {
+                ...parentTypedData[entryId].condition,
+                ...childTypedData[entryId].condition
+              };
+            }
             childTypedData[entryId] = { ...parentTypedData[entryId], ...childTypedData[entryId] };
           }
         }

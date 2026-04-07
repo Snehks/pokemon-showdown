@@ -51,8 +51,8 @@ const Abilities = {
   },
   keeneye: {
     inherit: true,
-    onModifyMove() {
-    }
+    onModifyMove: void 0
+    // no inherit
   },
   magicbounce: {
     inherit: true,
@@ -89,15 +89,15 @@ const Abilities = {
     onImmunity(type, pokemon) {
       if (type === "sandstorm" || type === "hail") return false;
     },
-    onTryHit() {
-    },
+    onTryHit: void 0,
+    // no inherit
     flags: {},
     rating: 0.5
   },
   sapsipper: {
     inherit: true,
-    onAllyTryHitSide() {
-    }
+    onAllyTryHitSide: void 0
+    // no inherit
   },
   serenegrace: {
     inherit: true,
@@ -112,8 +112,8 @@ const Abilities = {
   },
   soundproof: {
     inherit: true,
-    onAllyTryHitSide() {
-    }
+    onAllyTryHitSide: void 0
+    // no inherit
   },
   rebound: {
     inherit: true,

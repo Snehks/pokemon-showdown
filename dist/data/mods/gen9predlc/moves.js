@@ -60,7 +60,7 @@ const Moves = {
   },
   jetpunch: {
     inherit: true,
-    hasSheerForce: true
+    hasSheerForceBoost: true
   },
   matchagotcha: {
     inherit: true,

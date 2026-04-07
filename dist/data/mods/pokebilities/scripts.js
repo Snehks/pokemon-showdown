@@ -35,14 +35,17 @@ const Scripts = {
   },
   pokemon: {
     ignoringAbility() {
-      let neutralizinggas = false;
+      if (this.battle.gen >= 5 && !this.isActive) return true;
+      if (this.getAbility().flags["notransform"] && this.transformed) return true;
+      if (this.getAbility().flags["cantsuppress"]) return false;
+      if (this.volatiles["gastroacid"]) return true;
+      if (this.hasItem("Ability Shield") || this.m.innates?.includes("neutralizinggas") || this.ability === "neutralizinggas") return false;
       for (const pokemon of this.battle.getAllActive()) {
-        if ((pokemon.ability === "neutralizinggas" || pokemon.m.innates?.some((k) => k === "neutralizinggas")) && !pokemon.volatiles["gastroacid"] && !pokemon.abilityState.ending) {
-          neutralizinggas = true;
-          break;
+        if ((pokemon.m.innates?.includes("neutralizinggas") || pokemon.ability === "neutralizinggas") && !pokemon.volatiles["gastroacid"] && !pokemon.transformed && !pokemon.abilityState.ending && !this.volatiles["commanding"]) {
+          return true;
         }
       }
-      return !!(this.battle.gen >= 5 && !this.isActive || (this.volatiles["gastroacid"] || neutralizinggas && (this.ability !== "neutralizinggas" || this.m.innates?.some((k) => k === "neutralizinggas"))) && !this.getAbility().flags["cantsuppress"]);
+      return false;
     },
     hasAbility(ability) {
       if (this.ignoringAbility()) return false;

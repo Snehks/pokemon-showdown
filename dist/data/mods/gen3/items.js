@@ -24,8 +24,8 @@ module.exports = __toCommonJS(items_exports);
 const Items = {
   aguavberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -36,8 +36,8 @@ const Items = {
   },
   apicotberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -48,8 +48,8 @@ const Items = {
   },
   berryjuice: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -63,8 +63,8 @@ const Items = {
   },
   blackbelt: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyAtkPriority: 1,
     onModifyAtk(atk, user, target, move) {
       if (move?.type === "Fighting") {
@@ -74,8 +74,8 @@ const Items = {
   },
   blackglasses: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifySpAPriority: 1,
     onModifySpA(spa, user, target, move) {
       if (move?.type === "Dark") {
@@ -85,8 +85,8 @@ const Items = {
   },
   charcoal: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifySpAPriority: 1,
     onModifySpA(spa, user, target, move) {
       if (move?.type === "Fire") {
@@ -96,8 +96,8 @@ const Items = {
   },
   dragonfang: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifySpAPriority: 1,
     onModifySpA(spa, user, target, move) {
       if (move?.type === "Dragon") {
@@ -112,6 +112,7 @@ const Items = {
     num: 208,
     gen: 3,
     isNonstandard: "Unobtainable"
+    // No competitive use
   },
   fastball: {
     inherit: true,
@@ -119,8 +120,8 @@ const Items = {
   },
   figyberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -131,8 +132,8 @@ const Items = {
   },
   ganlonberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -143,8 +144,8 @@ const Items = {
   },
   hardstone: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyAtkPriority: 1,
     onModifyAtk(atk, user, target, move) {
       if (move?.type === "Rock") {
@@ -158,8 +159,8 @@ const Items = {
   },
   iapapaberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -314,8 +315,8 @@ const Items = {
   },
   lansatberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -338,8 +339,8 @@ const Items = {
   },
   liechiberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -355,8 +356,8 @@ const Items = {
         return this.chainModify(2);
       }
     },
-    onBasePower() {
-    }
+    onBasePower: void 0
+    // no inherit
   },
   loveball: {
     inherit: true,
@@ -368,8 +369,8 @@ const Items = {
   },
   magnet: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifySpAPriority: 1,
     onModifySpA(spa, user, target, move) {
       if (move?.type === "Electric") {
@@ -379,8 +380,8 @@ const Items = {
   },
   magoberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -391,8 +392,8 @@ const Items = {
   },
   metalcoat: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyAtkPriority: 1,
     onModifyAtk(atk, user, target, move) {
       if (move?.type === "Steel") {
@@ -402,8 +403,8 @@ const Items = {
   },
   miracleseed: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifySpAPriority: 1,
     onModifySpA(spa, user, target, move) {
       if (move?.type === "Grass") {
@@ -417,8 +418,8 @@ const Items = {
   },
   mysticwater: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifySpAPriority: 1,
     onModifySpA(spa, user, target, move) {
       if (move?.type === "Water") {
@@ -428,8 +429,8 @@ const Items = {
   },
   nevermeltice: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifySpAPriority: 1,
     onModifySpA(spa, user, target, move) {
       if (move?.type === "Ice") {
@@ -439,8 +440,8 @@ const Items = {
   },
   oranberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -451,8 +452,8 @@ const Items = {
   },
   petayaberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -463,8 +464,8 @@ const Items = {
   },
   poisonbarb: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyAtkPriority: 1,
     onModifyAtk(atk, user, target, move) {
       if (move?.type === "Poison") {
@@ -474,14 +475,14 @@ const Items = {
   },
   quickclaw: {
     inherit: true,
-    onFractionalPriority() {
-    }
+    onFractionalPriority: void 0
+    // no inherit
     // implemented in Pokemon#getActionSpeed()
   },
   salacberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -492,8 +493,8 @@ const Items = {
   },
   seaincense: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifySpAPriority: 1,
     onModifySpA(spa, user, target, move) {
       if (move?.type === "Water") {
@@ -503,8 +504,8 @@ const Items = {
   },
   sharpbeak: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyAtkPriority: 1,
     onModifyAtk(atk, user, target, move) {
       if (move?.type === "Flying") {
@@ -514,8 +515,8 @@ const Items = {
   },
   silkscarf: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyAtkPriority: 1,
     onModifyAtk(atk, user, target, move) {
       if (move?.type === "Normal") {
@@ -525,8 +526,8 @@ const Items = {
   },
   silverpowder: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyAtkPriority: 1,
     onModifyAtk(atk, user, target, move) {
       if (move?.type === "Bug") {
@@ -536,8 +537,8 @@ const Items = {
   },
   sitrusberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -551,8 +552,8 @@ const Items = {
   },
   softsand: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyAtkPriority: 1,
     onModifyAtk(atk, user, target, move) {
       if (move?.type === "Ground") {
@@ -562,8 +563,8 @@ const Items = {
   },
   spelltag: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifyAtkPriority: 1,
     onModifyAtk(atk, user, target, move) {
       if (move?.type === "Ghost") {
@@ -577,8 +578,8 @@ const Items = {
   },
   starfberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {
@@ -589,8 +590,8 @@ const Items = {
   },
   twistedspoon: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifySpAPriority: 1,
     onModifySpA(spa, user, target, move) {
       if (move?.type === "Psychic") {
@@ -600,8 +601,8 @@ const Items = {
   },
   wikiberry: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 4,
     onResidual(pokemon) {

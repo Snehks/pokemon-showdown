@@ -37,8 +37,8 @@ const Moves = {
   darkvoid: {
     inherit: true,
     accuracy: 80,
-    onTry() {
-    }
+    onTry: void 0
+    // no inherit
   },
   destinybond: {
     inherit: true,
@@ -48,52 +48,13 @@ const Moves = {
   },
   diamondstorm: {
     inherit: true,
-    self: null,
+    self: void 0,
+    // no inherit
     secondary: {
       chance: 50,
       self: {
         boosts: {
           def: 1
-        }
-      }
-    }
-  },
-  encore: {
-    inherit: true,
-    condition: {
-      duration: 3,
-      onStart(target) {
-        const moveSlot = target.lastMove ? target.getMoveData(target.lastMove.id) : null;
-        if (!target.lastMove || target.lastMove.flags["failencore"] || !moveSlot || moveSlot.pp <= 0) {
-          return false;
-        }
-        this.effectState.move = target.lastMove.id;
-        this.add("-start", target, "Encore");
-        if (!this.queue.willMove(target)) {
-          this.effectState.duration++;
-        }
-      },
-      onOverrideAction(pokemon, target, move) {
-        if (move.id !== this.effectState.move) return this.effectState.move;
-      },
-      onResidualOrder: 16,
-      onResidual(target) {
-        const lockedMoveSlot = target.getMoveData(this.effectState.move);
-        if (lockedMoveSlot && lockedMoveSlot.pp <= 0) {
-          target.removeVolatile("encore");
-        }
-      },
-      onEnd(target) {
-        this.add("-end", target, "Encore");
-      },
-      onDisableMove(pokemon) {
-        if (!this.effectState.move || !pokemon.hasMove(this.effectState.move)) {
-          return;
-        }
-        for (const moveSlot of pokemon.moveSlots) {
-          if (moveSlot.id !== this.effectState.move) {
-            pokemon.disableMove(moveSlot.id);
-          }
         }
       }
     }
@@ -109,6 +70,10 @@ const Moves = {
     inherit: true,
     basePower: 80
   },
+  heavyslam: {
+    inherit: true,
+    flags: { contact: 1, protect: 1, mirror: 1, nonsky: 1, metronome: 1 }
+  },
   leechlife: {
     inherit: true,
     basePower: 20,
@@ -118,43 +83,6 @@ const Moves = {
     inherit: true,
     flags: { protect: 1, bypasssub: 1, noassist: 1, failcopycat: 1, failmefirst: 1, nosleeptalk: 1 }
   },
-  minimize: {
-    inherit: true,
-    condition: {
-      noCopy: true,
-      onSourceModifyDamage(damage, source, target, move) {
-        const boostedMoves = [
-          "stomp",
-          "steamroller",
-          "bodyslam",
-          "flyingpress",
-          "dragonrush",
-          "phantomforce",
-          "heatcrash",
-          "shadowforce"
-        ];
-        if (boostedMoves.includes(move.id)) {
-          return this.chainModify(2);
-        }
-      },
-      onAccuracy(accuracy, target, source, move) {
-        const boostedMoves = [
-          "stomp",
-          "steamroller",
-          "bodyslam",
-          "flyingpress",
-          "dragonrush",
-          "phantomforce",
-          "heatcrash",
-          "shadowforce"
-        ];
-        if (boostedMoves.includes(move.id)) {
-          return true;
-        }
-        return accuracy;
-      }
-    }
-  },
   metronome: {
     inherit: true,
     flags: { noassist: 1, failcopycat: 1, nosleeptalk: 1 }
@@ -162,39 +90,9 @@ const Moves = {
   mistyterrain: {
     inherit: true,
     condition: {
-      effectType: "Terrain",
-      duration: 5,
-      durationCallback(source, effect) {
-        if (source?.hasItem("terrainextender")) {
-          return 8;
-        }
-        return 5;
-      },
-      onSetStatus(status, target, source, effect) {
-        if (!target.isGrounded() || target.isSemiInvulnerable()) return;
-        if (effect && (effect.status || effect.id === "yawn")) {
-          this.add("-activate", target, "move: Misty Terrain");
-        }
-        return false;
-      },
-      onBasePower(basePower, attacker, defender, move) {
-        if (move.type === "Dragon" && defender.isGrounded() && !defender.isSemiInvulnerable()) {
-          this.debug("misty terrain weaken");
-          return this.chainModify(0.5);
-        }
-      },
-      onFieldStart(field, source, effect) {
-        if (effect?.effectType === "Ability") {
-          this.add("-fieldstart", "move: Misty Terrain", `[from] ability: ${effect}`, `[of] ${source}`);
-        } else {
-          this.add("-fieldstart", "move: Misty Terrain");
-        }
-      },
-      onFieldResidualOrder: 27,
-      onFieldResidualSubOrder: 7,
-      onFieldEnd() {
-        this.add("-fieldend", "Misty Terrain");
-      }
+      inherit: true,
+      onTryAddVolatile: void 0
+      // no inherit
     }
   },
   mysticalfire: {
@@ -215,27 +113,24 @@ const Moves = {
       this.boost({ atk: -1, spa: -1 }, target, source);
     }
   },
+  phantomforce: {
+    inherit: true,
+    flags: { contact: 1, charge: 1, mirror: 1, metronome: 1, nosleeptalk: 1, noassist: 1, failinstruct: 1, minimize: 1 }
+  },
   powder: {
     inherit: true,
     condition: {
-      duration: 1,
-      onStart(target) {
-        this.add("-singleturn", target, "Powder");
-      },
-      onTryMovePriority: 1,
-      onTryMove(pokemon, target, move) {
-        if (move.type === "Fire") {
-          this.add("-activate", pokemon, "move: Powder");
-          this.damage(this.clampIntRange(Math.round(pokemon.maxhp / 4), 1));
-          this.attrLastMove("[still]");
-          return false;
-        }
-      }
+      inherit: true,
+      onTryMovePriority: 1
     }
   },
   rockblast: {
     inherit: true,
     flags: { protect: 1, mirror: 1, metronome: 1 }
+  },
+  shadowforce: {
+    inherit: true,
+    flags: { contact: 1, charge: 1, mirror: 1, metronome: 1, nosleeptalk: 1, noassist: 1, failinstruct: 1, minimize: 1 }
   },
   sheercold: {
     inherit: true,
@@ -299,11 +194,7 @@ const Moves = {
   wideguard: {
     inherit: true,
     condition: {
-      duration: 1,
-      onSideStart(target, source) {
-        this.add("-singleturn", source, "Wide Guard");
-      },
-      onTryHitPriority: 4,
+      inherit: true,
       onTryHit(target, source, effect) {
         if (effect && (effect.category === "Status" || effect.target !== "allAdjacent" && effect.target !== "allAdjacentFoes")) {
           return;

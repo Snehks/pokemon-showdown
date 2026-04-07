@@ -45,14 +45,20 @@ var import_dex = require("./dex");
  *
  * @license MIT
  */
+;
 class Side {
   constructor(name, battle, sideNum, team) {
     this.foe = null;
     // set in battle.start()
     /** Only exists in multi battle, for the allied side */
     this.allySide = null;
-    /** only used by Gen 1 Counter */
-    this.lastSelectedMove = "";
+    /**
+     * The move and the slot are chosen during move selection
+     * lastSelectedMove never resets
+     * lastSelectedMoveSlot resets on every switch
+     */
+    this.lastSelectedMove = "00";
+    this.lastSelectedMoveSlot = 0;
     const sideScripts = battle.dex.data.Scripts.side;
     if (sideScripts) Object.assign(this, sideScripts);
     this.battle = battle;
@@ -329,6 +335,7 @@ ${sideUpdate}`);
     const autoChoose = !moveText;
     const pokemon = this.active[index];
     const request = pokemon.getMoveRequestData();
+    let moveSlot = void 0;
     let moveid = "";
     let targetType = "";
     if (autoChoose) moveText = 1;
@@ -337,6 +344,7 @@ ${sideUpdate}`);
       if (moveIndex < 0 || moveIndex >= request.moves.length || !request.moves[moveIndex]) {
         return this.emitChoiceError(`Can't move: Your ${pokemon.name} doesn't have a move ${moveIndex + 1}`);
       }
+      moveSlot = moveIndex;
       moveid = request.moves[moveIndex].id;
       targetType = request.moves[moveIndex].target;
     } else {
@@ -344,8 +352,9 @@ ${sideUpdate}`);
       if (moveid.startsWith("hiddenpower")) {
         moveid = "hiddenpower";
       }
-      for (const move2 of request.moves) {
+      for (const [i, move2] of request.moves.entries()) {
         if (move2.id !== moveid) continue;
+        moveSlot = i;
         targetType = move2.target || "normal";
         break;
       }
@@ -353,6 +362,7 @@ ${sideUpdate}`);
         for (const [i, moveRequest] of request.maxMoves.maxMoves.entries()) {
           if (moveid === moveRequest.move) {
             moveid = request.moves[i].id;
+            moveSlot = i;
             targetType = moveRequest.target;
             event = "dynamax";
             break;
@@ -364,6 +374,7 @@ ${sideUpdate}`);
           if (!moveRequest) continue;
           if (moveid === (0, import_dex.toID)(moveRequest.move)) {
             moveid = request.moves[i].id;
+            moveSlot = i;
             targetType = moveRequest.target;
             event = "zmove";
             break;
@@ -382,6 +393,7 @@ ${sideUpdate}`);
         if (move2.disabled) continue;
         if (i < moves.length && move2.id === moves[i].id && moves[i].disabled) continue;
         moveid = move2.id;
+        moveSlot = i;
         targetType = move2.target;
         break;
       }
@@ -414,7 +426,7 @@ ${sideUpdate}`);
         return this.emitChoiceError(`Can't move: You can't choose a target for ${move.name}`);
       }
     }
-    const lockedMove = pokemon.getLockedMove();
+    const lockedMove = pokemon.getLockedMove() || pokemon.getSemiLockedMove();
     if (lockedMove) {
       let lockedMoveTargetLoc = pokemon.lastMoveTargetLoc || 0;
       const lockedMoveID = (0, import_dex.toID)(lockedMove);
@@ -427,6 +439,14 @@ ${sideUpdate}`);
         pokemon,
         targetLoc: lockedMoveTargetLoc,
         moveid: lockedMoveID
+      });
+      return true;
+    } else if (this.battle.gen === 1 && (["frz", "slp"].includes(pokemon.status) || pokemon.volatiles["partiallytrapped"])) {
+      if (pokemon.maybeLocked) this.choice.cantUndo = true;
+      this.choice.actions.push({
+        choice: "move",
+        pokemon,
+        moveid: "fight"
       });
       return true;
     } else if (!moves.length) {
@@ -449,6 +469,10 @@ ${sideUpdate}`);
     } else if (maxMove) {
       if (pokemon.maxMoveDisabled(move)) {
         return this.emitChoiceError(`Can't move: ${pokemon.name}'s ${maxMove.name} is disabled`);
+      }
+    } else if (this.battle.gen === 1) {
+      if (moves[moveSlot].disabled) {
+        return this.emitChoiceError(`Can't move: ${pokemon.name}'s ${move.name} is disabled`);
       }
     } else if (!zMove) {
       let isEnabled = false;
@@ -532,11 +556,15 @@ ${sideUpdate}`);
     if (terastallize && this.battle.gen !== 9) {
       return this.emitChoiceError(`Can't move: You can only Terastallize in Gen 9.`);
     }
+    if (moveSlot === void 0) {
+      throw new Error(`moveSlot should have been set by this point`);
+    }
     this.choice.actions.push({
       choice: "move",
       pokemon,
       targetLoc,
       moveid,
+      moveSlot,
       mega: mega || ultra,
       megax,
       megay,
@@ -806,6 +834,28 @@ ${sideUpdate}`);
       terastallize: false
     };
   }
+  commitChoices() {
+    if (this.battle.gen === 1) {
+      for (const choice of this.choice.actions) {
+        if (choice.choice !== "move" || !choice.pokemon) continue;
+        const move = choice.moveid;
+        if (move === "fight") {
+          const pokemon = choice.pokemon;
+          if (["frz", "slp"].includes(pokemon.status)) {
+          } else if (pokemon.volatiles["partiallytrapped"]) {
+            this.lastSelectedMove = "cannotmove";
+          }
+        } else if (move === "struggle") {
+          this.lastSelectedMove = move;
+        } else if (typeof choice.moveSlot === "number") {
+          this.lastSelectedMove = move;
+          this.lastSelectedMoveSlot = choice.moveSlot;
+        }
+        choice.moveid = this.lastSelectedMove;
+      }
+    }
+    this.battle.queue.addChoice(this.choice.actions);
+  }
   choose(input) {
     if (!this.requestState) {
       return this.emitChoiceError(
@@ -887,7 +937,7 @@ ${sideUpdate}`);
           if (!this.chooseMove(data, targetLoc, event)) return false;
           break;
         case "switch":
-          this.chooseSwitch(data);
+          if (!this.chooseSwitch(data)) return false;
           break;
         case "shift":
           if (data) return this.emitChoiceError(`Unrecognized data after "shift": ${data}`);
@@ -914,7 +964,7 @@ ${sideUpdate}`);
           return true;
         case "auto":
         case "default":
-          this.autoChoose();
+          if (!this.autoChoose()) return false;
           break;
         case "useitem": {
           const parts = data.split(" ");

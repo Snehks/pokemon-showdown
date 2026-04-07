@@ -82,7 +82,9 @@ const Pokedex = {
     inherit: true,
     abilities: { 0: "Shield Dust", 1: "Compound Eyes" },
     prevo: void 0,
+    // no inherit
     evoLevel: void 0
+    // no inherit
   },
   vivillonpokeball: {
     inherit: true,

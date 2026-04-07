@@ -269,7 +269,7 @@ class RandomGen7Teams extends import_teams.RandomGen8Teams {
         if (move.flags["sound"]) counter.add("sound");
         if (move.priority > 0) counter.add("priority");
       }
-      if (move.secondary || move.hasSheerForce) {
+      if (move.secondary || move.hasSheerForceBoost) {
         counter.add("sheerforce");
         if (sereneGraceBenefits(move)) {
           counter.add("serenegrace");

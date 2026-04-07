@@ -112,23 +112,22 @@ const Abilities = {
     }
   },
   lightningrod: {
+    inherit: true,
+    onAnyRedirectTarget: void 0,
+    // no inherit
     onFoeRedirectTarget(target, source, source2, move) {
       if (this.dex.moves.get(move.id).type !== "Electric") return;
       if (this.validTarget(this.effectState.target, source, move.target)) {
         return this.effectState.target;
       }
-    },
-    flags: { breakable: 1 },
-    name: "Lightning Rod",
-    rating: 0,
-    num: 32
+    }
   },
   magnetpull: {
     inherit: true,
-    onFoeTrapPokemon() {
-    },
-    onFoeMaybeTrapPokemon() {
-    },
+    onFoeTrapPokemon: void 0,
+    // no inherit
+    onFoeMaybeTrapPokemon: void 0,
+    // no inherit
     onAnyTrapPokemon(pokemon) {
       if (pokemon.hasType("Steel") && pokemon.isAdjacent(this.effectState.target)) {
         pokemon.tryTrap(true);
@@ -180,8 +179,8 @@ const Abilities = {
   },
   raindish: {
     inherit: true,
-    onWeather() {
-    },
+    onWeather: void 0,
+    // no inherit
     onResidualOrder: 10,
     onResidualSubOrder: 3,
     onResidual(pokemon) {
@@ -216,8 +215,8 @@ const Abilities = {
   },
   trace: {
     inherit: true,
-    onUpdate() {
-    },
+    onUpdate: void 0,
+    // no inherit
     onStart(pokemon) {
       const target = pokemon.side.randomFoe();
       if (!target || target.fainted) return;
@@ -228,8 +227,8 @@ const Abilities = {
   },
   truant: {
     inherit: true,
-    onStart() {
-    },
+    onStart: void 0,
+    // no inherit
     onSwitchIn(pokemon) {
       pokemon.truantTurn = this.turn !== 0;
     },

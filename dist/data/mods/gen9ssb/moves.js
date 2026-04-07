@@ -107,7 +107,6 @@ const Moves = {
         source.eatItem(true);
       }
     },
-    secondary: null,
     target: "normal",
     type: "Steel"
   },
@@ -131,7 +130,6 @@ const Moves = {
       this.add("-anim", pokemon, "Shift Gear", pokemon);
       this.boost({ spe: 2, atk: 1 });
     },
-    secondary: null,
     target: "self",
     type: "Steel"
   },
@@ -162,7 +160,6 @@ const Moves = {
         spa: -2
       }
     },
-    secondary: null,
     target: "normal",
     type: "Ghost"
   },
@@ -208,7 +205,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "self",
     type: "Water"
   },
@@ -237,7 +233,6 @@ const Moves = {
       if (target.addVolatile("healblock", source)) success = true;
       return success;
     },
-    secondary: null,
     target: "normal",
     type: "Grass"
   },
@@ -312,7 +307,6 @@ const Moves = {
         this.boost({ spa: -1, spd: -1 }, source);
       }
     },
-    secondary: null,
     target: "normal",
     type: "Normal"
   },
@@ -381,7 +375,6 @@ const Moves = {
       this.add("-anim", source, "Flower Trick", target);
       this.add("-anim", source, "Flower Trick", target);
     },
-    secondary: null,
     target: "normal",
     type: "Grass"
   },
@@ -483,7 +476,6 @@ const Moves = {
         (0, import_scripts.changeSet)(this, pokemon, import_random_teams.ssbSets["A Quag To The Past"], true);
       }
     },
-    secondary: null,
     target: "self",
     type: "Ground"
   },
@@ -520,7 +512,6 @@ const Moves = {
       return success;
     },
     isZ: "lilligantiumz",
-    secondary: null,
     target: "self",
     type: "Grass"
   },
@@ -565,7 +556,6 @@ const Moves = {
     multihit: 5,
     multiaccuracy: true,
     forceSTAB: true,
-    secondary: null,
     target: "normal",
     type: "Fire"
   },
@@ -615,7 +605,6 @@ const Moves = {
         this.heal(source.baseMaxhp / 2, source);
       }
     },
-    secondary: null,
     target: "self",
     type: "Psychic"
   },
@@ -638,7 +627,6 @@ const Moves = {
       this.add("-anim", source, "Earthquake", target);
     },
     volatileStatus: "flinch",
-    secondary: null,
     target: "normal",
     type: "???"
   },
@@ -763,7 +751,6 @@ const Moves = {
       spa: 2,
       spd: 1
     },
-    secondary: null,
     target: "self",
     type: "Psychic"
   },
@@ -991,7 +978,6 @@ const Moves = {
     onAfterMoveSecondarySelf(pokemon, target, move) {
       if (!target || target.fainted || target.hp <= 0) this.boost({ atk: 2 }, pokemon, pokemon, move);
     },
-    secondary: null,
     target: "normal",
     type: "Bug"
   },
@@ -1021,7 +1007,6 @@ const Moves = {
       this.add("-item", pokemon, item, "[from] move: what kind");
       this.heal(pokemon.baseMaxhp / 4, pokemon);
     },
-    secondary: null,
     target: "self",
     type: "Water"
   },
@@ -1106,7 +1091,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "self",
     type: "Dark"
   },
@@ -1204,7 +1188,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "self",
     type: "Normal"
   },
@@ -1226,7 +1209,6 @@ const Moves = {
     onEffectiveness(typeMod, target, type, move) {
       return typeMod + this.dex.getEffectiveness("Fire", type);
     },
-    secondary: null,
     target: "normal",
     type: "Water"
   },
@@ -1263,7 +1245,6 @@ const Moves = {
         source.skipBeforeSwitchOutEventFlag = false;
       }
     },
-    secondary: null,
     target: "self",
     type: "Normal"
   },
@@ -1347,7 +1328,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "self",
     type: "Normal"
     // bird type crashes during testing (runStatusImmunity for Bird at sim\pokemon.ts:2101:10). no-go.
@@ -1451,7 +1431,6 @@ const Moves = {
         pokemon.setStatus(status);
       }
     },
-    secondary: null,
     target: "self",
     type: "Electric"
   },
@@ -1516,7 +1495,6 @@ const Moves = {
     onMoveFail(target, source, move) {
       this.damage(source.baseMaxhp / 2, source, source, this.dex.conditions.get("High Jump Kick"));
     },
-    secondary: null,
     target: "normal",
     type: "Grass"
   },
@@ -1549,7 +1527,6 @@ const Moves = {
       const success = !!this.heal(this.modify(source.maxhp, 0.25));
       return source.addVolatile("magnetrise", source, move) || success;
     },
-    secondary: null,
     target: "self",
     type: "Normal"
   },
@@ -1634,7 +1611,6 @@ const Moves = {
     onHit(target) {
       this.actions.useMove("batonpass", target);
     },
-    secondary: null,
     target: "self",
     type: "Normal"
   },
@@ -1709,7 +1685,6 @@ const Moves = {
       return target.addVolatile("trapped", source, move, "trapper") || success;
     },
     zMove: { effect: "heal" },
-    secondary: null,
     target: "normal",
     type: "Ghost"
   },
@@ -1735,7 +1710,6 @@ const Moves = {
       this.add("-anim", source, "U-turn", target);
     },
     selfSwitch: true,
-    secondary: null,
     target: "normal",
     type: "Flying"
   },
@@ -1938,7 +1912,6 @@ const Moves = {
     onDamage(damage, target, source, effect) {
       if (damage >= target.hp) return target.hp - 1;
     },
-    secondary: null,
     target: "normal",
     type: "Dark"
   },
@@ -1978,7 +1951,6 @@ const Moves = {
       }
       target.addVolatile("hacked");
     },
-    secondary: null,
     target: "normal",
     type: "Ghost"
   },
@@ -2018,7 +1990,6 @@ const Moves = {
       def: 2
     },
     // passive recovery implemented in conditions.ts
-    secondary: null,
     target: "self",
     type: "Normal"
   },
@@ -2085,7 +2056,6 @@ const Moves = {
       };
       pokemon.moveSlots[teaIndex] = newMoveSlot;
     },
-    secondary: null,
     target: "self",
     type: "Flying"
   },
@@ -2103,7 +2073,6 @@ const Moves = {
       this.attrLastMove("[anim] Bleakwind Storm");
     },
     multihit: 5,
-    secondary: null,
     target: "normal",
     type: "Flying"
   },
@@ -2127,7 +2096,6 @@ const Moves = {
     },
     selfSwitch: true,
     recoil: [33, 100],
-    secondary: null,
     target: "normal",
     type: "Fighting"
   },
@@ -2164,7 +2132,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "normal",
     type: "Grass"
   },
@@ -2200,7 +2167,6 @@ const Moves = {
         target.addVolatile("taunt", source);
       }
     },
-    secondary: null,
     target: "normal",
     type: "Bug"
   },
@@ -2270,7 +2236,6 @@ const Moves = {
       spe: 1,
       atk: 1
     },
-    secondary: null,
     target: "self",
     type: "Poison"
   },
@@ -2297,7 +2262,6 @@ const Moves = {
         this.field.addPseudoWeather("gravity", source);
       }
     },
-    secondary: null,
     target: "normal",
     type: "???"
   },
@@ -2372,7 +2336,6 @@ const Moves = {
     self: {
       volatileStatus: "protect"
     },
-    secondary: null,
     target: "normal",
     type: "Normal"
   },
@@ -2434,7 +2397,6 @@ const Moves = {
       duration: 1
       // reviving implemented in side.ts, kind of
     },
-    secondary: null,
     target: "self",
     type: "Dark"
   },
@@ -2596,7 +2558,6 @@ const Moves = {
     self: {
       sideCondition: "safeguard"
     },
-    secondary: null,
     multihit: 3,
     target: "normal",
     type: "Ground"
@@ -2683,7 +2644,6 @@ const Moves = {
       this.add(`c:|${(0, import_scripts.getName)((source.illusion || source).name)}|${msg}`);
     },
     isZ: "irpatuziniumz",
-    secondary: null,
     target: "normal",
     type: "Fairy"
   },
@@ -2700,7 +2660,6 @@ const Moves = {
     onPrepareHit(target, source) {
       this.attrLastMove("[anim] High Jump Kick");
     },
-    secondary: null,
     target: "allAdjacent",
     type: "Psychic"
   },
@@ -2727,7 +2686,6 @@ const Moves = {
       this.add("-anim", source, "Snowscape", target);
     },
     weather: "snowscape",
-    secondary: null,
     target: "self",
     type: "Ice"
   },
@@ -2742,7 +2700,6 @@ const Moves = {
     pp: 5,
     flags: { contact: 1, protect: 1, mirror: 1, metronome: 1 },
     recoil: [1, 2],
-    secondary: null,
     priority: 0,
     onTryMove() {
       this.attrLastMove("[still]");
@@ -2776,7 +2733,6 @@ const Moves = {
     onTryMove() {
       this.attrLastMove("[still]");
     },
-    secondary: null,
     target: "normal",
     type: "Fighting"
   },
@@ -2913,7 +2869,6 @@ const Moves = {
       def: -1,
       spe: -1
     },
-    secondary: null,
     target: "normal",
     type: "Rock"
   },
@@ -3024,7 +2979,6 @@ const Moves = {
         this.add("-fieldend", "move: Anfield Atmosphere");
       }
     },
-    secondary: null,
     target: "all",
     type: "Psychic"
   },
@@ -3059,7 +3013,6 @@ const Moves = {
         pokemon.forceSwitchFlag = true;
       }
     },
-    secondary: null,
     target: "all",
     type: "Flying"
   },
@@ -3132,7 +3085,6 @@ const Moves = {
     priority: 1,
     flags: { protect: 1, mirror: 1, metronome: 1 },
     multihit: [2, 5],
-    secondary: null,
     onTryMove() {
       this.attrLastMove("[still]");
     },
@@ -3246,7 +3198,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "normal",
     type: "Steel",
     contestType: "Clever"
@@ -3294,7 +3245,6 @@ const Moves = {
         this.add("-end", target, "Rise Above");
       }
     },
-    secondary: null,
     target: "self",
     type: "Electric"
   },
@@ -3317,7 +3267,6 @@ const Moves = {
     },
     pseudoWeather: "trickroom",
     volatileStatus: "powertrick",
-    secondary: null,
     target: "self",
     type: "Psychic"
   },
@@ -3416,8 +3365,7 @@ const Moves = {
       attacker.addVolatile("twoturnmove", defender);
       return null;
     },
-    secondary: null,
-    hasSheerForce: true,
+    hasSheerForceBoost: true,
     onPrepareHit(target, source) {
       this.attrLastMove("[still]");
       this.add("-anim", source, "Lunar Dance", target);
@@ -3454,7 +3402,6 @@ const Moves = {
         this.add("-start", source, "typeadd", "Fire", "[from] move: Wrath of Frozen Flames");
       }
     },
-    secondary: null,
     target: "normal",
     type: "Dragon"
   },
@@ -3475,7 +3422,6 @@ const Moves = {
     onPrepareHit() {
       this.attrLastMove("[anim] Core Enforcer");
     },
-    secondary: null,
     target: "normal",
     type: "Ghost"
   },
@@ -3500,7 +3446,6 @@ const Moves = {
       this.add(`c:|${(0, import_scripts.getName)((source.illusion || source).name)}|Sorry i tried to fix smth but accidentally broke your ability :( will fix it next week`);
     },
     ignoreAbility: true,
-    secondary: null,
     target: "normal",
     type: "Normal"
   },
@@ -3536,7 +3481,6 @@ const Moves = {
         pokemon.forceSwitchFlag = true;
       }
     },
-    secondary: null,
     target: "all",
     type: "Electric"
   },
@@ -3589,7 +3533,6 @@ const Moves = {
       source.addVolatile("imprison", source);
       source.m.usedPlagiarism = true;
     },
-    secondary: null,
     target: "normal",
     type: "Dark"
   },
@@ -3621,7 +3564,6 @@ const Moves = {
         spe: 1
       }
     },
-    secondary: null,
     target: "all",
     type: "Dragon"
   },
@@ -3646,7 +3588,6 @@ const Moves = {
     onEffectiveness(typeMod, target, type) {
       if (type === "Water") return 1;
     },
-    secondary: null,
     target: "normal",
     type: "Ice"
   },
@@ -3695,7 +3636,6 @@ const Moves = {
       }
       this.heal(target.maxhp / 4, target, target, this.effect);
     },
-    secondary: null,
     target: "self",
     type: "Grass"
   },
@@ -3788,7 +3728,6 @@ const Moves = {
       }
     },
     selfSwitch: true,
-    secondary: null,
     target: "normal",
     type: "Ice"
   },
@@ -3857,7 +3796,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "all",
     type: "Steel"
   },
@@ -3919,7 +3857,6 @@ const Moves = {
         target.addVolatile("taunt", source, move);
       }
     },
-    secondary: null,
     target: "normal",
     type: "Ghost"
   },
@@ -4047,7 +3984,6 @@ const Moves = {
       this.add("-message", `${pokemon.name} gained 10 levels!`);
     },
     isZ: "pearyumz",
-    secondary: null,
     target: "self",
     type: "Steel"
   },
@@ -4448,7 +4384,6 @@ const Moves = {
       return success || !!this.canSwitch(source.side);
     },
     selfSwitch: true,
-    secondary: null,
     target: "self",
     type: "Normal"
   },
@@ -4486,7 +4421,6 @@ const Moves = {
       }
     },
     isZ: "rainiumz",
-    secondary: null,
     target: "self",
     type: "Water"
   },
@@ -4508,7 +4442,6 @@ const Moves = {
     onPrepareHit(target, source) {
       this.add("-anim", source, "Photon Geyser", target);
     },
-    secondary: null,
     target: "normal",
     type: "Psychic"
   },
@@ -4600,7 +4533,6 @@ const Moves = {
       this.add("-anim", source, "Dragon Dance", source);
       this.add("-anim", source, "Lock-On", source);
     },
-    secondary: null,
     target: "self",
     type: "Fire"
   },
@@ -4687,7 +4619,6 @@ const Moves = {
       const success = !!this.heal(this.modify(pokemon.maxhp, 0.5));
       return pokemon.cureStatus() || success;
     },
-    secondary: null,
     target: "self",
     type: "Water"
   },
@@ -4831,7 +4762,6 @@ const Moves = {
       this.actions.useMove(icebeam, target);
       return null;
     },
-    secondary: null,
     target: "self",
     type: "Electric"
   },
@@ -4875,7 +4805,6 @@ const Moves = {
         target.addVolatile("leechseed", source);
       }
     },
-    secondary: null,
     target: "normal",
     type: "Grass"
   },
@@ -4907,7 +4836,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "normal",
     type: "Grass"
   },
@@ -5026,7 +4954,6 @@ const Moves = {
       if (target?.positiveBoosts()) return priority + 1;
       return priority;
     },
-    secondary: null,
     target: "normal",
     type: "Steel"
   },
@@ -5049,7 +4976,6 @@ const Moves = {
     onPrepareHit(target, source) {
       this.add("-anim", source, "Burn Up", target);
     },
-    secondary: null,
     target: "normal",
     type: "Fire"
   },
@@ -5123,7 +5049,6 @@ const Moves = {
       def: 1,
       spd: 1
     },
-    secondary: null,
     target: "self",
     type: "Fire"
   },
@@ -5169,7 +5094,6 @@ const Moves = {
         pokemon.removeVolatile("phantomweapon");
       }
     },
-    secondary: null,
     target: "normal",
     type: "Ghost"
   },
@@ -5193,7 +5117,6 @@ const Moves = {
       this.add("-anim", source, "Nasty Plot", source);
       this.add("-anim", source, "Head Smash", target);
     },
-    secondary: null,
     target: "normal",
     type: "Steel"
   },
@@ -5218,7 +5141,6 @@ const Moves = {
     onPrepareHit(target, source) {
       this.add("-anim", source, "Aura Sphere", source);
     },
-    secondary: null,
     target: "normal",
     type: "Fighting"
   },
@@ -5243,7 +5165,6 @@ const Moves = {
     },
     multihit: 10,
     multiaccuracy: true,
-    secondary: null,
     target: "normal",
     type: "Poison"
   },
@@ -5271,7 +5192,6 @@ const Moves = {
       target?.faint(source);
     },
     ignoreImmunity: true,
-    secondary: null,
     target: "normal",
     type: "Ghost"
   },
@@ -5316,7 +5236,6 @@ const Moves = {
       this.add("-anim", source, "Focus Energy", target);
       this.add("-anim", source, "Agility", target);
     },
-    secondary: null,
     target: "self",
     type: "Psychic"
   },
@@ -5375,7 +5294,6 @@ const Moves = {
       this.add(`c:|${(0, import_scripts.getName)((pokemon.illusion || pokemon).name)}|he do be searching for rocks tho`);
       return !!this.queue.willAct() && this.runEvent("StallMove", pokemon);
     },
-    secondary: null,
     target: "self",
     type: "Ground"
   },
@@ -5451,7 +5369,6 @@ const Moves = {
         return success;
       }
     },
-    secondary: null,
     target: "normal",
     type: "Ghost"
   },
@@ -5479,7 +5396,6 @@ const Moves = {
       target.addVolatile("attract", source);
       target.addVolatile("confusion", source);
     },
-    secondary: null,
     target: "normal",
     type: "Normal"
   },
@@ -5514,7 +5430,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "normal",
     type: "Psychic"
   },
@@ -5549,7 +5464,6 @@ const Moves = {
         this.add("-end", pokemon, "Symphonie du Ze\u0301ro");
       }
     },
-    secondary: null,
     target: "normal",
     type: "Fairy"
   },
@@ -5624,7 +5538,6 @@ const Moves = {
       this.add("-anim", source, "U-Turn", target);
     },
     selfSwitch: true,
-    secondary: null,
     target: "normal",
     type: "Flying"
   },
@@ -5661,7 +5574,6 @@ const Moves = {
       }
       this.boost({ atk: boost }, pokemon, pokemon, move);
     },
-    secondary: null,
     target: "normal",
     type: "Steel"
   },
@@ -5722,7 +5634,6 @@ const Moves = {
       return success;
     },
     ignoreAbility: true,
-    secondary: null,
     target: "normal",
     type: "Flying"
   },
@@ -5764,7 +5675,6 @@ const Moves = {
         this.add("detailschange", pokemon, details);
       }
     },
-    secondary: null,
     target: "normal",
     type: "Grass"
   },
@@ -5779,7 +5689,6 @@ const Moves = {
     pp: 10,
     priority: 0,
     flags: { sound: 1, failcopycat: 1 },
-    secondary: null,
     onTryMove() {
       this.attrLastMove("[still]");
     },
@@ -5821,7 +5730,6 @@ const Moves = {
     pp: 10,
     priority: 0,
     flags: {},
-    secondary: null,
     selfSwitch: true,
     onTryMove() {
       this.attrLastMove("[still]");
@@ -5897,7 +5805,6 @@ const Moves = {
       attacker.addVolatile("twoturnmove", defender);
       return null;
     },
-    secondary: null,
     target: "normal",
     type: "Flying"
   },
@@ -5913,7 +5820,6 @@ const Moves = {
     priority: 0,
     flags: { protect: 1, mirror: 1, heal: 1, metronome: 1 },
     drain: [1, 2],
-    secondary: null,
     target: "allAdjacent",
     type: "Water",
     onTryMove() {
@@ -5972,7 +5878,6 @@ const Moves = {
         return this.chainModify(1.5);
       }
     },
-    secondary: null,
     target: "self",
     type: "Normal"
   },
@@ -6001,7 +5906,6 @@ const Moves = {
         return this.chainModify(1.75);
       }
     },
-    secondary: null,
     target: "normal",
     type: "Fire"
   },
@@ -6018,7 +5922,6 @@ const Moves = {
     flags: { reflectable: 1, mirror: 1, bypasssub: 1, allyanim: 1, metronome: 1, noassist: 1, failcopycat: 1, wind: 1 },
     forceSwitch: true,
     status: "tox",
-    secondary: null,
     target: "normal",
     type: "Poison"
   },
@@ -6052,7 +5955,6 @@ const Moves = {
         }
       }
     },
-    secondary: null,
     target: "normal",
     type: "Dark"
   },
@@ -6081,7 +5983,6 @@ const Moves = {
       }
       this.add(`c:|${(0, import_scripts.getName)((source.illusion || source).name)}|A blank canvas.`);
     },
-    secondary: null,
     target: "normal",
     type: "Ice"
   },
@@ -6114,7 +6015,6 @@ const Moves = {
       }
     },
     selfSwitch: true,
-    secondary: null,
     target: "self",
     type: "Dark"
   },
@@ -6176,7 +6076,6 @@ const Moves = {
       didSomething = pokemon.addVolatile("aquaring") || didSomething;
       return didSomething;
     },
-    secondary: null,
     target: "self",
     type: "Water"
   },
@@ -6207,7 +6106,6 @@ const Moves = {
       }
       target.trySetStatus("par", source, move);
     },
-    secondary: null,
     target: "normal",
     type: "Normal"
   },
@@ -6246,7 +6144,6 @@ const Moves = {
     ignoreNegativeOffensive: true,
     breaksProtect: true,
     ignoreAccuracy: true,
-    secondary: null,
     target: "normal",
     type: "Normal"
   },
@@ -6284,7 +6181,6 @@ const Moves = {
         spd: 1
       }
     },
-    secondary: null,
     target: "self",
     type: "Fire"
   },
@@ -6300,7 +6196,6 @@ const Moves = {
     priority: 0,
     flags: { contact: 1, protect: 1, mirror: 1, metronome: 1 },
     overrideOffensivePokemon: "target",
-    secondary: null,
     target: "normal",
     type: "Dark",
     onTryMove() {
@@ -6582,7 +6477,7 @@ const Moves = {
         if (!target.isGrounded()) {
           const baseMove = this.dex.moves.get(effect.id);
           if (baseMove.priority > 0) {
-            this.hint("Psychic Terrain doesn't affect Pok\xE9mon immune to Ground.");
+            this.hint("Psychic Terrain doesn't affect airborne Pok\xE9mon.");
           }
           return;
         }
@@ -6930,7 +6825,6 @@ const Moves = {
       this.actions.useMove(randomMove, target);
     },
     multihit: [2, 5],
-    secondary: null,
     target: "self",
     type: "???"
   }

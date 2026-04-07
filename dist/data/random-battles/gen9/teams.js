@@ -446,7 +446,7 @@ class RandomTeams {
           counter.add("priority");
         }
       }
-      if (move.secondary || move.hasSheerForce) {
+      if (move.secondary || move.hasSheerForceBoost) {
         counter.add("sheerforce");
         if (sereneGraceBenefits(move)) {
           counter.add("serenegrace");

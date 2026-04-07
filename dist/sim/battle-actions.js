@@ -245,10 +245,8 @@ class BattleActions {
       }
     }
     pokemon.lastDamage = 0;
-    let lockedMove;
     if (!externalMove) {
-      lockedMove = this.battle.runEvent("LockMove", pokemon);
-      if (lockedMove === true) lockedMove = false;
+      const lockedMove = pokemon.getLockedMove();
       if (!lockedMove) {
         if (!pokemon.deductPP(baseMove, null, target) && move.id !== "struggle") {
           this.battle.add("cant", pokemon, "nopp", move);
@@ -774,6 +772,7 @@ class BattleActions {
       if (hit > 1 && pokemon.status === "slp" && (!isSleepUsable || this.battle.gen === 4)) break;
       if (targets.every((target2) => !target2?.hp)) break;
       move.hit = hit;
+      move.lastHit = move.hit === targetHits;
       if (move.smartTarget && targets.length > 1) {
         targetsCopy = [targets[hit - 1]];
         damage = [damage[hit - 1]];
@@ -1550,10 +1549,9 @@ class BattleActions {
       return altForme.name;
     }
     if (!item.megaStone) return null;
-    if ((species.baseSpecies === "Floette" || species.baseSpecies === "Zygarde") && item.megaStone[species.name]) {
-      return item.megaStone[species.name];
-    }
-    const megaEvolution = item.megaStone[species.baseSpecies];
+    let megaEvolution = item.megaStone[species.name];
+    if (megaEvolution && this.dex.species.get(megaEvolution).gen >= 9) return megaEvolution;
+    megaEvolution = item.megaStone[species.baseSpecies];
     return megaEvolution && megaEvolution !== species.name ? megaEvolution : null;
   }
   canUltraBurst(pokemon) {
@@ -1585,7 +1583,7 @@ class BattleActions {
   }
   terastallize(pokemon) {
     if (pokemon.species.baseSpecies === "Ogerpon" && !["Fire", "Grass", "Rock", "Water"].includes(pokemon.teraType) && (!pokemon.illusion || pokemon.illusion.species.baseSpecies === "Ogerpon")) {
-      this.battle.hint("If Ogerpon Terastallizes into a type other than Fire, Grass, Rock, or Water, the game softlocks.");
+      this.battle.hint("If Ogerpon Terastallizes into a type other than Fire, Grass, Rock, or Water, the game crashes.", false, pokemon.side);
       return;
     }
     if (pokemon.illusion && ["Ogerpon", "Terapagos"].includes(pokemon.illusion.species.baseSpecies)) {

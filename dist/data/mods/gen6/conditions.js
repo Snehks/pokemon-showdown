@@ -62,8 +62,8 @@ const Conditions = {
   },
   choicelock: {
     inherit: true,
-    onBeforeMove() {
-    }
+    onBeforeMove: void 0
+    // no inherit
   }
 };
 //# sourceMappingURL=conditions.js.map

@@ -30,10 +30,10 @@ const Rulesets = {
       "Species Clause",
       "Nickname Clause",
       "OHKO Clause",
-      "Moody Clause",
       "Evasion Items Clause",
       "Evasion Moves Clause"
-    ]
+    ],
+    banlist: ["Moody"]
   },
   standarddoubles: {
     inherit: true,
@@ -42,11 +42,11 @@ const Rulesets = {
       "Species Clause",
       "Nickname Clause",
       "OHKO Clause",
-      "Moody Clause",
       "Evasion Abilities Clause",
       "Evasion Moves Clause",
       "Gravity Sleep Clause"
-    ]
+    ],
+    banlist: ["Moody"]
   },
   obtainablemoves: {
     inherit: true,

@@ -188,8 +188,8 @@ const Items = {
   },
   souldew: {
     inherit: true,
-    onBasePower() {
-    },
+    onBasePower: void 0,
+    // no inherit
     onModifySpAPriority: 1,
     onModifySpA(spa, pokemon) {
       if (pokemon.baseSpecies.num === 380 || pokemon.baseSpecies.num === 381) {

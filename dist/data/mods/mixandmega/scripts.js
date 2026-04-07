@@ -24,6 +24,8 @@ module.exports = __toCommonJS(scripts_exports);
 const Scripts = {
   gen: 9,
   init() {
+    this.modData("Abilities", "dragonize").isNonstandard = null;
+    this.modData("Abilities", "megasol").isNonstandard = null;
     for (const i in this.data.Items) {
       const item = this.data.Items[i];
       if (!item.megaStone && !item.onDrive && !(item.onPlate && !item.zMove) && !item.onMemory) continue;
