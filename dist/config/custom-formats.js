@@ -47,6 +47,30 @@ const Formats = [
     name: "[Gen 9] PBO PvP Battle No Preview",
     mod: "pbo",
     ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+  },
+  {
+    name: "[Gen 9] PBO PvP Doubles Battle",
+    mod: "pbo",
+    gameType: "doubles",
+    ruleset: ["Team Preview", "Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+  },
+  {
+    name: "[Gen 9] PBO PvP Doubles No Preview",
+    mod: "pbo",
+    gameType: "doubles",
+    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+  },
+  {
+    name: "[Gen 9] PBO Wild Doubles Battle",
+    mod: "pbo",
+    gameType: "doubles",
+    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+  },
+  {
+    name: "[Gen 9] PBO Wild Triples Battle",
+    mod: "pbo",
+    gameType: "triples",
+    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   }
 ];
 //# sourceMappingURL=custom-formats.js.map
