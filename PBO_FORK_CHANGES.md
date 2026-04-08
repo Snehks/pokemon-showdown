@@ -49,8 +49,11 @@ these changes by searching for `[PBO]` comments in the source.
 | 33 | `data/mods/pbo/scripts.ts` | Easter E5 event forms | Register 13 Easter E5 cosmetic event forms in PBO_EVENT_FORMS |
 | 34 | `config/custom-formats.ts` | PvP Doubles formats | Add PvP Doubles Battle, PvP Doubles No Preview with `gameType: 'doubles'` |
 | 35 | `config/custom-formats.ts` | Wild Doubles/Triples formats | Add Wild Doubles Battle (`gameType: 'doubles'`) and Wild Triples Battle (`gameType: 'triples'`) |
+| 36 | `data/mods/pbo/moves.ts` | Dynahax Max move secondary effects | Override all 18 Max moves to fire weather/terrain/stat effects for Dynahax (no `dynamax` volatile) |
+| 37 | `data/mods/pbo/abilities.ts` | Dynahax Max move category | `onModifyMove` sets Max move category to Special when SpA > Atk |
+| 38 | `data/mods/pbo/abilities.ts` | Dynahax self-confusion immunity | `onTryAddVolatile` blocks self-inflicted confusion (Outrage/Thrash) while allowing enemy confusion |
 
-**Total: 35 changes across 10 files.**
+**Total: 38 changes across 10 files.**
 
 ---
 
@@ -595,6 +598,46 @@ targeting, etc.).
 **Why:** PBO's multi-slot wild encounter system needs dedicated formats. `No Sturdy Wild`
 prevents wild Pokemon from surviving at 1 HP (Sturdy) in multi-wild encounters. Triples
 format exists for the triple wild encounter system.
+
+---
+
+## Change 36: Dynahax Max move secondary effects (data/mods/pbo/moves.ts)
+
+**What it does:** Overrides all 18 Max moves' `self.onHit` to use `canUseMaxEffect(source)`
+which accepts either the `dynamax` volatile OR the `dynahax` ability.
+
+**Why:** Vanilla Showdown gates all Max move secondary effects (weather, terrain, stat
+changes) behind `if (!source.volatiles['dynamax']) return;`. Dynahax bosses use Max moves
+natively without Dynamaxing, so they lack the volatile. Without this fix, Max Flare doesn't
+set sun, Max Geyser doesn't set rain, Max Knuckle doesn't boost Atk, etc.
+
+**Moves overridden:** maxairstream, maxdarkness, maxflare, maxflutterby, maxgeyser,
+maxhailstorm, maxknuckle, maxlightning, maxmindstorm, maxooze, maxovergrowth, maxphantasm,
+maxquake, maxrockfall, maxstarfall, maxsteelspike, maxstrike, maxwyrmwind.
+
+---
+
+## Change 37: Dynahax Max move category (data/mods/pbo/abilities.ts)
+
+**What it does:** Adds `onModifyMove` to Dynahax ability. When the move `isMax`, sets
+`move.category` to `'Special'` if SpA > Atk, `'Physical'` otherwise.
+
+**Why:** Max moves are hardcoded `category: "Physical"` in move data. Normally this doesn't
+matter because the category is inherited from the base move during Dynamax. But Dynahax bosses
+use Max moves directly (not derived from a base move), so a special attacker like Volcarona
+(485 SpA vs 234 Atk) would hit with its weaker stat.
+
+---
+
+## Change 38: Dynahax self-confusion immunity (data/mods/pbo/abilities.ts)
+
+**What it does:** Adds `onTryAddVolatile` that blocks confusion when `source` is null or
+`source === target` (self-inflicted).
+
+**Why:** Outrage, Thrash, and Petal Dance apply confusion to the user when the lockedmove
+ends. Dynahax bosses should be immune to this self-punishment since they're raid bosses.
+Enemy confusion (Confuse Ray, Dynamic Punch, etc.) still works — only self-inflicted
+confusion is blocked.
 
 ---
 

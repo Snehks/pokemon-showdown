@@ -36,6 +36,23 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 			}
 		},
 
+		// [PBO] Max moves are hardcoded Physical in move data. Dynahax bosses
+		// use them directly (not derived from a base move), so pick the better
+		// attacking stat: Special when SpA > Atk, Physical otherwise.
+		onModifyMove(move, pokemon) {
+			if (move.isMax) {
+				move.category = pokemon.getStat('spa', false, true) > pokemon.getStat('atk', false, true)
+					? 'Special' : 'Physical';
+			}
+		},
+
+		// Block self-inflicted confusion (Outrage, Thrash, Petal Dance).
+		// Enemy confusion (Confuse Ray, Dynamic Punch) still works.
+		// Self-inflicted: source is null (lockedmove onEnd) or source === target.
+		onTryAddVolatile(status, target, source) {
+			if (status.id === 'confusion' && (!source || source === target)) return null;
+		},
+
 		// Immune to all status conditions
 		// Mirrors: canAddStatus → always false
 		onSetStatus(status, target, source, effect) {
