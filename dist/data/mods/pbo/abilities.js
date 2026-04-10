@@ -53,10 +53,11 @@ const Abilities = {
     },
     // [PBO] Max moves are hardcoded Physical in move data. Dynahax bosses
     // use them directly (not derived from a base move), so pick the better
-    // attacking stat: Special when SpA > Atk, Physical otherwise.
+    // attacking stat. Uses storedStats directly (base + IVs + EVs + nature + level)
+    // so stat stages, abilities, items, burns, etc. do NOT flip the category mid-battle.
     onModifyMove(move, pokemon) {
       if (move.isMax) {
-        move.category = pokemon.getStat("spa", false, true) > pokemon.getStat("atk", false, true) ? "Special" : "Physical";
+        move.category = pokemon.storedStats.spa > pokemon.storedStats.atk ? "Special" : "Physical";
       }
     },
     // Block self-inflicted confusion (Outrage, Thrash, Petal Dance).
