@@ -73,11 +73,11 @@ const Abilities = {
       return false;
     },
     // Disable self-targeting moves that bypass onTryHit (which only fires on the target).
-    // Destiny Bond / Grudge target the user, not the boss, so onTryHit never sees them.
+    // Destiny Bond / Grudge / Baton Pass target the user, not the boss, so onTryHit never sees them.
     // Pattern: same as Imprison's onFoeDisableMove.
     onFoeDisableMove(pokemon) {
       for (const moveSlot of pokemon.moveSlots) {
-        if (moveSlot.id === "destinybond" || moveSlot.id === "grudge") {
+        if (moveSlot.id === "destinybond" || moveSlot.id === "grudge" || moveSlot.id === "batonpass") {
           pokemon.disableMove(moveSlot.id);
         }
       }
@@ -118,7 +118,8 @@ const Abilities = {
         "wrap",
         "healpulse",
         "superfang",
-        "grudge"
+        "grudge",
+        "batonpass"
       ]);
       if (blocked.has(move.id) || move.ohko) {
         this.add("-immune", target, "[from] ability: Dynahax");

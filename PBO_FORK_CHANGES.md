@@ -50,10 +50,12 @@ these changes by searching for `[PBO]` comments in the source.
 | 34 | `config/custom-formats.ts` | PvP Doubles formats | Add PvP Doubles Battle, PvP Doubles No Preview with `gameType: 'doubles'` |
 | 35 | `config/custom-formats.ts` | Wild Doubles/Triples formats | Add Wild Doubles Battle (`gameType: 'doubles'`) and Wild Triples Battle (`gameType: 'triples'`) |
 | 36 | `data/mods/pbo/moves.ts` | Dynahax Max move secondary effects | Override all 18 Max moves to fire weather/terrain/stat effects for Dynahax (no `dynamax` volatile) |
-| 37 | `data/mods/pbo/abilities.ts` | Dynahax Max move category | `onModifyMove` sets Max move category to Special when SpA > Atk |
+| 37 | `data/mods/pbo/abilities.ts` | Dynahax Max move category | `onModifyMove` sets Max move category via `storedStats` so boosts don't flip it mid-battle |
 | 38 | `data/mods/pbo/abilities.ts` | Dynahax self-confusion immunity | `onTryAddVolatile` blocks self-inflicted confusion (Outrage/Thrash) while allowing enemy confusion |
+| 39 | `data/mods/pbo/scripts.ts` | Cosmetic event form registration | `init()` clones ~372 PBO event forms (Halloween/Christmas/Summer/Valentine/Easter) from their base species into the Pokedex |
+| 40 | `data/mods/pbo/abilities.ts` | Dynahax Baton Pass block | `onFoeDisableMove` disables Baton Pass against Dynahax bosses (same pattern as Destiny Bond/Grudge) |
 
-**Total: 38 changes across 10 files.**
+**Total: 40 changes across 10 files.**
 
 ---
 
@@ -620,12 +622,17 @@ maxquake, maxrockfall, maxstarfall, maxsteelspike, maxstrike, maxwyrmwind.
 ## Change 37: Dynahax Max move category (data/mods/pbo/abilities.ts)
 
 **What it does:** Adds `onModifyMove` to Dynahax ability. When the move `isMax`, sets
-`move.category` to `'Special'` if SpA > Atk, `'Physical'` otherwise.
+`move.category` to `'Special'` if `pokemon.storedStats.spa > pokemon.storedStats.atk`,
+`'Physical'` otherwise. Uses `storedStats` directly (base + IVs + EVs + nature + level)
+rather than live stats, so Calm Mind / Swords Dance / items / burns / abilities do NOT
+flip the category mid-battle.
 
 **Why:** Max moves are hardcoded `category: "Physical"` in move data. Normally this doesn't
 matter because the category is inherited from the base move during Dynamax. But Dynahax bosses
 use Max moves directly (not derived from a base move), so a special attacker like Volcarona
-(485 SpA vs 234 Atk) would hit with its weaker stat.
+(485 SpA vs 234 Atk) would hit with its weaker stat. Using `storedStats` (instead of
+`pokemon.getStat('spa'/'atk', false, true)` as in the original implementation) prevents
+stat-stage boosts from flipping the category after the boss uses a setup move.
 
 ---
 
@@ -638,6 +645,37 @@ use Max moves directly (not derived from a base move), so a special attacker lik
 ends. Dynahax bosses should be immune to this self-punishment since they're raid bosses.
 Enemy confusion (Confuse Ray, Dynamic Punch, etc.) still works — only self-inflicted
 confusion is blocked.
+
+---
+
+## Change 39: Cosmetic event form registration (data/mods/pbo/scripts.ts)
+
+**What it does:** Adds a `Scripts.init()` handler (~400 lines in `data/mods/pbo/scripts.ts`)
+that iterates `PBO_EVENT_FORMS` and clones each entry as a Pokedex entry. Each event form
+inherits all battle-relevant properties from its base species (stats, types, abilities,
+`canMegaEvo`, `canGigantamax`, `battleOnly`, etc.) and only overrides identity fields
+(`name`, `forme`, `baseSpecies`). Form lists (`otherFormes`, `cosmeticFormes`, `formeOrder`)
+and evolution chains (`evos`, `prevo`) are cleared so cosmetic forms don't accidentally
+inherit sub-form trees.
+
+**Why:** PBO has ~372 cosmetic event forms (Halloween / Christmas / Summer / Valentine /
+Easter skins). Without this `init()` clone, Showdown doesn't know the IDs exist and treats
+them as unknown species when the PBO server packs a team with a skinned Pokemon. Changes 22
+and 33 document individual form additions to the `PBO_EVENT_FORMS` array, but the underlying
+registration mechanism was never backfilled. Original commit: `24cb4e26d` (Mar 2, 2026).
+
+---
+
+## Change 40: Dynahax Baton Pass block (data/mods/pbo/abilities.ts)
+
+**What it does:** Extends the `onFoeDisableMove` handler (from Change 26) to also disable
+Baton Pass for all opposing Pokemon. Also adds `batonpass` to the `onTryHit` blocked Set
+for consistency with how `destinybond` and `grudge` are listed in both places.
+
+**Why:** Baton Pass targets the user (`target: "self"`, `selfSwitch: 'copyvolatile'`),
+so the Dynahax boss's `onTryHit` never fires for it — same blind spot as Destiny Bond/Grudge.
+Without this block, a player could Baton Pass out of a Dynahax raid and escape with
+boosts/volatiles intact, trivializing the encounter. Same fix pattern as Change 26.
 
 ---
 

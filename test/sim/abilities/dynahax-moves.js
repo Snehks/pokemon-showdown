@@ -123,6 +123,14 @@ describe('Dynahax [Blocked Moves]', () => {
 		assert.cantMove(() => battle.makeChoices('move destinybond', 'move flamethrower'), 'Smeargle', 'Destiny Bond', true);
 	});
 
+	it('should disable Baton Pass for foes', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Smeargle', ability: 'owntempo', moves: ['batonpass', 'tackle'] }, { species: 'Pikachu', ability: 'static', moves: ['thunderbolt'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['flamethrower'] }],
+		]);
+		assert.cantMove(() => battle.makeChoices('move batonpass', 'move flamethrower'), 'Smeargle', 'Baton Pass', true);
+	});
+
 	it('should block Heal Pulse', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
 			[{ species: 'Smeargle', ability: 'owntempo', moves: ['healpulse'] }],
