@@ -36,7 +36,7 @@ const Rulesets = {
     name: "PBO Evasion Boost",
     effectType: "Volatile",
     onStart(target) {
-      this.add("-start", target, "pboevasionboost", "[silent]");
+      this.add("-start", target, "pboevasionboost");
     },
     onSourceModifyAccuracyPriority: -1,
     onSourceModifyAccuracy(accuracy, source, target, move) {
