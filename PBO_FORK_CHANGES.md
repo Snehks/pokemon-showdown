@@ -54,6 +54,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 38 | `data/mods/pbo/abilities.ts` | Dynahax self-confusion immunity | `onTryAddVolatile` blocks self-inflicted confusion (Outrage/Thrash) while allowing enemy confusion |
 | 39 | `data/mods/pbo/scripts.ts` | Cosmetic event form registration | `init()` clones ~372 PBO event forms (Halloween/Christmas/Summer/Valentine/Easter) from their base species into the Pokedex |
 | 40 | `data/mods/pbo/abilities.ts` | Dynahax Baton Pass block | `onFoeDisableMove` disables Baton Pass against Dynahax bosses (same pattern as Destiny Bond/Grudge) |
+| 41 | `config/custom-formats.ts`, `sim/pokemon.ts` | NPC Doubles Battle format | New `gen9pbonpcdoublesbattle` format for NPC trainer double battles + EV clamping exception |
 
 **Total: 40 changes across 10 files.**
 
@@ -676,6 +677,19 @@ for consistency with how `destinybond` and `grudge` are listed in both places.
 so the Dynahax boss's `onTryHit` never fires for it — same blind spot as Destiny Bond/Grudge.
 Without this block, a player could Baton Pass out of a Dynahax raid and escape with
 boosts/volatiles intact, trivializing the encounter. Same fix pattern as Change 26.
+
+---
+
+## Change 41: NPC Doubles Battle format (config/custom-formats.ts, sim/pokemon.ts)
+
+**What it does:** Adds a new `[Gen 9] PBO NPC Doubles Battle` format
+(`gen9pbonpcdoublesbattle`) for NPC trainer double battles. Uses `gameType: 'doubles'`
+with the same ruleset as NPC singles (no team preview, standard PBO clauses). Also
+extends the EV clamping exception in `sim/pokemon.ts` to include the new format ID,
+so Dynamax raid bosses with extreme EVs work correctly in NPC doubles.
+
+**Why:** PBO is adding NPC double battles (trainers with 2 active pokemon). A dedicated
+format keeps NPC-specific rules (no preview, NPC clauses) separate from PvP doubles.
 
 ---
 
