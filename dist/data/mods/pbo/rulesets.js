@@ -21,7 +21,6 @@ __export(rulesets_exports, {
   Rulesets: () => Rulesets
 });
 module.exports = __toCommonJS(rulesets_exports);
-var import_expeditions = require("./expeditions");
 const Rulesets = {
   nosturdywild: {
     effectType: "Rule",
@@ -33,6 +32,30 @@ const Rulesets = {
       }
     }
   },
-  ...import_expeditions.Rulesets
+  // ── Expedition rulesets ─────────────────────────────────────────────
+  // Activated via @@@rulesetId in the format string.
+  // Each rule attaches a volatile or modifies battle state for PBO expeditions.
+  pboexspectral: {
+    effectType: "Rule",
+    name: "PBO EX Spectral",
+    desc: "Wild Pokemon gain evasion boost (accuracy penalty for moves targeting them).",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[1]) {
+        pokemon.addVolatile("pboevasionboost");
+      }
+    }
+  },
+  pboevasionboost: {
+    name: "PBO Evasion Boost",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pboevasionboost");
+    },
+    onSourceModifyAccuracyPriority: -1,
+    onSourceModifyAccuracy(accuracy, source, target, move) {
+      if (typeof accuracy !== "number") return;
+      return this.chainModify([3072, 4096]);
+    }
+  }
 };
 //# sourceMappingURL=rulesets.js.map
