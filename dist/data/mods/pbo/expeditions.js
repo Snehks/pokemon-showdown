@@ -26,11 +26,9 @@ const Rulesets = {
     effectType: "Rule",
     name: "PBO Expedition Spectral",
     desc: "Wild Pokemon gain evasion boost (accuracy penalty for moves targeting them).",
-    onBattleStart(battle) {
-      for (const pokemon of battle.sides[1].active) {
-        if (pokemon && !pokemon.fainted) {
-          pokemon.addVolatile("pboevasionboost");
-        }
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[1]) {
+        pokemon.addVolatile("pboevasionboost");
       }
     }
   },

@@ -1,5 +1,5 @@
 /**
- * PBO Expedition rulesets — activated via @@@+rulesetId in the format string.
+ * PBO Expedition rulesets — activated via @@@rulesetId in the format string.
  * Each ruleset is independently testable; one file for side-by-side readability.
  */
 export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable = {
@@ -7,12 +7,10 @@ export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable 
 		effectType: 'Rule',
 		name: 'PBO Expedition Spectral',
 		desc: "Wild Pokemon gain evasion boost (accuracy penalty for moves targeting them).",
-		onBattleStart(battle) {
-			// Attach volatile to all active wild (p2) Pokemon
-			for (const pokemon of battle.sides[1].active) {
-				if (pokemon && !pokemon.fainted) {
-					pokemon.addVolatile('pboevasionboost');
-				}
+		onSwitchIn(pokemon) {
+			// Attach volatile to wild (p2) Pokemon only
+			if (pokemon.side === this.sides[1]) {
+				pokemon.addVolatile('pboevasionboost');
 			}
 		},
 	},
