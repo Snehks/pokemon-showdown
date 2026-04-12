@@ -210,4 +210,81 @@ export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable 
 			this.heal(pokemon.baseMaxhp / 5);
 		},
 	},
+
+	// ── Phase 3: Inline effects (stat boosts, no volatiles) ────────
+
+	// ── Swift (prefix) ─────────────────────────────────────────────
+	pboexswift: {
+		effectType: 'Rule',
+		name: 'PBO EX Swift',
+		desc: "Wild Pokemon gains +1 Speed at start of battle.",
+		onSwitchIn(pokemon) {
+			if (pokemon.side === this.sides[1]) {
+				this.boost({spe: 1}, pokemon);
+			}
+		},
+	},
+
+	// ── Resilient (prefix) ───────────────��─────────────────────────
+	pboexresilient: {
+		effectType: 'Rule',
+		name: 'PBO EX Resilient',
+		desc: "Wild Pokemon gains +1 Defense at start of battle.",
+		onSwitchIn(pokemon) {
+			if (pokemon.side === this.sides[1]) {
+				this.boost({def: 1}, pokemon);
+			}
+		},
+	},
+
+	// ── of Enfeeblement (suffix) ──────────────────────────────────
+	pboexofenfeeblement: {
+		effectType: 'Rule',
+		name: 'PBO EX of Enfeeblement',
+		desc: "Wild Pokemon gets -1 to a random stat at start of battle.",
+		onSwitchIn(pokemon) {
+			if (pokemon.side === this.sides[1]) {
+				const stat = this.sample(['atk', 'def', 'spa', 'spd', 'spe'] as const);
+				this.boost({[stat]: -1}, pokemon);
+			}
+		},
+	},
+
+	// ── of Mist (suffix) ──────────────────────────────────────────
+	pboexofmist: {
+		effectType: 'Rule',
+		name: 'PBO EX of Mist',
+		desc: "Player Pokemon gets -1 Accuracy and -1 Sp. Def on every switch-in.",
+		onSwitchIn(pokemon) {
+			if (pokemon.side === this.sides[0]) {
+				this.boost({accuracy: -1, spd: -1}, pokemon);
+			}
+		},
+	},
+
+	// ── of Weakness (suffix) ──────��───────────────────────────────
+	pboexofweakness: {
+		effectType: 'Rule',
+		name: 'PBO EX of Weakness',
+		desc: "Player Pokemon gets -1 to a random stat on every switch-in.",
+		onSwitchIn(pokemon) {
+			if (pokemon.side === this.sides[0]) {
+				const stat = this.sample(['atk', 'def', 'spa', 'spd', 'spe'] as const);
+				this.boost({[stat]: -1}, pokemon);
+			}
+		},
+	},
+
+	// ── of Confusion (suffix) ───────��─────────────────────────────
+	pboexofconfusion: {
+		effectType: 'Rule',
+		name: 'PBO EX of Confusion',
+		desc: "Player's lead Pokemon becomes confused on first switch-in only.",
+		onSwitchIn(pokemon) {
+			if (pokemon.side === this.sides[0] && !(this as any).pboConfusionApplied) {
+				(this as any).pboConfusionApplied = true;
+				pokemon.addVolatile('confusion');
+			}
+		},
+	},
 };
