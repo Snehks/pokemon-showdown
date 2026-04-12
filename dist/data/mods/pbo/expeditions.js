@@ -16,23 +16,32 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var rulesets_exports = {};
-__export(rulesets_exports, {
+var expeditions_exports = {};
+__export(expeditions_exports, {
   Rulesets: () => Rulesets
 });
-module.exports = __toCommonJS(rulesets_exports);
-var import_expeditions = require("./expeditions");
+module.exports = __toCommonJS(expeditions_exports);
 const Rulesets = {
-  nosturdywild: {
+  pboexspectral: {
     effectType: "Rule",
-    name: "No Sturdy Wild",
-    desc: "Sturdy is suppressed for wild Pokemon (p2).",
-    onSwitchIn(pokemon) {
-      if (pokemon.side === this.sides[1] && pokemon.ability === "sturdy") {
-        pokemon.ability = "";
+    name: "PBO Expedition Spectral",
+    desc: "Wild Pokemon gain evasion boost (accuracy penalty for moves targeting them).",
+    onBattleStart(battle) {
+      for (const pokemon of battle.sides[1].active) {
+        if (pokemon && !pokemon.fainted) {
+          pokemon.addVolatile("pboevasionboost");
+        }
       }
     }
   },
-  ...import_expeditions.Rulesets
+  pboevasionboost: {
+    name: "PBO Evasion Boost",
+    effectType: "Volatile",
+    onSourceModifyAccuracyPriority: -1,
+    onSourceModifyAccuracy(accuracy, source, target, move) {
+      if (typeof accuracy !== "number") return;
+      return this.chainModify([3072, 4096]);
+    }
+  }
 };
-//# sourceMappingURL=rulesets.js.map
+//# sourceMappingURL=expeditions.js.map

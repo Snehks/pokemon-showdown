@@ -1,3 +1,5 @@
+import {Rulesets as ExpeditionRulesets} from './expeditions';
+
 export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable = {
 	nosturdywild: {
 		effectType: 'Rule',
@@ -9,4 +11,5 @@ export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable 
 			}
 		},
 	},
+	...ExpeditionRulesets,
 };
