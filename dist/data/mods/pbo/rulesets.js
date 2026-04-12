@@ -292,6 +292,254 @@ const Rulesets = {
         pokemon.addVolatile("confusion");
       }
     }
+  },
+  // ── Phase 4: Category B — Player volatile ability-hooks ────────
+  // Each ruleset attaches a volatile to the player on every switch-in.
+  // Volatiles drop on switch-out (Showdown default) and re-attach via the ruleset's onSwitchIn.
+  // ── of Recoil (suffix) ─────────────────────────────────────────
+  pboexofrecoil: {
+    effectType: "Rule",
+    name: "PBO EX of Recoil",
+    desc: "Player Pokemon takes 10% recoil of damage dealt.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pborecoilonhit");
+      }
+    }
+  },
+  pborecoilonhit: {
+    name: "PBO Recoil On Hit",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pborecoilonhit");
+    },
+    onAfterMove(source, target, move) {
+      if (typeof move.totalDamage !== "number" || move.totalDamage <= 0) return;
+      if (!source.hp) return;
+      const recoil = Math.max(1, Math.floor(move.totalDamage / 10));
+      this.damage(recoil, source, source, this.dex.conditions.get("pborecoilonhit"));
+    }
+  },
+  // ── of Frailty (suffix) ─────────────────────────────────────────
+  pboexoffrailty: {
+    effectType: "Rule",
+    name: "PBO EX of Frailty",
+    desc: "Player Pokemon recovers 50% less HP from healing moves.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pbofrailheal");
+      }
+    }
+  },
+  pbofrailheal: {
+    name: "PBO Frail Heal",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pbofrailheal");
+    },
+    onTryHeal(damage, target, source, effect) {
+      if (effect?.effectType === "Move") {
+        return this.chainModify(0.5);
+      }
+    }
+  },
+  // ── of Exhaustion (suffix) ──────────────────────────────────────
+  pboexofexhaustion: {
+    effectType: "Rule",
+    name: "PBO EX of Exhaustion",
+    desc: "Player Pokemon consumes 1 extra PP per move used (Pressure-style).",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pboexhaustion");
+      }
+    }
+  },
+  pboexhaustion: {
+    name: "PBO Exhaustion",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pboexhaustion");
+    },
+    // onSourceDeductPP fires on the move user (source of the DeductPP event).
+    // Returning 1 adds 1 extra PP drop on top of the base -1, for a total of -2 per move.
+    onSourceDeductPP(target, source) {
+      return 1;
+    }
+  },
+  // ── of Blight (suffix) ──────────────────────────────────────────
+  pboexofblight: {
+    effectType: "Rule",
+    name: "PBO EX of Blight",
+    desc: "Player Pokemon takes double damage from burn/poison/toxic.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pboblight");
+      }
+    }
+  },
+  pboblight: {
+    name: "PBO Blight",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pboblight");
+    },
+    onDamage(damage, target, source, effect) {
+      if (!effect) return;
+      if (effect.id === "brn" || effect.id === "psn" || effect.id === "tox") {
+        return damage * 2;
+      }
+    }
+  },
+  // ── of Ashes (suffix) ───────────────────────────────────────────
+  // LEGACY DIRECTION (IncreaseDamageIfMoveIfOfTypeAbility): composed on the PLAYER's ability,
+  // intercepts getModifiedDamageDueToAttackerAbility — ATTACKER-SIDE.
+  // Player DEALS +40% damage with Fire-type moves (preserves legacy semantics, even though the
+  // thematic curse framing suggests defender-side).
+  pboexofashes: {
+    effectType: "Rule",
+    name: "PBO EX of Ashes",
+    desc: "Player Pokemon deals 40% more damage with Fire-type moves.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pboashes");
+      }
+    }
+  },
+  pboashes: {
+    name: "PBO Ashes",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pboashes");
+    },
+    onBasePower(basePower, attacker, defender, move) {
+      if (move.type === "Fire") {
+        return this.chainModify(1.4);
+      }
+    }
+  },
+  // ── of Impotence (suffix) ───────────────────────────────────────
+  pboexofimpotence: {
+    effectType: "Rule",
+    name: "PBO EX of Impotence",
+    desc: "Player Pokemon cannot use healing moves or healing items.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pboimpotence");
+      }
+    }
+  },
+  pboimpotence: {
+    name: "PBO Impotence",
+    effectType: "Volatile",
+    // Hardcoded healing item list matches legacy CancelHealingMoveAndItemAbility.battleHealingItems.
+    onStart(target) {
+      this.add("-start", target, "pboimpotence");
+    },
+    onTryHeal(damage, target, source, effect) {
+      if (!effect) return;
+      if (effect.effectType === "Move") return false;
+      const healingItems = [
+        "Leftovers",
+        "Black Sludge",
+        "Shell Bell",
+        "Big Root",
+        "Figy Berry",
+        "Wiki Berry",
+        "Mago Berry",
+        "Aguav Berry",
+        "Iapapa Berry",
+        "Oran Berry",
+        "Sitrus Berry",
+        "Enigma Berry",
+        "Lansat Berry"
+      ];
+      if (effect.effectType === "Item" && healingItems.includes(effect.name)) return false;
+    }
+  },
+  // ── of Drought (suffix) ─────────────────────────────────────────
+  pboexofdrought: {
+    effectType: "Rule",
+    name: "PBO EX of Drought",
+    desc: "Player Pokemon deals 50% less damage with Water moves and cannot set rain weather.",
+    // Showdown auto-registers rulesets with event handlers as a field-level pseudoweather
+    // (sim/battle.ts:306). onSetWeather fires via findFieldEventHandlers for any SetWeather
+    // event, so this intercepts both the player's Rain Dance and wild Drizzle/Primordial Sea.
+    onSetWeather(target, source, weather) {
+      const rainWeathers = ["raindance", "primordialsea"];
+      if (rainWeathers.includes(weather.id)) return false;
+    },
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pbodrought");
+      }
+    }
+  },
+  pbodrought: {
+    name: "PBO Drought",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pbodrought");
+    },
+    onBasePower(basePower, attacker, defender, move) {
+      if (move.type === "Water") {
+        return this.chainModify(0.5);
+      }
+    }
+  },
+  // ── of Silence (suffix) ─────────────────────────────────────────
+  pboexofsilence: {
+    effectType: "Rule",
+    name: "PBO EX of Silence",
+    desc: "Player Pokemon cannot use moves that have secondary effects.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pbosilence");
+      }
+    }
+  },
+  pbosilence: {
+    name: "PBO Silence",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pbosilence");
+    },
+    onBeforeMove(source, target, move) {
+      if (move.secondaries && move.secondaries.length > 0) {
+        this.attrLastMove("[still]");
+        this.add("cant", source, "ability: PBO Silence", move);
+        return false;
+      }
+    }
+  },
+  // ── of Misfortune (suffix) ──────────────────────────────────────
+  pboexofmisfortune: {
+    effectType: "Rule",
+    name: "PBO EX of Misfortune",
+    desc: "Player Pokemon cannot use or benefit from held items.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pbomisfortune");
+      }
+    }
+  },
+  pbomisfortune: {
+    name: "PBO Misfortune",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pbomisfortune");
+      const heldItem = target.getItem();
+      if (heldItem.exists) {
+        this.singleEvent("End", heldItem, target.itemState, target);
+      }
+    },
+    // Block healing items (Leftovers, Sitrus Berry, etc.)
+    onTryHeal(damage, target, source, effect) {
+      if (effect?.effectType === "Item") return false;
+    },
+    // Block berry consumption (attack berries, stat-boost berries)
+    onTryEatItem(item, pokemon) {
+      return false;
+    }
   }
 };
 //# sourceMappingURL=rulesets.js.map

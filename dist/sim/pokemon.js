@@ -155,7 +155,7 @@ class Pokemon {
       if (!this.set.evs[stat]) this.set.evs[stat] = 0;
       if (!this.set.ivs[stat] && this.set.ivs[stat] !== 0) this.set.ivs[stat] = 31;
     }
-    const maxEv = this.battle.format.id === "gen9pbonpcnationaldex" ? Infinity : 255;
+    const maxEv = this.battle.format.id === "gen9pbonpcnationaldex" || this.battle.format.id === "gen9pbonpcdoublesbattle" ? Infinity : 255;
     for (stat in this.set.evs) {
       this.set.evs[stat] = this.battle.clampIntRange(this.set.evs[stat], 0, maxEv);
     }
