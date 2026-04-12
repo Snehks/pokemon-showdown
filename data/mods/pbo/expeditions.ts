@@ -17,6 +17,9 @@ export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable 
 	pboevasionboost: {
 		name: 'PBO Evasion Boost',
 		effectType: 'Volatile',
+		onStart(target) {
+			this.add('-start', target, 'pboevasionboost', '[silent]');
+		},
 		onSourceModifyAccuracyPriority: -1,
 		onSourceModifyAccuracy(accuracy, source, target, move) {
 			if (typeof accuracy !== 'number') return;
