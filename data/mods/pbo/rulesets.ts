@@ -537,4 +537,40 @@ export const Rulesets: import('../../../sim/dex-formats').ModdedFormatDataTable 
 			return false;
 		},
 	},
+
+	// ── of Trickery (suffix) ────────────────────────────────────────
+	// Rerolls the player's non-HP EVs on every switch-in, then recomputes
+	// stats via the mod's `recalculateStats()` prototype extension. HP EVs
+	// are intentionally preserved (mirrors legacy
+	// AllPlayerPokemonEVRandomizingSuffixCondition). Boost stages in
+	// `pokemon.boosts` survive recalculation because modern gens apply them
+	// dynamically at getStat() time.
+	pboexoftrickery: {
+		effectType: 'Rule',
+		name: 'PBO EX of Trickery',
+		desc: "Player Pokemon have their non-HP EVs randomized on every switch-in.",
+		onSwitchIn(pokemon) {
+			if (pokemon.side !== this.sides[0]) return;
+
+			// Fisher-Yates shuffle stat order so earlier stats don't systematically
+			// get more budget than later ones when the 510 cap starts biting.
+			const statOrder: StatIDExceptHP[] = ['atk', 'def', 'spa', 'spd', 'spe'];
+			for (let i = statOrder.length - 1; i > 0; i--) {
+				const j = this.prng.random(i + 1);
+				[statOrder[i], statOrder[j]] = [statOrder[j], statOrder[i]];
+			}
+
+			let remaining = 510;
+			for (const stat of statOrder) {
+				const max = Math.min(252, remaining);
+				// random(n) returns int in [0, n), so pass max+1 to include max.
+				const value = this.prng.random(max + 1);
+				pokemon.set.evs[stat] = value;
+				remaining -= value;
+			}
+
+			pokemon.recalculateStats!();
+			this.add('-message', `${pokemon.name}'s stats have been randomly modified.`);
+		},
+	},
 };

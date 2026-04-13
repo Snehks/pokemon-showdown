@@ -600,6 +600,23 @@ const Scripts = {
       if (["Greninja-Bond", "Rockruff-Dusk"].includes(name)) name = this.species.baseSpecies;
       if (!level) level = this.level;
       return name + `, L${level}` + (this.gender === "" ? "" : `, ${this.gender}`) + (this.set.shiny ? ", shiny" : "");
+    },
+    // [PBO] Recompute non-boost stats from current set (IVs/EVs/nature).
+    // Used by the `pboexoftrickery` ruleset to re-apply randomized EVs on each
+    // player switch-in. In modern gens boost stages live in `this.boosts` and
+    // are applied dynamically via `getStat()`, so they survive recalculation
+    // automatically — no manual re-application needed.
+    // HP/maxhp are intentionally NOT touched (mirrors legacy
+    // AllPlayerPokemonEVRandomizingSuffixCondition, which preserves HP EVs).
+    recalculateStats() {
+      const stats = this.battle.spreadModify(this.species.baseStats, this.set);
+      this.baseStoredStats = stats;
+      let statName;
+      for (statName in this.storedStats) {
+        this.storedStats[statName] = stats[statName];
+        if (this.modifiedStats) this.modifiedStats[statName] = stats[statName];
+      }
+      this.speed = this.storedStats.spe;
     }
   }
 };
