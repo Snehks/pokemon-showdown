@@ -569,6 +569,424 @@ const Rulesets = {
       pokemon.recalculateStats();
       this.add("-message", `${pokemon.name}'s stats have been randomly modified.`);
     }
+  },
+  // ── Phase 8: Designed-but-never-built effects (CSV-only) ─────────
+  // These effects existed in prefix_data.csv / suffix_data.csv as descriptions
+  // but were never implemented in the legacy battle path. Implemented directly
+  // on Showdown since there is no legacy parity to preserve.
+  // ── Abyssal (prefix) ───────────────────────────────────────────
+  pboexabyssal: {
+    effectType: "Rule",
+    name: "PBO EX Abyssal",
+    desc: "Wild Pokemon deal 25% more damage but also take 25% more damage.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[1]) {
+        pokemon.addVolatile("pboabyssal");
+      }
+    }
+  },
+  pboabyssal: {
+    name: "PBO Abyssal",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pboabyssal");
+    },
+    onBasePowerPriority: 8,
+    onBasePower(basePower) {
+      return this.chainModify(1.25);
+    },
+    // Defender's volatile: amplifies incoming damage by 25%.
+    onSourceModifyDamage(damage, source, target, move) {
+      return this.chainModify(1.25);
+    }
+  },
+  // ── Aegis (prefix) ─────────────────────────────────────────────
+  // After taking damage on turn N, the wild becomes immune to move damage on
+  // turn N+1. State is per-volatile (per pokemon instance).
+  pboexaegis: {
+    effectType: "Rule",
+    name: "PBO EX Aegis",
+    desc: "Wild Pokemon become immune to damage for one turn after being hit.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[1]) {
+        pokemon.addVolatile("pboaegis");
+      }
+    }
+  },
+  pboaegis: {
+    name: "PBO Aegis",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pboaegis");
+      this.effectState.immuneOnTurn = -1;
+    },
+    onDamage(damage, target, source, effect) {
+      const state = this.effectState;
+      if (this.turn === state.immuneOnTurn && effect && effect.effectType === "Move") {
+        this.add("-activate", target, "move: PBO Aegis");
+        return false;
+      }
+    },
+    onDamagingHit(damage, target, source, move) {
+      this.effectState.immuneOnTurn = this.turn + 1;
+    }
+  },
+  // ── Doomed (prefix) ────────────────────────────────────────────
+  // Wild deals +50% damage but auto-faints after 5 residual ticks.
+  pboexdoomed: {
+    effectType: "Rule",
+    name: "PBO EX Doomed",
+    desc: "Wild Pokemon deals 50% more damage but faints after 5 turns.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[1]) {
+        pokemon.addVolatile("pbodoomed");
+      }
+    }
+  },
+  pbodoomed: {
+    name: "PBO Doomed",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pbodoomed");
+      this.effectState.countdown = 5;
+    },
+    onBasePowerPriority: 8,
+    onBasePower(basePower) {
+      return this.chainModify(1.5);
+    },
+    onResidualOrder: 5,
+    onResidualSubOrder: 5,
+    onResidual(pokemon) {
+      const state = this.effectState;
+      state.countdown--;
+      if (state.countdown <= 0) {
+        this.add("-message", `${pokemon.name}'s doom has come!`);
+        pokemon.faint();
+      }
+    }
+  },
+  // ── Ethereal (prefix) ──────────────────────────────────────────
+  // Mirrors Clear Body — blocks any opponent-induced negative stat changes,
+  // allows self-induced drops (Overheat, Close Combat, etc.).
+  pboexethereal: {
+    effectType: "Rule",
+    name: "PBO EX Ethereal",
+    desc: "Wild Pokemon are immune to stat-lowering effects.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[1]) {
+        pokemon.addVolatile("pboethereal");
+      }
+    }
+  },
+  pboethereal: {
+    name: "PBO Ethereal",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pboethereal");
+    },
+    onTryBoost(boost, target, source, effect) {
+      if (source && target === source) return;
+      let blocked = false;
+      let stat;
+      for (stat in boost) {
+        if (boost[stat] < 0) {
+          delete boost[stat];
+          blocked = true;
+        }
+      }
+      if (blocked && effect && !effect.secondaries) {
+        this.add("-fail", target, "unboost", "[from] move: PBO Ethereal");
+      }
+    }
+  },
+  // ── Mystic (prefix) — inline +1 SpA on switch-in ──────────────
+  pboexmystic: {
+    effectType: "Rule",
+    name: "PBO EX Mystic",
+    desc: "Wild Pokemon gains +1 Special Attack at start of battle.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[1]) {
+        this.boost({ spa: 1 }, pokemon);
+      }
+    }
+  },
+  // ── Vigorous (prefix) — inline +1 Atk on switch-in ────────────
+  pboexvigorous: {
+    effectType: "Rule",
+    name: "PBO EX Vigorous",
+    desc: "Wild Pokemon gains +1 Attack at start of battle.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[1]) {
+        this.boost({ atk: 1 }, pokemon);
+      }
+    }
+  },
+  // ── Reflective (prefix) — wild reflects 20% of damage taken ───
+  pboexreflective: {
+    effectType: "Rule",
+    name: "PBO EX Reflective",
+    desc: "Wild Pokemon reflect 20% of damage taken back to attacker.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[1]) {
+        pokemon.addVolatile("pboreflective");
+      }
+    }
+  },
+  pboreflective: {
+    name: "PBO Reflective",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pboreflective");
+    },
+    onDamagingHit(damage, target, source, move) {
+      if (!source || source === target) return;
+      if (source.fainted || source.hp <= 0) return;
+      if (typeof damage !== "number" || damage <= 0) return;
+      const reflected = Math.max(1, Math.floor(damage * 0.2));
+      this.damage(reflected, source, target, this.dex.conditions.get("PBO Reflective"));
+    }
+  },
+  // ── Vampiric (prefix) — wild heals 20% of damage dealt ────────
+  pboexvampiric: {
+    effectType: "Rule",
+    name: "PBO EX Vampiric",
+    desc: "Wild Pokemon heal 20% of damage dealt.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[1]) {
+        pokemon.addVolatile("pbovampiric");
+      }
+    }
+  },
+  pbovampiric: {
+    name: "PBO Vampiric",
+    effectType: "Volatile",
+    onStart(target) {
+      this.add("-start", target, "pbovampiric");
+    },
+    // onSourceDamagingHit fires on the attacker (the wild) for each hit it lands.
+    onSourceDamagingHit(damage, target, source, move) {
+      if (typeof damage !== "number" || damage <= 0) return;
+      if (target.fainted) return;
+      const heal = Math.max(1, Math.floor(damage * 0.2));
+      this.heal(heal, source, source, this.dex.conditions.get("PBO Vampiric"));
+    }
+  },
+  // ── of Chains (suffix) — locked to first move + cannot switch ─
+  // First move used becomes the only legal move; pokemon is also trapped.
+  pboexofchains: {
+    effectType: "Rule",
+    name: "PBO EX of Chains",
+    desc: "Player Pokemon are locked to the first move they use and cannot switch.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pbochains");
+      }
+    }
+  },
+  pbochains: {
+    name: "PBO Chains",
+    effectType: "Volatile",
+    onStart(pokemon) {
+      this.add("-start", pokemon, "pbochains");
+      this.effectState.lockedMove = null;
+    },
+    onAfterMove(source, target, move) {
+      const state = this.effectState;
+      if (!state.lockedMove && move && move.id) {
+        state.lockedMove = move.id;
+        this.add("-message", `${source.name} is chained to ${move.name}!`);
+      }
+    },
+    onLockMove(pokemon) {
+      const state = this.effectState;
+      return state.lockedMove || void 0;
+    },
+    onTrapPokemon(pokemon) {
+      pokemon.tryTrap(true);
+    }
+  },
+  // ── of Despair (suffix) — cannot use same move twice in a row ──
+  pboexofdespair: {
+    effectType: "Rule",
+    name: "PBO EX of Despair",
+    desc: "Player Pokemon cannot use the same move twice in a row.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pbodespair");
+      }
+    }
+  },
+  pbodespair: {
+    name: "PBO Despair",
+    effectType: "Volatile",
+    onStart(pokemon) {
+      this.add("-start", pokemon, "pbodespair");
+      this.effectState.lastMove = null;
+    },
+    onDisableMove(pokemon) {
+      const state = this.effectState;
+      if (state.lastMove) {
+        for (const moveSlot of pokemon.moveSlots) {
+          if (moveSlot.id === state.lastMove) {
+            pokemon.disableMove(moveSlot.id, false, this.effect.name);
+          }
+        }
+      }
+    },
+    onAfterMove(source, target, move) {
+      if (move && move.id) {
+        this.effectState.lastMove = move.id;
+      }
+    }
+  },
+  // ── of Disarray (suffix) — forced to use a random move ────────
+  // Uses onLockMove to force the engine to pick a random usable move each
+  // turn. Random pick fires anew each call to onLockMove (i.e., each turn).
+  pboexofdisarray: {
+    effectType: "Rule",
+    name: "PBO EX of Disarray",
+    desc: "Player Pokemon are forced to use random moves during battle.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pbodisarray");
+      }
+    }
+  },
+  pbodisarray: {
+    name: "PBO Disarray",
+    effectType: "Volatile",
+    onStart(pokemon) {
+      this.add("-start", pokemon, "pbodisarray");
+    },
+    onLockMove(pokemon) {
+      const usable = pokemon.moveSlots.filter((slot) => slot.pp > 0 && !slot.disabled).map((slot) => slot.id);
+      if (usable.length === 0) return void 0;
+      return this.sample(usable);
+    }
+  },
+  // ── of Isolation (suffix) — cannot switch ─────────────────────
+  pboexofisolation: {
+    effectType: "Rule",
+    name: "PBO EX of Isolation",
+    desc: "Player cannot switch Pokemon during battle.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pboisolation");
+      }
+    }
+  },
+  pboisolation: {
+    name: "PBO Isolation",
+    effectType: "Volatile",
+    onStart(pokemon) {
+      this.add("-start", pokemon, "pboisolation");
+    },
+    onTrapPokemon(pokemon) {
+      pokemon.tryTrap(true);
+    }
+  },
+  // ── of Ruin (suffix) — boost reversal every 3 turns ───────────
+  pboexofruin: {
+    effectType: "Rule",
+    name: "PBO EX of Ruin",
+    desc: "Player's stat boosts are reversed every 3 turns.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pboruin");
+      }
+    }
+  },
+  pboruin: {
+    name: "PBO Ruin",
+    effectType: "Volatile",
+    onStart(pokemon) {
+      this.add("-start", pokemon, "pboruin");
+      this.effectState.turnsActive = 0;
+    },
+    onResidualOrder: 28,
+    onResidual(pokemon) {
+      const state = this.effectState;
+      state.turnsActive++;
+      if (state.turnsActive % 3 !== 0) return;
+      let changed = false;
+      let stat;
+      for (stat in pokemon.boosts) {
+        const value = pokemon.boosts[stat];
+        if (value !== 0) {
+          pokemon.boosts[stat] = -value;
+          changed = true;
+        }
+      }
+      if (changed) {
+        this.add("-message", `${pokemon.name}'s stat changes were reversed by Ruin!`);
+      }
+    }
+  },
+  // ── of Rupture (suffix) ──────────────────────────────────────
+  // On switch-in: -1 Def / -1 SpD. When HP drops below 30%: +1 Atk / +1 SpA.
+  // Rage trigger fires once per volatile lifetime (re-arms on switch-out).
+  pboexofrupture: {
+    effectType: "Rule",
+    name: "PBO EX of Rupture",
+    desc: "Player Pokemon enter with -1 Def/SpD; gain +1 Atk/SpA when HP < 30%.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pborupture");
+      }
+    }
+  },
+  pborupture: {
+    name: "PBO Rupture",
+    effectType: "Volatile",
+    onStart(pokemon) {
+      this.add("-start", pokemon, "pborupture");
+      this.boost({ def: -1, spd: -1 }, pokemon, pokemon, this.effect);
+      this.effectState.rageTriggered = false;
+    },
+    onAfterMoveSecondary(target, source, move) {
+      const state = this.effectState;
+      if (state.rageTriggered) return;
+      if (target.hp > 0 && target.hp * 100 / target.maxhp < 30) {
+        state.rageTriggered = true;
+        this.boost({ atk: 1, spa: 1 }, target, target, this.effect);
+      }
+    },
+    onResidual(pokemon) {
+      const state = this.effectState;
+      if (state.rageTriggered) return;
+      if (pokemon.hp > 0 && pokemon.hp * 100 / pokemon.maxhp < 30) {
+        state.rageTriggered = true;
+        this.boost({ atk: 1, spa: 1 }, pokemon, pokemon, this.effect);
+      }
+    }
+  },
+  // ── of Wraiths (suffix) ──────────────────────────────────────
+  // On switch-in: -1 Speed. Player cannot resist Ghost-type moves: any
+  // negative type effectiveness contribution against Ghost is zeroed,
+  // turning Dark (resists Ghost) into neutral. Immunities (Normal vs Ghost)
+  // are intentionally not negated — designers can extend if needed.
+  pboexofwraiths: {
+    effectType: "Rule",
+    name: "PBO EX of Wraiths",
+    desc: "Player Pokemon cannot resist Ghost-type moves and enter with -1 Speed.",
+    onSwitchIn(pokemon) {
+      if (pokemon.side === this.sides[0]) {
+        pokemon.addVolatile("pbowraiths");
+      }
+    }
+  },
+  pbowraiths: {
+    name: "PBO Wraiths",
+    effectType: "Volatile",
+    onStart(pokemon) {
+      this.add("-start", pokemon, "pbowraiths");
+      this.boost({ spe: -1 }, pokemon, pokemon, this.effect);
+    },
+    onEffectiveness(typeMod, target, type, move) {
+      if (move && move.type === "Ghost" && typeMod < 0) {
+        return 0;
+      }
+    }
   }
 };
 //# sourceMappingURL=rulesets.js.map
