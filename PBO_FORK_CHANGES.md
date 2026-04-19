@@ -55,8 +55,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 39 | `data/mods/pbo/scripts.ts` | Cosmetic event form registration | `init()` clones ~372 PBO event forms (Halloween/Christmas/Summer/Valentine/Easter) from their base species into the Pokedex |
 | 40 | `data/mods/pbo/abilities.ts` | Dynahax Baton Pass block | `onFoeDisableMove` disables Baton Pass against Dynahax bosses (same pattern as Destiny Bond/Grudge) |
 | 41 | `config/custom-formats.ts`, `sim/pokemon.ts` | NPC Doubles Battle format | New `gen9pbonpcdoublesbattle` format for NPC trainer double battles + EV clamping exception |
+| 42 | `config/custom-formats.ts` | Random Singles/Doubles formats | New `gen9pborandomsinglesbattle` and `gen9pborandomdoublesbattle` formats without Terastal Clause so random battles allow Tera with Showdown-assigned competitive tera types |
 
-**Total: 40 changes across 10 files.**
+**Total: 41 changes across 10 files.**
 
 ---
 
@@ -690,6 +691,35 @@ so Dynamax raid bosses with extreme EVs work correctly in NPC doubles.
 
 **Why:** PBO is adding NPC double battles (trainers with 2 active pokemon). A dedicated
 format keeps NPC-specific rules (no preview, NPC clauses) separate from PvP doubles.
+
+---
+
+## Change 42: Random Singles/Doubles formats (config/custom-formats.ts)
+
+**What it does:** Adds two new PBO formats for random battles:
+
+- `gen9pborandomsinglesbattle` — `[Gen 9] PBO Random Singles Battle`
+- `gen9pborandomdoublesbattle` — `[Gen 9] PBO Random Doubles Battle` (`gameType: 'doubles'`)
+
+Both rulesets drop `Terastal Clause` (which would otherwise set
+`pokemon.canTerastallize = null` at battle start) but keep `Z-Move Clause` and
+`Dynamax Clause` active in line with all other PBO formats. Other rules mirror the
+existing PvP no-preview variants: `Sleep Clause Mod`, `Cancel Mod`,
+`HP Percentage Mod`, `Overflow Stat Mod`. No `Team Preview`.
+
+**Why:** PBO's random battle mode uses Showdown's built-in `gen9randombattle` /
+`gen9randomdoublesbattle` team generators, which assign each Pokemon a
+competitive `teraType` (e.g. Landorus-Therian Tera Flying) baked into the random
+set. Before these formats, every random battle was wrapped in
+`gen9pbopvpbattlenopreview` or `gen9pbopvpdoublesnopreview`, both of which carry
+Terastal Clause — so the Tera button was always disabled on the client even
+when the set declared a tera type. Dedicated random formats let that value reach
+`pokemon.canTerastallize` as a usable string while keeping Z-Move / Dynamax
+locked (gen 9 random sets don't configure those gimmicks).
+
+Non-random PvP, wild, and NPC battles continue to use the clause-locked formats.
+Server-side routing (`ShowdownPvpBattle.kt`) selects the new formats when the
+tier is `BattleTier.RANDOM`.
 
 ---
 

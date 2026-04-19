@@ -77,6 +77,21 @@ const Formats = [
     mod: "pbo",
     gameType: "triples",
     ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+  },
+  // [PBO] Random battles allow Terastallization — the Showdown random team generator
+  // assigns a competitive teraType per set (e.g. Landorus-T Tera Flying). Dropping
+  // Terastal Clause from these formats lets that value reach the client.
+  // Z-Move and Dynamax clauses stay active; gen 9 random sets don't configure them.
+  {
+    name: "[Gen 9] PBO Random Singles Battle",
+    mod: "pbo",
+    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "Z-Move Clause", "Dynamax Clause"]
+  },
+  {
+    name: "[Gen 9] PBO Random Doubles Battle",
+    mod: "pbo",
+    gameType: "doubles",
+    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "Z-Move Clause", "Dynamax Clause"]
   }
 ];
 //# sourceMappingURL=custom-formats.js.map
