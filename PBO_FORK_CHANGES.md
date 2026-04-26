@@ -56,8 +56,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 40 | `data/mods/pbo/abilities.ts` | Dynahax Baton Pass block | `onFoeDisableMove` disables Baton Pass against Dynahax bosses (same pattern as Destiny Bond/Grudge) |
 | 41 | `config/custom-formats.ts`, `sim/pokemon.ts` | NPC Doubles Battle format | New `gen9pbonpcdoublesbattle` format for NPC trainer double battles + EV clamping exception |
 | 42 | `config/custom-formats.ts` | Random Singles/Doubles formats | New `gen9pborandomsinglesbattle` and `gen9pborandomdoublesbattle` formats without Terastal Clause so random battles allow Tera with Showdown-assigned competitive tera types |
+| 43 | `data/mods/pbo/abilities.ts` | Dynahax Leech Seed block | Add `leechseed` to `onTryHit` blocked Set so Leech Seed fails on Dynamax raid bosses with `-immune` instead of applying the volatile |
 
-**Total: 41 changes across 10 files.**
+**Total: 42 changes across 10 files.**
 
 ---
 
@@ -720,6 +721,28 @@ locked (gen 9 random sets don't configure those gimmicks).
 Non-random PvP, wild, and NPC battles continue to use the clause-locked formats.
 Server-side routing (`ShowdownPvpBattle.kt`) selects the new formats when the
 tier is `BattleTier.RANDOM`.
+
+---
+
+## Change 43: Dynahax Leech Seed block (data/mods/pbo/abilities.ts)
+
+**What it does:** Adds `leechseed` to the `onTryHit` blocked Set in the Dynahax
+ability so Leech Seed fails on Dynamax raid bosses with `-immune` text instead
+of applying the `leechseed` volatile.
+
+**Why:** Vanilla Leech Seed only has a Grass-type immunity check
+(`data/moves.ts:onTryImmunity`), and Dynahax's existing protections did not
+cover it: `onSetStatus` only blocks non-volatile status (burn/poison/sleep),
+and `onTryAddVolatile` only blocks self-confusion. Leech Seed sets
+`volatileStatus: 'leechseed'`, so it slipped through both hooks. The Java
+legacy ability had a catch-all `canAddStatus → false`
+(`AbilityCache.java:1335`) that blanket-blocked volatiles — the TS port
+replaced it with the more granular hooks and missed Leech Seed. Affects
+both NPC singles (`gen9pbonpcnationaldex`) and NPC doubles
+(`gen9pbonpcdoublesbattle`) raid formats. Discord bug 1497588614698242122.
+
+**Tests:** `test/sim/abilities/dynahax-moves.js` — `should block Leech Seed
+(singles)` and `should block Leech Seed (doubles)`.
 
 ---
 

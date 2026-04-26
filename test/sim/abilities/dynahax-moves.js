@@ -233,4 +233,28 @@ describe('Dynahax [Blocked Moves]', () => {
 		]);
 		assert.cantMove(() => battle.makeChoices('move grudge', 'move flamethrower'), 'Smeargle', 'Grudge', true);
 	});
+
+	it('should block Leech Seed (singles)', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Smeargle', ability: 'owntempo', moves: ['leechseed'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+		]);
+		battle.makeChoices('move leechseed', 'move splash');
+		assert.equal(battle.p2.active[0].volatiles['leechseed'], undefined);
+	});
+
+	it('should block Leech Seed (doubles)', () => {
+		battle = common.createBattle({ formatid: 'gen9pbonpcdoublesbattle' }, [
+			[
+				{ species: 'Smeargle', ability: 'owntempo', moves: ['leechseed', 'splash'] },
+				{ species: 'Ditto', ability: 'owntempo', moves: ['splash'] },
+			],
+			[
+				{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] },
+				{ species: 'Blastoise', ability: 'dynahax', moves: ['splash'] },
+			],
+		]);
+		battle.makeChoices('move leechseed 1, move splash', 'move splash, move splash');
+		assert.equal(battle.p2.active[0].volatiles['leechseed'], undefined);
+	});
 });

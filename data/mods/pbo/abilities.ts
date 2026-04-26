@@ -83,7 +83,7 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 				'endeavor', 'finalgambit', 'simplebeam', 'destinybond', 'foulplay',
 				'bind', 'infestation', 'clamp', 'firespin', 'magmastorm',
 				'sandtomb', 'snaptrap', 'thundercage', 'whirlpool', 'wrap',
-				'healpulse', 'superfang', 'grudge', 'batonpass',
+				'healpulse', 'superfang', 'grudge', 'batonpass', 'leechseed',
 			]);
 			if (blocked.has(move.id) || move.ohko) {
 				this.add('-immune', target, '[from] ability: Dynahax');

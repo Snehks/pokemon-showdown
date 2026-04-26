@@ -119,7 +119,8 @@ const Abilities = {
         "healpulse",
         "superfang",
         "grudge",
-        "batonpass"
+        "batonpass",
+        "leechseed"
       ]);
       if (blocked.has(move.id) || move.ohko) {
         this.add("-immune", target, "[from] ability: Dynahax");
