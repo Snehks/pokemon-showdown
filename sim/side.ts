@@ -243,6 +243,9 @@ export class Side {
 		case 'triples': case 'rotation':
 			this.active = [null!, null!, null!];
 			break;
+		case 'horde':
+			this.active = Array(this.battle.format.activeSlotsPerSide![sideNum]).fill(null!);
+			break;
 		default:
 			this.active = [null!];
 		}

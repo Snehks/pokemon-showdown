@@ -98,7 +98,7 @@ class Battle {
     this.gameType = format.gameType || "singles";
     this.field = new import_field.Field(this);
     this.sides = Array(format.playerCount).fill(null);
-    this.activePerHalf = this.gameType === "triples" ? 3 : format.playerCount > 2 || this.gameType === "doubles" ? 2 : 1;
+    this.activePerHalf = format.activeSlotsPerSide ? Math.max(...format.activeSlotsPerSide) : this.gameType === "triples" ? 3 : format.playerCount > 2 || this.gameType === "doubles" ? 2 : 1;
     this.prng = options.prng || new import_prng.PRNG(options.seed || void 0);
     this.prngSeed = this.prng.startingSeed;
     this.rated = options.rated || !!options.rated;
@@ -1986,6 +1986,26 @@ class Battle {
    */
   validTargetLoc(targetLoc, source, targetType) {
     if (targetLoc === 0) return true;
+    if (this.gameType === "horde") {
+      const target = source.getAtLoc(targetLoc);
+      if (!target) return false;
+      const isSelf2 = source === target;
+      const isFoe2 = targetLoc > 0;
+      switch (targetType) {
+        case "randomNormal":
+        case "scripted":
+        case "normal":
+        case "adjacentFoe":
+          return isFoe2;
+        case "adjacentAlly":
+          return !isFoe2 && !isSelf2;
+        case "adjacentAllyOrSelf":
+          return !isFoe2 || isSelf2;
+        case "any":
+          return !isSelf2;
+      }
+      return false;
+    }
     const numSlots = this.activePerHalf;
     const sourceLoc = source.getLocOf(source);
     if (Math.abs(targetLoc) > numSlots) return false;

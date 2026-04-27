@@ -446,6 +446,7 @@ class Pokemon {
   }
   isAdjacent(pokemon2) {
     if (this.fainted || pokemon2.fainted) return false;
+    if (this.battle.gameType === "horde" && !this.isAlly(pokemon2)) return true;
     if (this.battle.activePerHalf <= 2) return this !== pokemon2;
     if (this.side === pokemon2.side) return Math.abs(this.position - pokemon2.position) === 1;
     return Math.abs(this.position + pokemon2.position + 1 - this.side.active.length) <= 1;

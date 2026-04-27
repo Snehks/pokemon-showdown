@@ -36,6 +36,13 @@ export const Formats: FormatList = [
 		ruleset: ['Sleep Clause Mod', 'Cancel Mod', 'HP Percentage Mod', 'Overflow Stat Mod', 'No Sturdy Wild', 'Terastal Clause', 'Z-Move Clause', 'Dynamax Clause'],
 	},
 	{
+		name: "[Gen 9] PBO Wild Horde 1v2",
+		mod: 'pbo',
+		gameType: 'horde',
+		activeSlotsPerSide: [1, 2],
+		ruleset: ['Sleep Clause Mod', 'Cancel Mod', 'HP Percentage Mod', 'Overflow Stat Mod', 'No Sturdy Wild', 'Terastal Clause', 'Z-Move Clause', 'Dynamax Clause'],
+	},
+	{
 		name: "[Gen 9] PBO PvP Battle No Preview",
 		mod: 'pbo',
 		ruleset: ['Sleep Clause Mod', 'Cancel Mod', 'HP Percentage Mod', 'Overflow Stat Mod', 'Terastal Clause', 'Z-Move Clause', 'Dynamax Clause'],

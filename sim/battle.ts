@@ -119,7 +119,7 @@ export class Battle {
 	 * The number of active pokemon per half-field.
 	 * See header comment in side.ts for details.
 	 */
-	readonly activePerHalf: 1 | 2 | 3;
+	readonly activePerHalf: 1 | 2 | 3 | 4 | 5;
 	readonly field: Field;
 	readonly sides: [Side, Side] | [Side, Side, Side, Side];
 	readonly prngSeed: PRNGSeed;
@@ -218,7 +218,8 @@ export class Battle {
 		this.gameType = (format.gameType || 'singles');
 		this.field = new Field(this);
 		this.sides = Array(format.playerCount).fill(null) as any;
-		this.activePerHalf = this.gameType === 'triples' ? 3 :
+		this.activePerHalf = format.activeSlotsPerSide ? Math.max(...format.activeSlotsPerSide) as 1 | 2 | 3 | 4 | 5 :
+			this.gameType === 'triples' ? 3 :
 			(format.playerCount > 2 || this.gameType === 'doubles') ? 2 :
 			1;
 		this.prng = options.prng || new PRNG(options.seed || undefined);
@@ -2401,6 +2402,27 @@ export class Battle {
 	 */
 	validTargetLoc(targetLoc: number, source: Pokemon, targetType: string) {
 		if (targetLoc === 0) return true;
+		if (this.gameType === 'horde') {
+			const target = source.getAtLoc(targetLoc);
+			if (!target) return false;
+			const isSelf = source === target;
+			const isFoe = targetLoc > 0;
+
+			switch (targetType) {
+			case 'randomNormal':
+			case 'scripted':
+			case 'normal':
+			case 'adjacentFoe':
+				return isFoe;
+			case 'adjacentAlly':
+				return !isFoe && !isSelf;
+			case 'adjacentAllyOrSelf':
+				return !isFoe || isSelf;
+			case 'any':
+				return !isSelf;
+			}
+			return false;
+		}
 		const numSlots = this.activePerHalf;
 		const sourceLoc = source.getLocOf(source);
 		if (Math.abs(targetLoc) > numSlots) return false;
@@ -3407,4 +3429,3 @@ export class Battle {
 		(this as any).log = [];
 	}
 }
-

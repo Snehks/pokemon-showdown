@@ -412,6 +412,8 @@ export class Format extends BasicEffect implements Readonly<BasicEffect> {
 	readonly rated: boolean | string;
 	/** Game type. */
 	readonly gameType: GameType;
+	/** Active slots for each side in asymmetric game types. */
+	readonly activeSlotsPerSide?: [number, number];
 	/** Number of players, based on game type, for convenience */
 	readonly playerCount: 2 | 4;
 	/** List of rule names. */
