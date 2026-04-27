@@ -1987,7 +1987,10 @@ class Battle {
   validTargetLoc(targetLoc, source, targetType) {
     if (targetLoc === 0) return true;
     if (this.gameType === "horde") {
-      const target = source.getAtLoc(targetLoc);
+      const targetSide = targetLoc > 0 ? source.side.foe : source.side;
+      const targetSlot = Math.abs(targetLoc) - 1;
+      if (targetSlot >= targetSide.active.length) return false;
+      const target = targetSide.active[targetSlot];
       if (!target) return false;
       const isSelf2 = source === target;
       const isFoe2 = targetLoc > 0;

@@ -43,4 +43,15 @@ describe('[PBO] Asymmetric wild horde battles', () => {
 		assert.fainted(secondWild);
 		assert(battle.ended, 'The battle should end after both wild slots faint');
 	});
+
+	it('should reject invalid horde target locations without throwing engine errors', () => {
+		battle = common.createBattle({formatid: 'gen9pbowildhorde1v2'}, [[
+			{species: 'Charizard', level: 100, ability: 'blaze', moves: ['dragonrage']},
+		], [
+			{species: 'Caterpie', level: 40, ability: 'shielddust', moves: ['splash']},
+			{species: 'Pidgey', level: 40, ability: 'keeneye', moves: ['splash']},
+		]]);
+
+		assert.cantTarget(() => battle.choose('p1', 'move 1 3'), 'dragon rage');
+	});
 });
