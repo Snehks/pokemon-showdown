@@ -57,8 +57,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 41 | `config/custom-formats.ts`, `sim/pokemon.ts` | NPC Doubles Battle format | New `gen9pbonpcdoublesbattle` format for NPC trainer double battles + EV clamping exception |
 | 42 | `config/custom-formats.ts` | Random Singles/Doubles formats | New `gen9pborandomsinglesbattle` and `gen9pborandomdoublesbattle` formats without Terastal Clause so random battles allow Tera with Showdown-assigned competitive tera types |
 | 43 | `data/mods/pbo/abilities.ts` | Dynahax Leech Seed block | Add `leechseed` to `onTryHit` blocked Set so Leech Seed fails on Dynamax raid bosses with `-immune` instead of applying the volatile |
+| 44 | `config/custom-formats.ts`, `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, `sim/pokemon.ts`, `test/sim/misc/pbo-asymmetric-horde.js` | Asymmetric wild horde format | Add PBO-only `horde` game type support for side-specific active slot counts such as player 1v2 wild battles |
 
-**Total: 42 changes across 10 files.**
+**Total: 44 changes across 14 files.**
 
 ---
 
@@ -746,10 +747,54 @@ both NPC singles (`gen9pbonpcnationaldex`) and NPC doubles
 
 ---
 
+## Change 44: Asymmetric wild horde format (config/custom-formats.ts, sim/dex-formats.ts, sim/global-types.ts, sim/battle.ts, sim/side.ts, sim/pokemon.ts)
+
+**What it does:** Adds a PBO-only horde battle shape for wild battles where the
+two sides do not have the same number of active slots. The first supported
+format is:
+
+- `gen9pbowildhorde1v2` — `[Gen 9] PBO Wild Horde 1v2`
+
+The format uses `gameType: 'horde'` and declares `activeSlotsPerSide: [1, 2]`.
+The engine still keeps `activePerHalf` as the maximum side width so shared
+field-position math continues to work, but `Side` initialization uses the
+per-side slot count for horde battles. Target validation and adjacency checks
+then treat opposing horde slots as reachable without pretending the player has
+an empty second active slot.
+
+**Files changed:**
+
+- `config/custom-formats.ts` — declares the `gen9pbowildhorde1v2` format.
+- `sim/dex-formats.ts` — adds optional `activeSlotsPerSide?: [number, number]`.
+- `sim/global-types.ts` — adds `horde` to `GameType`.
+- `sim/battle.ts` — derives `activePerHalf` from the widest side and adds horde
+  target validation, including a guard for invalid target slots.
+- `sim/side.ts` — creates each side's active array from `activeSlotsPerSide`
+  when `gameType === 'horde'`.
+- `sim/pokemon.ts` — treats opposing horde slots as adjacent for targetability.
+- `test/sim/misc/pbo-asymmetric-horde.js` — covers 1v2 slot shape, targeting,
+  wild-side actions, battle end after both wild Pokemon faint, and invalid
+  target rejection.
+
+**Why:** Showdown's standard battle shapes are symmetric: singles is 1v1,
+doubles is 2v2, triples is 3v3, etc. PBO wild hordes need battles such as one
+player Pokemon versus two wild Pokemon. Modeling that as doubles with a fainted
+or dummy player slot creates incorrect client requests and extra edge cases.
+A dedicated PBO horde game type lets the simulator represent the real battle
+shape directly while keeping the change gated to PBO formats.
+
+**Tests:** `test/sim/misc/pbo-asymmetric-horde.js` — `should run a 1v2 wild
+horde with independent wild slots` and `should reject invalid horde target
+locations without throwing engine errors`.
+
+**Original commits:** `91a7620ed` and `950b491f9`.
+
+---
+
 ## How to Upgrade
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
-2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/scripts.ts`, `data/mods/pbo/abilities.ts`, `data/mods/pbo/items.ts`, `data/mods/pbo/moves.ts`, and `config/custom-formats.ts`
+2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/scripts.ts`, `data/mods/pbo/abilities.ts`, `data/mods/pbo/items.ts`, `data/mods/pbo/moves.ts`, and `config/custom-formats.ts`. Also search for `activeSlotsPerSide` and `gameType === 'horde'` in `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, and `sim/pokemon.ts`.
 3. Resolve conflicts (changes are at end-of-interface and end-of-constructor)
 4. Run tests: `npm test` + PBO integration tests
 5. Tag: `git tag v<new_version>-pbo`
