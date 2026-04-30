@@ -58,8 +58,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 42 | `config/custom-formats.ts` | Random Singles/Doubles formats | New `gen9pborandomsinglesbattle` and `gen9pborandomdoublesbattle` formats without Terastal Clause so random battles allow Tera with Showdown-assigned competitive tera types |
 | 43 | `data/mods/pbo/abilities.ts` | Dynahax Leech Seed block | Add `leechseed` to `onTryHit` blocked Set so Leech Seed fails on Dynamax raid bosses with `-immune` instead of applying the volatile |
 | 44 | `config/custom-formats.ts`, `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, `sim/pokemon.ts`, `test/sim/misc/pbo-asymmetric-horde.js` | Asymmetric wild horde format | Add PBO-only `horde` game type support for side-specific active slot counts such as player 1v2 wild battles |
+| 45 | `data/mods/pbo/abilities.ts` | Cursed Body skip on Dynahax | Override Cursed Body so its 30% disable roll is skipped when the attacker has the Dynahax ability — prevents Dynamax raid bosses from being softlocked when their tiny Max-move set gets disabled |
 
-**Total: 44 changes across 14 files.**
+**Total: 45 changes across 14 files.**
 
 ---
 
@@ -791,7 +792,34 @@ locations without throwing engine errors`.
 
 ---
 
-## How to Upgrade
+## Change 45: Cursed Body skip on Dynahax (data/mods/pbo/abilities.ts)
+
+**What it does:** Overrides the vanilla `cursedbody` ability with `inherit: true`
+so the only handler that changes is `onDamagingHit`. The override mirrors the
+vanilla logic exactly (skip if attacker is already disabled, skip Max moves,
+skip future moves, skip Struggle, then `randomChance(3, 10)` to add the
+`disable` volatile) but adds an early `return` when the attacker has the
+Dynahax ability:
+
+```ts
+if (source.hasAbility('dynahax')) return;
+```
+
+`flags`, `name`, `rating`, and `num` come from the vanilla definition via
+`inherit: true`.
+
+**Why:** Dynamax raid bosses use the PBO-only Dynahax ability and their
+moveset is just a handful of Max moves. A successful Cursed Body disable on
+the boss's only viable attack can softlock or stall the encounter from the
+party's perspective. Dynahax already blocks a long list of disruptive effects
+(Disable, Encore, Taunt, Torment, Leech Seed, Destiny Bond, Grudge, Baton
+Pass, item theft, drain healing, etc.); skipping Cursed Body's disable roll
+fits squarely in that defensive blanket. This only affects raid encounters —
+in PvP, wild, NPC, and random battles no one has Dynahax, so vanilla Cursed
+Body behavior is unchanged.
+
+**Backward compatible:** No new fields, no schema change, no protocol change.
+Only a behavioral early-return for one ability against one ability.
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
 2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/scripts.ts`, `data/mods/pbo/abilities.ts`, `data/mods/pbo/items.ts`, `data/mods/pbo/moves.ts`, and `config/custom-formats.ts`. Also search for `activeSlotsPerSide` and `gameType === 'horde'` in `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, and `sim/pokemon.ts`.

@@ -32,6 +32,20 @@ const Abilities = {
       }
     }
   },
+  // [PBO] Cursed Body must not disable Dynahax raid boss moves — bosses have
+  // tiny Max-move sets and a successful disable can softlock the encounter.
+  cursedbody: {
+    inherit: true,
+    onDamagingHit(damage, target, source, move) {
+      if (source.volatiles["disable"]) return;
+      if (source.hasAbility("dynahax")) return;
+      if (!move.isMax && !move.flags["futuremove"] && move.id !== "struggle") {
+        if (this.randomChance(3, 10)) {
+          source.addVolatile("disable", this.effectState.target);
+        }
+      }
+    }
+  },
   dynahax: {
     // Block ALL non-move damage (weather ticks, status ticks, Life Orb, hazards, item damage, etc.)
     // Mirrors: cancelsStatusEffectDamage, cancelsWeatherEffectAffect,
