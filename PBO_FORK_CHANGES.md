@@ -59,8 +59,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 43 | `data/mods/pbo/abilities.ts` | Dynahax Leech Seed block | Add `leechseed` to `onTryHit` blocked Set so Leech Seed fails on Dynamax raid bosses with `-immune` instead of applying the volatile |
 | 44 | `config/custom-formats.ts`, `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, `sim/pokemon.ts`, `test/sim/misc/pbo-asymmetric-horde.js` | Asymmetric wild horde format | Add PBO-only `horde` game type support for side-specific active slot counts such as player 1v2 wild battles |
 | 45 | `data/mods/pbo/abilities.ts` | Cursed Body skip on Dynahax | Override Cursed Body so its 30% disable roll is skipped when the attacker has the Dynahax ability — prevents Dynamax raid bosses from being softlocked when their tiny Max-move set gets disabled |
+| 46 | `config/custom-formats.ts`, `sim/side.ts`, `test/sim/misc/pbo-asymmetric-horde.js` | Wider wild horde matrix | Add PBO wild horde 1v3, 1v4, and 1v5 formats and parse target slots beyond triples |
 
-**Total: 45 changes across 14 files.**
+**Total: 46 changes across 14 files.**
 
 ---
 
@@ -820,6 +821,28 @@ Body behavior is unchanged.
 
 **Backward compatible:** No new fields, no schema change, no protocol change.
 Only a behavioral early-return for one ability against one ability.
+
+---
+
+## Change 46: Wider wild horde matrix (config/custom-formats.ts, sim/side.ts)
+
+**What it does:** Extends the PBO horde format family from 1v2 to:
+
+- `gen9pbowildhorde1v3` — `[Gen 9] PBO Wild Horde 1v3`
+- `gen9pbowildhorde1v4` — `[Gen 9] PBO Wild Horde 1v4`
+- `gen9pbowildhorde1v5` — `[Gen 9] PBO Wild Horde 1v5`
+
+Each format uses `gameType: 'horde'` and an `activeSlotsPerSide` shape of
+`[1, N]`. Move-choice target parsing now accepts single-digit target locations
+up to 9 and relies on the existing horde target validation to reject slots that
+do not exist for the current battle.
+
+**Why:** PBO's first asymmetric wild battle only covered 1v2. The server now
+needs the same real side-count model for larger solo hordes, and target slots
+4 and 5 must parse as locations rather than being folded into the move id.
+
+**Tests:** `test/sim/misc/pbo-asymmetric-horde.js` covers 1v3, 1v4, and 1v5
+target legality, spread moves, invalid targets, and win conditions.
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
 2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/scripts.ts`, `data/mods/pbo/abilities.ts`, `data/mods/pbo/items.ts`, `data/mods/pbo/moves.ts`, and `config/custom-formats.ts`. Also search for `activeSlotsPerSide` and `gameType === 'horde'` in `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, and `sim/pokemon.ts`.
