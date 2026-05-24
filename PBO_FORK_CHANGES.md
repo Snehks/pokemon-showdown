@@ -60,7 +60,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 44 | `config/custom-formats.ts`, `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, `sim/pokemon.ts`, `test/sim/misc/pbo-asymmetric-horde.js` | Asymmetric wild horde format | Add PBO-only `horde` game type support for side-specific active slot counts such as player 1v2 wild battles |
 | 45 | `data/mods/pbo/abilities.ts` | Cursed Body skip on Dynahax | Override Cursed Body so its 30% disable roll is skipped when the attacker has the Dynahax ability — prevents Dynamax raid bosses from being softlocked when their tiny Max-move set gets disabled |
 | 46 | `config/custom-formats.ts`, `sim/side.ts`, `test/sim/misc/pbo-asymmetric-horde.js` | Wider wild horde matrix | Add PBO wild horde 1v3, 1v4, and 1v5 formats and parse target slots beyond triples |
-| 47 | `data/mods/pbo/abilities.ts` | Dynahax exploit setup move block | Disable Skill Swap, Focus Energy, Power Trick, and Dragon Cheer for foes while Dynahax bosses are active |
+| 47 | `data/mods/pbo/abilities.ts` | Dynahax exploit setup move block | Disable Skill Swap, Power Trick, and Dragon Cheer for foes while Dynahax bosses are active |
 
 **Total: 47 changes across 14 files.**
 
@@ -852,23 +852,22 @@ target legality, spread moves, invalid targets, and win conditions.
 **What it does:** Extends Dynahax's `onFoeDisableMove` protection to disable:
 
 - `skillswap`
-- `focusenergy`
 - `powertrick`
 - `dragoncheer`
 
 Skill Swap was already blocked when used directly into a Dynahax boss, but it
-still appeared as selectable. Focus Energy and Power Trick target the user, and
-Dragon Cheer targets an ally, so none of those moves reach the boss's
-`onTryHit` handler.
+still appeared as selectable. Power Trick targets the user and Dragon Cheer
+targets an ally, so neither move reaches the boss's `onTryHit` handler.
 
 **Why:** These setup moves let players stack or transfer crit/stat advantages
 around Dynamax raid bosses in doubles. In particular, Dragon Cheer can create
 Focus Energy-style crit pressure without switching, which can trivialize
-Dynahax boss damage races.
+Dynahax boss damage races. Focus Energy itself is intentionally left enabled
+so players retain a single-Pokemon crit setup option.
 
 **Tests:** `test/sim/abilities/dynahax-moves.js` now verifies Skill Swap,
-Focus Energy, Power Trick, and Dragon Cheer are disabled in the
-`gen9pbonpcdoublesbattle` format while Dynahax bosses are active.
+Power Trick, and Dragon Cheer are disabled in the `gen9pbonpcdoublesbattle`
+format while Dynahax bosses are active.
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
 2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/scripts.ts`, `data/mods/pbo/abilities.ts`, `data/mods/pbo/items.ts`, `data/mods/pbo/moves.ts`, and `config/custom-formats.ts`. Also search for `activeSlotsPerSide` and `gameType === 'horde'` in `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, and `sim/pokemon.ts`.

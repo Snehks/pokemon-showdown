@@ -87,12 +87,12 @@ const Abilities = {
       return false;
     },
     // Disable moves that bypass onTryHit or should not rely on targeting the boss.
-    // Destiny Bond / Grudge / Baton Pass / Focus Energy / Power Trick target the user.
+    // Destiny Bond / Grudge / Baton Pass / Power Trick target the user.
     // Dragon Cheer targets an ally, and Skill Swap should be disabled instead of only failing on use.
     // Pattern: same as Imprison's onFoeDisableMove.
     onFoeDisableMove(pokemon) {
       for (const moveSlot of pokemon.moveSlots) {
-        if (moveSlot.id === "destinybond" || moveSlot.id === "grudge" || moveSlot.id === "batonpass" || moveSlot.id === "skillswap" || moveSlot.id === "focusenergy" || moveSlot.id === "powertrick" || moveSlot.id === "dragoncheer") {
+        if (moveSlot.id === "destinybond" || moveSlot.id === "grudge" || moveSlot.id === "batonpass" || moveSlot.id === "skillswap" || moveSlot.id === "powertrick" || moveSlot.id === "dragoncheer") {
           pokemon.disableMove(moveSlot.id);
         }
       }

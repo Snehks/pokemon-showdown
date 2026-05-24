@@ -136,7 +136,7 @@ describe('Dynahax [Blocked Moves]', () => {
 	});
 
 	it('should disable Skill Swap and exploit setup moves for foes', () => {
-		for (const move of ['skillswap', 'focusenergy', 'powertrick', 'dragoncheer']) {
+		for (const move of ['skillswap', 'powertrick', 'dragoncheer']) {
 			if (battle) {
 				battle.destroy();
 				battle = null;
