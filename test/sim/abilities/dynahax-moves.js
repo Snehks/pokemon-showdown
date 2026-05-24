@@ -9,7 +9,8 @@ let battle;
 
 describe('Dynahax [Blocked Moves]', () => {
 	afterEach(() => {
-		battle.destroy();
+		if (battle) battle.destroy();
+		battle = null;
 	});
 
 	it('should block Taunt', () => {
@@ -67,12 +68,15 @@ describe('Dynahax [Blocked Moves]', () => {
 		assert.equal(battle.p2.active[0].ability, 'dynahax');
 	});
 
-	it('should block Skill Swap', () => {
+	it('should disable Skill Swap', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
-			[{ species: 'Smeargle', ability: 'owntempo', moves: ['skillswap'] }],
+			[{ species: 'Smeargle', ability: 'owntempo', moves: ['skillswap', 'tackle'] }],
 			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
 		]);
-		battle.makeChoices('move skillswap', 'move splash');
+
+		const skillSwap = battle.p1.activeRequest.active[0].moves.find(move => move.id === 'skillswap');
+		assert(skillSwap);
+		assert.equal(skillSwap.disabled, true);
 		assert.equal(battle.p2.active[0].ability, 'dynahax');
 	});
 
@@ -129,6 +133,29 @@ describe('Dynahax [Blocked Moves]', () => {
 			[{ species: 'Charizard', ability: 'dynahax', moves: ['flamethrower'] }],
 		]);
 		assert.cantMove(() => battle.makeChoices('move batonpass', 'move flamethrower'), 'Smeargle', 'Baton Pass', true);
+	});
+
+	it('should disable Skill Swap and exploit setup moves for foes', () => {
+		for (const move of ['skillswap', 'focusenergy', 'powertrick', 'dragoncheer']) {
+			if (battle) {
+				battle.destroy();
+				battle = null;
+			}
+			battle = common.createBattle({ formatid: 'gen9pbonpcdoublesbattle' }, [
+				[
+					{ species: 'Smeargle', ability: 'owntempo', moves: [move, 'splash'] },
+					{ species: 'Garchomp', ability: 'roughskin', moves: ['splash'] },
+				],
+				[
+					{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] },
+					{ species: 'Blastoise', ability: 'dynahax', moves: ['splash'] },
+				],
+			]);
+
+			const smeargleMove = battle.p1.activeRequest.active[0].moves.find(activeMove => activeMove.id === move);
+			assert(smeargleMove);
+			assert.equal(smeargleMove.disabled, true);
+		}
 	});
 
 	it('should block Heal Pulse', () => {

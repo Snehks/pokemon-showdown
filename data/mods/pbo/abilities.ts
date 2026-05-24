@@ -56,8 +56,8 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 		// so stat stages, abilities, items, burns, etc. do NOT flip the category mid-battle.
 		onModifyMove(move, pokemon) {
 			if (move.isMax) {
-				move.category = pokemon.storedStats.spa > pokemon.storedStats.atk
-					? 'Special' : 'Physical';
+				move.category = pokemon.storedStats.spa > pokemon.storedStats.atk ?
+					'Special' : 'Physical';
 			}
 		},
 
@@ -75,12 +75,21 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 			return false;
 		},
 
-		// Disable self-targeting moves that bypass onTryHit (which only fires on the target).
-		// Destiny Bond / Grudge / Baton Pass target the user, not the boss, so onTryHit never sees them.
+		// Disable moves that bypass onTryHit or should not rely on targeting the boss.
+		// Destiny Bond / Grudge / Baton Pass / Focus Energy / Power Trick target the user.
+		// Dragon Cheer targets an ally, and Skill Swap should be disabled instead of only failing on use.
 		// Pattern: same as Imprison's onFoeDisableMove.
 		onFoeDisableMove(pokemon) {
 			for (const moveSlot of pokemon.moveSlots) {
-				if (moveSlot.id === 'destinybond' || moveSlot.id === 'grudge' || moveSlot.id === 'batonpass') {
+				if (
+					moveSlot.id === 'destinybond' ||
+					moveSlot.id === 'grudge' ||
+					moveSlot.id === 'batonpass' ||
+					moveSlot.id === 'skillswap' ||
+					moveSlot.id === 'focusenergy' ||
+					moveSlot.id === 'powertrick' ||
+					moveSlot.id === 'dragoncheer'
+				) {
 					pokemon.disableMove(moveSlot.id);
 				}
 			}
