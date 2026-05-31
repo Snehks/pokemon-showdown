@@ -77,6 +77,7 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 
 		// Disable moves that bypass onTryHit or should not rely on targeting the boss.
 		// Destiny Bond / Grudge / Baton Pass / Power Trick target the user.
+		// Guard Split / Power Split / Speed Swap swap stats with the boss and trivialise raids.
 		// Dragon Cheer targets an ally, and Skill Swap should be disabled instead of only failing on use.
 		// Pattern: same as Imprison's onFoeDisableMove.
 		onFoeDisableMove(pokemon) {
@@ -87,7 +88,10 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 					moveSlot.id === 'batonpass' ||
 					moveSlot.id === 'skillswap' ||
 					moveSlot.id === 'powertrick' ||
-					moveSlot.id === 'dragoncheer'
+					moveSlot.id === 'dragoncheer' ||
+					moveSlot.id === 'guardsplit' ||
+					moveSlot.id === 'powersplit' ||
+					moveSlot.id === 'speedswap'
 				) {
 					pokemon.disableMove(moveSlot.id);
 				}

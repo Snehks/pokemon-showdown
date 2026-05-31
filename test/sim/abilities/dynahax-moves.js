@@ -136,7 +136,7 @@ describe('Dynahax [Blocked Moves]', () => {
 	});
 
 	it('should disable Skill Swap and exploit setup moves for foes', () => {
-		for (const move of ['skillswap', 'powertrick', 'dragoncheer']) {
+		for (const move of ['skillswap', 'powertrick', 'dragoncheer', 'guardsplit', 'powersplit', 'speedswap']) {
 			if (battle) {
 				battle.destroy();
 				battle = null;
@@ -156,6 +156,19 @@ describe('Dynahax [Blocked Moves]', () => {
 			assert(smeargleMove);
 			assert.equal(smeargleMove.disabled, true);
 		}
+	});
+
+	it('should keep Focus Energy enabled for foes', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Smeargle', ability: 'owntempo', moves: ['focusenergy', 'tackle'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+		]);
+
+		const focusEnergy = battle.p1.activeRequest.active[0].moves.find(activeMove => activeMove.id === 'focusenergy');
+		assert(focusEnergy);
+		assert.equal(focusEnergy.disabled, false);
+		battle.makeChoices('move focusenergy', 'move splash');
+		assert(battle.p1.active[0].volatiles['focusenergy']);
 	});
 
 	it('should block Heal Pulse', () => {

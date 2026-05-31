@@ -61,8 +61,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 45 | `data/mods/pbo/abilities.ts` | Cursed Body skip on Dynahax | Override Cursed Body so its 30% disable roll is skipped when the attacker has the Dynahax ability — prevents Dynamax raid bosses from being softlocked when their tiny Max-move set gets disabled |
 | 46 | `config/custom-formats.ts`, `sim/side.ts`, `test/sim/misc/pbo-asymmetric-horde.js` | Wider wild horde matrix | Add PBO wild horde 1v3, 1v4, and 1v5 formats and parse target slots beyond triples |
 | 47 | `data/mods/pbo/abilities.ts` | Dynahax exploit setup move block | Disable Skill Swap, Power Trick, and Dragon Cheer for foes while Dynahax bosses are active |
+| 48 | `data/mods/pbo/abilities.ts` | Dynahax stat-swap move block | Disable Guard Split, Power Split, and Speed Swap for foes while Dynahax bosses are active (Focus Energy stays enabled) |
 
-**Total: 47 changes across 14 files.**
+**Total: 48 changes across 14 files.**
 
 ---
 
@@ -868,6 +869,32 @@ so players retain a single-Pokemon crit setup option.
 **Tests:** `test/sim/abilities/dynahax-moves.js` now verifies Skill Swap,
 Power Trick, and Dragon Cheer are disabled in the `gen9pbonpcdoublesbattle`
 format while Dynahax bosses are active.
+
+---
+
+## Change 48: Dynahax stat-swap move block (data/mods/pbo/abilities.ts)
+
+**What it does:** Extends Dynahax's `onFoeDisableMove` protection further to disable:
+
+- `guardsplit`
+- `powersplit`
+- `speedswap`
+
+These moves don't go through `onTryHit` cleanly because they target the boss
+to swap stats rather than apply a status or do damage, so they previously
+slipped past Dynahax's other protections.
+
+**Why:** Guard Split / Power Split / Speed Swap let a player average or steal
+a raid boss's stats — a frail Smeargle equalising HP/Defenses with a Dynamax
+boss trivialises raid damage races and breaks the boss's intended difficulty
+curve. Focus Energy is **intentionally not on this list** — single-Pokemon
+crit setup is a fair pressure tool against raid bosses (see Change 47 notes).
+
+**Tests:** `test/sim/abilities/dynahax-moves.js` extends the exploit-setup
+loop to cover `guardsplit`, `powersplit`, `speedswap` and adds an explicit
+"Focus Energy still works" case so the allowed/blocked split is regression-tested.
+
+---
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
 2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/scripts.ts`, `data/mods/pbo/abilities.ts`, `data/mods/pbo/items.ts`, `data/mods/pbo/moves.ts`, and `config/custom-formats.ts`. Also search for `activeSlotsPerSide` and `gameType === 'horde'` in `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, and `sim/pokemon.ts`.
