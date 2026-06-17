@@ -62,8 +62,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 46 | `config/custom-formats.ts`, `sim/side.ts`, `test/sim/misc/pbo-asymmetric-horde.js` | Wider wild horde matrix | Add PBO wild horde 1v3, 1v4, and 1v5 formats and parse target slots beyond triples |
 | 47 | `data/mods/pbo/abilities.ts` | Dynahax exploit setup move block | Disable Skill Swap, Power Trick, and Dragon Cheer for foes while Dynahax bosses are active |
 | 48 | `data/mods/pbo/abilities.ts` | Dynahax stat-swap move block | Disable Guard Split, Power Split, and Speed Swap for foes while Dynahax bosses are active (Focus Energy stays enabled) |
+| 49 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 event forms | Register 28 Summer 2026 cosmetic forms (24 base + 4 Mega) in PBO_EVENT_FORMS |
 
-**Total: 48 changes across 14 files.**
+**Total: 49 changes across 14 files.**
 
 ---
 
@@ -893,6 +894,31 @@ crit setup is a fair pressure tool against raid bosses (see Change 47 notes).
 **Tests:** `test/sim/abilities/dynahax-moves.js` extends the exploit-setup
 loop to cover `guardsplit`, `powersplit`, `speedswap` and adds an explicit
 "Focus Energy still works" case so the allowed/blocked split is regression-tested.
+
+---
+
+## Change 49: Summer 2026 S3 event forms (data/mods/pbo/scripts.ts)
+
+**What it does:** Registers 28 Summer 2026 cosmetic event forms (suffix `S3`) in
+the `PBO_EVENT_FORMS` array — 24 base forms (Froakie-S3, Frogadier-S3, Greninja-S3,
+Whimsicott-S3, Sceptile-S3, Samurott-Hisui-S3, Gliscor-S3, Flareon-S3, Venusaur-S3,
+Grimmsnarl-S3, Salamence-S3, Terrakion-S3, Pecharunt-S3, Barbaracle-S3, Zangoose-S3,
+Scyther-S3, Lucario-S3, Infernape-S3, Gyarados-S3, Blastoise-S3, Jolteon-S3,
+Vaporeon-S3, Glaceon-S3, Crawdaunt-S3) and 4 Mega forms (Gyarados-Mega-S3,
+Venusaur-Mega-S3, Salamence-Mega-S3, Sceptile-Mega-S3). Each entry is a
+`[eventId, baseId, displayName, "S3"]` tuple consumed by the `init()` handler
+(Change 39), which clones the base species' battle data under the new id.
+
+**Why:** The PBO Summer 2026 event ships these skinned variants. Without
+registration in the fork, the server packs a team referencing e.g. `greninjas3`
+and Showdown rejects it as an unknown species. The Mega-S3 forms clone the base
+mega species so a summer form holding its Mega Stone evolves into the matching
+summer mega.
+
+**Tests:** Verified post-build that all 28 forms resolve via
+`Dex.mod('pbo').species.get(id)` with stats/types/abilities inherited from the
+base species (e.g. `gyaradosmegas3` → Water/Dark, Atk 155), and that every base
+id exists in the vanilla Pokedex so `init()` skips none.
 
 ---
 
