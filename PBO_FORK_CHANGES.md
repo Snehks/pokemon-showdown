@@ -63,8 +63,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 47 | `data/mods/pbo/abilities.ts` | Dynahax exploit setup move block | Disable Skill Swap, Power Trick, and Dragon Cheer for foes while Dynahax bosses are active |
 | 48 | `data/mods/pbo/abilities.ts` | Dynahax stat-swap move block | Disable Guard Split, Power Split, and Speed Swap for foes while Dynahax bosses are active (Focus Energy stays enabled) |
 | 49 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 event forms | Register 28 Summer 2026 cosmetic forms (24 base + 4 Mega) in PBO_EVENT_FORMS |
+| 50 | `data/mods/pbo/abilities.ts` | Dynahax Bestow block | Disable Bestow in the picker (`onFoeDisableMove`) and keep it in the `onTryHit` blocked Set so it fails against Dynahax bosses instead of handing them the foe's held item |
 
-**Total: 49 changes across 14 files.**
+**Total: 50 changes across 14 files.**
 
 ---
 
@@ -919,6 +920,35 @@ summer mega.
 `Dex.mod('pbo').species.get(id)` with stats/types/abilities inherited from the
 base species (e.g. `gyaradosmegas3` → Water/Dark, Atk 155), and that every base
 id exists in the vanilla Pokedex so `init()` skips none.
+
+---
+
+## Change 50: Dynahax Bestow block (data/mods/pbo/abilities.ts)
+
+**What it does:** Disables Bestow against Dynahax raid bosses via two
+complementary hooks — the same belt-and-braces pattern already used for Skill
+Swap:
+
+- `onFoeDisableMove` greys Bestow out in the foe's move picker so it can never
+  be selected against a boss.
+- `onTryHit` keeps `bestow` in the blocked Set so any indirect call (e.g.
+  Metronome) still fails with `-immune` text and never resolves against the boss.
+
+**Why:** Bestow (`target: "normal"`) hands the *user's* held item to the
+target via `onHit`. Against a Dynamax raid boss this would force a held item
+onto the boss — e.g. handing it a Choice/berry/utility item it was never
+intended to carry — which can alter the boss's behaviour and trivialise the
+encounter. Bestow's item transfer slipped past Dynahax's existing item
+protection: `onTakeItem` only blocks foes *stealing* the boss's item
+(Magician/Pickpocket/Trick taking), not a foe *giving* one. Disabling it in
+the picker matches the Destiny Bond / Baton Pass UX (no wasted turn), and the
+`onTryHit` guard mirrors how Trick / Switcheroo are handled as a robust
+catch-all. Affects both NPC singles (`gen9pbonpcnationaldex`) and NPC doubles
+(`gen9pbonpcdoublesbattle`) raid formats.
+
+**Tests:** `test/sim/abilities/dynahax-moves.js` — `should disable Bestow in
+the picker for foes` asserts the move's `disabled` flag, that the choice is
+rejected, and that neither side's held item moves.
 
 ---
 

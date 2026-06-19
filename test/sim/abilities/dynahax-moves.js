@@ -59,6 +59,21 @@ describe('Dynahax [Blocked Moves]', () => {
 		assert.equal(battle.p2.active[0].item, 'leftovers');
 	});
 
+	it('should disable Bestow in the picker for foes', () => {
+		battle = common.createBattle({ formatid: FORMAT }, [
+			[{ species: 'Smeargle', ability: 'owntempo', item: 'leftovers', moves: ['bestow', 'tackle'] }],
+			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+		]);
+
+		const bestow = battle.p1.activeRequest.active[0].moves.find(move => move.id === 'bestow');
+		assert(bestow);
+		assert.equal(bestow.disabled, true);
+		// Boss never picks up the foe's item, and the foe keeps it.
+		assert.cantMove(() => battle.makeChoices('move bestow', 'move splash'), 'Smeargle', 'Bestow', true);
+		assert.equal(battle.p2.active[0].item, '');
+		assert.equal(battle.p1.active[0].item, 'leftovers');
+	});
+
 	it('should block Entrainment', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
 			[{ species: 'Smeargle', ability: 'owntempo', moves: ['entrainment'] }],

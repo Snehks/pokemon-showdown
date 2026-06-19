@@ -78,7 +78,9 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 		// Disable moves that bypass onTryHit or should not rely on targeting the boss.
 		// Destiny Bond / Grudge / Baton Pass / Power Trick target the user.
 		// Guard Split / Power Split / Speed Swap swap stats with the boss and trivialise raids.
-		// Dragon Cheer targets an ally, and Skill Swap should be disabled instead of only failing on use.
+		// Dragon Cheer targets an ally. Skill Swap and Bestow are disabled in the picker
+		// instead of only failing on use (Bestow still also fails via onTryHit as a
+		// catch-all for indirect calls like Metronome).
 		// Pattern: same as Imprison's onFoeDisableMove.
 		onFoeDisableMove(pokemon) {
 			for (const moveSlot of pokemon.moveSlots) {
@@ -87,6 +89,7 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 					moveSlot.id === 'grudge' ||
 					moveSlot.id === 'batonpass' ||
 					moveSlot.id === 'skillswap' ||
+					moveSlot.id === 'bestow' ||
 					moveSlot.id === 'powertrick' ||
 					moveSlot.id === 'dragoncheer' ||
 					moveSlot.id === 'guardsplit' ||
@@ -105,7 +108,7 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 			const blocked = new Set([
 				'soak', 'magicpowder', 'trickortreat', 'forestscurse',
 				'doodle', 'perishsong', 'torment', 'taunt', 'encore',
-				'trick', 'switcheroo', 'entrainment', 'skillswap', 'painsplit',
+				'trick', 'switcheroo', 'bestow', 'entrainment', 'skillswap', 'painsplit',
 				'endeavor', 'finalgambit', 'simplebeam', 'destinybond', 'foulplay',
 				'bind', 'infestation', 'clamp', 'firespin', 'magmastorm',
 				'sandtomb', 'snaptrap', 'thundercage', 'whirlpool', 'wrap',
