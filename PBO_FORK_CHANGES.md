@@ -64,8 +64,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 48 | `data/mods/pbo/abilities.ts` | Dynahax stat-swap move block | Disable Guard Split, Power Split, and Speed Swap for foes while Dynahax bosses are active (Focus Energy stays enabled) |
 | 49 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 event forms | Register 28 Summer 2026 cosmetic forms (24 base + 4 Mega) in PBO_EVENT_FORMS |
 | 50 | `data/mods/pbo/abilities.ts` | Dynahax Bestow block | Disable Bestow in the picker (`onFoeDisableMove`) and keep it in the `onTryHit` blocked Set so it fails against Dynahax bosses instead of handing them the foe's held item |
+| 51 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 legendary forms | Register 3 more Summer 2026 forms (Latias-S3, Latios-S3, Volcanion-S3) in PBO_EVENT_FORMS |
 
-**Total: 50 changes across 14 files.**
+**Total: 51 changes across 14 files.**
 
 ---
 
@@ -949,6 +950,32 @@ catch-all. Affects both NPC singles (`gen9pbonpcnationaldex`) and NPC doubles
 **Tests:** `test/sim/abilities/dynahax-moves.js` — `should disable Bestow in
 the picker for foes` asserts the move's `disabled` flag, that the choice is
 rejected, and that neither side's held item moves.
+
+---
+
+## Change 51: Summer 2026 S3 legendary forms (data/mods/pbo/scripts.ts)
+
+**What it does:** Registers 3 additional Summer 2026 cosmetic event forms (suffix
+`S3`) in the `PBO_EVENT_FORMS` array — Latias-S3 (`latiass3`), Latios-S3
+(`latioss3`), and Volcanion-S3 (`volcanions3`). Each is a
+`[eventId, baseId, displayName, "S3"]` tuple consumed by the `init()` handler
+(Change 39), which clones the base species' battle data under the new id. These
+extend Change 49's batch — these three legendaries were in prior summer events
+(they already have `-S` and `-S2` forms) but were missing from the initial S3
+registration. Suffix `S3` = Summer event #3, applied uniformly to every form for
+the event (not a per-species serial).
+
+**Why:** The PBO Summer 2026 event ships these skinned legendary variants
+(Latios/Latias exchange NPCs, Volcanion ladder reward). Without registration in
+the fork, the server packs a team referencing e.g. `latiass3` and Showdown
+rejects it as an unknown species. No `megas.csv` row or `otherFormes` mega-link
+is added — matching the most-recent `-S2` precedent for these species, so the
+S3 forms do not mega-evolve in battle.
+
+**Tests:** Verified post-build that all 3 forms resolve via the compiled
+`dist/data/mods/pbo/scripts.js` `PBO_EVENT_FORMS` (31 total `S3` tuples = 28 from
+Change 49 + 3), with every base id (`latias`, `latios`, `volcanion`) present in
+the vanilla Pokedex so `init()` clones rather than skips.
 
 ---
 
