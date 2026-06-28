@@ -205,44 +205,28 @@ describe('Dynahax [Blocked Moves]', () => {
 		assert.fullHP(battle.p2.active[0]);
 	});
 
-	it('should block Soak', () => {
-		battle = common.createBattle({ formatid: FORMAT }, [
-			[{ species: 'Smeargle', ability: 'owntempo', moves: ['soak'] }],
-			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
-		]);
-		const typesBefore = battle.p2.active[0].getTypes().join('/');
-		battle.makeChoices('move soak', 'move splash');
-		assert.equal(battle.p2.active[0].getTypes().join('/'), typesBefore);
-	});
+	it('should disable type-change and banned moves in the picker for foes', () => {
+		// Type-change moves (Soak / Magic Powder / Trick-or-Treat / Forest's Curse / Doodle)
+		// were only blocked when aimed at the boss via onTryHit; players cast them on an ALLY
+		// to gain a typing immunity, which never targets the boss. They are now disabled in the
+		// picker like Destiny Bond. Imprison / Role Play / Copycat are banned & disabled outright.
+		for (const move of [
+			'soak', 'magicpowder', 'trickortreat', 'forestscurse', 'doodle',
+			'imprison', 'roleplay', 'copycat',
+		]) {
+			if (battle) {
+				battle.destroy();
+				battle = null;
+			}
+			battle = common.createBattle({ formatid: FORMAT }, [
+				[{ species: 'Smeargle', ability: 'owntempo', moves: [move, 'tackle'] }],
+				[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+			]);
 
-	it('should block Magic Powder', () => {
-		battle = common.createBattle({ formatid: FORMAT }, [
-			[{ species: 'Hatterene', ability: 'owntempo', moves: ['magicpowder'] }],
-			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
-		]);
-		const typesBefore = battle.p2.active[0].getTypes().join('/');
-		battle.makeChoices('move magicpowder', 'move splash');
-		assert.equal(battle.p2.active[0].getTypes().join('/'), typesBefore);
-	});
-
-	it('should block Trick-or-Treat', () => {
-		battle = common.createBattle({ formatid: FORMAT }, [
-			[{ species: 'Gourgeist', ability: 'owntempo', moves: ['trickortreat'] }],
-			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
-		]);
-		const typesBefore = battle.p2.active[0].getTypes().join('/');
-		battle.makeChoices('move trickortreat', 'move splash');
-		assert.equal(battle.p2.active[0].getTypes().join('/'), typesBefore);
-	});
-
-	it("should block Forest's Curse", () => {
-		battle = common.createBattle({ formatid: FORMAT }, [
-			[{ species: 'Trevenant', ability: 'owntempo', moves: ['forestscurse'] }],
-			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
-		]);
-		const typesBefore = battle.p2.active[0].getTypes().join('/');
-		battle.makeChoices('move forestscurse', 'move splash');
-		assert.equal(battle.p2.active[0].getTypes().join('/'), typesBefore);
+			const smeargleMove = battle.p1.activeRequest.active[0].moves.find(activeMove => activeMove.id === move);
+			assert(smeargleMove, `${move} should be in the request`);
+			assert.equal(smeargleMove.disabled, true, `${move} must be disabled in the Dynahax picker`);
+		}
 	});
 
 	it('should block Simple Beam', () => {

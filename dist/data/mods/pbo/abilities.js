@@ -92,10 +92,17 @@ const Abilities = {
     // Dragon Cheer targets an ally. Skill Swap and Bestow are disabled in the picker
     // instead of only failing on use (Bestow still also fails via onTryHit as a
     // catch-all for indirect calls like Metronome).
+    // Soak / Magic Powder / Trick-or-Treat / Forest's Curse / Doodle change a target's
+    // typing — players cast them on an ALLY (never the boss) to make the ally immune to
+    // the boss's attacks, which onTryHit alone can't stop (the boss is not the target).
+    // Disabling them in the picker (like Destiny Bond) blocks every target.
+    // Imprison / Role Play / Copycat are banned & disabled: Imprison locks the boss out of
+    // shared moves, Role Play / Copycat copy abilities/moves to break intended checks. They
+    // stay in the onTryHit blocked set too as a catch-all for indirect calls (Metronome).
     // Pattern: same as Imprison's onFoeDisableMove.
     onFoeDisableMove(pokemon) {
       for (const moveSlot of pokemon.moveSlots) {
-        if (moveSlot.id === "destinybond" || moveSlot.id === "grudge" || moveSlot.id === "batonpass" || moveSlot.id === "skillswap" || moveSlot.id === "bestow" || moveSlot.id === "powertrick" || moveSlot.id === "dragoncheer" || moveSlot.id === "guardsplit" || moveSlot.id === "powersplit" || moveSlot.id === "speedswap") {
+        if (moveSlot.id === "destinybond" || moveSlot.id === "grudge" || moveSlot.id === "batonpass" || moveSlot.id === "skillswap" || moveSlot.id === "bestow" || moveSlot.id === "powertrick" || moveSlot.id === "dragoncheer" || moveSlot.id === "guardsplit" || moveSlot.id === "powersplit" || moveSlot.id === "speedswap" || moveSlot.id === "soak" || moveSlot.id === "magicpowder" || moveSlot.id === "trickortreat" || moveSlot.id === "forestscurse" || moveSlot.id === "doodle" || moveSlot.id === "imprison" || moveSlot.id === "roleplay" || moveSlot.id === "copycat") {
           pokemon.disableMove(moveSlot.id);
         }
       }
@@ -139,7 +146,10 @@ const Abilities = {
         "superfang",
         "grudge",
         "batonpass",
-        "leechseed"
+        "leechseed",
+        "imprison",
+        "roleplay",
+        "copycat"
       ]);
       if (blocked.has(move.id) || move.ohko) {
         this.add("-immune", target, "[from] ability: Dynahax");

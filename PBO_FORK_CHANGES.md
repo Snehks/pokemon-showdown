@@ -65,8 +65,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 49 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 event forms | Register 28 Summer 2026 cosmetic forms (24 base + 4 Mega) in PBO_EVENT_FORMS |
 | 50 | `data/mods/pbo/abilities.ts` | Dynahax Bestow block | Disable Bestow in the picker (`onFoeDisableMove`) and keep it in the `onTryHit` blocked Set so it fails against Dynahax bosses instead of handing them the foe's held item |
 | 51 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 legendary forms | Register 3 more Summer 2026 forms (Latias-S3, Latios-S3, Volcanion-S3) in PBO_EVENT_FORMS |
+| 52 | `data/mods/pbo/abilities.ts` | Dynahax type-change & move-copy block | Disable Soak / Magic Powder / Trick-or-Treat / Forest's Curse / Doodle in the picker (players cast them on an ally for a typing immunity, which never targets the boss so onTryHit can't stop it) and ban & disable Imprison / Role Play / Copycat (added to both `onFoeDisableMove` and the `onTryHit` blocked Set) |
 
-**Total: 51 changes across 14 files.**
+**Total: 52 changes across 14 files.**
 
 ---
 
@@ -976,6 +977,35 @@ S3 forms do not mega-evolve in battle.
 `dist/data/mods/pbo/scripts.js` `PBO_EVENT_FORMS` (31 total `S3` tuples = 28 from
 Change 49 + 3), with every base id (`latias`, `latios`, `volcanion`) present in
 the vanilla Pokedex so `init()` clones rather than skips.
+
+---
+
+## Change 52: Dynahax type-change & move-copy block (data/mods/pbo/abilities.ts)
+
+**What it does:** Extends Dynahax's foe-move protection in two ways:
+
+- Adds `soak`, `magicpowder`, `trickortreat`, `forestscurse`, and `doodle` to
+  `onFoeDisableMove` so they are greyed out in the foe's picker (like Destiny
+  Bond). They were already in the `onTryHit` blocked Set, but that only fires
+  when the move targets the boss.
+- Adds `imprison`, `roleplay`, and `copycat` to **both** `onFoeDisableMove` and
+  the `onTryHit` blocked Set ("banned & disabled") — disabled in the picker, with
+  the `onTryHit` entry as a catch-all for indirect calls (e.g. Metronome).
+
+**Why:** The type-change moves were exploitable because Dynamax raids are
+multi-player: a player would cast Soak / Trick-or-Treat / Forest's Curse / Magic
+Powder / Doodle on a **teammate** (or themselves), never on the boss, to flip the
+ally's typing and make it 100% immune to the boss's attacks. Because the boss was
+never the target, the `onTryHit` block (which keys off the boss being the target)
+never fired. Disabling them in the picker stops the move from being selected
+against any target. Imprison locks the boss out of moves the user also carries;
+Role Play / Copycat copy abilities/last-used moves to sidestep intended raid
+checks — all three are banned outright.
+
+**Tests:** `test/sim/abilities/dynahax-moves.js` replaces the old "block on use"
+type-change cases with a picker loop asserting `disabled === true` for all eight
+moves (`soak`, `magicpowder`, `trickortreat`, `forestscurse`, `doodle`,
+`imprison`, `roleplay`, `copycat`) while a Dynahax boss is active.
 
 ---
 
