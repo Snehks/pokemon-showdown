@@ -149,7 +149,16 @@ const Abilities = {
         "leechseed",
         "imprison",
         "roleplay",
-        "copycat"
+        "copycat",
+        // Stat-swap moves target the boss directly. They are disabled in the
+        // picker (onFoeDisableMove) for direct use, but must ALSO fail here so
+        // indirect calls (Sleep Talk / Assist / Metronome / Copycat) can't swap
+        // stats with the boss and trivialise the raid. (Power Trick is self-target
+        // and Dragon Cheer is ally-target, so they never reach the boss's onTryHit
+        // and stay picker-only — neither manipulates the boss's stats.)
+        "guardsplit",
+        "powersplit",
+        "speedswap"
       ]);
       if (blocked.has(move.id) || move.ohko) {
         this.add("-immune", target, "[from] ability: Dynahax");
@@ -165,6 +174,59 @@ const Abilities = {
     // Mirrors: getHpToAbsorb → 1 (we use chainModify(0) which floors to 0)
     onSourceTryHeal(damage, target, source, effect) {
       if (effect?.id === "drain") return this.chainModify(0);
+    },
+    // [PBO] Floor the boss's OWN stat drops at -1. Engine-enforced so stat
+    // protection no longer depends on the AI rolling Haze/Clear Smog or on the
+    // boss even knowing those moves. Only negative deltas are clamped — positive
+    // self-boosts from the boss's own Max moves (Max Knuckle atk+1, Max Ooze
+    // spa+1, Max Steelspike def+1, etc.) are left untouched. A single drop may
+    // still land at -1 (so Intimidate/Sticky Web keep a token effect), but never
+    // reaches -2. Mirrors Clear Body's onTryBoost shape but one-sided and floored
+    // instead of a hard zero.
+    onTryBoost(boost, target, source, effect) {
+      if (source && target === source) return;
+      let showMsg = false;
+      let i;
+      for (i in boost) {
+        const delta = boost[i];
+        if (delta >= 0) continue;
+        const floored = Math.max(target.boosts[i] + delta, -1);
+        const allowed = floored - target.boosts[i];
+        if (allowed === 0) {
+          delete boost[i];
+        } else {
+          boost[i] = allowed;
+        }
+        showMsg = true;
+      }
+      if (showMsg && !effect.secondaries && effect.id !== "octolock") {
+        this.add("-fail", target, "unboost", "[from] ability: Dynahax", `[of] ${target}`);
+      }
+    },
+    // [PBO] At end of turn, reset any FOE positive stat boosts to 0. Engine-enforced
+    // replacement for the AI choosing Haze — players can no longer set up and sweep by
+    // blocking the boss's Haze (via Imprison, denying its turn, etc.). Only positive
+    // stages are cleared; the player's negative stages (self-inflicted drops, or drops
+    // the boss applied via Max Phantasm/Strike) are preserved. Fires per foe via foes(),
+    // so doubles raids (a boost on the second player slot) are covered structurally.
+    // Runs at the standard end-of-turn residual order (28/2, same as Speed Boost / Moody),
+    // so the player still gets one turn of their boost before it is wiped.
+    onResidualOrder: 28,
+    onResidualSubOrder: 2,
+    onResidual(pokemon) {
+      for (const foe of pokemon.foes()) {
+        let cleared = false;
+        let i;
+        for (i in foe.boosts) {
+          if (foe.boosts[i] > 0) {
+            foe.boosts[i] = 0;
+            cleared = true;
+          }
+        }
+        if (cleared) {
+          this.add("-clearpositiveboost", foe, pokemon, "ability: Dynahax");
+        }
+      }
     },
     // Can't be traced, skill swapped, etc.
     flags: {

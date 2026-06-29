@@ -66,8 +66,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 50 | `data/mods/pbo/abilities.ts` | Dynahax Bestow block | Disable Bestow in the picker (`onFoeDisableMove`) and keep it in the `onTryHit` blocked Set so it fails against Dynahax bosses instead of handing them the foe's held item |
 | 51 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 legendary forms | Register 3 more Summer 2026 forms (Latias-S3, Latios-S3, Volcanion-S3) in PBO_EVENT_FORMS |
 | 52 | `data/mods/pbo/abilities.ts` | Dynahax type-change & move-copy block | Disable Soak / Magic Powder / Trick-or-Treat / Forest's Curse / Doodle in the picker (players cast them on an ally for a typing immunity, which never targets the boss so onTryHit can't stop it) and ban & disable Imprison / Role Play / Copycat (added to both `onFoeDisableMove` and the `onTryHit` blocked Set) |
+| 53 | `data/mods/pbo/abilities.ts` | Dynahax engine-enforced stat protection | Floor the boss's own stat drops at -1 (`onTryBoost`) and reset all FOE positive boosts to 0 at end of turn (`onResidual`), so stat protection no longer depends on the boss knowing Haze/Clear Smog or on AI RNG. Also adds the stat-swap moves Guard Split / Power Split / Speed Swap to the `onTryHit` blocked Set so indirect calls (Sleep Talk / Assist / Metronome) can't swap stats with the boss |
 
-**Total: 52 changes across 14 files.**
+**Total: 53 changes across 14 files.**
 
 ---
 
@@ -1006,6 +1007,52 @@ checks — all three are banned outright.
 type-change cases with a picker loop asserting `disabled === true` for all eight
 moves (`soak`, `magicpowder`, `trickortreat`, `forestscurse`, `doodle`,
 `imprison`, `roleplay`, `copycat`) while a Dynahax boss is active.
+
+---
+
+## Change 53: Dynahax engine-enforced stat protection (data/mods/pbo/abilities.ts)
+
+**What it does:** Moves Dynamax raid-boss stat protection out of the AI and into
+the engine. Three additions to the `dynahax` ability:
+
+- **`onTryBoost`** — floors the boss's OWN stat drops at `-1`. Only negative
+  deltas are clamped (`target.boosts[i] + delta >= -1`); positive self-boosts from
+  the boss's own Max moves (Max Knuckle `atk+1`, Max Ooze `spa+1`, Max Steelspike
+  `def+1`, etc.) are left untouched. A single drop may still land at `-1` (so
+  Intimidate / Sticky Web keep a token effect), but never reaches `-2`. Mirrors
+  Clear Body's `onTryBoost` shape but one-sided and floored instead of a hard zero.
+- **`onResidual`** (order 28 / sub 2, same as Speed Boost / Moody) — at end of
+  turn, resets every FOE's positive stat stages to `0` via `pokemon.foes()`,
+  emitting `-clearpositiveboost` per affected foe. The player's negative stages
+  (self-inflicted drops, or drops the boss applied via Max Phantasm/Strike) are
+  preserved. Fires per foe, so doubles raids (a boost on the second player slot)
+  are covered structurally.
+- **`onTryHit` blocked Set** — adds `guardsplit`, `powersplit`, `speedswap`. These
+  target the boss directly and were already disabled in the picker
+  (`onFoeDisableMove`), but indirect calls (Sleep Talk / Assist / Metronome) could
+  still swap stats with the boss. (Power Trick is self-target and Dragon Cheer is
+  ally-target, so they never reach the boss's `onTryHit` and stay picker-only —
+  neither manipulates the boss's stats.)
+
+**Why:** Stat protection previously relied on the server-side
+`HazeOrClearSmogWrapperAIGenerator` AI *choosing* Haze/Clear Smog — a probabilistic
+(25%/75%) roll that only worked if the boss actually knew one of those moves with
+PP. Players found exploits that prevented the boss from ever using Haze (Imprison,
+denying its turn, calling banned moves indirectly), leaving boss/foe stats uncapped
+at the standard ±6 and letting a buffed player sweep the raid. Engine enforcement
+removes the moveset dependency and the RNG. The end-of-turn timing (rather than
+immediate) lets a player see their boost land and act once with it before it is
+wiped — matching the intended "the boss hazes your boosts each turn" behavior.
+
+The AI wrapper is intentionally KEPT as a dormant redundant safety net (its trigger
+conditions are now almost never met); it is not removed in this change.
+
+**Tests:** `test/sim/abilities/dynahax-boosts.js` — boss drop floored at `-1`
+(Charm/Growl); single Intimidate still `-1` (regression); foe Swords Dance / Belly
+Drum cleared at end of turn; foe boost cleared even when called via Sleep Talk;
+boss's own Max Knuckle `atk+1` preserved; foe negative boost (Curse `spe-1`)
+preserved while positives cleared; doubles boost on the second slot cleared; Guard
+Split called indirectly via Sleep Talk fails (boss def unchanged).
 
 ---
 
