@@ -28,6 +28,66 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 			}
 		},
 	},
+	conquerorshaki: {
+		onStart(pokemon) {
+			let activated = false;
+			for (const target of pokemon.foes()) {
+				if (!activated) {
+					this.add('-ability', pokemon, "Conqueror's Haki", 'boost');
+					activated = true;
+				}
+				this.boost({atk: -1, spa: -1}, target, pokemon, null, true);
+			}
+		},
+		flags: {
+			failroleplay: 1, noreceiver: 1, noentrain: 1, notrace: 1,
+			failskillswap: 1, cantsuppress: 1,
+		},
+		name: "Conqueror's Haki",
+		rating: 5,
+		num: -2,
+	},
+	worldsstrongestcreature: {
+		onDamagePriority: -40,
+		onDamage(damage, target, source, effect) {
+			if ((this.effectState as any).used) return;
+			if (target.hp <= 1) return;
+			if (damage >= target.hp && effect && effect.effectType === 'Move') {
+				(this.effectState as any).used = true;
+				this.add('-ability', target, "World's Strongest Creature");
+				return target.hp - 1;
+			}
+		},
+		flags: {
+			failroleplay: 1, noreceiver: 1, noentrain: 1, notrace: 1,
+			failskillswap: 1, cantsuppress: 1,
+		},
+		name: "World's Strongest Creature",
+		rating: 5,
+		num: -3,
+	},
+	drunkendragon: {
+		onAfterMoveSecondary(target, source, move) {
+			const state = this.effectState as any;
+			if (state.used) return;
+			if (!source || source === target || !target.hp || !move.totalDamage) return;
+			const lastAttackedBy = target.getLastAttackedBy();
+			if (!lastAttackedBy) return;
+			if (target.hp <= target.maxhp / 2) {
+				state.used = true;
+				this.add('-ability', target, 'Drunken Dragon');
+				this.heal(Math.floor(target.maxhp / 4), target, target, this.effect);
+				this.boost({atk: 1, spe: 1}, target, target, this.effect);
+			}
+		},
+		flags: {
+			failroleplay: 1, noreceiver: 1, noentrain: 1, notrace: 1,
+			failskillswap: 1, cantsuppress: 1,
+		},
+		name: "Drunken Dragon",
+		rating: 5,
+		num: -4,
+	},
 	dynahax: {
 		// Block ALL non-move damage (weather ticks, status ticks, Life Orb, hazards, item damage, etc.)
 		// Mirrors: cancelsStatusEffectDamage, cancelsWeatherEffectAffect,
