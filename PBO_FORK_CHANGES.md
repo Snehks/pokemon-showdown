@@ -1055,6 +1055,8 @@ boss's own Max Knuckle `atk+1` preserved; foe negative boost (Curse `spe-1`)
 preserved while positives cleared; doubles boost on the second slot cleared; Guard
 Split called indirectly via Sleep Talk fails (boss def unchanged).
 
+---
+
 ## Change 54: One Piece Champion boss abilities (data/mods/pbo/abilities.ts)
 
 Adds three PBO-only custom abilities for the One Piece Champion boss encounter:
@@ -1071,4 +1073,4 @@ These are assigned through NPC XML with the existing `ability="..."` Pokemon att
 2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/scripts.ts`, `data/mods/pbo/abilities.ts`, `data/mods/pbo/items.ts`, `data/mods/pbo/moves.ts`, and `config/custom-formats.ts`. Also search for `activeSlotsPerSide` and `gameType === 'horde'` in `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, and `sim/pokemon.ts`.
 3. Resolve conflicts (changes are at end-of-interface and end-of-constructor)
 4. Run tests: `npm test` + PBO integration tests
-5. Tag: `git tag v<new_version>-pbo`
+5. Tag: `git tag v<base_version>-pbo-vNN`
