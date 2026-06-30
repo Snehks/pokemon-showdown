@@ -77,7 +77,7 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 				state.used = true;
 				this.add('-ability', target, 'Drunken Dragon');
 				this.heal(Math.floor(target.maxhp / 4), target, target, this.effect);
-				this.boost({atk: 1, spe: 1}, target, target, this.effect);
+				this.boost({atk: 1, spe: 1}, target, target);
 			}
 		},
 		flags: {
