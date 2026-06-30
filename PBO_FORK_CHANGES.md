@@ -61,14 +61,15 @@ these changes by searching for `[PBO]` comments in the source.
 | 46 | `config/custom-formats.ts`, `sim/side.ts`, `test/sim/misc/pbo-asymmetric-horde.js` | Wider wild horde matrix | Add PBO wild horde 1v3, 1v4, and 1v5 formats and parse target slots beyond triples |
 | 47 | `data/mods/pbo/abilities.ts` | Dynahax exploit setup move block | Disable Skill Swap, Power Trick, and Dragon Cheer for foes while Dynahax bosses are active |
 | 48 | `data/mods/pbo/abilities.ts` | Dynahax stat-swap move block | Disable Guard Split, Power Split, and Speed Swap for foes while Dynahax bosses are active (Focus Energy stays enabled) |
-| 49 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 event forms | Register 28 Summer 2026 cosmetic forms (24 base + 4 Mega) in PBO_EVENT_FORMS |
+| 49 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 event forms | Register Summer 2026 cosmetic forms in PBO_EVENT_FORMS |
 | 50 | `data/mods/pbo/abilities.ts` | Dynahax Bestow block | Disable Bestow in the picker (`onFoeDisableMove`) and keep it in the `onTryHit` blocked Set so it fails against Dynahax bosses instead of handing them the foe's held item |
 | 51 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 legendary forms | Register 3 more Summer 2026 forms (Latias-S3, Latios-S3, Volcanion-S3) in PBO_EVENT_FORMS |
 | 52 | `data/mods/pbo/abilities.ts` | Dynahax type-change & move-copy block | Disable Soak / Magic Powder / Trick-or-Treat / Forest's Curse / Doodle in the picker (players cast them on an ally for a typing immunity, which never targets the boss so onTryHit can't stop it) and ban & disable Imprison / Role Play / Copycat (added to both `onFoeDisableMove` and the `onTryHit` blocked Set) |
 | 53 | `data/mods/pbo/abilities.ts` | Dynahax engine-enforced stat protection | Floor the boss's own stat drops at -1 (`onTryBoost`) and reset all FOE positive boosts to 0 at end of turn (`onResidual`), so stat protection no longer depends on the boss knowing Haze/Clear Smog or on AI RNG. Also adds the stat-swap moves Guard Split / Power Split / Speed Swap to the `onTryHit` blocked Set so indirect calls (Sleep Talk / Assist / Metronome) can't swap stats with the boss |
 | 54 | `data/mods/pbo/abilities.ts` | One Piece Champion boss abilities | Add XML-assignable Conqueror's Haki, World's Strongest Creature, and Drunken Dragon custom boss abilities |
+| 55 | `data/mods/pbo/scripts.ts` | Blaziken-S3 event form | Register missing Blaziken-S3 in the Summer 2026 S3 event-form block |
 
-**Total: 54 changes across 14 files.**
+**Total: 55 changes across 14 files.**
 
 ---
 
@@ -908,11 +909,11 @@ loop to cover `guardsplit`, `powersplit`, `speedswap` and adds an explicit
 
 ## Change 49: Summer 2026 S3 event forms (data/mods/pbo/scripts.ts)
 
-**What it does:** Registers 28 Summer 2026 cosmetic event forms (suffix `S3`) in
-the `PBO_EVENT_FORMS` array — 24 base forms (Froakie-S3, Frogadier-S3, Greninja-S3,
+**What it does:** Registers 29 Summer 2026 cosmetic event forms (suffix `S3`) in
+the `PBO_EVENT_FORMS` array — 25 base forms (Froakie-S3, Frogadier-S3, Greninja-S3,
 Whimsicott-S3, Sceptile-S3, Samurott-Hisui-S3, Gliscor-S3, Flareon-S3, Venusaur-S3,
 Grimmsnarl-S3, Salamence-S3, Terrakion-S3, Pecharunt-S3, Barbaracle-S3, Zangoose-S3,
-Scyther-S3, Lucario-S3, Infernape-S3, Gyarados-S3, Blastoise-S3, Jolteon-S3,
+Scyther-S3, Lucario-S3, Infernape-S3, Blaziken-S3, Gyarados-S3, Blastoise-S3, Jolteon-S3,
 Vaporeon-S3, Glaceon-S3, Crawdaunt-S3) and 4 Mega forms (Gyarados-Mega-S3,
 Venusaur-Mega-S3, Salamence-Mega-S3, Sceptile-Mega-S3). Each entry is a
 `[eventId, baseId, displayName, "S3"]` tuple consumed by the `init()` handler
@@ -924,7 +925,7 @@ and Showdown rejects it as an unknown species. The Mega-S3 forms clone the base
 mega species so a summer form holding its Mega Stone evolves into the matching
 summer mega.
 
-**Tests:** Verified post-build that all 28 forms resolve via
+**Tests:** Verified post-build that all 29 forms resolve via
 `Dex.mod('pbo').species.get(id)` with stats/types/abilities inherited from the
 base species (e.g. `gyaradosmegas3` → Water/Dark, Atk 155), and that every base
 id exists in the vanilla Pokedex so `init()` skips none.
@@ -1070,6 +1071,17 @@ Adds three PBO-only custom abilities for the One Piece Champion boss encounter:
 - `Drunken Dragon`: once per battle after direct damage leaves the holder at or below 50% HP, heals 25% max HP and raises Attack and Speed by one stage.
 
 These are assigned through NPC XML with the existing `ability="..."` Pokemon attribute.
+
+---
+
+## Change 55: Blaziken-S3 event form registration (data/mods/pbo/scripts.ts)
+
+Adds the missing `Blaziken-S3` Summer 2026 cosmetic form to `PBO_EVENT_FORMS`
+as `["blazikens3", "blaziken", "Blaziken-S3", "S3"]`.
+
+**Why:** PBO data contains `Blaziken-S3` (`showdownId=blazikens3`, pokedex 1887).
+Without this fork registration, `ShowdownEventFormRegistrationTest` fails and battles
+that pack the form cannot resolve the species in `Dex.mod('pbo')`.
 
 ---
 

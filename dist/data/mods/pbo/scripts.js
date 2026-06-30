@@ -433,6 +433,7 @@ const PBO_EVENT_FORMS = [
   ["scythers3", "scyther", "Scyther-S3", "S3"],
   ["lucarios3", "lucario", "Lucario-S3", "S3"],
   ["infernapes3", "infernape", "Infernape-S3", "S3"],
+  ["blazikens3", "blaziken", "Blaziken-S3", "S3"],
   ["gyaradoss3", "gyarados", "Gyarados-S3", "S3"],
   ["blastoises3", "blastoise", "Blastoise-S3", "S3"],
   ["jolteons3", "jolteon", "Jolteon-S3", "S3"],
