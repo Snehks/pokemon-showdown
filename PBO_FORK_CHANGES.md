@@ -24,7 +24,6 @@ these changes by searching for `[PBO]` comments in the source.
 | 9 | `sim/battle-queue.ts` | Extended `resolveAction` | Add `useitem: 7` to action order (before moves) |
 | 10 | `sim/battle.ts` | Extended `runAction` | Execute bag item scripts via `case 'useitem'` |
 | 11 | `data/mods/pbo/scripts.ts` | Bag item scripts | 11 scripts: potion, revive, full_restore, cure_status, ether, elixir, x_stat, dire_hit, guard_spec, clear_boost, potion_by_portion |
-
 | 12 | `data/mods/pbo/abilities.ts` | Dynahax ability | Custom Dynamax raid boss ability — blocks non-move damage, status, specific moves/abilities, draining |
 | 13 | `sim/pokemon.ts` | Skip EV clamp for NPC format | PBO raid bosses use extreme EVs (e.g. 12M HP EV); skip 0-255 clamp when `format.id === 'gen9pbonpcnationaldex'` |
 | 14 | `config/custom-formats.ts` | PBO NPC National Dex format | `[Gen 9] PBO NPC National Dex` — NPC battles with unclamped EVs for raid bosses |
@@ -33,7 +32,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 17 | `config/custom-formats.ts` | PBO PvP No Preview format | `[Gen 9] PBO PvP Battle No Preview` — PvP without team preview |
 | 18 | `sim/side.ts` | `forfeit` choice command | Calls `battle.win(foe)` for instant forfeit |
 | 19 | `sim/battle-actions.ts`, `data/mods/pbo/abilities.ts` | Dynahax Max move power | Skip BP zeroing for Dynahax + boost Max/G-Max BP to 130 |
-| 20 | `config/custom-formats.ts` | Gimmick clauses | Add Terastal/Z-Move/Dynamax Clause to all PBO formats |
+| 20 | `config/custom-formats.ts` | Gimmick clauses | Disable Terastal/Z-Move/Dynamax in non-random PBO formats; random formats intentionally allow Tera |
 | 21 | `config/custom-formats.ts` | Overflow Stat Mod | Prevent 16-bit stat overflow for high-level Pokemon with +nature |
 | 22 | `data/mods/pbo/scripts.ts` | Christmas form registration | Add missing Clefairy-C and Clefable-C to PBO_EVENT_FORMS |
 | 23 | `data/mods/pbo/abilities.ts` | Dynahax healing block | Block all non-move healing (Grassy Terrain, Leftovers, etc.) against Dynahax bosses |
@@ -387,25 +386,30 @@ PvP, wild battles, or standard Dynamax.
 
 ---
 
-## Change 20: Gimmick clauses on all PBO formats (config/custom-formats.ts)
+## Change 20: Gimmick clauses on non-random PBO formats (config/custom-formats.ts)
 
 **What it does:** Adds `Terastal Clause`, `Z-Move Clause`, and `Dynamax Clause` to
-the ruleset of all five PBO custom formats (Standard, NPC, PvP, Wild, PvP No Preview).
+the ruleset of non-random PBO custom formats (Standard, NPC, PvP, Wild, PvP No Preview,
+and later non-random variants). PBO random formats intentionally omit `Terastal Clause`
+so Showdown-assigned Tera types remain usable there, but still keep `Z-Move Clause` and
+`Dynamax Clause`.
 
-**Effect:** In all PBO formats:
+**Effect:** In non-random PBO formats:
 - Terastallization is disabled (`canTerastallize = null` on all Pokemon at battle start)
 - Z-Moves are banned (Z-Crystal validation + rule announcement)
 - Dynamax is disabled (`dynamaxUsed = true` on all sides at battle start)
 
-**Not affected:** Showdown's built-in `gen{1-9}randombattle` formats (used by PBO's
-Random Battle mode) are untouched and retain all gimmick mechanics.
+**Not affected:** Showdown's built-in `gen{1-9}randombattle` formats are untouched.
+PBO random formats introduced in Change 42 intentionally allow Terastallization while
+keeping Z-Moves and Dynamax disabled.
 
 **Dynahax compatibility:** Dynamax Clause prevents the Dynamax *action*, but Dynahax
 raid bosses never Dynamax — they have G-Max/Max moves directly in their moveset. The
 Dynahax ability handles power scaling independently. Confirmed safe by integration tests.
 
-**Why:** PBO restricts Tera, Z-Moves, and Dynamax to Random Battles only. These mechanics
-are not part of the standard PBO battle experience.
+**Why:** PBO restricts Terastallization to Random Battles and keeps Z-Moves/Dynamax
+disabled in PBO-owned formats. These mechanics are not part of the standard PBO battle
+experience.
 
 ---
 
@@ -1068,6 +1072,8 @@ Adds three PBO-only custom abilities for the One Piece Champion boss encounter:
 These are assigned through NPC XML with the existing `ability="..."` Pokemon attribute.
 
 ---
+
+## Upgrade Checklist
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
 2. Search for `[PBO]` in `sim/teams.ts`, `sim/pokemon.ts`, `sim/side.ts`, `sim/battle.ts`, `sim/battle-queue.ts`, `data/mods/pbo/scripts.ts`, `data/mods/pbo/abilities.ts`, `data/mods/pbo/items.ts`, `data/mods/pbo/moves.ts`, and `config/custom-formats.ts`. Also search for `activeSlotsPerSide` and `gameType === 'horde'` in `sim/dex-formats.ts`, `sim/global-types.ts`, `sim/battle.ts`, `sim/side.ts`, and `sim/pokemon.ts`.

@@ -1,7 +1,8 @@
 // [PBO] Custom format for PBO battle engine.
 // No team validation rules — PBO validates server-side.
-// [PBO] Terastal/Z-Move/Dynamax clauses: these gimmicks are disabled in all PBO formats.
-// They remain available in Showdown's built-in gen{1-9}randombattle formats (Random Battles).
+// [PBO] Gimmick clauses: non-random PBO formats disable Terastal, Z-Moves, and Dynamax.
+// PBO random formats intentionally allow Terastallization from Showdown-assigned Tera types,
+// but still disable Z-Moves and Dynamax.
 // [PBO] Overflow Stat Mod: prevents 16-bit truncation overflow in nature multiplication.
 // Standard Showdown only needs this for Eternatus-Eternamax, but PBO has levels > 100
 // which can push high-base-stat Pokemon (e.g. Regirock Def 200 at L120) past the 65535
