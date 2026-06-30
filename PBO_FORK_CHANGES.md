@@ -67,8 +67,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 51 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 legendary forms | Register 3 more Summer 2026 forms (Latias-S3, Latios-S3, Volcanion-S3) in PBO_EVENT_FORMS |
 | 52 | `data/mods/pbo/abilities.ts` | Dynahax type-change & move-copy block | Disable Soak / Magic Powder / Trick-or-Treat / Forest's Curse / Doodle in the picker (players cast them on an ally for a typing immunity, which never targets the boss so onTryHit can't stop it) and ban & disable Imprison / Role Play / Copycat (added to both `onFoeDisableMove` and the `onTryHit` blocked Set) |
 | 53 | `data/mods/pbo/abilities.ts` | Dynahax engine-enforced stat protection | Floor the boss's own stat drops at -1 (`onTryBoost`) and reset all FOE positive boosts to 0 at end of turn (`onResidual`), so stat protection no longer depends on the boss knowing Haze/Clear Smog or on AI RNG. Also adds the stat-swap moves Guard Split / Power Split / Speed Swap to the `onTryHit` blocked Set so indirect calls (Sleep Talk / Assist / Metronome) can't swap stats with the boss |
+| 54 | `data/mods/pbo/abilities.ts` | One Piece Champion boss abilities | Add XML-assignable Conqueror's Haki, World's Strongest Creature, and Drunken Dragon custom boss abilities |
 
-**Total: 53 changes across 14 files.**
+**Total: 54 changes across 14 files.**
 
 ---
 
@@ -1053,6 +1054,16 @@ Drum cleared at end of turn; foe boost cleared even when called via Sleep Talk;
 boss's own Max Knuckle `atk+1` preserved; foe negative boost (Curse `spe-1`)
 preserved while positives cleared; doubles boost on the second slot cleared; Guard
 Split called indirectly via Sleep Talk fails (boss def unchanged).
+
+## Change 54: One Piece Champion boss abilities (data/mods/pbo/abilities.ts)
+
+Adds three PBO-only custom abilities for the One Piece Champion boss encounter:
+
+- `Conqueror's Haki`: on entry, lowers all active opposing Pokemon's Attack and Special Attack by one stage.
+- `World's Strongest Creature`: once per battle, survives direct move damage that would KO the holder and leaves it at 1 HP.
+- `Drunken Dragon`: once per battle after direct damage leaves the holder at or below 50% HP, heals 25% max HP and raises Attack and Speed by one stage.
+
+These are assigned through NPC XML with the existing `ability="..."` Pokemon attribute.
 
 ---
 
