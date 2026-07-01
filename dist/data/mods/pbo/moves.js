@@ -208,6 +208,27 @@ const Moves = {
       }
     }
   },
+  // --- Dynahax move blocks ---
+  // [PBO] Imprison targets the USER (target: "self"), so it never reaches the
+  // Dynahax boss's onTryHit — disabling it in the picker (abilities.ts
+  // onFoeDisableMove) only blocks a direct pick, not indirect calls (Sleep Talk /
+  // Metronome / Assist / Instruct). Failing it here in onTry — which fires on the
+  // shared useMove path for every invocation route — guarantees Imprison can never
+  // apply against a Dynahax boss in any single or double battle. If any foe is a
+  // Dynahax boss, the move fails outright (its shared-move lockout could softlock
+  // the raid). Against normal foes it behaves exactly as vanilla.
+  imprison: {
+    inherit: true,
+    onTry(source) {
+      for (const foe of source.foes()) {
+        if (foe.hasAbility("dynahax")) {
+          this.attrLastMove("[still]");
+          this.add("-fail", source, "move: Imprison");
+          return null;
+        }
+      }
+    }
+  },
   // --- Cosmetic event form overrides ---
   hyperspacefury: {
     inherit: true,

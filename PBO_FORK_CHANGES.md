@@ -65,11 +65,12 @@ these changes by searching for `[PBO]` comments in the source.
 | 50 | `data/mods/pbo/abilities.ts` | Dynahax Bestow block | Disable Bestow in the picker (`onFoeDisableMove`) and keep it in the `onTryHit` blocked Set so it fails against Dynahax bosses instead of handing them the foe's held item |
 | 51 | `data/mods/pbo/scripts.ts` | Summer 2026 S3 legendary forms | Register 3 more Summer 2026 forms (Latias-S3, Latios-S3, Volcanion-S3) in PBO_EVENT_FORMS |
 | 52 | `data/mods/pbo/abilities.ts` | Dynahax type-change & move-copy block | Disable Soak / Magic Powder / Trick-or-Treat / Forest's Curse / Doodle in the picker (players cast them on an ally for a typing immunity, which never targets the boss so onTryHit can't stop it) and ban & disable Imprison / Role Play / Copycat (added to both `onFoeDisableMove` and the `onTryHit` blocked Set) |
-| 53 | `data/mods/pbo/abilities.ts` | Dynahax engine-enforced stat protection | Floor the boss's own stat drops at -1 (`onTryBoost`) and reset all FOE positive boosts to 0 at end of turn (`onResidual`), so stat protection no longer depends on the boss knowing Haze/Clear Smog or on AI RNG. Also adds the stat-swap moves Guard Split / Power Split / Speed Swap to the `onTryHit` blocked Set so indirect calls (Sleep Talk / Assist / Metronome) can't swap stats with the boss |
+| 53 | `data/mods/pbo/abilities.ts` | Dynahax engine-enforced stat protection | **REVERTED by Change 56.** Floored the boss's own stat drops at -1 (`onTryBoost`) and reset all FOE positive boosts to 0 at end of turn (`onResidual`); also added Guard Split / Power Split / Speed Swap to the `onTryHit` blocked Set |
 | 54 | `data/mods/pbo/abilities.ts` | One Piece Champion boss abilities | Add XML-assignable Conqueror's Haki, World's Strongest Creature, and Drunken Dragon custom boss abilities |
 | 55 | `data/mods/pbo/scripts.ts` | Blaziken-S3 event form | Register missing Blaziken-S3 in the Summer 2026 S3 event-form block |
+| 56 | `data/mods/pbo/abilities.ts`, `data/mods/pbo/moves.ts` | Revert Dynahax engine stat protection + hard-block Imprison | Remove Change 53's `onTryBoost` floor, `onResidual` foe-boost wipe, and the Guard Split / Power Split / Speed Swap `onTryHit` entries. Add an `imprison` `onTry` override in `moves.ts` so Imprison fails against a Dynahax boss by **any** route (direct pick, Sleep Talk, Metronome, Assist, Instruct) in single and double battles |
 
-**Total: 55 changes across 14 files.**
+**Total: 56 changes across 14 files.**
 
 ---
 
@@ -1018,6 +1019,13 @@ moves (`soak`, `magicpowder`, `trickortreat`, `forestscurse`, `doodle`,
 
 ## Change 53: Dynahax engine-enforced stat protection (data/mods/pbo/abilities.ts)
 
+> **⚠️ REVERTED by Change 56.** The `onTryBoost` floor, the `onResidual`
+> foe-boost wipe, and the Guard Split / Power Split / Speed Swap `onTryHit`
+> entries described below were removed. Boss stat drops are no longer floored at
+> `-1`, foe positive boosts are no longer wiped end of turn, and the stat-swap
+> moves are only disabled in the picker again (not blocked on indirect use). The
+> section is kept for history. See Change 56.
+
 **What it does:** Moves Dynamax raid-boss stat protection out of the AI and into
 the engine. Three additions to the `dynahax` ability:
 
@@ -1082,6 +1090,48 @@ as `["blazikens3", "blaziken", "Blaziken-S3", "S3"]`.
 **Why:** PBO data contains `Blaziken-S3` (`showdownId=blazikens3`, pokedex 1887).
 Without this fork registration, `ShowdownEventFormRegistrationTest` fails and battles
 that pack the form cannot resolve the species in `Dex.mod('pbo')`.
+
+---
+
+## Change 56: Revert Dynahax engine stat protection + hard-block Imprison (data/mods/pbo/abilities.ts, data/mods/pbo/moves.ts)
+
+**What it does:** Two parts.
+
+1. **Reverts Change 53.** Removes the three additions Change 53 made to the
+   `dynahax` ability:
+   - the `onTryBoost` hook that floored the boss's own stat drops at `-1`,
+   - the `onResidual` (order 28 / sub 2) hook that wiped every foe's positive
+     stat stages at end of turn (and its `-clearpositiveboost` message),
+   - the `guardsplit` / `powersplit` / `speedswap` entries in the `onTryHit`
+     blocked Set.
+
+   After the revert, boss stat drops behave like vanilla (Charm takes the boss to
+   `-2`, Intimidate stacks normally), foe boosts persist between turns, and Guard
+   Split / Power Split / Speed Swap are once again **only** disabled in the picker
+   via `onFoeDisableMove` (indirect calls succeed again). Stat protection reverts
+   to relying on the server-side `HazeOrClearSmogWrapperAIGenerator` AI. The test
+   file `test/sim/abilities/dynahax-boosts.js` (added by Change 53) is deleted.
+
+2. **Hard-blocks Imprison against a Dynahax boss by any route.** Adds an
+   `imprison` `onTry` override in `moves.ts`: if any foe has the `dynahax`
+   ability, the move fails (`-fail` + `[still]`). Imprison targets the **user**
+   (`target: "self"`), so it never reaches the boss's `onTryHit`, and the existing
+   `onFoeDisableMove` entry only greys it out in the picker — it does not stop
+   indirect casts (Sleep Talk / Metronome / Assist / Instruct). `onTry` fires on
+   the shared `useMove` path for every invocation route, so Imprison can never
+   apply against a Dynahax boss in any single or double battle. Against normal
+   (non-Dynahax) foes, Imprison behaves exactly as vanilla.
+
+**Why:** The Change 53 engine-enforced stat protection was reverted at the owner's
+request. Imprison remains a raid-softlock hazard (it can lock the boss out of its
+tiny Max-move set, and it survives indirect calls the picker-disable misses), so it
+is now blocked at the move level as the single source of truth for "Imprison can't
+be used against a Dynahax boss."
+
+**Tests:** `test/sim/moves/dynahax-imprison.js` — Imprison disabled in the picker
+(singles + doubles); Imprison fails when called indirectly via Sleep Talk (singles
++ doubles); Imprison still works against a non-Dynahax foe. The reverted
+`test/sim/abilities/dynahax-boosts.js` is removed.
 
 ---
 
