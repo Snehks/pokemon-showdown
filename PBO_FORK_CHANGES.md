@@ -69,8 +69,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 54 | `data/mods/pbo/abilities.ts` | One Piece Champion boss abilities | Add XML-assignable Conqueror's Haki, World's Strongest Creature, and Drunken Dragon custom boss abilities |
 | 55 | `data/mods/pbo/scripts.ts` | Blaziken-S3 event form | Register missing Blaziken-S3 in the Summer 2026 S3 event-form block |
 | 56 | `data/mods/pbo/abilities.ts`, `data/mods/pbo/moves.ts` | Revert Dynahax engine stat protection + hard-block Imprison | Remove Change 53's `onTryBoost` floor, `onResidual` foe-boost wipe, and the Guard Split / Power Split / Speed Swap `onTryHit` entries. Add an `imprison` `onTry` override in `moves.ts` so Imprison fails against a Dynahax boss by **any** route (direct pick, Sleep Talk, Metronome, Assist, Instruct) in single and double battles |
+| 57 | `data/mods/pbo/abilities.ts` | Dynahax percentage-damage move block | Add Nature's Madness, Guardian of Alola, and Ruination to the Dynahax `onTryHit` blocked Set so percentage-HP damage fails against raid bosses |
 
-**Total: 56 changes across 14 files.**
+**Total: 57 changes across 14 files.**
 
 ---
 
@@ -1132,6 +1133,17 @@ be used against a Dynahax boss."
 (singles + doubles); Imprison fails when called indirectly via Sleep Talk (singles
 + doubles); Imprison still works against a non-Dynahax foe. The reverted
 `test/sim/abilities/dynahax-boosts.js` is removed.
+
+---
+
+## Change 57: Dynahax percentage-damage move block (data/mods/pbo/abilities.ts)
+
+Adds `naturesmadness`, `guardianofalola`, and `ruination` to the Dynahax
+`onTryHit` blocked Set alongside `superfang`. These moves deal fixed percentage
+HP damage and would otherwise bypass normal raid-boss damage expectations.
+
+**Tests:** `test/sim/abilities/dynahax-moves.js` now verifies Nature's Madness,
+Guardian of Alola, and Ruination leave a Dynahax boss at full HP.
 
 ---
 

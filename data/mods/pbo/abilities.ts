@@ -36,7 +36,7 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 					this.add('-ability', pokemon, "Conqueror's Haki", 'boost');
 					activated = true;
 				}
-				this.boost({atk: -1, spa: -1}, target, pokemon, null, true);
+				this.boost({ atk: -1, spa: -1 }, target, pokemon, null, true);
 			}
 		},
 		flags: {
@@ -52,7 +52,7 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 		onDamage(damage, target, source, effect) {
 			if ((this.effectState as any).used) return;
 			if (target.hp <= 1) return;
-			if (damage >= target.hp && effect && effect.effectType === 'Move') {
+			if (damage >= target.hp && effect?.effectType === 'Move') {
 				(this.effectState as any).used = true;
 				this.add('-ability', target, "World's Strongest Creature");
 				return target.hp - 1;
@@ -77,7 +77,7 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 				state.used = true;
 				this.add('-ability', target, 'Drunken Dragon');
 				this.heal(Math.floor(target.maxhp / 4), target, target, this.effect);
-				this.boost({atk: 1, spe: 1}, target, target, null, true);
+				this.boost({ atk: 1, spe: 1 }, target, target, null, true);
 			}
 		},
 		flags: {
@@ -190,7 +190,8 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 				'endeavor', 'finalgambit', 'simplebeam', 'destinybond', 'foulplay',
 				'bind', 'infestation', 'clamp', 'firespin', 'magmastorm',
 				'sandtomb', 'snaptrap', 'thundercage', 'whirlpool', 'wrap',
-				'healpulse', 'superfang', 'grudge', 'batonpass', 'leechseed',
+				'healpulse', 'superfang', 'naturesmadness', 'guardianofalola', 'ruination',
+				'grudge', 'batonpass', 'leechseed',
 				'imprison', 'roleplay', 'copycat',
 			]);
 			if (blocked.has(move.id) || move.ohko) {

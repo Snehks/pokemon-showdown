@@ -74,7 +74,7 @@ const Abilities = {
     onDamage(damage, target, source, effect) {
       if (this.effectState.used) return;
       if (target.hp <= 1) return;
-      if (damage >= target.hp && effect && effect.effectType === "Move") {
+      if (damage >= target.hp && effect?.effectType === "Move") {
         this.effectState.used = true;
         this.add("-ability", target, "World's Strongest Creature");
         return target.hp - 1;
@@ -219,6 +219,9 @@ const Abilities = {
         "wrap",
         "healpulse",
         "superfang",
+        "naturesmadness",
+        "guardianofalola",
+        "ruination",
         "grudge",
         "batonpass",
         "leechseed",

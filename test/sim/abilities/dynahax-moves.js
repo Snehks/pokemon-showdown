@@ -115,6 +115,21 @@ describe('Dynahax [Blocked Moves]', () => {
 		assert.fullHP(battle.p2.active[0]);
 	});
 
+	it('should block percentage-damage moves', () => {
+		for (const move of ['naturesmadness', 'guardianofalola', 'ruination']) {
+			if (battle) {
+				battle.destroy();
+				battle = null;
+			}
+			battle = common.createBattle({ formatid: FORMAT, forceRandomChance: true }, [
+				[{ species: 'Smeargle', ability: 'owntempo', moves: [move] }],
+				[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
+			]);
+			battle.makeChoices(`move ${move}`, 'move splash');
+			assert.fullHP(battle.p2.active[0]);
+		}
+	});
+
 	it('should block Endeavor', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
 			[{ species: 'Smeargle', ability: 'owntempo', moves: ['endeavor'] }],
