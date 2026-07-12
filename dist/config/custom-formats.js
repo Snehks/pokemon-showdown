@@ -40,6 +40,13 @@ const Formats = [
     ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
+    name: "[Gen 9] PBO Coop NPC 2v1",
+    mod: "pbo",
+    gameType: "horde",
+    activeSlotsPerSide: [2, 1],
+    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+  },
+  {
     name: "[Gen 9] PBO PvP Battle",
     mod: "pbo",
     ruleset: ["Team Preview", "Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
