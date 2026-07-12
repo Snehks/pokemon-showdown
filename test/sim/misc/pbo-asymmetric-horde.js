@@ -7,6 +7,19 @@ let battle;
 
 const WILD_SPECIES = ['Caterpie', 'Pidgey', 'Rattata', 'Zubat', 'Weedle'];
 
+function createCoopHordeBattle(enemyCount) {
+	return common.createBattle({formatid: `gen9pbocoopwild2v${enemyCount}`}, [[
+		{species: 'Chansey', level: 100, ability: 'naturalcure', moves: ['splash']},
+		{species: 'Blissey', level: 100, ability: 'naturalcure', moves: ['splash']},
+	], WILD_SPECIES.slice(0, enemyCount).map(species => (
+		{species, level: 40, ability: 'runaway', moves: ['dragonrage']}
+	))]);
+}
+
+function targetedWildChoices(enemyCount, target) {
+	return Array(enemyCount).fill(`move 1 ${target}`).join(', ');
+}
+
 function createHordeBattle(enemyCount) {
 	return common.createBattle({formatid: `gen9pbowildhorde1v${enemyCount}`}, [[
 		{species: 'Charizard', level: 100, ability: 'blaze', moves: ['dragonrage', 'seismictoss', 'growl']},
@@ -108,6 +121,34 @@ describe('[PBO] Asymmetric wild horde battles', () => {
 					target === enemyCount,
 					`The battle should ${target === enemyCount ? 'end' : 'continue'} after ${target} wild fainted`
 				);
+			}
+		});
+	}
+
+	for (const enemyCount of [1, 3, 4, 5]) {
+		it(`should run a 2v${enemyCount} co-op horde where every wild can target either human slot`, () => {
+			battle = createCoopHordeBattle(enemyCount);
+
+			assert.equal(battle.sides[0].active.length, 2);
+			assert.equal(battle.sides[1].active.length, enemyCount);
+
+			const firstHuman = battle.sides[0].active[0];
+			const secondHuman = battle.sides[0].active[1];
+			const firstHp = firstHuman.hp;
+			const secondHp = secondHuman.hp;
+
+			battle.makeChoices('move 1, move 1', targetedWildChoices(enemyCount, 1));
+			assert(firstHuman.hp < firstHp, 'Every wild should be able to target human slot one');
+			assert.equal(secondHuman.hp, secondHp, 'Human slot two should not be hit by slot-one choices');
+
+			const firstHpAfterTurnOne = firstHuman.hp;
+			battle.makeChoices('move 1, move 1', targetedWildChoices(enemyCount, 2));
+			assert.equal(firstHuman.hp, firstHpAfterTurnOne, 'Human slot one should not be hit by slot-two choices');
+			assert(secondHuman.hp < secondHp, 'Every wild should be able to target human slot two');
+
+			for (const species of WILD_SPECIES.slice(0, enemyCount)) {
+				assert(battle.log.some(line => line.startsWith(`|move|p2`) && line.includes(`: ${species}|Dragon Rage|`)),
+					`${species} should receive and execute an action`);
 			}
 		});
 	}

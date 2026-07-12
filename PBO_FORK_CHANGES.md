@@ -1154,3 +1154,17 @@ Guardian of Alola, and Ruination leave a Dynahax boss at full HP.
 3. Resolve conflicts (changes are at end-of-interface and end-of-constructor)
 4. Run tests: `npm test` + PBO integration tests
 5. Tag: `git tag v<base_version>-pbo-vNN`
+## Co-op PvE asymmetric formats
+
+PBO co-op PvE keeps both human-controlled active Pokemon on `p1` and uses the
+existing `horde` game type for unequal side sizes. The following formats extend
+the v68 `activeSlotsPerSide` support:
+
+- `gen9pbocoopwild2v1` — `[Gen 9] PBO Coop Wild 2v1`
+- `gen9pbocoopwild2v3` — `[Gen 9] PBO Coop Wild 2v3`
+- `gen9pbocoopwild2v4` — `[Gen 9] PBO Coop Wild 2v4`
+- `gen9pbocoopwild2v5` — `[Gen 9] PBO Coop Wild 2v5`
+
+Symmetric `2v2` continues to use the existing PBO wild doubles format. Engine
+tests verify that every opponent slot can target either human slot, including
+all five opponent actions in `2v5`.
