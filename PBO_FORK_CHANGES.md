@@ -1164,6 +1164,7 @@ the v68 `activeSlotsPerSide` support:
 - `gen9pbocoopwild2v3` — `[Gen 9] PBO Coop Wild 2v3`
 - `gen9pbocoopwild2v4` — `[Gen 9] PBO Coop Wild 2v4`
 - `gen9pbocoopwild2v5` — `[Gen 9] PBO Coop Wild 2v5`
+- `gen9pbocoopnpc2v1` — `[Gen 9] PBO Coop NPC 2v1`
 
 Symmetric `2v2` continues to use the existing PBO wild doubles format. Engine
 tests verify that every opponent slot can target either human slot, including

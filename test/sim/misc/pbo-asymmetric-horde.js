@@ -152,4 +152,10 @@ describe('[PBO] Asymmetric wild horde battles', () => {
 			}
 		});
 	}
+
+	it('should expose the co-op NPC boss format as 2v1', () => {
+		const format = Dex.formats.get('gen9pbocoopnpc2v1');
+		assert.equal(format.gameType, 'horde');
+		assert.deepEqual(format.activeSlotsPerSide, [2, 1]);
+	});
 });
