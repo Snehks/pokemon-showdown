@@ -19,8 +19,8 @@ these changes by searching for `[PBO]` comments in the source.
 | 4 | `sim/pokemon.ts` | Extended constructor | Apply `currentHp`, `status`, `movePP` during Pokemon init |
 | 5 | `data/mods/pbo/scripts.ts` | PBO mod | Always include level in details string (PBO has levels > 100) |
 | 6 | `config/custom-formats.ts` | PBO custom format | `[Gen 9] PBO Standard Battle` with no team validation |
-| 7 | `sim/side.ts` | Extended `ChosenAction` | Add `useitem` choice type + `bagItemScript`, `bagItemData` fields |
-| 8 | `sim/side.ts` | Extended `choose()` | Parse `useitem <target> <script> <data...>` command |
+| 7 | `sim/side.ts` | Extended `ChosenAction` | Add `useitem` choice type + `bagItemScript`, `bagItemToken`, `bagItemData` fields |
+| 8 | `sim/side.ts` | Extended `choose()` | Parse `useitem <target> <script> <actionToken> <data...>` command |
 | 9 | `sim/battle-queue.ts` | Extended `resolveAction` | Add `useitem: 7` to action order (before moves) |
 | 10 | `sim/battle.ts` | Extended `runAction` | Execute bag item scripts via `case 'useitem'` |
 | 11 | `data/mods/pbo/scripts.ts` | Bag item scripts | 11 scripts: potion, revive, full_restore, cure_status, ether, elixir, x_stat, dire_hit, guard_spec, clear_boost, potion_by_portion |
@@ -176,9 +176,10 @@ since PBO validates teams server-side.
 
 **What it does:**
 1. Adds `'useitem'` to the `choice` union type
-2. Adds two optional fields:
+2. Adds three optional fields:
 ```typescript
 bagItemScript?: string;   // Name of the bag item script to execute
+bagItemToken?: string;    // Server-generated execution acknowledgement token
 bagItemData?: string[];    // Additional data passed to the script
 ```
 
@@ -192,7 +193,7 @@ bagItemData?: string[];    // Additional data passed to the script
 
 **What it does:** Parses the `useitem` command format:
 ```
-useitem <targetRef> <scriptName> <data...>
+useitem <targetRef> <scriptName> <actionToken> <data...>
 ```
 
 Target resolution:
@@ -200,7 +201,7 @@ Target resolution:
 - `p1:2` → bench Pokemon at index 2 on side p1
 
 Pushes a `ChosenAction` with `choice: 'useitem'`, the resolved target, script name,
-and item data array.
+server-generated action token, and item data array. Tokenless actions are rejected.
 
 ---
 
@@ -220,8 +221,8 @@ games where bag items are used before any attacks.
 
 **What it does:** Executes the bag item script:
 1. Looks up `bagItems[action.bagItemScript]` from `this.dex.data.Scripts`
-2. Emits `|bagitem|<target>|<scriptName>` protocol line
-3. Calls `script.use(battle, target, scriptName, data)`
+2. Calls `script.use(battle, target, scriptName, data)`
+3. After successful completion, emits `|bagitem|<target>|<scriptName>|<actionToken>`
 4. Catches and logs errors gracefully
 
 ---

@@ -46,4 +46,38 @@ describe('[PBO] Bag item useitem action', () => {
 		assert(!battle.log.some(line => line.startsWith('|bagitem|')),
 			'A rejected item action must not emit an execution acknowledgement');
 	});
+
+	it('should acknowledge a successful script even when it has no battle effect', () => {
+		battle = common.createBattle({formatid: 'gen9pbostandardbattle'}, [
+			[{species: 'Charizard', ability: 'Blaze', moves: ['splash']}],
+			[{species: 'Blastoise', ability: 'Torrent', moves: ['splash']}],
+		]);
+		const scripts = battle.dex.data.Scripts.bagItems;
+		scripts.no_effect_test = {use() {}};
+
+		try {
+			battle.makeChoices('useitem p1a no_effect_test battle-42-item-no-effect', 'move 1');
+			assert(battle.log.some(line => line === '|bagitem|p1a|no_effect_test|battle-42-item-no-effect'),
+				'A successfully invoked no-effect script should still be acknowledged');
+		} finally {
+			delete scripts.no_effect_test;
+		}
+	});
+
+	it('should not acknowledge a script that throws before completing', () => {
+		battle = common.createBattle({formatid: 'gen9pbostandardbattle'}, [
+			[{species: 'Charizard', ability: 'Blaze', moves: ['splash']}],
+			[{species: 'Blastoise', ability: 'Torrent', moves: ['splash']}],
+		]);
+		const scripts = battle.dex.data.Scripts.bagItems;
+		scripts.throwing_test = {use() { throw new Error('expected test failure'); }};
+
+		try {
+			battle.makeChoices('useitem p1a throwing_test battle-42-item-throw', 'move 1');
+			assert(!battle.log.some(line => line === '|bagitem|p1a|throwing_test|battle-42-item-throw'),
+				'A failed script must not be acknowledged as executed');
+		} finally {
+			delete scripts.throwing_test;
+		}
+	});
 });
