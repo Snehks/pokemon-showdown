@@ -45,6 +45,7 @@ export interface ChosenAction {
 	priority?: number; // priority of the action
 	// [PBO] Bag item fields for useitem action
 	bagItemScript?: string;
+	bagItemToken?: string;
 	bagItemData?: string[];
 }
 
@@ -1276,15 +1277,16 @@ export class Side {
 				if (!this.autoChoose()) return false;
 				break;
 			case 'useitem': {
-				// [PBO] Format: "useitem <targetRef> <scriptName> <data...>"
+				// [PBO] Format: "useitem <targetRef> <scriptName> <actionToken> <data...>"
 				// targetRef: "p1a" for active, "p1:2" for bench pokemon (side.pokemon[2])
 				const parts = data.split(' ');
-				if (parts.length < 2) {
-					return this.emitChoiceError('useitem requires target and script name');
+				if (parts.length < 3) {
+					return this.emitChoiceError('useitem requires target, script name, and action token');
 				}
 				const targetRef = parts[0];
 				const scriptName = parts[1];
-				const itemData = parts.slice(2);
+				const actionToken = parts[2];
+				const itemData = parts.slice(3);
 
 				// Resolve target pokemon
 				let targetPokemon;
@@ -1311,6 +1313,7 @@ export class Side {
 					target: targetPokemon,
 					side: this,
 					bagItemScript: scriptName,
+					bagItemToken: actionToken,
 					bagItemData: itemData,
 				} as any);
 				break;

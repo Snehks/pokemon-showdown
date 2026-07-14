@@ -971,12 +971,13 @@ ${sideUpdate}`);
           break;
         case "useitem": {
           const parts = data.split(" ");
-          if (parts.length < 2) {
-            return this.emitChoiceError("useitem requires target and script name");
+          if (parts.length < 3) {
+            return this.emitChoiceError("useitem requires target, script name, and action token");
           }
           const targetRef = parts[0];
           const scriptName = parts[1];
-          const itemData = parts.slice(2);
+          const actionToken = parts[2];
+          const itemData = parts.slice(3);
           let targetPokemon;
           if (targetRef.includes(":")) {
             const [sideId, slotStr] = targetRef.split(":");
@@ -998,6 +999,7 @@ ${sideUpdate}`);
             target: targetPokemon,
             side: this,
             bagItemScript: scriptName,
+            bagItemToken: actionToken,
             bagItemData: itemData
           });
           break;
