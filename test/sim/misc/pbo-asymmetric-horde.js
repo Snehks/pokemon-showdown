@@ -153,6 +153,24 @@ describe('[PBO] Asymmetric wild horde battles', () => {
 		});
 	}
 
+	it('should allow a normal move to target the co-op ally in a 2v3 horde', () => {
+		battle = common.createBattle({formatid: 'gen9pbocoopwild2v3'}, [[
+			{species: 'Machamp', level: 100, ability: 'noguard', moves: ['crunch']},
+			{species: 'Blissey', level: 100, ability: 'naturalcure', moves: ['splash']},
+		], WILD_SPECIES.slice(0, 3).map(species => (
+			{species, level: 40, ability: 'runaway', moves: ['splash']}
+		))]);
+
+		const ally = battle.sides[0].active[1];
+		const allyHp = ally.hp;
+
+		battle.makeChoices('move 1 -2, move 1', 'move 1, move 1, move 1');
+
+		assert(ally.hp < allyHp, 'The selected co-op ally should take damage');
+		assert(battle.log.includes('|move|p1a: Machamp|Crunch|p1b: Blissey'),
+			'The ally-targeted move should resolve instead of rejecting the turn');
+	});
+
 	it('should expose the co-op NPC boss format as 2v1', () => {
 		const format = Dex.formats.get('gen9pbocoopnpc2v1');
 		assert.equal(format.gameType, 'horde');

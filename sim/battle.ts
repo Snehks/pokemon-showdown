@@ -2414,9 +2414,10 @@ export class Battle {
 			switch (targetType) {
 			case 'randomNormal':
 			case 'scripted':
-			case 'normal':
 			case 'adjacentFoe':
 				return isFoe;
+			case 'normal':
+				return !isSelf;
 			case 'adjacentAlly':
 				return !isFoe && !isSelf;
 			case 'adjacentAllyOrSelf':

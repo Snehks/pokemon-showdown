@@ -1997,9 +1997,10 @@ class Battle {
       switch (targetType) {
         case "randomNormal":
         case "scripted":
-        case "normal":
         case "adjacentFoe":
           return isFoe2;
+        case "normal":
+          return !isSelf2;
         case "adjacentAlly":
           return !isFoe2 && !isSelf2;
         case "adjacentAllyOrSelf":
