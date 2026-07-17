@@ -16,6 +16,22 @@ function createCoopHordeBattle(enemyCount) {
 	))]);
 }
 
+function createCoopTargetBattle(enemyCount) {
+	const formatid = enemyCount === 2 ? 'gen9pbowilddoublesbattle' : `gen9pbocoopwild2v${enemyCount}`;
+	return common.createBattle({formatid}, [[
+		{species: 'Machamp', level: 100, ability: 'noguard', moves: ['crunch', 'splash']},
+		{species: 'Conkeldurr', level: 100, ability: 'guts', moves: ['crunch', 'splash']},
+	], WILD_SPECIES.slice(0, enemyCount).map(species => (
+		{species, level: 100, ability: 'runaway', moves: ['splash']}
+	))]);
+}
+
+function humanTargetChoice(sourceSlot, targetLoc) {
+	const choices = ['move 2', 'move 2'];
+	choices[sourceSlot] = `move 1 ${targetLoc}`;
+	return choices.join(', ');
+}
+
 function targetedWildChoices(enemyCount, target) {
 	return Array(enemyCount).fill(`move 1 ${target}`).join(', ');
 }
@@ -170,6 +186,51 @@ describe('[PBO] Asymmetric wild horde battles', () => {
 		assert(battle.log.includes('|move|p1a: Machamp|Crunch|p1b: Blissey'),
 			'The ally-targeted move should resolve instead of rejecting the turn');
 	});
+
+	for (const enemyCount of [1, 2, 3, 4, 5]) {
+		it(`should resolve every legal human target permutation in 2v${enemyCount}`, () => {
+			for (const sourceSlot of [0, 1]) {
+				const allyTargetLoc = -(2 - sourceSlot);
+				const targetLocs = [
+					allyTargetLoc,
+					...Array.from({length: enemyCount}, (_, targetSlot) => targetSlot + 1),
+				];
+				for (const targetLoc of targetLocs) {
+					battle = createCoopTargetBattle(enemyCount);
+					const targetSide = targetLoc < 0 ? battle.sides[0] : battle.sides[1];
+					const target = targetSide.active[Math.abs(targetLoc) - 1];
+					const previousHp = target.hp;
+
+					battle.makeChoices(
+						humanTargetChoice(sourceSlot, targetLoc),
+						wildChoices(enemyCount)
+					);
+
+					assert(
+						target.hp < previousHp,
+						`Human slot ${sourceSlot + 1} should hit target ${targetLoc} in 2v${enemyCount}`
+					);
+					battle.destroy();
+					battle = null;
+				}
+			}
+		});
+
+		it(`should reject self and out-of-range human targets in 2v${enemyCount}`, () => {
+			for (const sourceSlot of [0, 1]) {
+				for (const targetLoc of [-(sourceSlot + 1), -3, enemyCount + 1]) {
+					battle = createCoopTargetBattle(enemyCount);
+					assert.cantTarget(
+						() => battle.choose('p1', humanTargetChoice(sourceSlot, targetLoc)),
+						'crunch',
+						`Human slot ${sourceSlot + 1} should reject target ${targetLoc} in 2v${enemyCount}`
+					);
+					battle.destroy();
+					battle = null;
+				}
+			}
+		});
+	}
 
 	it('should expose the co-op NPC boss format as 2v1', () => {
 		const format = Dex.formats.get('gen9pbocoopnpc2v1');
