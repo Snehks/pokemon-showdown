@@ -54,63 +54,63 @@ const Formats = [
   {
     name: "[Gen 9] PBO Wild Battle",
     mod: "pbo",
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO Wild Horde 1v2",
     mod: "pbo",
     gameType: "horde",
     activeSlotsPerSide: [1, 2],
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO Wild Horde 1v3",
     mod: "pbo",
     gameType: "horde",
     activeSlotsPerSide: [1, 3],
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO Wild Horde 1v4",
     mod: "pbo",
     gameType: "horde",
     activeSlotsPerSide: [1, 4],
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO Wild Horde 1v5",
     mod: "pbo",
     gameType: "horde",
     activeSlotsPerSide: [1, 5],
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO Coop Wild 2v1",
     mod: "pbo",
     gameType: "horde",
     activeSlotsPerSide: [2, 1],
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO Coop Wild 2v3",
     mod: "pbo",
     gameType: "horde",
     activeSlotsPerSide: [2, 3],
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO Coop Wild 2v4",
     mod: "pbo",
     gameType: "horde",
     activeSlotsPerSide: [2, 4],
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO Coop Wild 2v5",
     mod: "pbo",
     gameType: "horde",
     activeSlotsPerSide: [2, 5],
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO PvP Battle No Preview",
@@ -133,13 +133,13 @@ const Formats = [
     name: "[Gen 9] PBO Wild Doubles Battle",
     mod: "pbo",
     gameType: "doubles",
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   {
     name: "[Gen 9] PBO Wild Triples Battle",
     mod: "pbo",
     gameType: "triples",
-    ruleset: ["Sleep Clause Mod", "Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
+    ruleset: ["Cancel Mod", "HP Percentage Mod", "Overflow Stat Mod", "No Sturdy Wild", "Terastal Clause", "Z-Move Clause", "Dynamax Clause"]
   },
   // [PBO] Random battles allow Terastallization — the Showdown random team generator
   // assigns a competitive teraType per set (e.g. Landorus-T Tera Flying). Dropping

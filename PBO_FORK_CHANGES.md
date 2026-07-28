@@ -1148,6 +1148,24 @@ Guardian of Alola, and Ruination leave a Dynahax boss at full HP.
 
 ---
 
+## Change 58: Remove Sleep Clause from wild battles (config/custom-formats.ts)
+
+Removes `Sleep Clause Mod` from every PBO wild format: ordinary wild singles,
+solo hordes (`1v2` through `1v5`), co-op wild formats (`2v1` through `2v5`),
+wild doubles, and wild triples. PvP, NPC, and standard formats retain the
+clause.
+
+Wild encounters are not competitive matches, so putting one wild Pokemon to
+sleep must not prevent another wild Pokemon from being put to sleep. This is
+especially important for hordes with multiple simultaneous opponents and keeps
+the rule consistent when a partner joins the same encounter.
+
+**Tests:** `test/sim/misc/pbo-sleep-clause.js` verifies the clause is absent
+from every wild format, multiple wild slots can be asleep in solo and co-op
+hordes, and PvP/NPC/standard formats still enforce the clause.
+
+---
+
 ## Upgrade Checklist
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
