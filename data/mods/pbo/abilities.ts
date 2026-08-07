@@ -137,7 +137,11 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 
 		// Disable moves that bypass onTryHit or should not rely on targeting the boss.
 		// Destiny Bond / Grudge / Baton Pass / Power Trick target the user.
-		// Guard Split / Power Split / Speed Swap swap stats with the boss and trivialise raids.
+		// Guard Split / Power Split / Speed Swap swap stats with the boss and trivialise
+		// raids — they are ALSO in the onTryHit blocked Set because move-calling moves
+		// (Sleep Talk / Metronome / Assist) execute via actions.useMove(), which never
+		// checks the picker disable. Baton Pass targets the USER so onTryHit can't
+		// catch it — it is hard-blocked at move level (moves.ts onTry, like Imprison).
 		// Dragon Cheer targets an ally. Skill Swap and Bestow are disabled in the picker
 		// instead of only failing on use (Bestow still also fails via onTryHit as a
 		// catch-all for indirect calls like Metronome).
@@ -193,6 +197,7 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 				'healpulse', 'superfang', 'naturesmadness', 'guardianofalola', 'ruination',
 				'grudge', 'batonpass', 'leechseed',
 				'imprison', 'roleplay', 'copycat',
+				'powersplit', 'guardsplit', 'speedswap',
 			]);
 			if (blocked.has(move.id) || move.ohko) {
 				this.add('-immune', target, '[from] ability: Dynahax');

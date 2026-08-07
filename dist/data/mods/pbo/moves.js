@@ -229,6 +229,24 @@ const Moves = {
       }
     }
   },
+  // [PBO] Baton Pass targets the USER, so a Dynahax boss's onTryHit never sees
+  // it, and the picker disable (Dynahax onFoeDisableMove) is bypassed by
+  // Sleep Talk / Metronome / Assist, which call moves via actions.useMove()
+  // without checking disabled slots. Escaping a raid with boosts/volatiles
+  // intact trivialises the encounter, so against a Dynahax boss the move
+  // fails outright by every route. Same pattern as Imprison above.
+  batonpass: {
+    inherit: true,
+    onTry(source) {
+      for (const foe of source.foes()) {
+        if (foe.hasAbility("dynahax")) {
+          this.attrLastMove("[still]");
+          this.add("-fail", source, "move: Baton Pass");
+          return null;
+        }
+      }
+    }
+  },
   // --- Cosmetic event form overrides ---
   hyperspacefury: {
     inherit: true,

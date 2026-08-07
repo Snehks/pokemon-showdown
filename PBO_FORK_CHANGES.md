@@ -1147,6 +1147,31 @@ Guardian of Alola, and Ruination leave a Dynahax boss at full HP.
 
 ---
 
+## Change 58: Dynahax indirect banned-move bypass (data/mods/pbo/abilities.ts, data/mods/pbo/moves.ts)
+
+Discord report: "You can still use Baton Pass during the Dynamax event, and
+there's a chance to trigger banned moves like Power Split and Guard Split by
+luck." Move-calling moves (Sleep Talk / Metronome / Assist) execute via
+`actions.useMove()`, which never checks the picker disable
+(`onFoeDisableMove`), so every move banned only at selection level could still
+execute through an indirect call:
+
+- **Power Split / Guard Split / Speed Swap** target the boss but were missing
+  from the `onTryHit` blocked Set — an indirect call averaged/swapped the
+  player's stats with the boss's inflated stats, trivialising raids. Added all
+  three to the blocked Set.
+- **Baton Pass** targets the USER, so `onTryHit` never fires for it — an
+  indirect call let a player escape a raid with boosts/volatiles intact. Added
+  an `onTry` hard block at move level (fails against any Dynahax foe by every
+  route), same pattern as Imprison (Change 56).
+
+**Tests:** `test/sim/abilities/dynahax-indirect-calls.js` verifies Sleep
+Talk-called Baton Pass / Power Split / Guard Split / Speed Swap all fail
+against Dynahax bosses (singles + doubles for Baton Pass) and still work
+against normal foes.
+
+---
+
 ## Upgrade Checklist
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
