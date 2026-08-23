@@ -474,6 +474,19 @@ export const Scripts: ModdedBattleScriptsData = {
 			use(battle: any, pokemon: any, itemId: string, data: string[]) {
 				const healthRatio = parseFloat(data[0]);
 				if (pokemon.fainted) {
+					// When the target still occupies an active slot (it fainted with no
+					// replacements available, so it was never switched out), un-fainting
+					// it in place leaves `isActive = false` (cleared by faintMessages) —
+					// the engine would then accept choices for the slot but silently skip
+					// its moves in runAction. Mirror Revival Blessing: queue an
+					// instaswitch so the revived Pokemon formally re-enters its slot.
+					if (pokemon.position < pokemon.side.active.length) {
+						battle.queue.addChoice({
+							choice: 'instaswitch',
+							pokemon,
+							target: pokemon,
+						});
+					}
 					pokemon.fainted = false;
 					pokemon.side.pokemonLeft++;
 					pokemon.faintQueued = false;

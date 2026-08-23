@@ -247,6 +247,14 @@ games where bag items are used before any attacks.
 | `clear_boost` | Clear all stat boosts | none |
 | `potion_by_portion` | Heal by HP ratio, optional confusion | `[ratio, confuse?]` |
 
+**Note on `revive`:** when the target still occupies an active slot (it fainted
+with no replacements available, so it never left the field), the script queues
+an `instaswitch` before un-fainting — mirroring Revival Blessing's in-slot
+branch in `sim/battle.ts`. Without it the target keeps `isActive = false`
+(cleared by `faintMessages`) and becomes a "zombie": the engine accepts choices
+for its slot but silently skips its moves in `runAction`, and the battle cannot
+end while it keeps `pokemonLeft` above zero.
+
 ---
 
 ## Change 12: Dynahax ability (data/mods/pbo/abilities.ts)
