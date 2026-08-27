@@ -1228,6 +1228,35 @@ normal foes.
 
 ---
 
+## Change 61: Upstream v0.11.11 sync + daily sync automation (.github/workflows/upstream-sync.yml)
+
+Merged upstream `v0.11.11` (276 commits) into the fork. Zero textual
+conflicts — all PBO customizations sit at end-of-interface / end-of-constructor
+positions per the Upgrade Checklist. Verified after the merge:
+
+- All `[PBO]` markers, `activeSlotsPerSide`, and `gameType === 'horde'` code
+  survived intact.
+- `dist/` rebuilt from the merged source.
+- PBO subset (dynahax + pbo-* mocha tests) fully green; the 3 full-suite
+  failures (stat-cap overflow, gen1 trapmoves x2) are pre-existing and fail
+  identically on the pre-merge base.
+- Game repo `:server:showdown:test` suite (665 tests) green against the
+  synced engine build.
+
+**Automation:** `.github/workflows/upstream-sync.yml` runs daily (05:30 UTC,
+plus manual dispatch). It merges `upstream/master` into a rolling
+`sync/upstream` branch, rebuilds `dist/`, requires the PBO subset tests to
+pass, runs the full suite informationally, and opens/updates a PR against
+master. On merge conflict it opens/updates an `upstream-sync` issue listing
+the conflicted files instead. Two rules:
+
+- **Merge the sync PR with a merge commit, never squash** — squashing breaks
+  the merge-base and makes every future sync re-conflict.
+- Tagging a `v<base>-pbo-vNN` release and re-pinning the game repo's
+  `package.json` remain manual, post-review steps.
+
+---
+
 ## Upgrade Checklist
 
 1. `git fetch upstream && git merge upstream/v<new_version>`
