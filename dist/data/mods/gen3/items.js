@@ -475,7 +475,9 @@ const Items = {
   },
   quickclaw: {
     inherit: true,
-    onFractionalPriority: void 0
+    onBeforeTurn: void 0,
+    // no inherit
+    onCustap: void 0
     // no inherit
     // implemented in Pokemon#getActionSpeed()
   },

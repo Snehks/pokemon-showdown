@@ -488,7 +488,7 @@ const FormatsData = {
     tier: "ZU"
   },
   porygon2: {
-    tier: "UUBL"
+    tier: "(OU)"
   },
   omanyte: {
     tier: "PU"
@@ -755,7 +755,7 @@ const FormatsData = {
     tier: "UUBL"
   },
   raikou: {
-    tier: "UUBL"
+    tier: "OU"
   },
   entei: {
     tier: "UUBL"
@@ -953,7 +953,7 @@ const FormatsData = {
     tier: "LC"
   },
   manectric: {
-    tier: "RU"
+    tier: "RUBL"
   },
   plusle: {
     tier: "NU"
@@ -1157,10 +1157,10 @@ const FormatsData = {
     tier: "UUBL"
   },
   regice: {
-    tier: "UUBL"
+    tier: "(OU)"
   },
   registeel: {
-    tier: "UUBL"
+    tier: "OU"
   },
   latias: {
     tier: "Uber"

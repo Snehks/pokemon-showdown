@@ -177,7 +177,7 @@ class RandomGen6Teams extends import_teams2.default {
   constructor(format, prng) {
     super(format, prng);
     this.randomSets = require("./sets.json");
-    this.randomFactorySets = require("./factory-sets.json");
+    this.randomOldGenFactorySets = require("./factory-sets.json");
     this.noStab = NO_STAB;
     this.priorityPokemon = PRIORITY_POKEMON;
     this.moveEnforcementCheckers = {
@@ -323,7 +323,7 @@ class RandomGen6Teams extends import_teams2.default {
       [["roar", "protect"], ["metalburst", "protect"]]
     ];
     for (const pair of incompatiblePairs) this.incompatibleMoves(moves, movePool, pair[0], pair[1]);
-    if (!types.includes("Dark") && preferredType !== "Dark") {
+    if (!types.has("Dark") && preferredType !== "Dark") {
       this.incompatibleMoves(moves, movePool, "knockoff", ["pursuit", "suckerpunch"]);
     }
     const statusInflictingMoves = ["nuzzle", "thunderwave", "toxic", "willowisp", "yawn"];
@@ -348,7 +348,7 @@ class RandomGen6Teams extends import_teams2.default {
   // Generate random moveset for a given species, role, preferred type.
   randomMoveset(types, abilities, teamDetails, species, isLead, movePool, preferredType, role) {
     const moves = /* @__PURE__ */ new Set();
-    let counter = this.newQueryMoves(moves, species, preferredType, abilities);
+    let counter = this.queryMoves(moves, species, preferredType, abilities);
     this.cullMovePool(
       types,
       moves,
@@ -385,10 +385,14 @@ class RandomGen6Teams extends import_teams2.default {
         movePool,
         moves,
         abilities,
-        new Set(types),
+        types,
         counter,
         species,
-        teamDetails
+        teamDetails,
+        isLead,
+        false,
+        preferredType,
+        role
       );
     };
     if (species.requiredMove) {
@@ -513,7 +517,7 @@ class RandomGen6Teams extends import_teams2.default {
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
         const moveType = this.getMoveType(move, species, abilities, preferredType);
-        if (types.includes(moveType) && move.priority > 0 && (move.basePower || move.basePowerCallback)) {
+        if (types.has(moveType) && move.priority > 0 && (move.basePower || move.basePowerCallback)) {
           priorityMoves.push(moveid);
         }
       }
@@ -559,7 +563,7 @@ class RandomGen6Teams extends import_teams2.default {
         );
       }
     }
-    if (!counter.get("preferred")) {
+    if (!counter.get(preferredType)) {
       const stabMoves = [];
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
@@ -589,7 +593,7 @@ class RandomGen6Teams extends import_teams2.default {
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
         const moveType = this.getMoveType(move, species, abilities, preferredType);
-        if (!this.noStab.includes(moveid) && (move.basePower || move.basePowerCallback) && types.includes(moveType)) {
+        if (!this.noStab.includes(moveid) && (move.basePower || move.basePowerCallback) && types.has(moveType)) {
           stabMoves.push(moveid);
         }
       }
@@ -608,7 +612,7 @@ class RandomGen6Teams extends import_teams2.default {
           role
         );
       } else {
-        if (movePool.includes("uturn") && types.includes("Bug")) {
+        if (movePool.includes("uturn") && types.has("Bug")) {
           counter = this.addMove(
             "uturn",
             moves,
@@ -679,7 +683,7 @@ class RandomGen6Teams extends import_teams2.default {
         );
       }
     }
-    if (!counter.damagingMoves.size && !(moves.has("uturn") && types.includes("Bug"))) {
+    if (!counter.damagingMoves.size && !(moves.has("uturn") && types.has("Bug"))) {
       const attackingMoves = [];
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
@@ -776,7 +780,7 @@ class RandomGen6Teams extends import_teams2.default {
     }
     return moves;
   }
-  shouldCullAbility(ability, types, moves, abilities, counter, movePool, teamDetails, species, preferredType, role) {
+  shouldCullAbility(ability, types, moves, abilities, counter, teamDetails, species) {
     switch (ability) {
       case "Chlorophyll":
       case "Solar Power":
@@ -802,7 +806,7 @@ class RandomGen6Teams extends import_teams2.default {
     }
     return false;
   }
-  getAbility(types, moves, abilities, counter, movePool, teamDetails, species, preferredType, role) {
+  getAbility(types, moves, abilities, counter, teamDetails, species) {
     if (abilities.length <= 1) return abilities[0];
     if (species.id === "pangoro" && counter.get("ironfist")) return "Iron Fist";
     if (species.id === "tornadus" && counter.get("Status")) return "Prankster";
@@ -812,18 +816,7 @@ class RandomGen6Teams extends import_teams2.default {
     if (species.id === "roserade" && counter.get("technician")) return "Technician";
     const abilityAllowed = [];
     for (const ability of abilities) {
-      if (!this.shouldCullAbility(
-        ability,
-        types,
-        moves,
-        abilities,
-        counter,
-        movePool,
-        teamDetails,
-        species,
-        preferredType,
-        role
-      )) {
+      if (!this.shouldCullAbility(ability, types, moves, abilities, counter, teamDetails, species)) {
         abilityAllowed.push(ability);
       }
     }
@@ -846,7 +839,6 @@ class RandomGen6Teams extends import_teams2.default {
     if (species.name === "Shedinja" || species.name === "Smeargle") return "Focus Sash";
     if (species.name === "Talonflame") return "Sharp Beak";
     if (species.name === "Unfezant" || moves.has("focusenergy")) return "Scope Lens";
-    if (species.name === "Unown") return "Choice Specs";
     if (species.name === "Wobbuffet") return "Custap Berry";
     if (species.name === "Shuckle") return "Mental Herb";
     if (species.name === "Honchkrow") return "Life Orb";
@@ -895,7 +887,7 @@ class RandomGen6Teams extends import_teams2.default {
       return scarfReqs && (species.baseStats.atk >= 100 || ability === "Pure Power" || ability === "Huge Power") && this.randomChance(1, 2) ? "Choice Scarf" : "Choice Band";
     }
     if (ability === "Sturdy" && moves.has("explosion") && !counter.get("speedsetup")) return "Custap Berry";
-    if (types.includes("Normal") && moves.has("fakeout") && !!counter.get("Normal")) return "Silk Scarf";
+    if (types.has("Normal") && moves.has("fakeout") && !!counter.get("Normal")) return "Silk Scarf";
     if (role === "Bulky Setup" && !!counter.get("speedsetup") && !moves.has("swordsdance")) {
       return "Weakness Policy";
     }
@@ -933,7 +925,7 @@ class RandomGen6Teams extends import_teams2.default {
     let item = void 0;
     const evs = { hp: 85, atk: 85, def: 85, spa: 85, spd: 85, spe: 85 };
     const ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
-    const types = species.types;
+    const types = new Set(species.types);
     const baseAbilities = set.abilities;
     const abilities = species.battleOnly && !species.requiredAbility ? Object.values(species.abilities) : baseAbilities;
     const moves = this.randomMoveset(
@@ -946,23 +938,13 @@ class RandomGen6Teams extends import_teams2.default {
       preferredType,
       role
     );
-    const counter = this.newQueryMoves(moves, species, preferredType, abilities);
-    ability = this.getAbility(
-      new Set(types),
-      moves,
-      baseAbilities,
-      counter,
-      movePool,
-      teamDetails,
-      species,
-      preferredType,
-      role
-    );
+    const counter = this.queryMoves(moves, species, preferredType, abilities);
+    ability = this.getAbility(new Set(types), moves, baseAbilities, counter, teamDetails, species);
     item = this.getPriorityItem(ability, types, moves, counter, teamDetails, species, isLead, preferredType, role);
     if (item === void 0) {
       item = this.getItem(ability, types, moves, counter, teamDetails, species, isLead, preferredType, role);
     }
-    if (item === "Leftovers" && types.includes("Poison")) {
+    if (item === "Leftovers" && types.has("Poison")) {
       item = "Black Sludge";
     }
     const level = this.getLevel(species);
@@ -974,11 +956,12 @@ class RandomGen6Teams extends import_teams2.default {
     for (const move of moves) {
       if (move.startsWith("hiddenpower")) hasHiddenPower = true;
     }
-    if (hasHiddenPower) {
+    if (hasHiddenPower || species.id === "ditto") {
       let hpType;
       for (const move of moves) {
         if (move.startsWith("hiddenpower")) hpType = move.substr(11);
       }
+      if (species.id === "ditto") hpType = "ice";
       if (!hpType) throw new Error(`hasHiddenPower is true, but no Hidden Power move was found.`);
       const HPivs = ivs.atk === 0 ? import_teams2.ZeroAttackHPIVs[hpType] : this.dex.types.get(hpType).HPivs;
       let iv;
@@ -1031,7 +1014,7 @@ class RandomGen6Teams extends import_teams2.default {
   }
   randomFactorySet(species, teamData, tier) {
     const id = (0, import_dex.toID)(species.name);
-    const setList = this.randomFactorySets[tier][id].sets;
+    const setList = this.randomOldGenFactorySets[tier][id].sets;
     const itemsMax = { choicespecs: 1, choiceband: 1, choicescarf: 1 };
     const movesMax = {
       rapidspin: 1,
@@ -1120,7 +1103,7 @@ class RandomGen6Teams extends import_teams2.default {
     if (!this.factoryTier) this.factoryTier = this.sample(["Uber", "OU", "UU", "RU", "NU", "PU"]);
     const chosenTier = this.factoryTier;
     const pokemon = [];
-    const pokemonPool = Object.keys(this.randomFactorySets[chosenTier]);
+    const pokemonPool = Object.keys(this.randomOldGenFactorySets[chosenTier]);
     const teamData = {
       typeCount: {},
       typeComboCount: {},
@@ -1159,7 +1142,7 @@ class RandomGen6Teams extends import_teams2.default {
     while (pokemonPool.length && pokemon.length < this.maxTeamSize) {
       const species = this.dex.species.get(this.sampleNoReplace(pokemonPool));
       if (!species.exists) continue;
-      const speciesFlags = this.randomFactorySets[chosenTier][species.id].flags;
+      const speciesFlags = this.randomOldGenFactorySets[chosenTier][species.id].flags;
       if (teamData.baseFormes[species.baseSpecies]) continue;
       if (!teamData.megaCount) teamData.megaCount = 0;
       if (teamData.megaCount >= 1 && speciesFlags.megaOnly) continue;

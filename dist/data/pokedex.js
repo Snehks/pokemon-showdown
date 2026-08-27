@@ -95,7 +95,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Green",
     eggGroups: ["Monster", "Grass"],
-    changesFrom: "Venusaur"
+    changesFrom: "Venusaur",
+    placeholderFor: "Venusaur"
   },
   charmander: {
     num: 4,
@@ -185,7 +186,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Red",
     eggGroups: ["Monster", "Dragon"],
-    changesFrom: "Charizard"
+    changesFrom: "Charizard",
+    placeholderFor: "Charizard"
   },
   squirtle: {
     num: 7,
@@ -260,7 +262,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Blue",
     eggGroups: ["Monster", "Water 1"],
-    changesFrom: "Blastoise"
+    changesFrom: "Blastoise",
+    placeholderFor: "Blastoise"
   },
   caterpie: {
     num: 10,
@@ -314,7 +317,8 @@ const Pokedex = {
     weightkg: 0,
     color: "White",
     eggGroups: ["Bug"],
-    changesFrom: "Butterfree"
+    changesFrom: "Butterfree",
+    placeholderFor: "Butterfree"
   },
   weedle: {
     num: 13,
@@ -598,6 +602,7 @@ const Pokedex = {
     heightm: 0.4,
     weightkg: 6,
     color: "Yellow",
+    tags: ["True Past"],
     eggGroups: ["Undiscovered"],
     gen: 6
   },
@@ -613,6 +618,7 @@ const Pokedex = {
     heightm: 0.4,
     weightkg: 6,
     color: "Yellow",
+    tags: ["True Past"],
     eggGroups: ["Undiscovered"],
     changesFrom: "Pikachu-Cosplay",
     gen: 6
@@ -629,6 +635,7 @@ const Pokedex = {
     heightm: 0.4,
     weightkg: 6,
     color: "Yellow",
+    tags: ["True Past"],
     eggGroups: ["Undiscovered"],
     changesFrom: "Pikachu-Cosplay",
     gen: 6
@@ -645,6 +652,7 @@ const Pokedex = {
     heightm: 0.4,
     weightkg: 6,
     color: "Yellow",
+    tags: ["True Past"],
     eggGroups: ["Undiscovered"],
     changesFrom: "Pikachu-Cosplay",
     gen: 6
@@ -661,6 +669,7 @@ const Pokedex = {
     heightm: 0.4,
     weightkg: 6,
     color: "Yellow",
+    tags: ["True Past"],
     eggGroups: ["Undiscovered"],
     changesFrom: "Pikachu-Cosplay",
     gen: 6
@@ -677,6 +686,7 @@ const Pokedex = {
     heightm: 0.4,
     weightkg: 6,
     color: "Yellow",
+    tags: ["True Past"],
     eggGroups: ["Undiscovered"],
     changesFrom: "Pikachu-Cosplay",
     gen: 6
@@ -811,7 +821,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Yellow",
     eggGroups: ["Field", "Fairy"],
-    changesFrom: "Pikachu"
+    changesFrom: "Pikachu",
+    placeholderFor: "Pikachu"
   },
   pikachuworld: {
     num: 25,
@@ -868,7 +879,7 @@ const Pokedex = {
     forme: "Mega-X",
     types: ["Electric"],
     baseStats: { hp: 60, atk: 135, def: 95, spa: 90, spd: 95, spe: 110 },
-    abilities: { 0: "Surge Surfer" },
+    abilities: { 0: "Electric Surge" },
     heightm: 1.2,
     weightkg: 38,
     color: "Yellow",
@@ -883,7 +894,7 @@ const Pokedex = {
     forme: "Mega-Y",
     types: ["Electric"],
     baseStats: { hp: 60, atk: 100, def: 55, spa: 160, spd: 80, spe: 130 },
-    abilities: { 0: "Surge Surfer" },
+    abilities: { 0: "No Guard" },
     heightm: 1,
     weightkg: 26,
     color: "Yellow",
@@ -1077,7 +1088,7 @@ const Pokedex = {
     types: ["Fairy", "Flying"],
     genderRatio: { M: 0.25, F: 0.75 },
     baseStats: { hp: 95, atk: 80, def: 93, spa: 135, spd: 110, spe: 70 },
-    abilities: { 0: "Cute Charm", 1: "Magic Guard", H: "Unaware" },
+    abilities: { 0: "Magic Bounce" },
     heightm: 1.7,
     weightkg: 42.3,
     color: "Pink",
@@ -1408,7 +1419,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Yellow",
     eggGroups: ["Field"],
-    changesFrom: "Meowth"
+    changesFrom: "Meowth",
+    placeholderFor: "Meowth"
   },
   persian: {
     num: 53,
@@ -1710,7 +1722,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Gray",
     eggGroups: ["Human-Like"],
-    changesFrom: "Machamp"
+    changesFrom: "Machamp",
+    placeholderFor: "Machamp"
   },
   bellsprout: {
     num: 69,
@@ -1761,7 +1774,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Grass", "Poison"],
     baseStats: { hp: 80, atk: 125, def: 85, spa: 135, spd: 95, spe: 70 },
-    abilities: { 0: "Chlorophyll", H: "Gluttony" },
+    abilities: { 0: "Innards Out" },
     heightm: 4.5,
     weightkg: 125.5,
     color: "Green",
@@ -2272,7 +2285,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Purple",
     eggGroups: ["Amorphous"],
-    changesFrom: "Gengar"
+    changesFrom: "Gengar",
+    placeholderFor: "Gengar"
   },
   onix: {
     num: 95,
@@ -2349,7 +2363,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Red",
     eggGroups: ["Water 3"],
-    changesFrom: "Kingler"
+    changesFrom: "Kingler",
+    placeholderFor: "Kingler"
   },
   voltorb: {
     num: 100,
@@ -2774,9 +2789,8 @@ const Pokedex = {
     forme: "Mega",
     types: ["Water", "Psychic"],
     gender: "N",
-    // FIXME: change stats on generation shift
-    baseStats: { hp: 60, atk: 140, def: 105, spa: 130, spd: 105, spe: 120 },
-    abilities: { 0: "Illuminate", 1: "Natural Cure", H: "Analytic" },
+    baseStats: { hp: 60, atk: 100, def: 105, spa: 130, spd: 105, spe: 120 },
+    abilities: { 0: "Huge Power" },
     heightm: 2.3,
     weightkg: 80,
     color: "Purple",
@@ -3024,7 +3038,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Blue",
     eggGroups: ["Monster", "Water 1"],
-    changesFrom: "Lapras"
+    changesFrom: "Lapras",
+    placeholderFor: "Lapras"
   },
   ditto: {
     num: 132,
@@ -3081,7 +3096,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Brown",
     eggGroups: ["Field"],
-    changesFrom: "Eevee"
+    changesFrom: "Eevee",
+    placeholderFor: "Eevee"
   },
   vaporeon: {
     num: 134,
@@ -3253,7 +3269,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Black",
     eggGroups: ["Monster"],
-    changesFrom: "Snorlax"
+    changesFrom: "Snorlax",
+    placeholderFor: "Snorlax"
   },
   articuno: {
     num: 144,
@@ -3800,6 +3817,7 @@ const Pokedex = {
     heightm: 0.3,
     weightkg: 2,
     color: "Yellow",
+    tags: ["True Past"],
     eggGroups: ["Undiscovered"],
     gen: 4
   },
@@ -4674,7 +4692,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Steel", "Flying"],
     baseStats: { hp: 65, atk: 140, def: 110, spa: 40, spd: 100, spe: 110 },
-    abilities: { 0: "Keen Eye", 1: "Sturdy", H: "Weak Armor" },
+    abilities: { 0: "Stalwart" },
     heightm: 1.7,
     weightkg: 40.4,
     color: "Gray",
@@ -7462,7 +7480,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Fighting", "Flying"],
     baseStats: { hp: 85, atk: 140, def: 100, spa: 60, spd: 90, spe: 110 },
-    abilities: { 0: "Intimidate", H: "Reckless" },
+    abilities: { 0: "Contrary" },
     heightm: 1.9,
     weightkg: 50,
     color: "Gray",
@@ -9967,7 +9985,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Ground", "Steel"],
     baseStats: { hp: 110, atk: 165, def: 100, spa: 65, spd: 65, spe: 103 },
-    abilities: { 0: "Sand Rush", 1: "Sand Force", H: "Mold Breaker" },
+    abilities: { 0: "Piercing Drill" },
     heightm: 0.9,
     weightkg: 60,
     color: "Gray",
@@ -10194,7 +10212,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Bug", "Poison"],
     baseStats: { hp: 60, atk: 140, def: 149, spa: 75, spd: 99, spe: 62 },
-    abilities: { 0: "Poison Point", 1: "Swarm", H: "Speed Boost" },
+    abilities: { 0: "Shell Armor" },
     heightm: 3.2,
     weightkg: 230.5,
     color: "Red",
@@ -10516,7 +10534,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Dark", "Fighting"],
     baseStats: { hp: 65, atk: 130, def: 135, spa: 55, spd: 135, spe: 68 },
-    abilities: { 0: "Shed Skin", 1: "Moxie", H: "Intimidate" },
+    abilities: { 0: "Intimidate" },
     heightm: 1.1,
     weightkg: 31,
     color: "Red",
@@ -10668,7 +10686,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Green",
     eggGroups: ["Mineral"],
-    changesFrom: "Garbodor"
+    changesFrom: "Garbodor",
+    placeholderFor: "Garbodor"
   },
   zorua: {
     num: 570,
@@ -11196,7 +11215,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Electric"],
     baseStats: { hp: 85, atk: 145, def: 80, spa: 135, spd: 90, spe: 80 },
-    abilities: { 0: "Levitate" },
+    abilities: { 0: "Eelevate" },
     heightm: 3,
     weightkg: 180,
     color: "Blue",
@@ -11278,7 +11297,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Ghost", "Fire"],
     baseStats: { hp: 60, atk: 75, def: 110, spa: 175, spd: 110, spe: 90 },
-    abilities: { 0: "Flash Fire", 1: "Flame Body", H: "Infiltrator" },
+    abilities: { 0: "Infiltrator" },
     heightm: 2.5,
     weightkg: 69.6,
     color: "Black",
@@ -11487,7 +11506,7 @@ const Pokedex = {
     types: ["Ground", "Ghost"],
     gender: "N",
     baseStats: { hp: 89, atk: 159, def: 105, spa: 70, spd: 105, spe: 55 },
-    abilities: { 0: "Iron Fist", 1: "Klutz", H: "No Guard" },
+    abilities: { 0: "Unseen Fist" },
     heightm: 4,
     weightkg: 330,
     color: "Green",
@@ -12564,7 +12583,7 @@ const Pokedex = {
     types: ["Fire", "Normal"],
     genderRatio: { M: 0.125, F: 0.875 },
     baseStats: { hp: 86, atk: 88, def: 92, spa: 129, spd: 86, spe: 126 },
-    abilities: { 0: "Rivalry", 1: "Unnerve", H: "Moxie" },
+    abilities: { 0: "Fire Mane" },
     heightm: 1.5,
     weightkg: 93.3,
     color: "Brown",
@@ -12629,7 +12648,7 @@ const Pokedex = {
     types: ["Fairy"],
     gender: "F",
     baseStats: { hp: 74, atk: 85, def: 87, spa: 155, spd: 148, spe: 102 },
-    abilities: { 0: "Flower Veil", H: "Symbiosis" },
+    abilities: { 0: "Fairy Aura" },
     heightm: 0.2,
     weightkg: 100.8,
     color: "White",
@@ -12785,7 +12804,7 @@ const Pokedex = {
     types: ["Psychic"],
     gender: "M",
     baseStats: { hp: 74, atk: 48, def: 76, spa: 143, spd: 101, spe: 124 },
-    abilities: { 0: "Keen Eye", 1: "Infiltrator", H: "Competitive" },
+    abilities: { 0: "Trace" },
     heightm: 0.8,
     weightkg: 10.1,
     color: "Blue",
@@ -12802,7 +12821,7 @@ const Pokedex = {
     types: ["Psychic"],
     gender: "F",
     baseStats: { hp: 74, atk: 48, def: 76, spa: 143, spd: 101, spe: 124 },
-    abilities: { 0: "Keen Eye", 1: "Infiltrator", H: "Competitive" },
+    abilities: { 0: "Trace" },
     heightm: 0.8,
     weightkg: 10.1,
     color: "White",
@@ -12956,7 +12975,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Dark", "Psychic"],
     baseStats: { hp: 86, atk: 102, def: 88, spa: 98, spd: 120, spe: 88 },
-    abilities: { 0: "Contrary", 1: "Suction Cups", H: "Infiltrator" },
+    abilities: { 0: "Contrary" },
     heightm: 2.9,
     weightkg: 69.8,
     color: "Blue",
@@ -12998,7 +13017,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Rock", "Fighting"],
     baseStats: { hp: 72, atk: 140, def: 130, spa: 64, spd: 106, spe: 88 },
-    abilities: { 0: "Tough Claws", 1: "Sniper", H: "Pickpocket" },
+    abilities: { 0: "Tough Claws" },
     heightm: 2.2,
     weightkg: 100,
     color: "Brown",
@@ -13040,7 +13059,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Poison", "Dragon"],
     baseStats: { hp: 65, atk: 85, def: 105, spa: 132, spd: 163, spe: 44 },
-    abilities: { 0: "Poison Point", 1: "Poison Touch", H: "Adaptability" },
+    abilities: { 0: "Regenerator" },
     heightm: 2.1,
     weightkg: 100.3,
     color: "Brown",
@@ -13190,7 +13209,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Fighting", "Flying"],
     baseStats: { hp: 78, atk: 137, def: 100, spa: 74, spd: 93, spe: 118 },
-    abilities: { 0: "Limber", 1: "Unburden", H: "Mold Breaker" },
+    abilities: { 0: "No Guard" },
     heightm: 1,
     weightkg: 25,
     color: "Green",
@@ -13925,6 +13944,7 @@ const Pokedex = {
     heightm: 1.4,
     weightkg: 60,
     color: "Brown",
+    tags: ["True Past"],
     eggGroups: ["Field"]
   },
   grubbin: {
@@ -13980,6 +14000,7 @@ const Pokedex = {
     heightm: 2.6,
     weightkg: 147.5,
     color: "Blue",
+    tags: ["True Past"],
     eggGroups: ["Bug"]
   },
   crabrawler: {
@@ -14017,7 +14038,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Fighting", "Ice"],
     baseStats: { hp: 97, atk: 157, def: 122, spa: 62, spd: 107, spe: 33 },
-    abilities: { 0: "Hyper Cutter", 1: "Iron Fist", H: "Anger Point" },
+    abilities: { 0: "Iron Fist" },
     heightm: 2.6,
     weightkg: 252.8,
     color: "White",
@@ -14123,6 +14144,7 @@ const Pokedex = {
     heightm: 0.4,
     weightkg: 2,
     color: "Yellow",
+    tags: ["True Past"],
     eggGroups: ["Bug", "Fairy"]
   },
   rockruff: {
@@ -14320,6 +14342,7 @@ const Pokedex = {
     heightm: 3.1,
     weightkg: 217.5,
     color: "Green",
+    tags: ["True Past"],
     eggGroups: ["Water 1", "Bug"]
   },
   fomantis: {
@@ -14361,6 +14384,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 58,
     color: "Pink",
+    tags: ["True Past"],
     eggGroups: ["Grass"]
   },
   morelull: {
@@ -14428,6 +14452,7 @@ const Pokedex = {
     abilities: { 0: "Corrosion" },
     heightm: 2.1,
     weightkg: 81,
+    tags: ["True Past"],
     color: "Black",
     eggGroups: ["Monster", "Dragon"]
   },
@@ -15070,6 +15095,7 @@ const Pokedex = {
     heightm: 0.6,
     weightkg: 13,
     color: "Gray",
+    tags: ["True Past"],
     eggGroups: ["Field", "Fairy"]
   },
   mimikyu: {
@@ -15112,6 +15138,7 @@ const Pokedex = {
     heightm: 0.4,
     weightkg: 2.8,
     color: "Yellow",
+    tags: ["True Past"],
     eggGroups: ["Amorphous"]
   },
   mimikyubustedtotem: {
@@ -15160,7 +15187,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Normal", "Dragon"],
     baseStats: { hp: 78, atk: 85, def: 110, spa: 160, spd: 116, spe: 36 },
-    abilities: { 0: "Berserk", 1: "Sap Sipper", H: "Cloud Nine" },
+    abilities: { 0: "Berserk" },
     heightm: 3,
     weightkg: 240.5,
     color: "White",
@@ -15232,6 +15259,7 @@ const Pokedex = {
     heightm: 2.4,
     weightkg: 207.5,
     color: "Gray",
+    tags: ["True Past"],
     eggGroups: ["Dragon"]
   },
   tapukoko: {
@@ -15701,7 +15729,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Gray",
     eggGroups: ["Undiscovered"],
-    changesFrom: "Melmetal"
+    changesFrom: "Melmetal",
+    placeholderFor: "Melmetal"
   },
   grookey: {
     num: 810,
@@ -15759,7 +15788,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Green",
     eggGroups: ["Field", "Grass"],
-    changesFrom: "Rillaboom"
+    changesFrom: "Rillaboom",
+    placeholderFor: "Rillaboom"
   },
   scorbunny: {
     num: 813,
@@ -15817,7 +15847,8 @@ const Pokedex = {
     weightkg: 0,
     color: "White",
     eggGroups: ["Field", "Human-Like"],
-    changesFrom: "Cinderace"
+    changesFrom: "Cinderace",
+    placeholderFor: "Cinderace"
   },
   sobble: {
     num: 816,
@@ -15875,7 +15906,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Blue",
     eggGroups: ["Water 1", "Field"],
-    changesFrom: "Inteleon"
+    changesFrom: "Inteleon",
+    placeholderFor: "Inteleon"
   },
   skwovet: {
     num: 819,
@@ -15954,7 +15986,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Purple",
     eggGroups: ["Flying"],
-    changesFrom: "Corviknight"
+    changesFrom: "Corviknight",
+    placeholderFor: "Corviknight"
   },
   blipbug: {
     num: 824,
@@ -16008,7 +16041,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Red",
     eggGroups: ["Bug"],
-    changesFrom: "Orbeetle"
+    changesFrom: "Orbeetle",
+    placeholderFor: "Orbeetle"
   },
   nickit: {
     num: 827,
@@ -16123,7 +16157,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Green",
     eggGroups: ["Monster", "Water 1"],
-    changesFrom: "Drednaw"
+    changesFrom: "Drednaw",
+    placeholderFor: "Drednaw"
   },
   yamper: {
     num: 835,
@@ -16202,7 +16237,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Black",
     eggGroups: ["Mineral"],
-    changesFrom: "Coalossal"
+    changesFrom: "Coalossal",
+    placeholderFor: "Coalossal"
   },
   applin: {
     num: 840,
@@ -16243,7 +16279,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Green",
     eggGroups: ["Grass", "Dragon"],
-    changesFrom: "Flapple"
+    changesFrom: "Flapple",
+    placeholderFor: "Flapple"
   },
   appletun: {
     num: 842,
@@ -16272,7 +16309,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Green",
     eggGroups: ["Grass", "Dragon"],
-    changesFrom: "Appletun"
+    changesFrom: "Appletun",
+    placeholderFor: "Appletun"
   },
   silicobra: {
     num: 843,
@@ -16312,7 +16350,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Green",
     eggGroups: ["Field", "Dragon"],
-    changesFrom: "Sandaconda"
+    changesFrom: "Sandaconda",
+    placeholderFor: "Sandaconda"
   },
   cramorant: {
     num: 845,
@@ -16440,7 +16479,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Purple",
     eggGroups: ["Human-Like"],
-    changesFrom: "Toxtricity"
+    changesFrom: "Toxtricity",
+    placeholderFor: "Toxtricity"
   },
   toxtricitylowkeygmax: {
     num: 849,
@@ -16455,7 +16495,8 @@ const Pokedex = {
     color: "Purple",
     eggGroups: ["Human-Like"],
     battleOnly: "Toxtricity-Low-Key",
-    changesFrom: "Toxtricity-Low-Key"
+    changesFrom: "Toxtricity-Low-Key",
+    placeholderFor: "Toxtricity-Low-Key"
   },
   sizzlipede: {
     num: 850,
@@ -16495,7 +16536,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Red",
     eggGroups: ["Bug"],
-    changesFrom: "Centiskorch"
+    changesFrom: "Centiskorch",
+    placeholderFor: "Centiskorch"
   },
   clobbopus: {
     num: 852,
@@ -16645,7 +16687,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Pink",
     eggGroups: ["Fairy"],
-    changesFrom: "Hatterene"
+    changesFrom: "Hatterene",
+    placeholderFor: "Hatterene"
   },
   impidimp: {
     num: 859,
@@ -16703,7 +16746,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Purple",
     eggGroups: ["Fairy", "Human-Like"],
-    changesFrom: "Grimmsnarl"
+    changesFrom: "Grimmsnarl",
+    placeholderFor: "Grimmsnarl"
   },
   obstagoon: {
     num: 862,
@@ -16881,7 +16925,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Yellow",
     eggGroups: ["Fairy", "Amorphous"],
-    changesFrom: "Alcremie"
+    changesFrom: "Alcremie",
+    placeholderFor: "Alcremie"
   },
   falinks: {
     num: 870,
@@ -16905,7 +16950,7 @@ const Pokedex = {
     types: ["Fighting"],
     gender: "N",
     baseStats: { hp: 65, atk: 135, def: 135, spa: 70, spd: 65, spe: 100 },
-    abilities: { 0: "Battle Armor", H: "Defiant" },
+    abilities: { 0: "Defiant" },
     heightm: 1.6,
     weightkg: 99,
     color: "Yellow",
@@ -17087,7 +17132,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Green",
     eggGroups: ["Field", "Mineral"],
-    changesFrom: "Copperajah"
+    changesFrom: "Copperajah",
+    placeholderFor: "Copperajah"
   },
   dracozolt: {
     num: 880,
@@ -17162,7 +17208,8 @@ const Pokedex = {
     weightkg: 0,
     color: "White",
     eggGroups: ["Mineral", "Dragon"],
-    changesFrom: "Duraludon"
+    changesFrom: "Duraludon",
+    placeholderFor: "Duraludon"
   },
   dreepy: {
     num: 885,
@@ -17299,6 +17346,7 @@ const Pokedex = {
     heightm: 100,
     weightkg: 0,
     color: "Purple",
+    tags: ["Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cannotDynamax: true
   },
@@ -17367,7 +17415,8 @@ const Pokedex = {
     weightkg: 0,
     color: "Gray",
     eggGroups: ["Undiscovered"],
-    changesFrom: "Urshifu"
+    changesFrom: "Urshifu",
+    placeholderFor: "Urshifu"
   },
   urshifurapidstrikegmax: {
     num: 892,
@@ -17383,7 +17432,8 @@ const Pokedex = {
     color: "Gray",
     eggGroups: ["Undiscovered"],
     battleOnly: "Urshifu-Rapid-Strike",
-    changesFrom: "Urshifu-Rapid-Strike"
+    changesFrom: "Urshifu-Rapid-Strike",
+    placeholderFor: "Urshifu-Rapid-Strike"
   },
   zarude: {
     num: 893,
@@ -18366,7 +18416,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Grass", "Fire"],
     baseStats: { hp: 65, atk: 138, def: 85, spa: 138, spd: 85, spe: 75 },
-    abilities: { 0: "Chlorophyll", 1: "Insomnia", H: "Moody" },
+    abilities: { 0: "Spicy Spray" },
     heightm: 1.2,
     weightkg: 22,
     color: "Green",
@@ -18626,7 +18676,7 @@ const Pokedex = {
     forme: "Mega",
     types: ["Rock", "Poison"],
     baseStats: { hp: 83, atk: 90, def: 105, spa: 150, spd: 96, spe: 101 },
-    abilities: { 0: "Toxic Debris", H: "Corrosion" },
+    abilities: { 0: "Adaptability" },
     heightm: 2.8,
     weightkg: 77,
     color: "Blue",
@@ -20824,6 +20874,18 @@ const Pokedex = {
     battleOnly: "Ramnarok",
     gen: 9
   },
+  obliteryx: {
+    num: -80,
+    name: "Obliteryx",
+    types: ["Dark", "Flying"],
+    baseStats: { hp: 102, atk: 128, def: 126, spa: 45, spd: 90, spe: 64 },
+    abilities: { 0: "Opportunist", 1: "Analytic" },
+    heightm: 1.6,
+    weightkg: 62,
+    color: "Black",
+    eggGroups: ["Flying"],
+    gen: 9
+  },
   // NOTE: PokeStar "formes" are not actually formes and thus do not have a formeOrder
   pokestarsmeargle: {
     num: -5e3,
@@ -20834,6 +20896,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Field"],
     gen: 5
   },
@@ -20847,6 +20910,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     otherFormes: ["Pokestar UFO-2", "Pokestar UFO-PropU2"],
     cosmeticFormes: ["Pokestar UFO-PropU1"],
@@ -20864,6 +20928,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     gen: 5
   },
@@ -20877,6 +20942,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar Brycen-Man-Prop"],
     gen: 5
@@ -20891,6 +20957,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar MT-Prop"],
     gen: 5
@@ -20905,6 +20972,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar MT2-Prop"],
     gen: 5
@@ -20919,6 +20987,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar Transport-Prop"],
     gen: 5
@@ -20933,6 +21002,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar Giant-2", "Pokestar Giant-PropO1", "Pokestar Giant-PropO2"],
     gen: 5
@@ -20946,6 +21016,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar Humanoid-Prop"],
     gen: 5
@@ -20959,6 +21030,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar Monster-Prop"],
     gen: 5
@@ -20972,6 +21044,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar F-00-Prop"],
     gen: 5
@@ -20985,6 +21058,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar F-002-Prop"],
     gen: 5
@@ -20998,6 +21072,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar Spirit-Prop"],
     gen: 5
@@ -21012,6 +21087,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar Black Door-Prop"],
     gen: 5
@@ -21026,6 +21102,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar White Door-Prop"],
     gen: 5
@@ -21040,6 +21117,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     cosmeticFormes: ["Pokestar Black Belt-Prop"],
     gen: 5
@@ -21056,6 +21134,7 @@ const Pokedex = {
     heightm: 1.5,
     weightkg: 61,
     color: "White",
+    tags: ["Pokestar", "True Past", "Past Unobtainable"],
     eggGroups: ["Undiscovered"],
     gen: 5
   }

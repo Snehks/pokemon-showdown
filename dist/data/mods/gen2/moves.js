@@ -79,12 +79,37 @@ const Moves = {
       onSemiLockMove: "bide"
     }
   },
+  conversion2: {
+    inherit: true,
+    onHit(target, source) {
+      if (!target.lastMove) {
+        return false;
+      }
+      const possibleTypes = [];
+      const lastMove = target.lastMove;
+      const attackType = lastMove.id === "struggle" ? "Normal" : lastMove.type;
+      for (const typeName of this.dex.types.names()) {
+        const typeCheck = this.dex.types.get(typeName).damageTaken[attackType];
+        if (typeCheck === 2 || typeCheck === 3) {
+          possibleTypes.push(typeName);
+        }
+      }
+      if (!possibleTypes.length) {
+        return false;
+      }
+      const randomType = this.sample(possibleTypes);
+      if (!source.setType(randomType)) return false;
+      this.add("-start", source, "typechange", randomType);
+    }
+  },
   counter: {
     inherit: true,
     damageCallback(pokemon, target) {
       const lastAttackedBy = pokemon.getLastAttackedBy();
       if (!lastAttackedBy?.move || !lastAttackedBy.thisTurn) return false;
-      if (this.getCategory(lastAttackedBy.move) === "Physical" && target.lastMove?.id !== "sleeptalk") {
+      const lastMove = lastAttackedBy.source.lastMove;
+      if (!lastMove || lastAttackedBy.move !== lastMove.id) return false;
+      if (this.getCategory(lastAttackedBy.move) === "Physical") {
         return 2 * lastAttackedBy.damage;
       }
       return false;
@@ -163,6 +188,9 @@ const Moves = {
         }
         this.effectState.move = lockedMove;
         this.add("-start", target, "Encore");
+        if (this.effectState.move === "pursuit") {
+          target.addVolatile("pursuit", target, this.dex.getActiveMove("pursuit"));
+        }
       },
       onResidualOrder: 13,
       onResidualSubOrder: void 0
@@ -352,7 +380,9 @@ const Moves = {
     damageCallback(pokemon, target) {
       const lastAttackedBy = pokemon.getLastAttackedBy();
       if (!lastAttackedBy?.move || !lastAttackedBy.thisTurn) return false;
-      if (this.getCategory(lastAttackedBy.move) === "Special" && target.lastMove?.id !== "sleeptalk") {
+      const lastMove = lastAttackedBy.source.lastMove;
+      if (!lastMove || lastAttackedBy.move !== lastMove.id) return false;
+      if (this.getCategory(lastAttackedBy.move) === "Special") {
         return 2 * lastAttackedBy.damage;
       }
       return false;
@@ -370,11 +400,8 @@ const Moves = {
     onHit(pokemon) {
       const noMirror = ["metronome", "mimic", "mirrormove", "sketch", "sleeptalk", "transform"];
       const target = pokemon.side.foe.active[0];
-      const lastMove = target?.lastMove && target?.lastMove.id;
-      if (!lastMove || !pokemon.activeTurns && !target.moveThisTurn) {
-        return false;
-      }
-      if (noMirror.includes(lastMove) || pokemon.moves.includes(lastMove)) {
+      const lastMove = target.lastMove?.id;
+      if (!lastMove || noMirror.includes(lastMove) || pokemon.moves.includes(lastMove)) {
         return false;
       }
       this.actions.useMove(lastMove, pokemon);
@@ -486,42 +513,27 @@ const Moves = {
   },
   pursuit: {
     inherit: true,
-    beforeTurnCallback(pokemon, target) {
-      if (pokemon.isAlly(target)) return;
-      target.addVolatile("pursuit");
-      const data = target.volatiles["pursuit"];
-      if (!data.sources) {
-        data.sources = [];
-      }
-      data.sources.push(pokemon);
-    },
     onModifyMove: void 0,
     // no inherit
     condition: {
       inherit: true,
-      onBeforeSwitchOut(pokemon) {
+      onFoeBeforeSwitchOut(pokemon) {
+        const source = this.effectState.source;
         this.debug("Pursuit start");
-        let alreadyAdded = false;
-        for (const source of this.effectState.sources) {
-          if (source.speed < pokemon.speed || source.speed === pokemon.speed && this.randomChance(1, 2)) {
-            pokemon.removeVolatile("destinybond");
-          }
-          if (!this.queue.cancelMove(source) || !source.hp) continue;
-          if (!alreadyAdded) {
-            this.add("-activate", pokemon, "move: Pursuit");
-            alreadyAdded = true;
-          }
-          if (source.canMegaEvo || source.canUltraBurst) {
-            for (const [actionIndex, action] of this.queue.entries()) {
-              if (action.pokemon === source && action.choice === "megaEvo") {
-                this.actions.runMegaEvo(source);
-                this.queue.list.splice(actionIndex, 1);
-                break;
-              }
+        if (this.effectState.targetLoc !== source.getLocOf(pokemon) || !source.isAdjacent(pokemon) || !source.hp || source.volatiles["encore"] && source.volatiles["encore"].move !== "pursuit" || !this.queue.cancelMove(source)) return;
+        if (source.canMegaEvo || source.canUltraBurst) {
+          for (const [actionIndex, action] of this.queue.entries()) {
+            if (action.pokemon === source && action.choice === "megaEvo") {
+              this.actions.runMegaEvo(source);
+              this.queue.list.splice(actionIndex, 1);
+              break;
             }
           }
-          this.actions.runMove("pursuit", source, source.getLocOf(pokemon));
         }
+        if (source.speed < pokemon.speed || source.speed === pokemon.speed && this.randomChance(1, 2)) {
+          pokemon.removeVolatile("destinybond");
+        }
+        this.actions.runMove("pursuit", source, source.getLocOf(pokemon), { sourceEffect: this.effectState.sourceEffect });
       }
     }
   },
@@ -780,7 +792,7 @@ const Moves = {
   triattack: {
     inherit: true,
     onHit(target, source, move) {
-      move.statusRoll = ["par", "frz", "brn"][this.random(3)];
+      move.statusRoll = this.sample(["par", "frz", "brn"]);
     },
     secondary: {
       chance: 20,

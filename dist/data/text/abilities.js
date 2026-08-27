@@ -420,6 +420,11 @@ const AbilitiesText = {
     desc: "This Pokemon is immune to Ground-type moves and restores 1/4 of its maximum HP, rounded down, when hit by a Ground-type move.",
     shortDesc: "This Pokemon heals 1/4 of its max HP when hit by Ground moves; Ground immunity."
   },
+  eelevate: {
+    name: "Eelevate",
+    desc: "This Pokemon is immune to Ground-type attacks and the effects of Spikes, Toxic Spikes, Sticky Web, and the Arena Trap Ability. The effects of Gravity, Ingrain, Smack Down, Thousand Arrows, and Iron Ball nullify the immunity. Thousand Arrows can hit this Pokemon as if it did not have this Ability. This Pokemon's highest stat is raised by 1 stage if it attacks and knocks out another Pokemon. Stat stage changes are not considered. If multiple stats are tied, Attack, Defense, Special Attack, Special Defense, and Speed are prioritized in that order.",
+    shortDesc: "This Pokemon is immune to Ground; +1 to highest stat if it KOes another Pokemon."
+  },
   effectspore: {
     name: "Effect Spore",
     desc: "30% chance a Pokemon making contact with this Pokemon will be poisoned, paralyzed, or fall asleep.",
@@ -475,6 +480,10 @@ const AbilitiesText = {
   filter: {
     name: "Filter",
     shortDesc: "This Pokemon receives 3/4 damage from supereffective attacks."
+  },
+  firemane: {
+    name: "Fire Mane",
+    shortDesc: "This Pokemon's offensive stat is multiplied by 1.5 while using a Fire-type attack."
   },
   flamebody: {
     name: "Flame Body",
@@ -640,6 +649,10 @@ const AbilitiesText = {
     name: "Healer",
     desc: "30% chance this Pokemon's ally has its non-volatile status condition cured at the end of each turn.",
     shortDesc: "30% chance this Pokemon's ally has its status cured at the end of each turn.",
+    champions: {
+      desc: "50% chance this Pokemon's ally has its non-volatile status condition cured at the end of each turn.",
+      shortDesc: "50% chance this Pokemon's ally has its status cured at the end of each turn."
+    },
     gen6: {
       desc: "30% chance each of this Pokemon's adjacent allies has its non-volatile status condition cured at the end of each turn.",
       shortDesc: "30% chance each adjacent ally has its status cured at the end of each turn."
@@ -1225,6 +1238,10 @@ const AbilitiesText = {
     },
     addItem: "#recycle"
   },
+  piercingdrill: {
+    name: "Piercing Drill",
+    shortDesc: "This Pokemon's contact moves ignore a target's protection and deal 1/4 the usual damage."
+  },
   pixilate: {
     name: "Pixilate",
     desc: "This Pokemon's Normal-type moves become Fairy-type moves and have their power multiplied by 1.2. This effect comes after other effects that change a move's type, but before Ion Deluge and Electrify's effects.",
@@ -1729,6 +1746,10 @@ const AbilitiesText = {
     desc: "This Pokemon's Speed is raised by 1 stage at the end of each full turn it has been on the field.",
     shortDesc: "This Pokemon's Speed is raised 1 stage at the end of each full turn on the field."
   },
+  spicyspray: {
+    name: "Spicy Spray",
+    shortDesc: "If this Pokemon is hit by an attack, the attacker becomes burned."
+  },
   stakeout: {
     name: "Stakeout",
     shortDesc: "This Pokemon's offensive stat is doubled against a target that switched in this turn."
@@ -2093,7 +2114,10 @@ const AbilitiesText = {
   },
   unseenfist: {
     name: "Unseen Fist",
-    shortDesc: "This Pokemon's contact moves ignore the target's protection, except Max Guard."
+    shortDesc: "This Pokemon's contact moves ignore the target's protection, except Max Guard.",
+    champions: {
+      shortDesc: "This Pokemon's contact moves ignore a target's protection and deal 1/4 the usual damage."
+    }
   },
   vesselofruin: {
     name: "Vessel of Ruin",

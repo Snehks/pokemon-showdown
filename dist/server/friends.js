@@ -55,7 +55,7 @@ class FailureMessage extends Error {
     Error.captureStackTrace(this, FailureMessage);
   }
 }
-function sendPM(message, to, from = "~") {
+function sendPM(message, to, from) {
   const senderID = toID(from);
   const receiverID = toID(to);
   const sendingUser = Users.get(senderID);
@@ -194,13 +194,15 @@ class FriendsDatabase {
     }
     sendPM(
       `/nonotify You sent a friend request to ${receiver?.connected ? receiver.name : receiverID}!`,
-      user.name
+      user.name,
+      receiverID
     );
     sendPM(
       `/uhtml undo-${receiverID},<button class="button" name="send" value="/friends undorequest ${import_lib.Utils.escapeHTML(receiverID)}"><i class="fa fa-undo"></i> Undo</button>`,
-      user.name
+      user.name,
+      receiverID
     );
-    sendPM(disclaimer, user.id);
+    sendPM(disclaimer, user.id, receiverID);
     return result;
   }
   async removeRequest(receiverID, senderID) {

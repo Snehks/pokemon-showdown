@@ -39,10 +39,9 @@ const FormatsData = {
     natDexTier: "UUBL"
   },
   venusaurgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   charmander: {
     tier: "LC"
@@ -66,10 +65,9 @@ const FormatsData = {
     natDexTier: "OU"
   },
   charizardgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   squirtle: {
     tier: "LC"
@@ -88,10 +86,9 @@ const FormatsData = {
     natDexTier: "Uber"
   },
   blastoisegmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   caterpie: {
     tier: "LC"
@@ -105,10 +102,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   butterfreegmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   weedle: {
     isNonstandard: "Past",
@@ -271,10 +267,9 @@ const FormatsData = {
     tier: "Illegal"
   },
   pikachugmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   pikachuworld: {
     tier: "ZU",
@@ -445,10 +440,9 @@ const FormatsData = {
     tier: "LC"
   },
   meowthgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   persian: {
     tier: "ZU",
@@ -543,10 +537,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   machampgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   bellsprout: {
     isNonstandard: "Past",
@@ -739,13 +732,12 @@ const FormatsData = {
   gengarmega: {
     isNonstandard: "Past",
     tier: "Illegal",
-    natDexTier: "Uber"
+    natDexTier: "AG"
   },
   gengargmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   onix: {
     tier: "LC"
@@ -779,10 +771,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   kinglergmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   voltorb: {
     isNonstandard: "Past",
@@ -1039,10 +1030,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   laprasgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   ditto: {
     tier: "ZU",
@@ -1057,10 +1047,9 @@ const FormatsData = {
     tier: "Illegal"
   },
   eeveegmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   vaporeon: {
     tier: "NU",
@@ -1150,10 +1139,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   snorlaxgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   articuno: {
     tier: "ZU",
@@ -2431,7 +2419,7 @@ const FormatsData = {
   rayquazamega: {
     isNonstandard: "Past",
     tier: "Illegal",
-    natDexTier: "Uber"
+    natDexTier: "AG"
   },
   jirachi: {
     tier: "UU",
@@ -3322,10 +3310,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   garbodorgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   zorua: {
     tier: "LC"
@@ -3618,7 +3605,7 @@ const FormatsData = {
   hydreigon: {
     tier: "UU",
     doublesTier: "(DUU)",
-    natDexTier: "UU"
+    natDexTier: "UUBL"
   },
   larvesta: {
     tier: "LC"
@@ -4668,7 +4655,7 @@ const FormatsData = {
   necrozmaultra: {
     isNonstandard: "Past",
     tier: "Illegal",
-    natDexTier: "Uber"
+    natDexTier: "AG"
   },
   magearna: {
     tier: "Uber",
@@ -4715,10 +4702,9 @@ const FormatsData = {
     natDexTier: "UUBL"
   },
   melmetalgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   grookey: {
     tier: "LC"
@@ -4734,10 +4720,9 @@ const FormatsData = {
     natDexTier: "OU"
   },
   rillaboomgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   scorbunny: {
     tier: "LC"
@@ -4751,10 +4736,9 @@ const FormatsData = {
     natDexTier: "Uber"
   },
   cinderacegmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   sobble: {
     tier: "LC"
@@ -4768,10 +4752,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   inteleongmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   skwovet: {
     tier: "LC"
@@ -4793,10 +4776,9 @@ const FormatsData = {
     natDexTier: "OU"
   },
   corviknightgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   blipbug: {
     tier: "LC"
@@ -4810,10 +4792,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   orbeetlegmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   nickit: {
     tier: "LC"
@@ -4848,10 +4829,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   drednawgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   yamper: {
     tier: "LC"
@@ -4873,10 +4853,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   coalossalgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   applin: {
     tier: "LC"
@@ -4887,10 +4866,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   flapplegmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   appletun: {
     tier: "ZU",
@@ -4898,10 +4876,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   appletungmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   silicobra: {
     tier: "LC"
@@ -4912,10 +4889,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   sandacondagmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   cramorant: {
     tier: "ZU",
@@ -4954,16 +4930,14 @@ const FormatsData = {
     natDexTier: "RU"
   },
   toxtricitygmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   toxtricitylowkeygmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   sizzlipede: {
     tier: "LC"
@@ -4974,10 +4948,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   centiskorchgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   clobbopus: {
     tier: "LC"
@@ -5010,10 +4983,9 @@ const FormatsData = {
     natDexTier: "UU"
   },
   hatterenegmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   impidimp: {
     tier: "LC"
@@ -5027,10 +4999,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   grimmsnarlgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   milcery: {
     tier: "LC"
@@ -5041,10 +5012,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   alcremiegmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   falinks: {
     tier: "ZU",
@@ -5103,10 +5073,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   copperajahgmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   dracozolt: {
     tier: "UUBL",
@@ -5134,10 +5103,9 @@ const FormatsData = {
     natDexTier: "RU"
   },
   duraludongmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   dreepy: {
     tier: "LC"
@@ -5153,12 +5121,12 @@ const FormatsData = {
   zacian: {
     tier: "AG",
     doublesTier: "DUber",
-    natDexTier: "Uber"
+    natDexTier: "AG"
   },
   zaciancrowned: {
     tier: "AG",
     doublesTier: "DUber",
-    natDexTier: "Uber"
+    natDexTier: "AG"
   },
   zamazenta: {
     tier: "Uber",
@@ -5193,16 +5161,14 @@ const FormatsData = {
     natDexTier: "UU"
   },
   urshifugmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   urshifurapidstrikegmax: {
-    isNonstandard: "Gigantamax",
     tier: "AG",
     doublesTier: "(DUber)",
-    natDexTier: "(Uber)"
+    natDexTier: "(AG)"
   },
   zarude: {
     tier: "UU",
@@ -5243,7 +5209,7 @@ const FormatsData = {
   calyrexshadow: {
     tier: "Uber",
     doublesTier: "DUber",
-    natDexTier: "Uber"
+    natDexTier: "AG"
   },
   wyrdeer: {
     isNonstandard: "Future",

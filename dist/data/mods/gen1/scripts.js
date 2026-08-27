@@ -68,9 +68,13 @@ const Scripts = {
       if (!amount) amount = 1;
       ppData.pp -= amount;
       if (ppData.pp < 0) {
-        this.battle.hint("In Gen 1, if a Pok\xE9mon is forced to use a move with 0 PP, the move will underflow to have 63 PP.");
+        this.battle.hint(
+          "In Gen 1, if a Pok\xE9mon is forced to use a move with 0 PP, the move will underflow to have 63 PP.",
+          void 0,
+          this.side
+        );
       }
-      ppData.pp = (ppData.pp % 64 + 64) % 64;
+      ppData.pp = this.battle.trunc(ppData.pp, 6);
       if (ppData.virtual && !this.transformed) {
         this.baseMoveSlots[this.side.lastSelectedMoveSlot].pp = ppData.pp;
       }
@@ -215,14 +219,27 @@ const Scripts = {
           const moveSlot = pokemon.getMoveSlot(pokemon.side.lastSelectedMoveSlot);
           if (moveSlot) pokemon.deductPP(moveSlot.id, null, target);
         }
-        if (!lockedMove && move.id !== pokemon.getMoveSlot(pokemon.side.lastSelectedMoveSlot)?.id) {
+        if (!lockedMove && move.id !== pokemon.side.lastEnemySelectedMove) {
           this.battle.hint("Desync Clause Mod activated!");
           this.battle.hint(
-            "In Gen 1, a Pok\xE9mon might default to using a move that doesn't match the move of the slot it last selected."
+            "In Gen 1, if both players would see the same Pok\xE9mon using different moves, the Pokemon defaults to the move shown from the perspective of the player controlling that Pok\xE9mon."
           );
-          abortMove();
-          return;
         }
+      }
+      if (move.id === "nomove") {
+        this.battle.hint(
+          "In Gen 1, if a Pok\xE9mon is thawed from freeze and no move has been selected yet, the Pok\xE9mon will use a move with Fissure's animation, 102 base power, ??? type, Special category, and around 31.6% accuracy."
+        );
+        move = Object.assign(this.battle.dex.getActiveMove("fissure"), {
+          // name: "", Technically, the move's name is an empty string, but we keep Fissure's name for the client's animation
+          basePower: 102,
+          ohko: false,
+          flags: {},
+          type: "???",
+          category: "Special",
+          accuracy: 100 * 81 / 256,
+          pp: 10
+        });
       }
       this.useMove(move, pokemon, { target, sourceEffect });
     },
@@ -257,11 +274,12 @@ const Scripts = {
       if (baseMove.target !== move.target) {
         target = this.battle.getRandomTarget(pokemon, move);
       }
-      if (!TWO_TURN_MOVES.includes(move.id) || pokemon.volatiles["twoturnmove"]) pokemon.lastMove = move;
+      pokemon.side.lastMove = move;
+      pokemon.side.lastEnemyMove = move;
+      if (!TWO_TURN_MOVES.includes(move.id) || pokemon.volatiles["twoturnmove"]) pokemon.moveUsed(move);
       const moveResult = this.useMoveInner(moveOrMoveName, pokemon, { target, sourceEffect });
       if (move.id !== "metronome") {
         if (move.id !== "mirrormove" || (!pokemon.side.foe.active[0]?.lastMove || pokemon.side.foe.active[0].lastMove?.id === "mirrormove")) {
-          pokemon.side.lastMove = move;
           this.battle.runEvent("AfterMove", pokemon, target, move);
           if (!target || target.hp > 0) {
             this.battle.runEvent("AfterMoveSelf", pokemon, target, move);
@@ -500,6 +518,7 @@ const Scripts = {
         }
         if ((damage || damage === 0) && !target.fainted) {
           damage = this.battle.damage(damage, target, pokemon, move);
+          if (damage) this.applyRecoilDamage(damage, move, pokemon);
           if (!(damage || damage === 0)) return false;
           didSomething = true;
         } else if (damage === false && typeof hitResult === "undefined") {
@@ -702,6 +721,7 @@ const Scripts = {
         level *= 2;
         if (!suppressMessages) this.battle.add("-crit", target);
       }
+      level = this.battle.trunc(level, 8);
       if (move.ignoreOffensive) {
         this.battle.debug("Negating (sp)atk boost/penalty.");
         attack = attacker.getStat(atkType, true);
@@ -714,8 +734,8 @@ const Scripts = {
         if (attack >= 1024 || defense >= 1024) {
           this.battle.hint("In Gen 1, a stat will roll over to a small number if it is larger than 1024.");
         }
-        attack = this.battle.clampIntRange(Math.floor(attack / 4) % 256, 1);
-        defense = Math.floor(defense / 4) % 256;
+        attack = this.battle.clampIntRange(this.battle.trunc(Math.floor(attack / 4), 8), 1);
+        defense = this.battle.trunc(Math.floor(defense / 4), 8);
         if (defense === 0) {
           this.battle.hint("Pokemon Showdown avoids division by zero by rounding defense up to 1. In game, the battle would have crashed.");
           defense = 1;

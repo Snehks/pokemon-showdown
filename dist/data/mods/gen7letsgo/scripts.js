@@ -24,7 +24,7 @@ module.exports = __toCommonJS(scripts_exports);
 function checkMegaForme(species, forme, battle) {
   const baseSpecies = battle.dex.species.get(species.baseSpecies);
   const altForme = battle.dex.species.get(`${baseSpecies.name}-${forme}`);
-  if (altForme.exists && altForme.gen <= 7 && !battle.ruleTable.isBannedSpecies(altForme) && !battle.ruleTable.isBanned("pokemontag:mega")) {
+  if (altForme.exists && altForme.gen <= 7 && !battle.ruleTable.isBannedSpecies(altForme) && !battle.ruleTable.isBanned("tag:mega")) {
     return altForme.name;
   }
   return null;

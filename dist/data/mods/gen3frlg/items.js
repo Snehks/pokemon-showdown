@@ -142,10 +142,6 @@ const Items = {
     inherit: true,
     isNonstandard: "Unobtainable"
   },
-  seaincense: {
-    inherit: true,
-    isNonstandard: "Unobtainable"
-  },
   shellbell: {
     inherit: true,
     isNonstandard: "Unobtainable"

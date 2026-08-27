@@ -64,7 +64,7 @@ const Scripts = {
         this.battle.debug(`Spread modifier: ${spreadModifier}`);
         baseDamage = this.battle.modify(baseDamage, spreadModifier);
       }
-      baseDamage = this.battle.runEvent("WeatherModifyDamage", pokemon, target, move, baseDamage);
+      baseDamage = this.battle.priorityEvent("WeatherModifyDamage", pokemon, target, move, baseDamage);
       if (move.category === "Physical" && !Math.floor(baseDamage)) {
         baseDamage = 1;
       }
@@ -161,7 +161,6 @@ const Scripts = {
         }
       }
       if (!this.battle.singleEvent("TryMove", move, null, pokemon, target, move) || !this.battle.runEvent("TryMove", pokemon, target, move)) {
-        move.mindBlownRecoil = false;
         return false;
       }
       this.battle.singleEvent("UseMoveMessage", move, null, pokemon, target, move);
@@ -405,8 +404,8 @@ const Scripts = {
         damage = this.moveHit(target, pokemon, move);
         move.totalDamage = damage;
       }
-      if (move.recoil && move.totalDamage) {
-        this.battle.damage(this.calcRecoilDamage(move.totalDamage, move, pokemon), pokemon, target, "recoil");
+      if (move.totalDamage) {
+        this.applyRecoilDamage(move.totalDamage, move, pokemon);
       }
       if (target && pokemon !== target) target.gotAttacked(move, damage, pokemon);
       if (move.ohko && !target.hp) this.battle.add("-ohko");
@@ -417,9 +416,6 @@ const Scripts = {
         this.battle.runEvent("AfterMoveSecondary", target, pokemon, move);
       }
       return damage;
-    },
-    calcRecoilDamage(damageDealt, move) {
-      return this.battle.clampIntRange(Math.floor(damageDealt * move.recoil[0] / move.recoil[1]), 1);
     }
   }
 };

@@ -2182,7 +2182,7 @@ const pages = {
       buf += modlogEntries.results.map((result) => {
         const day = Chat.toTimestamp(new Date(result.time)).split(" ")[0];
         let innerBuf = import_lib.Utils.html`<td><small>#${result.entryID}</small> [${day}] `;
-        innerBuf += `${result.action}${result.note ? ` (${result.note.trim()})` : ``}</td>`;
+        innerBuf += import_lib.Utils.html`${result.action}${result.note ? import_lib.Utils.html` (${result.note.trim()})` : ``}</td>`;
         const existingIgnore = metadata.modlogIgnores?.[targetUser];
         const todayMatch = existingIgnore === day;
         const entryMatch = Array.isArray(existingIgnore) && existingIgnore?.includes(result.entryID);

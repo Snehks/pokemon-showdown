@@ -22,8 +22,8 @@ __export(teams_exports, {
   default: () => teams_default
 });
 module.exports = __toCommonJS(teams_exports);
-var import_teams = require("../gen8/teams");
-class RandomLetsGoTeams extends import_teams.RandomGen8Teams {
+var import_teams = require("../gen8bdsp/teams");
+class RandomLetsGoTeams extends import_teams.RandomBDSPTeams {
   constructor(format, prng) {
     super(format, prng);
     this.randomData = require("./data.json");

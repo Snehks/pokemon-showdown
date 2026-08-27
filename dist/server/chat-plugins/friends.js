@@ -48,18 +48,23 @@ const Friends = new class {
     if (pendingCount === 1) {
       const sender = [...friendRequests.received][0];
       const senderName = Users.getExact(sender)?.name || sender;
-      let buf = import_utils.Utils.html`/uhtml sent,<button class="button" name="send" value="/friends accept ${sender}">Accept</button> | `;
+      let buf = import_utils.Utils.html`/uhtml sent-${sender},<button class="button" name="send" value="/friends accept ${sender}">Accept</button> | `;
       buf += import_utils.Utils.html`<button class="button" name="send" value="/friends reject ${sender}">Deny</button><br /> `;
       buf += `<small>(You can also stop this user from sending you friend requests with <code>/ignore</code>)</small>`;
-      (0, import_friends.sendPM)(import_utils.Utils.html`/raw <span class="username">${senderName}</span> sent you a friend request!`, user.id);
-      (0, import_friends.sendPM)(buf, user.id);
+      (0, import_friends.sendPM)(import_utils.Utils.html`/raw <span class="username">${senderName}</span> sent you a friend request!`, user.id, sender);
+      (0, import_friends.sendPM)(buf, user.id, sender);
       (0, import_friends.sendPM)(
         `/raw <small>Note: If this request is accepted, your friend will be notified when you come online, and you will be notified when they do, unless you opt out of receiving them.</small>`,
-        user.id
+        user.id,
+        sender
       );
     } else {
-      (0, import_friends.sendPM)(`/nonotify You have ${pendingCount} friend requests pending!`, user.id);
-      (0, import_friends.sendPM)(`/raw <button class="button" name="send" value="/j view-friends-received">View</button></div>`, user.id);
+      (0, import_friends.sendPM)(`/nonotify You have ${pendingCount} friend requests pending!`, user.id, "~");
+      (0, import_friends.sendPM)(
+        `/raw <button class="button" name="send" value="/j view-friends-received">View</button></div>`,
+        user.id,
+        "~"
+      );
     }
   }
   async notifyConnection(user) {
@@ -260,7 +265,9 @@ const commands = {
       if (!target) return this.parse("/help friends");
       await Friends.request(user, target);
       this.refreshPage("friends-sent");
-      return this.sendReply(`You sent a friend request to '${target}'.`);
+      if (toID(this.pmTargetName) !== target) {
+        this.sendReply(`You sent a friend request to '${target}'.`);
+      }
     },
     unfriend: "remove",
     async remove(target, room, user) {
@@ -289,12 +296,12 @@ const commands = {
       if (!target) return this.parse("/help friends");
       await Friends.approveRequest(user.id, target);
       const targetUser = Users.get(target);
-      (0, import_friends.sendPM)(`You accepted a friend request from "${target}".`, user.id);
+      (0, import_friends.sendPM)(`/text You accepted a friend request from "${target}".`, user.id, target);
+      (0, import_friends.sendPM)(`/uhtmlchange sent-${target},`, user.id, target);
       this.refreshPage("friends-received");
       if (targetUser) {
-        (0, import_friends.sendPM)(`/text ${user.name} accepted your friend request!`, targetUser.id);
-        (0, import_friends.sendPM)(`/uhtmlchange sent-${targetUser.id},`, targetUser.id);
-        (0, import_friends.sendPM)(`/uhtmlchange undo-${targetUser.id},`, targetUser.id);
+        (0, import_friends.sendPM)(`/text ${user.name} accepted your friend request!`, targetUser.id, user.id);
+        (0, import_friends.sendPM)(`/uhtmlchange undo-${user.id},`, targetUser.id, user.id);
       }
       await Chat.Friends.updateUserCache(user);
       if (targetUser) await Chat.Friends.updateUserCache(targetUser);
@@ -308,8 +315,11 @@ const commands = {
       if (!res.changes) {
         throw new Chat.ErrorMessage(`You do not have a friend request pending from '${target}'.`);
       }
+      const targetUser = Users.get(target);
       this.refreshPage("friends-received");
-      return (0, import_friends.sendPM)(`You denied a friend request from '${target}'.`, user.id);
+      (0, import_friends.sendPM)(`/text You denied a friend request from '${target}'.`, user.id, target);
+      (0, import_friends.sendPM)(`/uhtmlchange sent-${target},`, user.id, target);
+      if (targetUser) (0, import_friends.sendPM)(`/uhtmlchange undo-${user.id},`, targetUser.id, user.id);
     },
     toggle(target, room, user, connection) {
       Friends.checkCanUse(this);
@@ -336,8 +346,11 @@ const commands = {
       Friends.checkCanUse(this);
       target = toID(target);
       await Friends.removeRequest(target, user.id);
+      const targetUser = Users.get(target);
       this.refreshPage("friends-sent");
-      return (0, import_friends.sendPM)(`You removed your friend request to '${target}'.`, user.id);
+      (0, import_friends.sendPM)(`/text You removed your friend request to '${target}'.`, user.id, target);
+      (0, import_friends.sendPM)(`/uhtmlchange undo-${target},`, user.id, target);
+      if (targetUser) (0, import_friends.sendPM)(`/uhtmlchange sent-${user.id},`, targetUser.id, user.id);
     },
     hidenotifs: "viewnotifications",
     hidenotifications: "viewnotifications",

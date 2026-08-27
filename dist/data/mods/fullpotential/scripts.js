@@ -28,7 +28,7 @@ const Scripts = {
       if (typeof move === "string") move = this.dex.getActiveMove(move);
       if (typeof move === "number") {
         const basePower2 = move;
-        move = new Dex.Move({
+        move = new this.dex.Move({
           basePower: basePower2,
           type: "???",
           category: "Physical",

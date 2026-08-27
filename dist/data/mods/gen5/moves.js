@@ -700,10 +700,11 @@ const Moves = {
     },
     condition: {
       inherit: true,
-      onTryHit(target, source, effect) {
-        if (effect && (effect.id === "feint" || this.dex.moves.get(effect.id).priority <= 0)) {
+      onTryHit(target, source, move) {
+        if (move.id === "feint" || this.dex.moves.get(move.id).priority <= 0) {
           return;
         }
+        if (this.checkMoveBypassesProtect(move, source, target)) return;
         this.add("-activate", target, "Quick Guard");
         const lockedmove = source.getVolatile("lockedmove");
         if (lockedmove) {
@@ -718,7 +719,19 @@ const Moves = {
   ragepowder: {
     inherit: true,
     priority: 3,
-    flags: { noassist: 1, failcopycat: 1 }
+    flags: { noassist: 1, failcopycat: 1 },
+    condition: {
+      inherit: true,
+      onFoeRedirectTarget(target, source, source2, move) {
+        const ragePowderUser = this.effectState.target;
+        if (ragePowderUser.isSkyDropped()) return;
+        if (this.validTarget(ragePowderUser, source, move.target)) {
+          if (move.smartTarget) move.smartTarget = false;
+          this.debug("Rage Powder redirected target of move");
+          return ragePowderUser;
+        }
+      }
+    }
   },
   reflect: {
     inherit: true,
@@ -891,8 +904,8 @@ const Moves = {
         } else {
           this.add("-activate", target, "Substitute", "[damage]");
         }
-        if (move.recoil && damage) {
-          this.damage(this.actions.calcRecoilDamage(damage, move, source), source, target, "recoil");
+        if (damage) {
+          this.actions.applyRecoilDamage(damage, move, source);
         }
         if (move.drain) {
           this.heal(Math.ceil(damage * move.drain[0] / move.drain[1]), source, target, "drain");

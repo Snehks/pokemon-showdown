@@ -24,13 +24,14 @@ module.exports = __toCommonJS(scripts_exports);
 var import_prng = require("../../../sim/prng");
 var import_pokemon = require("../../../sim/pokemon");
 var import_teams = require("../../../sim/teams");
+var import_dex = require("../../../sim/dex");
 const Scripts = {
   start() {
     this.gen = this.random(1, 10);
-    const format = Dex.formats.get(
+    const format = import_dex.Dex.formats.get(
       `gen${this.gen}randombattle@@@${[...this.format.ruleset, ...this.format.customRules || []].join(",")}`
     );
-    this.dex = Dex.forFormat(format);
+    this.dex = import_dex.Dex.forFormat(format);
     this.ruleTable = this.dex.formats.getRuleTable(format);
     this.teamGenerator = import_teams.Teams.getGenerator(format);
     this.actions.battle = this;

@@ -52,7 +52,7 @@ function assignMissingFields(self, data) {
 class BasicEffect {
   constructor(data) {
     this.name = import_utils.Utils.getString(data.name).trim();
-    this.id = data.realMove ? toID(data.realMove) : toID(this.name);
+    this.id = toID(this.name);
     this.fullname = import_utils.Utils.getString(data.fullname) || this.name;
     this.effectType = import_utils.Utils.getString(data.effectType) || "Condition";
     this.exists = data.exists ?? !!this.id;

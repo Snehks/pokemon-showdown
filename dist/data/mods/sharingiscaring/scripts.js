@@ -33,7 +33,7 @@ const Scripts = {
       const item = this.ignoringItem() ? "" : this.item;
       if (item === "ironball" || this.volatiles["item:ironball"] && !this.ignoringItem()) return true;
       if (!negateImmunity && this.hasType("Flying") && !(this.hasType("???") && "roost" in this.volatiles)) return false;
-      if (this.hasAbility("levitate") && !this.battle.suppressingAbility(this)) return null;
+      if (this.hasAbility(["levitate", "eelevate"]) && !this.battle.suppressingAbility(this)) return null;
       if ("magnetrise" in this.volatiles) return false;
       if ("telekinesis" in this.volatiles) return false;
       if (item === "airballoon" || this.volatiles["item:airballoon"] && !this.ignoringItem()) return false;

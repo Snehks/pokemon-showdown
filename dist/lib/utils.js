@@ -37,6 +37,7 @@ __export(utils_exports, {
   getString: () => getString,
   html: () => html,
   levenshtein: () => levenshtein,
+  normalize: () => normalize,
   parseExactInt: () => parseExactInt,
   randomElement: () => randomElement,
   shuffle: () => shuffle,
@@ -61,6 +62,15 @@ function escapeHTML(str) {
 function stripHTML(htmlContent) {
   if (!htmlContent) return "";
   return htmlContent.replace(/<[^>]*>/g, "");
+}
+function normalize(message) {
+  message = message.replace(/'/g, "").replace(/[^A-Za-z0-9]+/g, " ").trim();
+  if (!/[A-Za-z][A-Za-z]/.test(message)) {
+    message = message.replace(/ */g, "");
+  } else if (!message.includes(" ")) {
+    message = message.replace(/([A-Z])/g, " $1").trim();
+  }
+  return " " + message.toLowerCase() + " ";
 }
 function formatOrder(place) {
   let remainder = place % 100;
@@ -229,8 +239,7 @@ function clampIntRange(num, min, max) {
   return num;
 }
 function clearRequireCache(options = {}) {
-  const excludes = options?.exclude || [];
-  excludes.push("/node_modules/");
+  const excludes = [...options?.exclude || [], "/node_modules/"];
   for (const path in require.cache) {
     if (excludes.some((p) => path.includes(p))) continue;
     const mod = require.cache[path];
@@ -240,13 +249,13 @@ function clearRequireCache(options = {}) {
   }
 }
 function uncacheModuleTree(mod, excludes) {
-  if (!mod.children?.length || excludes.some((p) => mod.filename.includes(p))) return;
-  for (const [i, child] of mod.children.entries()) {
+  const children = mod.children;
+  if (!children?.length || excludes.some((p) => mod.filename.includes(p))) return;
+  delete mod.children;
+  for (const child of children) {
     if (excludes.some((p) => child.filename.includes(p))) continue;
-    mod.children?.splice(i, 1);
     uncacheModuleTree(child, excludes);
   }
-  delete mod.children;
 }
 function deepClone(obj) {
   if (obj === null || typeof obj !== "object") return obj;

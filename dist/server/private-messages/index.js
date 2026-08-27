@@ -30,9 +30,9 @@ var private_messages_exports = {};
 __export(private_messages_exports, {
   EXPIRY_TIME: () => EXPIRY_TIME,
   MAX_PENDING: () => MAX_PENDING,
-  PM: () => PM,
   PrivateMessages: () => PrivateMessages,
-  SEEN_EXPIRY_TIME: () => SEEN_EXPIRY_TIME
+  SEEN_EXPIRY_TIME: () => SEEN_EXPIRY_TIME,
+  database: () => database
 });
 module.exports = __toCommonJS(private_messages_exports);
 var import_lib = require("../../lib");
@@ -42,19 +42,19 @@ var import_database = require("./database");
 const EXPIRY_TIME = 60 * 24 * 60 * 60 * 1e3;
 const SEEN_EXPIRY_TIME = 7 * 24 * 60 * 60 * 1e3;
 const MAX_PENDING = 20;
-const PM = (0, import_lib.SQL)("private-messages", module, {
+const database = (0, import_lib.SQL)("private-messages", module, {
   file: "databases/offline-pms.db",
   extension: "server/private-messages/database.js"
 });
 const PrivateMessages = new class {
   constructor() {
-    this.database = PM;
+    this.database = database;
     this.clearInterval = this.nextClear();
     this.offlineIsEnabled = Config.usesqlitepms && Config.usesqlite;
   }
   async sendOffline(to, from, message, context) {
     await this.checkCanSend(to, from);
-    const result = await PM.transaction("send", [toID(from), toID(to), message]);
+    const result = await database.transaction("send", [toID(from), toID(to), message]);
     if (result.error) throw new Chat.ErrorMessage(result.error);
     if (typeof from === "object") {
       from.send(`|pm|${this.getIdentity(from)}|${this.getIdentity(to)}|${message} __[sent offline]__`);
@@ -66,10 +66,10 @@ const PrivateMessages = new class {
     return changed;
   }
   getSettings(userid) {
-    return PM.get(import_database.statements.getSettings, [toID(userid)]);
+    return database.get(import_database.statements.getSettings, [toID(userid)]);
   }
   deleteSettings(userid) {
-    return PM.run(import_database.statements.deleteSettings, [toID(userid)]);
+    return database.run(import_database.statements.deleteSettings, [toID(userid)]);
   }
   async checkCanSend(to, from) {
     from = toID(from);
@@ -108,9 +108,9 @@ const PrivateMessages = new class {
   setViewOnly(user, val) {
     const id = toID(user);
     if (!val) {
-      return PM.run(import_database.statements.deleteSettings, [id]);
+      return database.run(import_database.statements.deleteSettings, [id]);
     }
-    return PM.run(import_database.statements.setBlock, [id, val]);
+    return database.run(import_database.statements.setBlock, [id, val]);
   }
   checkCanUse(user, options = { forceBool: false, isLogin: false }) {
     if (!this.offlineIsEnabled) {
@@ -152,7 +152,7 @@ const PrivateMessages = new class {
     return `${Users.globalAuth.get(toID(user))}${user}`;
   }
   nextClear() {
-    if (!PM.isParentProcess) return null;
+    if (!database.isParentProcess) return null;
     const time = Date.now();
     const nextMidnight = /* @__PURE__ */ new Date();
     nextMidnight.setHours(24, 0, 0, 0);
@@ -165,7 +165,7 @@ const PrivateMessages = new class {
     return this.clearInterval;
   }
   clearSeen() {
-    return PM.run(import_database.statements.clearSeen, [Date.now(), SEEN_EXPIRY_TIME]);
+    return database.run(import_database.statements.clearSeen, [Date.now(), SEEN_EXPIRY_TIME]);
   }
   send(message, user, pmTarget, onlyRecipient = null) {
     const buf = `|pm|${user.getIdentity()}|${pmTarget.getIdentity()}|${message}`;
@@ -177,10 +177,10 @@ const PrivateMessages = new class {
   }
   async fetchUnseen(user) {
     const userid = toID(user);
-    return await PM.transaction("listNew", [userid]) || [];
+    return await database.transaction("listNew", [userid]) || [];
   }
   async fetchAll(user) {
-    return await PM.all(import_database.statements.fetch, [toID(user)]) || [];
+    return await database.all(import_database.statements.fetch, [toID(user)]) || [];
   }
   async renderReceived(user) {
     const all = await this.fetchAll(user);
@@ -217,16 +217,18 @@ const PrivateMessages = new class {
     return buf;
   }
   clearOffline() {
-    return PM.run(import_database.statements.clearDated, [Date.now(), EXPIRY_TIME]);
+    return database.run(import_database.statements.clearDated, [Date.now(), EXPIRY_TIME]);
   }
   destroy() {
-    void PM.destroy();
+    if (this.clearInterval) clearTimeout(this.clearInterval);
+    this.clearInterval = null;
+    void database.destroy();
   }
   start(processCount) {
     start(processCount);
   }
 }();
-if (!PM.isParentProcess) {
+if (!database.isParentProcess) {
   ConfigLoader.ensureLoaded();
   global.Monitor = {
     crashlog(error, source = "A private message child process", details = null) {
@@ -247,7 +249,7 @@ function start(processCount) {
   if (!Config.usesqlite) {
     return;
   }
-  PM.spawn(processCount["pm"] ?? 1);
-  void PM.run(import_database.statements.clearDated, [Date.now(), EXPIRY_TIME]);
+  database.spawn(processCount["pm"] ?? 1);
+  void database.run(import_database.statements.clearDated, [Date.now(), EXPIRY_TIME]);
 }
 //# sourceMappingURL=index.js.map

@@ -176,6 +176,11 @@ class RandomGen1Teams extends import_teams.default {
     }
     return pokemon;
   }
+  getLevel(species) {
+    if (this.adjustLevel) return this.adjustLevel;
+    if (this.randomData[species.id]["level"]) return this.randomData[species.id]["level"];
+    return 80;
+  }
   /**
    * Random set generation for Gen 1 Random Battles.
    */

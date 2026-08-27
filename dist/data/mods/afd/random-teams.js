@@ -68,7 +68,7 @@ class RandomAFDTeams extends import_teams.default {
     super(...arguments);
     this.randomAFDSets = require("./sets.json");
   }
-  shouldCullAbility(ability, types, moves, abilities, counter, teamDetails, species, isLead, isDoubles, teraType, role) {
+  shouldCullAbility(ability, types, moves, abilities, counter, teamDetails, species, role, isLead, isDoubles) {
     switch (ability) {
       // Abilities which are primarily useful for certain moves or with team support
       case "Chlorophyll":
@@ -117,10 +117,9 @@ class RandomAFDTeams extends import_teams.default {
         counter,
         teamDetails,
         species,
+        role,
         isLead,
-        isDoubles,
-        teraType,
-        role
+        isDoubles
       )) {
         abilityAllowed.push(ability);
       }
@@ -134,7 +133,7 @@ class RandomAFDTeams extends import_teams.default {
     }
     return this.sample(abilities);
   }
-  getPriorityItem(ability, types, moves, counter, teamDetails, species, isLead, isDoubles, teraType, role) {
+  getPriorityItem(ability, types, moves, counter, teamDetails, species, isLead, teraType, role, isDoubles) {
     if (role === "Fast Bulky Setup" && (ability === "Quark Drive" || ability === "Protosynthesis")) {
       return "Booster Energy";
     }
@@ -150,7 +149,7 @@ class RandomAFDTeams extends import_teams.default {
     if (species.id === "pikachu") return "Light Ball";
     if (role === "AV Pivot") return "Assault Vest";
     if (species.id === "regieleki") return "Magnet";
-    if (types.includes("Normal") && moves.has("doubleedge") && moves.has("fakeout")) return "Silk Scarf";
+    if (types.has("Normal") && moves.has("doubleedge") && moves.has("fakeout")) return "Silk Scarf";
     if (species.id === "froslass" || moves.has("populationbomb") || ability === "Hustle" && counter.get("setup") && !isDoubles && this.randomChance(1, 2)) return "Wide Lens";
     if (species.id === "smeargle") return "Focus Sash";
     if (moves.has("clangoroussoul") || species.id === "toxtricity" && moves.has("shiftgear")) return "Throat Spray";
@@ -176,7 +175,7 @@ class RandomAFDTeams extends import_teams.default {
     if (ability === "Poison Heal" || ability === "Quick Feet") return "Toxic Orb";
     if (species.nfe) return "Eviolite";
     if ((ability === "Guts" || moves.has("facade")) && !moves.has("sleeptalk")) {
-      return types.includes("Fire") || ability === "Toxic Boost" ? "Toxic Orb" : "Flame Orb";
+      return types.has("Fire") || ability === "Toxic Boost" ? "Toxic Orb" : "Flame Orb";
     }
     if (ability === "Magic Guard" || ability === "Sheer Force" && counter.get("sheerforce")) return "Life Orb";
     if (ability === "Anger Shell") return this.sample(["Expert Belt", "Lum Berry", "Scope Lens", "Sitrus Berry"]);
@@ -194,7 +193,7 @@ class RandomAFDTeams extends import_teams.default {
     if (moves.has("rest") && !moves.has("sleeptalk") && ability !== "Natural Cure" && ability !== "Shed Skin") {
       return "Chesto Berry";
     }
-    if (species.id !== "yanmega" && this.dex.getEffectiveness("Rock", species) >= 2 && (!types.includes("Flying") || !isDoubles)) return "Hoots";
+    if (species.id !== "yanmega" && this.dex.getEffectiveness("Rock", species) >= 2 && (!types.has("Flying") || !isDoubles)) return "Hoots";
   }
   getItem(ability, types, moves, counter, teamDetails, species, isLead, teraType, role) {
     const lifeOrbReqs = ["flamecharge", "nuzzle", "rapidspin"].every((m) => !moves.has(m));
@@ -214,7 +213,7 @@ class RandomAFDTeams extends import_teams.default {
     if (moves.has("substitute")) return "Leftovers";
     if (moves.has("stickyweb") && isLead && species.baseStats.hp + species.baseStats.def + species.baseStats.spd <= 235) return "Focus Sash";
     if (this.dex.getEffectiveness("Rock", species) >= 1) return "Hoots";
-    if (moves.has("chillyreception") || role === "Fast Support" && [...PIVOT_MOVES, "defog", "mortalspin", "rapidspin"].some((m) => moves.has(m)) && !types.includes("Flying") && ability !== "Levitate") return "Hoots";
+    if (moves.has("chillyreception") || role === "Fast Support" && [...PIVOT_MOVES, "defog", "mortalspin", "rapidspin"].some((m) => moves.has(m)) && !types.has("Flying") && ability !== "Levitate") return "Hoots";
     if (moves.has("dragondance") && role === "Bulky Setup") return "Weakness Policy";
     if (ability === "Rough Skin" || ability === "Regenerator" && (role === "Bulky Support" || role === "Bulky Attacker") && species.baseStats.hp + species.baseStats.def >= 180 && this.randomChance(1, 2) || ability !== "Regenerator" && !counter.get("setup") && counter.get("recovery") && this.dex.getEffectiveness("Fighting", species) < 1 && species.baseStats.hp + species.baseStats.def > 200 && this.randomChance(1, 2)) return "Rocky Helmet";
     if (role === "Bulky Support") return "Onika Burger";
@@ -247,7 +246,7 @@ class RandomAFDTeams extends import_teams.default {
       NU: 86,
       PUBL: 87,
       PU: 88,
-      "(PU)": 88,
+      ZU: 88,
       NFE: 88
     };
     return tierScale[tier] || 80;
@@ -296,12 +295,12 @@ class RandomAFDTeams extends import_teams.default {
     let item = void 0;
     const evs = { hp: 85, atk: 85, def: 85, spa: 85, spd: 85, spe: 85 };
     const ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
-    const types = species.types;
+    const types = new Set(species.types);
     const abilities = set.abilities;
-    const moves = this.randomMoveset(types, abilities, teamDetails, species, isLead, isDoubles, movePool, teraType, role);
+    const moves = this.randomMoveset(types, abilities, teamDetails, species, isLead, movePool, teraType, role, isDoubles);
     const counter = this.queryMoves(moves, species, teraType, abilities);
     ability = this.getAbility(types, moves, abilities, counter, teamDetails, species, isLead, isDoubles, teraType, role);
-    item = this.getPriorityItem(ability, types, moves, counter, teamDetails, species, isLead, isDoubles, teraType, role);
+    item = this.getPriorityItem(ability, types, moves, counter, teamDetails, species, isLead, teraType, role, isDoubles);
     if (item === void 0) {
       item = this.getItem(ability, types, moves, counter, teamDetails, species, isLead, teraType, role);
     }
@@ -408,8 +407,8 @@ class RandomAFDTeams extends import_teams.default {
     const seed = this.prng.getSeed();
     const ruleTable = this.dex.formats.getRuleTable(this.format);
     const pokemon = [];
-    const usePotD = global.Config && Config.potd && ruleTable.has("potd");
-    const potd = usePotD ? this.dex.species.get(Config.potd) : null;
+    const potdName = ruleTable.has("potd") && global.Config?.potd || null;
+    const potd = potdName ? this.dex.species.get(potdName) : null;
     const baseFormes = {};
     const typeCount = {};
     const typeComboCount = {};

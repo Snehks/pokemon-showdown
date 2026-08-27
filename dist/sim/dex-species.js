@@ -286,7 +286,7 @@ class DexSpecies {
         const isLetsGo = species.gen <= 7 && (species.num <= 151 || ["Meltan", "Melmetal"].includes(species.name)) && (!species.forme || species.isMega || ["Alola", "Starter"].includes(species.forme) && species.name !== "Pikachu-Alola");
         if (!isLetsGo) species.isNonstandard = "Past";
       }
-      if (this.dex.currentMod === "gen8bdsp" && (!species.isNonstandard || ["Gigantamax", "CAP"].includes(species.isNonstandard))) {
+      if (this.dex.currentMod === "gen8bdsp" && (!species.isNonstandard || species.isNonstandard === "CAP")) {
         if (species.gen > 4 || species.num < 1 && species.isNonstandard !== "CAP" || species.id === "pichuspikyeared") {
           species.isNonstandard = "Future";
           species.tier = species.doublesTier = species.natDexTier = "Illegal";
@@ -416,6 +416,7 @@ class DexSpecies {
     if (!this.getLearnsetData(species.id).learnset && species.forme) {
       return this.get(species.changesFrom || species.baseSpecies);
     } else if (species.prevo) {
+      if (this.dex.currentMod.startsWith("champions")) return null;
       species = this.get(species.prevo);
       if (species.gen > Math.max(2, this.dex.gen)) return null;
       return species;

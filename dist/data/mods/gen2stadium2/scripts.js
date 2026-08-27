@@ -212,8 +212,8 @@ const Scripts = {
       if (move.ohko) this.battle.add("-ohko");
       this.battle.singleEvent("AfterMoveSecondary", move, null, target, pokemon, move);
       this.battle.runEvent("AfterMoveSecondary", target, pokemon, move);
-      if (move.recoil && move.totalDamage && (pokemon.side.pokemonLeft > 1 || target.side.pokemonLeft > 1 || target.hp)) {
-        this.battle.damage(this.calcRecoilDamage(move.totalDamage, move, pokemon), pokemon, target, "recoil");
+      if (move.totalDamage && (pokemon.side.pokemonLeft > 1 || target.side.pokemonLeft > 1 || target.hp)) {
+        this.applyRecoilDamage(move.totalDamage, move, pokemon);
       }
       return damage;
     },
@@ -445,13 +445,6 @@ const Scripts = {
     }
     if (this.gen <= 1) {
       this.queue.clear();
-      for (const pokemon of this.getAllActive()) {
-        if (pokemon.volatiles["bide"]?.damage) {
-          pokemon.volatiles["bide"].damage = 0;
-          this.hint("Desync Clause Mod activated!");
-          this.hint("In Gen 1, Bide's accumulated damage is reset to 0 when a Pokemon faints.");
-        }
-      }
     } else if (this.gen <= 3 && this.gameType === "singles") {
       for (const pokemon of this.getAllActive()) {
         if (this.gen <= 2) {

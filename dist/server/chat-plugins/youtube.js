@@ -40,7 +40,8 @@ const GROUPWATCH_ROOMS = [
   "pokemongo",
   "hindi",
   "franais",
-  "arcade"
+  "arcade",
+  "kpop"
 ];
 const videoDataCache = Chat.oldPlugins.youtube?.videoDataCache || /* @__PURE__ */ new Map();
 const searchDataCache = Chat.oldPlugins.youtube?.searchDataCache || /* @__PURE__ */ new Map();

@@ -195,10 +195,11 @@ const Moves = {
     inherit: true,
     condition: {
       inherit: true,
-      onTryHit(target, source, effect) {
-        if (effect && (effect.category === "Status" || effect.target !== "allAdjacent" && effect.target !== "allAdjacentFoes")) {
+      onTryHit(target, source, move) {
+        if (move.category === "Status" || move?.target !== "allAdjacent" && move.target !== "allAdjacentFoes") {
           return;
         }
+        if (this.checkMoveBypassesProtect(move, source, target, false)) return;
         this.add("-activate", target, "move: Wide Guard");
         const lockedmove = source.getVolatile("lockedmove");
         if (lockedmove) {

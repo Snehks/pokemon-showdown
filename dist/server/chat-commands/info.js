@@ -671,7 +671,7 @@ const commands = {
               details["Pre-Evolution"] = pokemon.prevo;
             }
             if (!evos.length) {
-              details[`<font color="#686868">Does Not Evolve</font>`] = "";
+              details[`<span class="gray">Does Not Evolve</span>`] = "";
             } else {
               details["Evolution"] = evos.join(", ");
             }
@@ -711,14 +711,14 @@ const commands = {
           break;
         case "move":
           const move = dex.moves.get(newTarget.name);
-          buffer += `${prefix}${Chat.getDataMoveHTML(move)}
+          buffer += `${prefix}${Chat.getDataMoveHTML(move, dex.currentMod.startsWith("champions"))}
 `;
           if (showDetails) {
             details = {
               Priority: String(move.priority),
               Gen: String(move.gen) || "CAP"
             };
-            const pastGensOnly = move.isNonstandard === "Past" && dex.gen >= 8 || move.isNonstandard === "Gigantamax" && dex.gen !== 8;
+            const pastGensOnly = move.isNonstandard === "Past" && dex.gen >= 8;
             if (pastGensOnly) details["&#10007; Past Gens Only"] = "";
             if (move.secondary || move.secondaries || move.hasSheerForceBoost) {
               details["&#10003; Boosted by Sheer Force"] = "";
@@ -827,13 +827,16 @@ const commands = {
             };
             if (ability.flags["cantsuppress"]) details["&#10003; Not affected by Gastro Acid"] = "";
             if (ability.flags["breakable"]) details["&#10003; Ignored by Mold Breaker"] = "";
+            if (ability.isNonstandard) {
+              details[`Unobtainable in Gen ${dex.gen}`] = "";
+            }
           }
           break;
         default:
           throw new Error(`Unrecognized searchType`);
       }
       if (showDetails) {
-        buffer += `${prefix}<font size="1">${Object.entries(details).map(([detail, value]) => value === "" ? detail : `<font color="#686868">${detail}:</font> ${value}`).join("&nbsp;|&ThickSpace;")}</font>
+        buffer += `${prefix}<font size="1">${Object.entries(details).map(([detail, value]) => value === "" ? detail : `<span class="gray">${detail}:</span> ${value}`).join("&nbsp;|&ThickSpace;")}</font>
 `;
       }
     }

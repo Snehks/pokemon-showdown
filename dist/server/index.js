@@ -130,6 +130,7 @@ function setupGlobals() {
   void IPTools.loadHostsAndRanges();
   const TeamValidatorAsync2 = require("./team-validator-async");
   global.TeamValidatorAsync = TeamValidatorAsync2;
+  global.TeamValidator = TeamValidatorAsync2.TeamValidator;
   global.Sockets = import_sockets.Sockets;
   if (!Config.lazysockets) {
     import_sockets.Sockets.start(Config.subprocessescache);

@@ -200,7 +200,7 @@ const FormatsData = {
     tier: "NU"
   },
   poliwag: {
-    tier: "ZU"
+    tier: "ZUBL"
   },
   poliwhirl: {
     tier: "NU"
@@ -425,7 +425,7 @@ const FormatsData = {
     tier: "NU"
   },
   jolteon: {
-    tier: "OU"
+    tier: "UU"
   },
   flareon: {
     tier: "ZU"

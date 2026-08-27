@@ -237,7 +237,7 @@ const Teams = new class Teams2 {
     }
     return output;
   }
-  exportSet(set, { hideStats, removeNicknames } = {}) {
+  exportSet(set, { hideStats, removeNicknames, useStatPoints } = {}) {
     let out = ``;
     if (typeof removeNicknames === "function" && set.name && set.name !== set.species) {
       set.name = removeNicknames(set.name) || set.species;
@@ -284,7 +284,7 @@ const Teams = new class Teams2 {
       out += `Gigantamax: Yes  
 `;
     }
-    if (set.teraType) {
+    if (set.teraType && !useStatPoints) {
       out += `Tera Type: ${set.teraType}  
 `;
     }
@@ -502,7 +502,7 @@ const Teams = new class Teams2 {
       TeamGenerator = require("../data/mods/afd/random-teams").default;
     } else if (formatID.includes("gen9babyrandombattle")) {
       TeamGenerator = require("../data/random-battles/gen9baby/teams").default;
-    } else if (formatID.includes("gen9randombattle") && format.ruleTable?.has("+pokemontag:cap")) {
+    } else if (formatID.includes("gen9randombattle") && format.ruleTable?.has("+tag:cap")) {
       TeamGenerator = require("../data/random-battles/gen9cap/teams").default;
     } else if (formatID.includes("gen9freeforallrandombattle")) {
       TeamGenerator = require("../data/random-battles/gen9ffa/teams").default;

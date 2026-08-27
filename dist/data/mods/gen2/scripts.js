@@ -272,8 +272,8 @@ const Scripts = {
       if (move.ohko) this.battle.add("-ohko");
       this.battle.singleEvent("AfterMoveSecondary", move, null, target, pokemon, move);
       this.battle.runEvent("AfterMoveSecondary", target, pokemon, move);
-      if (move.recoil && move.totalDamage) {
-        this.battle.damage(this.calcRecoilDamage(move.totalDamage, move, pokemon), pokemon, target, "recoil");
+      if (move.totalDamage) {
+        this.applyRecoilDamage(move.totalDamage, move, pokemon);
       }
       return damage;
     },
@@ -560,8 +560,8 @@ const Scripts = {
         if (attack >= 1024 || defense >= 1024) {
           this.battle.hint("In Gen 2, a stat will roll over to a small number if it is larger than 1024.");
         }
-        attack = this.battle.clampIntRange(Math.floor(attack / 4) % 256, 1);
-        defense = this.battle.clampIntRange(Math.floor(defense / 4) % 256, 1);
+        attack = this.battle.clampIntRange(this.battle.trunc(Math.floor(attack / 4), 8), 1);
+        defense = this.battle.clampIntRange(this.battle.trunc(Math.floor(defense / 4), 8), 1);
       }
       if (move.selfdestruct && defType === "def") {
         defense = this.battle.clampIntRange(Math.floor(defense / 2), 1);

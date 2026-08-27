@@ -120,15 +120,9 @@ const Abilities = {
   effectspore: {
     inherit: true,
     onDamagingHit(damage, target, source, move) {
-      if (damage && move.flags["contact"] && !source.status) {
-        const r = this.random(100);
-        if (r < 10) {
-          source.setStatus("slp", target);
-        } else if (r < 20) {
-          source.setStatus("par", target);
-        } else if (r < 30) {
-          source.setStatus("psn", target);
-        }
+      if (damage && move.flags["contact"] && this.randomChance(3, 10)) {
+        const status = this.sample(["slp", "par", "psn"]);
+        source.trySetStatus(status, target);
       }
     }
   },
@@ -312,13 +306,19 @@ const Abilities = {
       }
     }
   },
+  multitype: {
+    inherit: true,
+    onTakeItem: false,
+    onSetAbility: false
+    // redundant but hardcoded
+  },
   naturalcure: {
     inherit: true,
     onCheckShow: void 0,
     // no inherit
     onSwitchOut(pokemon) {
       if (!pokemon.status || pokemon.status === "fnt") return;
-      this.add("-curestatus", pokemon, pokemon.status, "[from] ability: Natural Cure");
+      this.add("-curestatus", pokemon, pokemon.status, "[from] ability: Natural Cure", "[silent]");
       pokemon.clearStatus();
     }
   },
@@ -443,6 +443,12 @@ const Abilities = {
     onResidualOrder: 10,
     onResidualSubOrder: 3
   },
+  stall: {
+    inherit: true,
+    onFractionalPriority(priority, pokemon) {
+      if (priority >= 0) return -0.1;
+    }
+  },
   static: {
     inherit: true,
     onDamagingHit(damage, target, source, move) {
@@ -551,13 +557,24 @@ const Abilities = {
       const target = pokemon.side.randomFoe();
       if (!target || target.fainted) return;
       const ability = target.getAbility();
-      const bannedAbilities = ["forecast", "multitype", "trace"];
-      if (bannedAbilities.includes(target.ability)) {
-        return;
-      }
+      if (ability.flags["notrace"]) return;
       pokemon.setAbility(ability, target);
     },
     flags: { notrace: 1 }
+  },
+  truant: {
+    inherit: true,
+    onBeforeMove(pokemon) {
+      if (pokemon.volatiles["truant"]) {
+        this.add("cant", pokemon, "ability: Truant");
+        return false;
+      }
+    },
+    onResidual(pokemon) {
+      if (!pokemon.removeVolatile("truant")) {
+        pokemon.addVolatile("truant");
+      }
+    }
   },
   vitalspirit: {
     inherit: true,

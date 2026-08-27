@@ -36,14 +36,13 @@ __export(chat_exports, {
   PageContext: () => PageContext
 });
 module.exports = __toCommonJS(chat_exports);
-var ConfigLoader = __toESM(require("./config-loader"));
 var Friends = __toESM(require("./friends"));
 var import_lib = require("../lib");
 var Artemis = __toESM(require("./artemis"));
-var import_sim = require("../sim");
 var import_private_messages = require("./private-messages");
 var pathModule = __toESM(require("path"));
 var JSX = __toESM(require("./chat-jsx"));
+var import_chat_db = require("./chat-db");
 var import_chat_formatter = require("./chat-formatter");
 /**
  * Chat
@@ -75,7 +74,6 @@ const MESSAGE_COOLDOWN = 5 * 60 * 1e3;
 const MAX_PARSE_RECURSION = 10;
 const VALID_COMMAND_TOKENS = "/!";
 const BROADCAST_TOKEN = "!";
-const PLUGIN_DATABASE_PATH = "./databases/chat-plugins.db";
 const MAX_PLUGIN_LOADING_DEPTH = 3;
 let probe = null;
 try {
@@ -84,9 +82,6 @@ try {
 }
 const EMOJI_REGEX = /[\p{Emoji_Modifier_Base}\p{Emoji_Presentation}\uFE0F]/u;
 const TRANSLATION_DIRECTORY = pathModule.resolve(__dirname, "..", "translations");
-const PM = (0, import_lib.SQL)("chat-db", module, {
-  file: global.Config?.nofswriting ? ":memory:" : PLUGIN_DATABASE_PATH
-});
 class PatternTester {
   constructor() {
     this.elements = [];
@@ -216,14 +211,14 @@ class MessageContext {
   }
   extractFormat(formatOrMod, allowRules) {
     if (!formatOrMod) {
-      return { dex: import_sim.Dex.includeData(), format: null, isMatch: false };
+      return { dex: Dex.includeData(), format: null, isMatch: false };
     }
-    const format = import_sim.Dex.formats.get(formatOrMod);
+    const format = Dex.formats.get(formatOrMod);
     if (format.effectType === "Format" || allowRules && format.effectType === "Rule") {
-      return { dex: import_sim.Dex.forFormat(format), format, isMatch: true };
+      return { dex: Dex.forFormat(format), format, isMatch: true };
     }
-    if (toID(formatOrMod) in import_sim.Dex.dexes) {
-      return { dex: import_sim.Dex.mod(toID(formatOrMod)), format: null, isMatch: true };
+    if (toID(formatOrMod) in Dex.dexes) {
+      return { dex: Dex.mod(toID(formatOrMod)), format: null, isMatch: true };
     }
     return this.extractFormat();
   }
@@ -373,6 +368,7 @@ class CommandContext extends MessageContext {
     this.message = options.message || ``;
     this.recursionDepth = options.recursionDepth || 0;
     this.pmTarget = options.pmTarget || null;
+    this.pmTargetName = options.pmTargetName || options.pmTarget?.name || null;
     this.room = options.room || null;
     this.connection = options.connection;
     this.cmd = options.cmd || "";
@@ -396,6 +392,7 @@ class CommandContext extends MessageContext {
         connection: this.connection,
         room: this.room,
         pmTarget: this.pmTarget,
+        pmTargetName: this.pmTargetName,
         recursionDepth: this.recursionDepth + 1,
         bypassRoomCheck: this.bypassRoomCheck,
         ...options
@@ -504,6 +501,10 @@ class CommandContext extends MessageContext {
         }
       }
       Chat.PrivateMessages.send(message, this.user, this.pmTarget);
+    } else if (this.pmTargetName) {
+      this.errorReply(`Your message could not be sent:
+${message}
+Sending command messages to offline users is not supported.`);
     } else if (this.room) {
       this.room.add(`|c|${this.user.getIdentity(this.room)}|${message}`);
       this.room.game?.onLogMessage?.(message, this.user);
@@ -593,7 +594,7 @@ It needs to be sent to a user or room.`);
     if (!sender) {
       if (this.room) throw new Error(`Not a PM`);
       sender = this.user;
-      receiver = this.pmTarget;
+      receiver = this.pmTarget || this.pmTargetName;
     }
     const targetIdentity = typeof receiver === "string" ? ` ${receiver}` : receiver ? receiver.getIdentity() : "~";
     const prefix = `|pm|${sender.getIdentity()}|${targetIdentity}|`;
@@ -822,6 +823,9 @@ It needs to be sent to a user or room.`);
     if (this.broadcasting || !this.shouldBroadcast()) {
       return true;
     }
+    if (this.pmTargetName && !this.pmTarget) {
+      throw new Chat.ErrorMessage(`You cannot broadcast commands in offline PMs.`);
+    }
     if (this.user.locked && !(this.room?.roomid.startsWith("help-") || this.pmTarget?.can("lock"))) {
       throw new Chat.ErrorMessage([
         `You cannot broadcast this command's information while locked.`,
@@ -1032,14 +1036,13 @@ It needs to be sent to a user or room.`);
     if (setting === true && !user.can("lock")) return false;
     const friends = targetUser.friends || /* @__PURE__ */ new Set();
     if (setting === "friends") return friends.has(user.id);
-    return Users.globalAuth.atLeast(user, setting);
+    return Users.globalAuth.atLeast(user, setting) || friends.has(user.id);
   }
   checkPMHTML(targetUser) {
     if (!(this.room && targetUser.id in this.room.users) && !this.user.can("addhtml")) {
       throw new Chat.ErrorMessage("You do not have permission to use PM HTML to users who are not in this room.");
     }
-    const friends = targetUser.friends || /* @__PURE__ */ new Set();
-    if (targetUser.settings.blockPMs && (targetUser.settings.blockPMs === true || targetUser.settings.blockPMs === "friends" && !friends.has(this.user.id) || !Users.globalAuth.atLeast(this.user, targetUser.settings.blockPMs)) && !this.user.can("lock")) {
+    if (!this.checkCanPM(targetUser)) {
       Chat.maybeNotifyBlocked("pm", targetUser, this.user);
       throw new Chat.ErrorMessage("This user is currently blocking PMs.");
     }
@@ -1183,6 +1186,7 @@ It needs to be sent to a user or room.`);
                 ]);
               }
             } else if (buttonName === "send" && buttonValue && botmsgCommandRegex.test(buttonValue)) {
+            } else if (buttonName === "copyText") {
             } else if (buttonName) {
               throw new Chat.ErrorMessage([
                 `This button is not allowed: <${tagContent}>`,
@@ -1294,7 +1298,12 @@ const Chat = new class {
     this.FriendsPM = Friends.PM;
     this.PrivateMessages = import_private_messages.PrivateMessages;
     this.multiLinePattern = new PatternTester();
-    this.destroyHandlers = [Artemis.destroy, Friends.destroy];
+    this.destroyHandlers = [
+      Artemis.destroy,
+      Friends.destroy,
+      () => void import_chat_db.pluginDatabase.destroy(),
+      () => Chat.PrivateMessages.destroy()
+    ];
     this.crqHandlers = {};
     this.handlers = /* @__PURE__ */ Object.create(null);
     /** The key is the name of the plugin. */
@@ -1325,7 +1334,7 @@ const Chat = new class {
      * All chat plugins share one database.
      * Chat.databaseReadyPromise will be truthy if the database is not yet ready.
      */
-    this.database = PM;
+    this.database = import_chat_db.pluginDatabase;
     this.databaseReadyPromise = null;
     this.MessageContext = MessageContext;
     this.CommandContext = CommandContext;
@@ -1397,7 +1406,7 @@ const Chat = new class {
     } else {
       name = name.slice(0, 18);
     }
-    name = import_sim.Dex.getName(name);
+    name = Dex.getName(name);
     for (const curFilter of Chat.namefilters) {
       name = curFilter(name, user);
       if (!name) return "";
@@ -1441,7 +1450,7 @@ const Chat = new class {
     for (const dirname of directories) {
       if (/[^a-z0-9]/.test(dirname)) continue;
       const dir = (0, import_lib.FS)(`${TRANSLATION_DIRECTORY}/${dirname}`);
-      const languageID = import_sim.Dex.toID(dirname);
+      const languageID = toID(dirname);
       const files = await dir.readdir();
       for (const filename of files) {
         if (!filename.endsWith(".js")) continue;
@@ -1531,10 +1540,6 @@ const Chat = new class {
     for (const { file } of migrationsToRun) {
       await this.database.runFile(pathModule.resolve(migrationsFolder, file));
     }
-    Chat.destroyHandlers.push(
-      () => void Chat.database?.destroy(),
-      () => Chat.PrivateMessages.destroy()
-    );
   }
   /**
    * Command parser
@@ -1619,23 +1624,23 @@ const Chat = new class {
     }
   }
   annotateCommands(commandTable, namespace = "", pluginName) {
-    for (const cmd2 in commandTable) {
-      const entry = commandTable[cmd2];
+    for (const cmd in commandTable) {
+      const entry = commandTable[cmd];
       if (typeof entry === "object") {
-        this.annotateCommands(entry, `${namespace}${cmd2} `, pluginName);
+        this.annotateCommands(entry, `${namespace}${cmd} `, pluginName);
       }
       if (typeof entry === "string") {
         const base = commandTable[entry];
         if (!base) continue;
         if (!base.aliases) base.aliases = [];
-        if (!base.aliases.includes(cmd2)) base.aliases.push(cmd2);
+        if (!base.aliases.includes(cmd)) base.aliases.push(cmd);
         continue;
       }
       if (typeof entry !== "function") continue;
       const handlerCode = entry.toString();
       entry.requiresRoom = /requireRoom\((?:'|"|`)(.*?)(?:'|"|`)/.exec(handlerCode)?.[1] || /this\.requireRoom\(/.test(handlerCode);
       entry.hasRoomPermissions = /\bthis\.(checkCan|can)\([^,)\n]*, [^,)\n]*,/.test(handlerCode);
-      entry.broadcastable = cmd2.endsWith("help") || /\bthis\.(?:(check|can|run|should)Broadcast)\(/.test(handlerCode);
+      entry.broadcastable = cmd.endsWith("help") || /\bthis\.(?:(check|can|run|should)Broadcast)\(/.test(handlerCode);
       entry.isPrivate = /\bthis\.(?:privately(Check)?Can|commandDoesNotExist)\(/.test(handlerCode);
       entry.requiredPermission = /this\.(?:checkCan|privately(?:Check)?Can)\(['`"]([a-zA-Z0-9]+)['"`](\)|, )/.exec(handlerCode)?.[1];
       entry.plugin = pluginName;
@@ -1651,8 +1656,8 @@ const Chat = new class {
           if (baseEntry.isPrivate) entry.isPrivate = baseEntry.isPrivate;
         }
       }
-      entry.cmd = cmd2;
-      entry.fullCmd = `${namespace}${cmd2}`;
+      entry.cmd = cmd;
+      entry.fullCmd = `${namespace}${cmd}`;
     }
     return commandTable;
   }
@@ -1762,16 +1767,16 @@ const Chat = new class {
     if (!VALID_COMMAND_TOKENS.includes(cmdToken)) return null;
     if (cmdToken === message.charAt(1)) return null;
     if (cmdToken === BROADCAST_TOKEN && /[^A-Za-z0-9]/.test(message.charAt(1))) return null;
-    let [cmd2, target] = import_lib.Utils.splitFirst(message.slice(1), " ");
-    cmd2 = cmd2.toLowerCase();
-    if (cmd2.endsWith(",")) cmd2 = cmd2.slice(0, -1);
+    let [cmd, target] = import_lib.Utils.splitFirst(message.slice(1), " ");
+    cmd = cmd.toLowerCase();
+    if (cmd.endsWith(",")) cmd = cmd.slice(0, -1);
     let curCommands = Chat.commands;
     let commandHandler;
-    let fullCmd = cmd2;
+    let fullCmd = cmd;
     let prevCmdName = "";
     do {
-      if (cmd2 in curCommands) {
-        commandHandler = curCommands[cmd2];
+      if (cmd in curCommands) {
+        commandHandler = curCommands[cmd];
       } else {
         commandHandler = void 0;
       }
@@ -1781,18 +1786,18 @@ const Chat = new class {
         return this.parseCommand(cmdToken + "help " + fullCmd.slice(0, -4), true);
       }
       if (commandHandler && typeof commandHandler === "object") {
-        [cmd2, target] = import_lib.Utils.splitFirst(target, " ");
-        cmd2 = cmd2.toLowerCase();
+        [cmd, target] = import_lib.Utils.splitFirst(target, " ");
+        cmd = cmd.toLowerCase();
         prevCmdName = fullCmd;
-        fullCmd += " " + cmd2;
+        fullCmd += " " + cmd;
         curCommands = commandHandler;
       }
     } while (commandHandler && typeof commandHandler === "object");
     if (!commandHandler && (curCommands.default || curCommands[""])) {
       commandHandler = curCommands.default || curCommands[""];
       fullCmd = prevCmdName;
-      target = `${cmd2}${target ? ` ${target}` : ""}`;
-      cmd2 = fullCmd.split(" ").shift();
+      target = `${cmd}${target ? ` ${target}` : ""}`;
+      cmd = fullCmd.split(" ").shift();
       if (typeof commandHandler === "string") {
         commandHandler = curCommands[commandHandler];
       }
@@ -1816,7 +1821,7 @@ const Chat = new class {
       }
     }
     return {
-      cmd: cmd2,
+      cmd,
       cmdToken,
       target,
       fullCmd,
@@ -1825,8 +1830,8 @@ const Chat = new class {
   }
   allCommands(table = Chat.commands) {
     const results = [];
-    for (const cmd2 in table) {
-      const handler = table[cmd2];
+    for (const cmd in table) {
+      const handler = table[cmd];
       if (Array.isArray(handler) || !handler || ["string", "boolean"].includes(typeof handler)) {
         continue;
       }
@@ -2032,13 +2037,13 @@ const Chat = new class {
     buf += "</span> ";
     if (gen >= 3) {
       buf += '<span style="float:left;min-height:26px">';
-      if (species.abilities["1"] && (gen >= 4 || import_sim.Dex.abilities.get(species.abilities["1"]).gen === 3)) {
+      if (species.abilities["1"] && (gen >= 4 || Dex.abilities.get(species.abilities["1"]).gen === 3)) {
         buf += `<span class="col twoabilitycol">${species.abilities["0"]}<br />${species.abilities["1"]}</span>`;
       } else {
         buf += `<span class="col abilitycol">${species.abilities["0"]}</span>`;
       }
       if (species.abilities["H"] && species.abilities["S"]) {
-        buf += `<span class="col twoabilitycol${species.unreleasedHidden ? " unreleasedhacol" : ""}"><em>${species.abilities["H"]}<br />(${species.abilities["S"]})</em></span>`;
+        buf += `<span class="col twoabilitycol${species.unreleasedHidden ? " unreleasedhacol" : ""}"><em>${species.abilities["H"]}<br /><span style="display: inline-block;">(${species.abilities["S"]})</span></em></span>`;
       } else if (species.abilities["H"]) {
         buf += `<span class="col abilitycol${species.unreleasedHidden ? " unreleasedhacol" : ""}"><em>${species.abilities["H"]}</em></span>`;
       } else if (species.abilities["S"]) {
@@ -2064,7 +2069,7 @@ const Chat = new class {
     buf += "</li>";
     return `<div class="message"><ul class="utilichart">${buf}<li style="clear:both"></li></ul></div>`;
   }
-  getDataMoveHTML(move) {
+  getDataMoveHTML(move, isChampions = false) {
     let buf = `<ul class="utilichart"><li class="result">`;
     buf += `<span class="col movenamecol"><a href="https://${Config.routes.dex}/moves/${move.id}">${move.name}</a></span> `;
     const encodedMoveType = encodeURIComponent(move.type);
@@ -2075,7 +2080,8 @@ const Chat = new class {
     }
     buf += `<span class="col widelabelcol"><em>Accuracy</em><br>${typeof move.accuracy === "number" ? `${move.accuracy}%` : "\u2014"}</span> `;
     const basePP = move.pp || 1;
-    const pp = Math.floor(move.noPPBoosts ? basePP : basePP * 8 / 5);
+    let pp = Math.floor(move.noPPBoosts ? basePP : basePP * 8 / 5);
+    if (isChampions) pp = move.noPPBoosts ? basePP : (basePP / 5 + 1) * 4;
     buf += `<span class="col pplabelcol"><em>PP</em><br>${pp}</span> `;
     buf += `<span class="col movedesccol">${move.shortDesc || move.desc}</span> `;
     buf += `</li><li style="clear:both"></li></ul>`;
@@ -2119,20 +2125,6 @@ const Chat = new class {
       result[key].push(val);
     }
     return result;
-  }
-  /**
-   * Normalize a message for the purposes of applying chat filters.
-   *
-   * Not used by PS itself, but feel free to use it in your own chat filters.
-   */
-  normalize(message) {
-    message = message.replace(/'/g, "").replace(/[^A-Za-z0-9]+/g, " ").trim();
-    if (!/[A-Za-z][A-Za-z]/.test(message)) {
-      message = message.replace(/ */g, "");
-    } else if (!message.includes(" ")) {
-      message = message.replace(/([A-Z])/g, " $1").trim();
-    }
-    return " " + message.toLowerCase() + " ";
   }
   /**
    * Generates dimensions to fit an image at url into a maximum size of maxWidth x maxHeight,
@@ -2207,6 +2199,7 @@ const Chat = new class {
   }
 }();
 Chat.escapeHTML = import_lib.Utils.escapeHTML;
+Chat.normalize = import_lib.Utils.normalize;
 Chat.splitFirst = import_lib.Utils.splitFirst;
 Chat.sendPM = Chat.PrivateMessages.send.bind(Chat.PrivateMessages);
 CommandContext.prototype.can = CommandContext.prototype.checkCan;
@@ -2230,31 +2223,14 @@ CommandContext.prototype.splitTarget = function(target, exactName) {
   this.targetUsername = targetUsername;
   return rest;
 };
-if (!PM.isParentProcess) {
-  ConfigLoader.ensureLoaded();
-  global.Monitor = {
-    crashlog(error, source = "A chat child process", details = null) {
-      const repr = JSON.stringify([error.name, error.message, source, details]);
-      process.send(`THROW
-@!!@${repr}
-${error.stack}`);
-    }
-  };
-  process.on("uncaughtException", (err) => {
-    Monitor.crashlog(err, "A chat database process");
-  });
-  process.on("unhandledRejection", (err) => {
-    Monitor.crashlog(err, "A chat database process");
-  });
-  PM.startRepl((cmd) => eval(cmd));
-}
 function start(processCount) {
   if (Config.usesqlite) {
-    PM.spawn(processCount["chatdb"] ?? 1);
+    import_chat_db.pluginDatabase.spawn(processCount["chatdb"] ?? 1);
     Chat.databaseReadyPromise = Chat.prepareDatabase();
   }
   Chat.PrivateMessages.start(processCount);
   Friends.start(processCount);
   Artemis.start(processCount);
 }
+setTimeout(() => Chat.loadPlugins(), 5e3);
 //# sourceMappingURL=chat.js.map

@@ -104,6 +104,7 @@ class UNO extends Rooms.RoomGame {
     this.direction = 1;
     this.spectators = /* @__PURE__ */ Object.create(null);
     this.isPlusFour = false;
+    this.lastColor = null;
     this.gameNumber = room.nextGameNumber();
     this.playerCap = cap;
     this.suppressMessages = suppressMessages || false;
@@ -145,6 +146,7 @@ class UNO extends Rooms.RoomGame {
       this.topCard = this.drawCard(1)[0];
       this.discards.unshift(this.topCard);
     } while (this.topCard.color === "Black");
+    this.lastColor = this.topCard.color;
     this.sendToRoom(`|raw|The top card is <span style="font-weight:bold;color: ${textColors[this.topCard.color]}">${this.topCard.name}</span>.`);
     this.onRunEffect(this.topCard.value, true);
     this.nextTurn(true);
@@ -191,11 +193,13 @@ class UNO extends Rooms.RoomGame {
     const removingCurrentPlayer = player === this.currentPlayer;
     if (removingCurrentPlayer) {
       if (this.state === "color") {
-        if (!this.topCard) {
-          throw new Error(`No top card in the discard pile.`);
+        if (!this.topCard || !this.lastColor) {
+          throw new Error(`No top card in the discard pile or last color.`);
         }
-        this.topCard.changedColor = this.discards[1].changedColor || this.discards[1].color;
-        this.sendToRoom(`|raw|${import_lib.Utils.escapeHTML(name)} has not picked a color, the color will stay as <span style="color: ${textColors[this.topCard.changedColor]}">${this.topCard.changedColor}</span>.`);
+        this.topCard.changedColor = this.lastColor;
+        this.sendToRoom(
+          `|raw|${import_lib.Utils.escapeHTML(name)} failed to pick a color. It will remain <span style="color: ${textColors[this.topCard.changedColor]}">${this.topCard.changedColor}</span>.`
+        );
       }
     }
     if (this.awaitUnoPlayer === player) this.awaitUnoPlayer = null;
@@ -301,6 +305,7 @@ class UNO extends Rooms.RoomGame {
     if (this.timer) clearTimeout(this.timer);
     this.onCheckUno();
     this.topCard = card;
+    if (card.color !== "Black") this.lastColor = card.color;
     player.removeCard(cardName);
     this.discards.unshift(card);
     if (player.hand.length === 1) {
@@ -364,6 +369,7 @@ class UNO extends Rooms.RoomGame {
       throw new Error(`No top card in the discard pile.`);
     }
     this.topCard.changedColor = color;
+    this.lastColor = color;
     this.sendToRoom(`|c:|${Math.floor(Date.now() / 1e3)}|~|The color has been changed to ${color}.`);
     if (this.timer) clearTimeout(this.timer);
     player.sendRoom("|uhtmlchange|uno-color|");
@@ -553,7 +559,7 @@ const commands = {
     end(target, room, user) {
       room = this.requireRoom();
       this.checkCan("minigame", null, room);
-      if (!room.game || room.game.gameid !== "uno") {
+      if (room.game?.gameid !== "uno") {
         throw new Chat.ErrorMessage("There is no UNO game going on in this room.");
       }
       room.game.destroy();

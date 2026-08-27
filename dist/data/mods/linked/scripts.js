@@ -126,9 +126,7 @@ const Scripts = {
         if (action.linked) {
           const linkedMoves = action.linked;
           for (let i = linkedMoves.length - 1; i >= 0; i--) {
-            const isValidTarget = this.validTargetLoc(action.targetLoc, action.pokemon, linkedMoves[i].target);
-            const randomTarget = this.getRandomTarget(action.pokemon, linkedMoves[i]);
-            const targetLoc = isValidTarget || !randomTarget ? action.targetLoc : action.pokemon.getLocOf(randomTarget);
+            const targetLoc = this.resolveTargetLoc(action.targetLoc, action, linkedMoves[i]);
             const pseudoAction = {
               choice: "move",
               priority: action.priority,
@@ -140,7 +138,10 @@ const Scripts = {
               mega: action.mega,
               order: action.order,
               fractionalPriority: action.fractionalPriority,
-              originalTarget: action.originalTarget
+              // @ts-expect-error modded
+              originalTarget: action.linkedTargets[i],
+              // @ts-expect-error modded
+              sorted: i === 1
             };
             this.queue.unshift(pseudoAction);
           }
@@ -331,7 +332,8 @@ const Scripts = {
     }
     if (this.gen < 5) this.eachEvent("Update");
     const nextAction = this.queue.peek();
-    if (this.gen >= 8 && (nextAction?.choice === "move" || nextAction?.choice === "runDynamax") && nextAction?.pokemon !== action.pokemon) {
+    if (this.gen >= 8 && // @ts-expect-error modded
+    (nextAction?.choice === "move" || nextAction?.choice === "runDynamax") && !nextAction?.sorted) {
       this.updateSpeed();
       for (const queueAction of this.queue.list) {
         if (queueAction.pokemon) this.getActionSpeed(queueAction);
@@ -340,34 +342,12 @@ const Scripts = {
     }
     return false;
   },
-  getTarget(pokemon, move, targetLoc, originalTarget) {
-    move = this.dex.moves.get(move);
-    if (move.smartTarget) {
-      const curTarget = pokemon.getAtLoc(targetLoc);
-      return curTarget && !curTarget.fainted ? curTarget : this.getRandomTarget(pokemon, move);
-    }
-    const selfLoc = pokemon.getLocOf(pokemon);
-    if (["adjacentAlly", "any", "normal"].includes(move.target) && targetLoc === selfLoc && !pokemon.volatiles["twoturnmove"] && !pokemon.volatiles["iceball"] && !pokemon.volatiles["rollout"]) {
-      return move.flags["futuremove"] ? pokemon : null;
-    }
-    if (move.target !== "randomNormal" && this.validTargetLoc(targetLoc, pokemon, move.target)) {
-      const target = pokemon.getAtLoc(targetLoc);
-      if (target?.fainted) {
-        if (this.gameType === "freeforall") {
-          return target;
-        }
-        if (target.isAlly(pokemon)) {
-          if (move.target === "adjacentAllyOrSelf" && this.gen !== 5) {
-            return pokemon;
-          }
-          return target;
-        }
-      }
-      if (target && !target.fainted) {
-        return target;
-      }
-    }
-    return this.getRandomTarget(pokemon, move);
+  resolveTargetLoc(targetLoc, action, move) {
+    const isValidTarget = this.validTargetLoc(targetLoc, action.pokemon, move.target);
+    if (isValidTarget) return targetLoc;
+    const randomTarget = this.getRandomTarget(action.pokemon, move);
+    if (!randomTarget) return targetLoc;
+    return action.pokemon.getLocOf(randomTarget);
   },
   actions: {
     runMove(moveOrMoveName, pokemon, targetLoc, options) {
@@ -567,13 +547,19 @@ const Scripts = {
             const decisionMove = this.battle.toID(action.move);
             if (linkedMoves.some((x) => x.id === decisionMove)) {
               action.linked = linkedMoves;
-              const linkedOtherMove = action.linked[1 - linkedMoves.findIndex((x) => x.id === decisionMove)];
+              action.linkedTargets = [];
+              for (const move of linkedMoves) {
+                const targetLoc = this.battle.resolveTargetLoc(action.targetLoc, action, move);
+                action.linkedTargets.push(action.pokemon.getAtLoc(targetLoc));
+              }
+              const linkedOtherIndex = 1 - linkedMoves.findIndex((x) => x.id === decisionMove);
+              const linkedOtherMove = action.linked[linkedOtherIndex];
               if (linkedOtherMove.beforeTurnCallback) {
                 this.addChoice({
                   choice: "beforeTurnMove",
                   pokemon: action.pokemon,
                   move: linkedOtherMove,
-                  targetLoc: action.targetLoc
+                  targetLoc: action.linkedTargets[linkedOtherIndex]
                 });
               }
               if (linkedOtherMove.priorityChargeCallback) {
@@ -581,7 +567,7 @@ const Scripts = {
                   choice: "priorityChargeMove",
                   pokemon: action.pokemon,
                   move: linkedOtherMove,
-                  targetLoc: action.targetLoc
+                  targetLoc: action.linkedTargets[linkedOtherIndex]
                 });
               }
             }

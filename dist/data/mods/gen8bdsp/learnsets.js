@@ -21338,6 +21338,7 @@ const Learnsets = {
       waterpulse: ["8M", "8L15"]
     }
   },
+  gastrodoneast: {},
   ambipom: {
     learnset: {
       aerialace: ["8M"],

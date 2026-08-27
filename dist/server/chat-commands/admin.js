@@ -34,6 +34,7 @@ __export(admin_exports, {
 module.exports = __toCommonJS(admin_exports);
 var path = __toESM(require("path"));
 var child_process = __toESM(require("child_process"));
+var import_module = require("module");
 var import_lib = require("../../lib");
 /**
  * Administration commands
@@ -550,8 +551,8 @@ ${buf}`);
     await this.parse(`/rebuild`);
     const lock = Monitor.hotpatchLock;
     const hotpatches = [
-      "chat",
       "formats",
+      "chat",
       "loginserver",
       "punishments",
       "dnsbl",
@@ -562,7 +563,12 @@ ${buf}`);
     ];
     target2 = toID(target2);
     try {
-      import_lib.Utils.clearRequireCache({ exclude: ["/lib/process-manager"] });
+      const exclude = ["/lib/process-manager"];
+      if (!["all", "formats", "battles", "validator", "learnsets"].includes(target2)) {
+        exclude.push("/sim/");
+      }
+      import_lib.Utils.clearRequireCache({ exclude });
+      const reRequire = (0, import_module.createRequire)(__filename);
       if (target2 === "all") {
         if (lock["all"]) {
           throw new Chat.ErrorMessage(`Hot-patching all has been disabled by ${lock["all"].by} (${lock["all"].reason})`);
@@ -591,9 +597,9 @@ ${buf}`);
         }
         const oldPlugins = Chat.plugins;
         Chat.destroy();
-        global.Chat = require("../chat").Chat;
+        global.Chat = reRequire("../chat").Chat;
         Chat.start(Config.subprocessescache);
-        global.Tournaments = require("../tournaments").Tournaments;
+        global.Tournaments = reRequire("../tournaments").Tournaments;
         this.sendReply("Reloading chat plugins...");
         Chat.loadPlugins(oldPlugins);
         this.sendReply("DONE");
@@ -604,10 +610,15 @@ ${buf}`);
           );
         }
         this.sendReply("Hotpatching processmanager prototypes...");
-        const cache = { ...require.cache };
-        import_lib.Utils.clearRequireCache();
-        const newPM = require("../../lib/process-manager");
-        require.cache = cache;
+        const pmPath = require.resolve("../../lib/process-manager");
+        const oldPMModule = require.cache[pmPath];
+        delete require.cache[pmPath];
+        const newPM = reRequire("../../lib/process-manager");
+        if (oldPMModule) {
+          require.cache[pmPath] = oldPMModule;
+        } else {
+          delete require.cache[pmPath];
+        }
         const protos = [
           [import_lib.ProcessManager.QueryProcessManager, newPM.QueryProcessManager],
           [import_lib.ProcessManager.StreamProcessManager, newPM.StreamProcessManager],
@@ -615,7 +626,7 @@ ${buf}`);
           [import_lib.ProcessManager.RawProcessManager, newPM.RawProcessManager],
           [import_lib.ProcessManager.QueryProcessWrapper, newPM.QueryProcessWrapper],
           [import_lib.ProcessManager.StreamProcessWrapper, newPM.StreamProcessWrapper],
-          [import_lib.ProcessManager.RawProcessManager, newPM.RawProcessWrapper]
+          [import_lib.ProcessManager.RawProcessWrapper, newPM.RawProcessWrapper]
         ].map((part) => part.map((constructor) => constructor.prototype));
         for (const [oldProto, newProto] of protos) {
           const newKeys = keysToCopy(newProto);
@@ -637,12 +648,12 @@ ${buf}`);
         let newProto, oldProto, message;
         switch (target2) {
           case "usersp":
-            newProto = require("../users").User.prototype;
+            newProto = reRequire("../users").User.prototype;
             oldProto = Users.User.prototype;
             message = "user prototypes";
             break;
           case "roomsp":
-            newProto = require("../rooms").BasicRoom.prototype;
+            newProto = reRequire("../rooms").BasicRoom.prototype;
             oldProto = Rooms.BasicRoom.prototype;
             message = "rooms prototypes";
             break;
@@ -681,7 +692,7 @@ ${buf}`);
           throw new Chat.ErrorMessage(`Hot-patching tournaments has been disabled by ${lock["tournaments"].by} (${lock["tournaments"].reason})`);
         }
         this.sendReply("Hotpatching tournaments...");
-        global.Tournaments = require("../tournaments").Tournaments;
+        global.Tournaments = reRequire("../tournaments").Tournaments;
         Chat.loadPlugin(Tournaments, "tournaments");
         this.sendReply("DONE");
       } else if (target2 === "formats" || target2 === "battles") {
@@ -695,18 +706,19 @@ ${buf}`);
           throw new Chat.ErrorMessage(`Hot-patching the validator has been disabled by ${lock["validator"].by} (${lock["validator"].reason})`);
         }
         this.sendReply("Hotpatching formats...");
-        global.Dex = require("../../sim/dex").Dex;
+        global.Dex = reRequire("../../sim/dex").Dex;
+        global.TeamValidator = reRequire("../../sim/team-validator").TeamValidator;
         Rooms.global.formatList = "";
         void TeamValidatorAsync.PM.respawn();
         void Rooms.PM.respawn();
         void Chat.plugins.datasearch?.PM?.respawn();
-        global.Teams = require("../../sim/teams").Teams;
+        global.Teams = reRequire("../../sim/teams").Teams;
         Rooms.global.sendAll(Rooms.global.formatListText);
         this.sendReply("DONE");
       } else if (target2 === "loginserver") {
         this.sendReply("Hotpatching loginserver...");
         (0, import_lib.FS)("config/custom.css").unwatch();
-        global.LoginServer = require("../loginserver").LoginServer;
+        global.LoginServer = reRequire("../loginserver").LoginServer;
         this.sendReply("DONE. New login server requests will use the new code.");
       } else if (target2 === "learnsets" || target2 === "validator") {
         if (lock["validator"]) {
@@ -717,18 +729,18 @@ ${buf}`);
         }
         this.sendReply("Hotpatching validator...");
         void TeamValidatorAsync.PM.respawn();
-        global.Teams = require("../../sim/teams").Teams;
+        global.Teams = reRequire("../../sim/teams").Teams;
         this.sendReply("DONE. Any battles started after now will have teams be validated according to the new code.");
       } else if (target2 === "punishments") {
         if (lock["punishments"]) {
           throw new Chat.ErrorMessage(`Hot-patching punishments has been disabled by ${lock["punishments"].by} (${lock["punishments"].reason})`);
         }
         this.sendReply("Hotpatching punishments...");
-        global.Punishments = require("../punishments").Punishments;
+        global.Punishments = reRequire("../punishments").Punishments;
         this.sendReply("DONE");
       } else if (target2 === "dnsbl" || target2 === "datacenters" || target2 === "iptools") {
         this.sendReply("Hotpatching ip-tools...");
-        global.IPTools = require("../ip-tools").IPTools;
+        global.IPTools = reRequire("../ip-tools").IPTools;
         void IPTools.loadHostsAndRanges();
         this.sendReply("DONE");
       } else if (target2 === "modlog") {
@@ -1447,125 +1459,7 @@ exports.Learnsets = {
       throw new Chat.ErrorMessage("/editbattle - This is not a battle room.");
     }
     const battle2 = room2.battle;
-    let cmd;
-    [cmd, target2] = import_lib.Utils.splitFirst(target2, " ");
-    if (cmd.endsWith(",")) cmd = cmd.slice(0, -1);
-    const targets = target2.split(",");
-    if (targets.length === 1 && targets[0] === "") targets.pop();
-    let player, pokemon, move, stat, value;
-    switch (cmd) {
-      case "hp":
-      case "h":
-        if (targets.length !== 3) {
-          this.errorReply("Incorrect command use");
-          return this.parse("/help editbattle");
-        }
-        [player, pokemon, value] = targets.map((f) => f.trim());
-        [player, pokemon] = [player, pokemon].map(toID);
-        void battle2.stream.write(
-          `>eval let p=pokemon('${player}', '${pokemon}');p.sethp(${parseInt(value)});if (p.isActive)battle.add('-damage',p,p.getHealth);`
-        );
-        break;
-      case "status":
-      case "s":
-        if (targets.length !== 3) {
-          this.errorReply("Incorrect command use");
-          return this.parse("/help editbattle");
-        }
-        [player, pokemon, value] = targets.map(toID);
-        void battle2.stream.write(
-          `>eval let pl=player('${player}');let p=pokemon(pl,'${pokemon}');p.setStatus('${value}');if (!p.isActive){battle.add('','please ignore the above');battle.add('-status',pl.active[0],pl.active[0].status,'[silent]');}`
-        );
-        break;
-      case "pp":
-        if (targets.length !== 4) {
-          this.errorReply("Incorrect command use");
-          return this.parse("/help editbattle");
-        }
-        [player, pokemon, move, value] = targets.map((f) => f.trim());
-        [player, pokemon, move] = [player, pokemon, move].map(toID);
-        void battle2.stream.write(
-          `>eval pokemon('${player}','${pokemon}').getMoveData('${move}').pp = ${parseInt(value)};`
-        );
-        break;
-      case "boost":
-      case "b":
-        if (targets.length !== 4) {
-          this.errorReply("Incorrect command use");
-          return this.parse("/help editbattle");
-        }
-        [player, pokemon, stat, value] = targets.map((f) => f.trim());
-        [player, pokemon, stat] = [player, pokemon, stat].map(toID);
-        void battle2.stream.write(
-          `>eval let p=pokemon('${player}','${pokemon}');battle.boost({${stat}:${parseInt(value)}},p)`
-        );
-        break;
-      case "volatile":
-      case "v":
-        if (targets.length !== 3) {
-          this.errorReply("Incorrect command use");
-          return this.parse("/help editbattle");
-        }
-        [player, pokemon, value] = targets.map(toID);
-        void battle2.stream.write(
-          `>eval pokemon('${player}','${pokemon}').addVolatile('${value}')`
-        );
-        break;
-      case "sidecondition":
-      case "sc":
-        if (targets.length !== 2) {
-          this.errorReply("Incorrect command use");
-          return this.parse("/help editbattle");
-        }
-        [player, value] = targets.map(toID);
-        void battle2.stream.write(`>eval player('${player}').addSideCondition('${value}', 'debug')`);
-        break;
-      case "fieldcondition":
-      case "pseudoweather":
-      case "fc":
-        if (targets.length !== 1) {
-          this.errorReply("Incorrect command use");
-          return this.parse("/help editbattle");
-        }
-        [value] = targets.map(toID);
-        void battle2.stream.write(`>eval battle.field.addPseudoWeather('${value}', 'debug')`);
-        break;
-      case "weather":
-      case "w":
-        if (targets.length !== 1) {
-          this.errorReply("Incorrect command use");
-          return this.parse("/help editbattle");
-        }
-        [value] = targets.map(toID);
-        void battle2.stream.write(`>eval battle.field.setWeather('${value}', 'debug')`);
-        break;
-      case "terrain":
-      case "t":
-        if (targets.length !== 1) {
-          this.errorReply("Incorrect command use");
-          return this.parse("/help editbattle");
-        }
-        [value] = targets.map(toID);
-        void battle2.stream.write(`>eval battle.field.setTerrain('${value}', 'debug')`);
-        break;
-      case "reseed":
-        if (targets.length !== 0) {
-          if (targets.length !== 4) {
-            this.errorReply("Seed must have 4 parts");
-            return this.parse("/help editbattle");
-          }
-          if (!targets.every((val) => /^[0-9]{1,5}$/.test(val))) {
-            this.errorReply("Seed parts much be unsigned 16-bit integers");
-            return this.parse("/help editbattle");
-          }
-        }
-        void battle2.stream.write(`>reseed ${targets.join(",")}`);
-        if (targets.length) this.sendReply(`Reseeded to ${targets.join(",")}`);
-        break;
-      default:
-        this.errorReply(`Unknown editbattle command: ${cmd}`);
-        return this.parse("/help editbattle");
-    }
+    void battle2.stream.write(`>editbattle user:${user2.name}, ${target2}`);
   },
   editbattlehelp: [
     `/editbattle hp [player], [pokemon], [hp]`,

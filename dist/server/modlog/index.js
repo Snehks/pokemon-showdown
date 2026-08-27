@@ -110,7 +110,7 @@ const PUNISHMENTS = [
   "UNNAMELOCK",
   "PERMABLACKLIST"
 ];
-const PM = (0, import_lib.SQL)("modlog", module, {
+const database = (0, import_lib.SQL)("modlog", module, {
   file: MODLOG_DB_PATH,
   extension: "server/modlog/transactions.js",
   sqliteOptions: Config.modlogsqliteoptions,
@@ -129,7 +129,7 @@ class Modlog {
     this.globalPunishmentsSearchQuery = null;
     this.queuedEntries = [];
     this.databaseReady = false;
-    this.database = PM;
+    this.database = database;
     this.readyPromise = null;
   }
   setup() {
@@ -423,7 +423,7 @@ class Modlog {
   }
 }
 const mainModlog = new Modlog();
-if (!PM.isParentProcess) {
+if (!database.isParentProcess) {
   ConfigLoader.ensureLoaded();
   global.Monitor = {
     crashlog(error, source = "A modlog child process", details = null) {
@@ -444,14 +444,14 @@ function start(processCount) {
   if (!Config.usesqlite || !Config.usesqlitemodlog) {
     return;
   }
-  PM.spawn(processCount["modlog"] ?? 1);
+  database.spawn(processCount["modlog"] ?? 1);
   mainModlog.setup();
 }
 function restart() {
-  void PM.respawn();
+  void database.respawn();
   mainModlog.setup();
 }
 function destroy() {
-  void PM.destroy();
+  void database.destroy();
 }
 //# sourceMappingURL=index.js.map

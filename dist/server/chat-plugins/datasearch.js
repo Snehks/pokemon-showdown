@@ -37,8 +37,6 @@ __export(datasearch_exports, {
 module.exports = __toCommonJS(datasearch_exports);
 var ConfigLoader = __toESM(require("../config-loader"));
 var import_lib = require("../../lib");
-var import_team_validator = require("../../sim/team-validator");
-var import_chat = require("../chat");
 /**
  * Data searching commands.
  * Pokemon Showdown - http://pokemonshowdown.com/
@@ -93,7 +91,7 @@ const commands = {
   async dexsearch(target, room, user, connection, cmd2, message) {
     this.checkBroadcast();
     if (!target) return this.parse("/help dexsearch");
-    if (target.length > 300) throw new import_chat.Chat.ErrorMessage("Dexsearch queries may not be longer than 300 characters.");
+    if (target.length > 300) throw new Chat.ErrorMessage("Dexsearch queries may not be longer than 300 characters.");
     const targetGen = parseInt(cmd2[cmd2.length - 1]);
     if (targetGen) target += `, mod=gen${targetGen}`;
     const split = target.split(",").map((term) => term.trim());
@@ -120,11 +118,11 @@ const commands = {
     }, user);
     if (!response.error && !this.runBroadcast()) return;
     if (response.error) {
-      throw new import_chat.Chat.ErrorMessage(response.error);
+      throw new Chat.ErrorMessage(response.error);
     } else if (response.reply) {
       this.sendReplyBox(response.reply);
     } else if (response.dt) {
-      import_chat.Chat.commands.data.call(
+      Chat.commands.data.call(
         this,
         response.dt,
         room,
@@ -152,10 +150,10 @@ const commands = {
       if (!arg) continue;
       const num = Number(arg);
       if (Number.isInteger(num)) {
-        if (qty) throw new import_chat.Chat.ErrorMessage("Only specify the number of Pok\xE9mon Moves once.");
+        if (qty) throw new Chat.ErrorMessage("Only specify the number of Pok\xE9mon Moves once.");
         qty = num;
         if (qty < 1 || MAX_RANDOM_RESULTS < qty) {
-          throw new import_chat.Chat.ErrorMessage(`Number of random Pok\xE9mon Moves must be between 1 and ${MAX_RANDOM_RESULTS}.`);
+          throw new Chat.ErrorMessage(`Number of random Pok\xE9mon Moves must be between 1 and ${MAX_RANDOM_RESULTS}.`);
         }
         targetsBuffer.push(`random${qty}`);
       } else {
@@ -175,11 +173,11 @@ const commands = {
     }, user);
     if (!response.error && !this.runBroadcast(true)) return;
     if (response.error) {
-      throw new import_chat.Chat.ErrorMessage(response.error);
+      throw new Chat.ErrorMessage(response.error);
     } else if (response.reply) {
       this.sendReplyBox(response.reply);
     } else if (response.dt) {
-      import_chat.Chat.commands.data.call(
+      Chat.commands.data.call(
         this,
         response.dt,
         room,
@@ -207,10 +205,10 @@ const commands = {
       if (!arg) continue;
       const num = Number(arg);
       if (Number.isInteger(num)) {
-        if (qty) throw new import_chat.Chat.ErrorMessage("Only specify the number of Pok\xE9mon once.");
+        if (qty) throw new Chat.ErrorMessage("Only specify the number of Pok\xE9mon once.");
         qty = num;
         if (qty < 1 || MAX_RANDOM_RESULTS < qty) {
-          throw new import_chat.Chat.ErrorMessage(`Number of random Pok\xE9mon must be between 1 and ${MAX_RANDOM_RESULTS}.`);
+          throw new Chat.ErrorMessage(`Number of random Pok\xE9mon must be between 1 and ${MAX_RANDOM_RESULTS}.`);
         }
         targetsBuffer.push(`random${qty}`);
       } else {
@@ -230,11 +228,11 @@ const commands = {
     }, user);
     if (!response.error && !this.runBroadcast(true)) return;
     if (response.error) {
-      throw new import_chat.Chat.ErrorMessage(response.error);
+      throw new Chat.ErrorMessage(response.error);
     } else if (response.reply) {
       this.sendReplyBox(response.reply);
     } else if (response.dt) {
-      import_chat.Chat.commands.data.call(
+      Chat.commands.data.call(
         this,
         response.dt,
         room,
@@ -261,10 +259,10 @@ const commands = {
       if (!arg) continue;
       const num = Number(arg);
       if (Number.isInteger(num)) {
-        if (qty) throw new import_chat.Chat.ErrorMessage("Only specify the number of abilities once.");
+        if (qty) throw new Chat.ErrorMessage("Only specify the number of abilities once.");
         qty = num;
         if (qty < 1 || MAX_RANDOM_RESULTS < qty) {
-          throw new import_chat.Chat.ErrorMessage(`Number of random abilities must be between 1 and ${MAX_RANDOM_RESULTS}.`);
+          throw new Chat.ErrorMessage(`Number of random abilities must be between 1 and ${MAX_RANDOM_RESULTS}.`);
         }
         targetsBuffer.push(`random${qty}`);
       } else {
@@ -279,11 +277,11 @@ const commands = {
     });
     if (!response.error && !this.runBroadcast(true)) return;
     if (response.error) {
-      throw new import_chat.Chat.ErrorMessage(response.error);
+      throw new Chat.ErrorMessage(response.error);
     } else if (response.reply) {
       this.sendReplyBox(response.reply);
     } else if (response.dt) {
-      import_chat.Chat.commands.data.call(
+      Chat.commands.data.call(
         this,
         response.dt,
         room,
@@ -337,11 +335,11 @@ const commands = {
     }, user);
     if (!response.error && !this.runBroadcast()) return;
     if (response.error) {
-      throw new import_chat.Chat.ErrorMessage(response.error);
+      throw new Chat.ErrorMessage(response.error);
     } else if (response.reply) {
       this.sendReplyBox(response.reply);
     } else if (response.dt) {
-      import_chat.Chat.commands.data.call(
+      Chat.commands.data.call(
         this,
         response.dt,
         room,
@@ -379,11 +377,11 @@ const commands = {
     }, user);
     if (!response.error && !this.runBroadcast()) return;
     if (response.error) {
-      throw new import_chat.Chat.ErrorMessage(response.error);
+      throw new Chat.ErrorMessage(response.error);
     } else if (response.reply) {
       this.sendReplyBox(response.reply);
     } else if (response.dt) {
-      import_chat.Chat.commands.data.call(
+      Chat.commands.data.call(
         this,
         response.dt,
         room,
@@ -410,10 +408,10 @@ const commands = {
       if (!arg) continue;
       const num = Number(arg);
       if (Number.isInteger(num)) {
-        if (qty) throw new import_chat.Chat.ErrorMessage("Only specify the number of items once.");
+        if (qty) throw new Chat.ErrorMessage("Only specify the number of items once.");
         qty = num;
         if (qty < 1 || MAX_RANDOM_RESULTS < qty) {
-          throw new import_chat.Chat.ErrorMessage(`Number of random items must be between 1 and ${MAX_RANDOM_RESULTS}.`);
+          throw new Chat.ErrorMessage(`Number of random items must be between 1 and ${MAX_RANDOM_RESULTS}.`);
         }
         targetsBuffer.push(`random${qty}`);
       } else {
@@ -428,11 +426,11 @@ const commands = {
     });
     if (!response.error && !this.runBroadcast(true)) return;
     if (response.error) {
-      throw new import_chat.Chat.ErrorMessage(response.error);
+      throw new Chat.ErrorMessage(response.error);
     } else if (response.reply) {
       this.sendReplyBox(response.reply);
     } else if (response.dt) {
-      import_chat.Chat.commands.data.call(
+      Chat.commands.data.call(
         this,
         response.dt,
         room,
@@ -469,11 +467,11 @@ const commands = {
     }, user);
     if (!response.error && !this.runBroadcast()) return;
     if (response.error) {
-      throw new import_chat.Chat.ErrorMessage(response.error);
+      throw new Chat.ErrorMessage(response.error);
     } else if (response.reply) {
       this.sendReplyBox(response.reply);
     } else if (response.dt) {
-      import_chat.Chat.commands.data.call(
+      Chat.commands.data.call(
         this,
         response.dt,
         room,
@@ -510,7 +508,7 @@ const commands = {
   sslearn: "learn",
   async learn(target, room, user, connection, cmd2, message) {
     if (!target) return this.parse("/help learn");
-    if (target.length > 300) throw new import_chat.Chat.ErrorMessage(`Query too long.`);
+    if (target.length > 300) throw new Chat.ErrorMessage(`Query too long.`);
     const GENS = { rby: 1, gsc: 2, adv: 3, dpp: 4, bw2: 5, oras: 6, usum: 7, ss: 8 };
     let cmdGen = GENS[cmd2.slice(0, -5)];
     if (cmdGen) target = `gen${cmdGen}, ${target}`;
@@ -527,7 +525,7 @@ const commands = {
     }, user);
     if (!response.error && !this.runBroadcast()) return;
     if (response.error) {
-      throw new import_chat.Chat.ErrorMessage(response.error);
+      throw new Chat.ErrorMessage(response.error);
     } else if (response.reply) {
       this.sendReplyBox(response.reply);
     }
@@ -552,10 +550,10 @@ const commands = {
       if (!arg) continue;
       const num = Number(arg);
       if (Number.isInteger(num)) {
-        if (qty) throw new import_chat.Chat.ErrorMessage("Only specify the number of types once.");
+        if (qty) throw new Chat.ErrorMessage("Only specify the number of types once.");
         qty = num;
         if (qty < 1 || MAX_RANDOM_RESULTS < qty) {
-          throw new import_chat.Chat.ErrorMessage(`Number of random types must be between 1 and ${MAX_RANDOM_RESULTS}.`);
+          throw new Chat.ErrorMessage(`Number of random types must be between 1 and ${MAX_RANDOM_RESULTS}.`);
         }
         targetsBuffer.push(`random${qty}`);
       } else {
@@ -570,11 +568,11 @@ const commands = {
     });
     if (!response.error && !this.runBroadcast(true)) return;
     if (response.error) {
-      throw new import_chat.Chat.ErrorMessage(response.error);
+      throw new Chat.ErrorMessage(response.error);
     } else if (response.reply) {
       this.sendReplyBox(response.reply);
     } else if (response.dt) {
-      import_chat.Chat.commands.data.call(
+      Chat.commands.data.call(
         this,
         response.dt,
         room,
@@ -634,7 +632,7 @@ function prepareDexsearchValidator(usedMod, rules, nationalSearch) {
   }
   if (nationalSearch && !ruleTable.has("natdexmod")) additionalRules.push("natdexmod");
   if (nationalSearch && ruleTable.valueRules.has("minsourcegen")) additionalRules.push("!!minsourcegen=3");
-  return import_team_validator.TeamValidator.get(`${format}${additionalRules.length ? `@@@${additionalRules.join(",")}` : ""}`);
+  return TeamValidator.get(`${format}${additionalRules.length ? `@@@${additionalRules.join(",")}` : ""}`);
 }
 function runDexsearch(target, cmd2, message, isTest) {
   const searches = [];
@@ -1537,7 +1535,7 @@ function runDexsearch(target, cmd2, message, isTest) {
     if (!isRegionalForm && !maskForm && mon.baseSpecies && results.includes(mod.species.get(mon.baseSpecies)) && getSortValue(mon) === getSortValue(mod.species.get(mon.baseSpecies))) continue;
     const teraFormeChangesFrom = mon.forme.endsWith("Tera") ? !Array.isArray(mon.battleOnly) ? mon.battleOnly : null : null;
     if (teraFormeChangesFrom && results.includes(mod.species.get(teraFormeChangesFrom)) && getSortValue(mon) === getSortValue(mod.species.get(teraFormeChangesFrom))) continue;
-    if (mon.isNonstandard === "Gigantamax" && !allowGmax) continue;
+    if (mon.forme.endsWith("Gmax") && !allowGmax) continue;
     results.push(mon);
   }
   if (usedMod === "gen7letsgo") {
@@ -2111,7 +2109,7 @@ function runMovesearch(target, cmd2, message, isTest) {
   for (const moveid of validMoves) {
     const move = mod.moves.get(moveid);
     if (move.gen <= mod.gen) {
-      if (!nationalSearch && move.isNonstandard && move.isNonstandard !== "Gigantamax" || nationalSearch && move.isNonstandard && !["Gigantamax", "Past", "Unobtainable"].includes(move.isNonstandard) || move.isMax && mod.gen !== 8) {
+      if (!nationalSearch && move.isNonstandard || nationalSearch && move.isNonstandard && !["Past", "Unobtainable"].includes(move.isNonstandard) || move.isMax && mod.gen !== 8) {
         continue;
       } else {
         dex[moveid] = move;
@@ -2781,7 +2779,7 @@ function runAbilitysearch(target, cmd2, message) {
     let descWords = ability.desc || ability.shortDesc || "";
     if (/[1-9.]+x/.test(descWords)) descWords += " increases";
     descWords = descWords.replace(/super[-\s]effective/g, "supereffective");
-    const descWordsArray = import_chat.Chat.normalize(descWords).split(" ");
+    const descWordsArray = import_lib.Utils.normalize(descWords).split(" ");
     for (const word of searchedWords) {
       switch (word) {
         case "specialattack":
@@ -2890,7 +2888,7 @@ function runLearn(target, cmd2, formatid) {
   } else {
     gen = Dex.forFormat(format).gen;
   }
-  const validator = import_team_validator.TeamValidator.get(format);
+  const validator = TeamValidator.get(format);
   const species = validator.dex.species.get(targets.shift());
   const setSources = validator.allSources(species);
   const set = {
@@ -3018,7 +3016,7 @@ function runLearn(target, cmd2, formatid) {
 function runSearch(query, user) {
   if (user) {
     if (user.lastCommand.startsWith("/datasearch ")) {
-      throw new import_chat.Chat.ErrorMessage(
+      throw new Chat.ErrorMessage(
         `You already have a datasearch query pending. Wait until it's complete before running another.`
       );
     }
@@ -3102,6 +3100,7 @@ ${error.stack}`);
     });
   }
   global.Dex = require("../../sim/dex").Dex;
+  global.TeamValidator = require("../../sim/team-validator").TeamValidator;
   global.toID = Dex.toID;
   Dex.includeData();
   PM.startRepl((cmd) => eval(cmd));

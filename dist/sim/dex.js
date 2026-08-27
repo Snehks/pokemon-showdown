@@ -44,6 +44,7 @@ var import_dex_abilities = require("./dex-abilities");
 var import_dex_species = require("./dex-species");
 var import_dex_formats = require("./dex-formats");
 var import_utils = require("../lib/utils");
+var import_tags = require("../data/tags");
 /**
  * Dex
  * Pokemon Showdown - http://pokemonshowdown.com/
@@ -159,8 +160,21 @@ class ModdedDex {
     const mod = this.formats.get(format).mod;
     return dexes[mod || BASE_MOD].includeData();
   }
-  /** `force` is needed to mod data defined by the mod itself (for instance,
-   * if you want to use modData and pokedex.ts on the same pokemon. */
+  /**
+   * Lets the `this` ModdedDex own the requested data entry, by deep-cloning it,
+   * and returns it.
+   *
+   * Includes a fast path in case a copy has already been performed.
+   * If the data entry was copied by `loadData` rather than `modData`
+   * (for instance, if pokedex.ts with inherit: true is used on the same Pokémon),
+   * the fast path will return an unsafe (not owned) shallow clone.
+   *
+   * Make sure the arguments passed to `modData` are safe according to the architecture
+   * of your mod, because the dex loader will not check them for you.
+   *
+   * Note that the `force` parameter disables the fast path, thus
+   * enabling piecewise modding through both techniques: data files and `scripts.ts`.
+   */
   modData(dataType, id, force) {
     if (this.isBase) return this.data[dataType][id];
     if (!force && this.data[dataType][id] !== dexes[this.parentMod].data[dataType][id]) {
@@ -243,6 +257,17 @@ class ModdedDex {
       default:
         return 0;
     }
+  }
+  isTagged(thing, tagName) {
+    const tag = import_tags.Tags[toID(tagName)];
+    if (!tag) return void 0;
+    if (thing.effectType === "Pokemon") {
+      return !!(tag.speciesFilter || tag.genericFilter)?.(thing);
+    }
+    if (thing.effectType === "Move") {
+      return !!(tag.moveFilter || tag.genericFilter)?.(thing);
+    }
+    return !!tag.genericFilter?.(thing);
   }
   getDescs(table, id, dataEntry) {
     if (dataEntry.shortDesc) {

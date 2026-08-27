@@ -35,7 +35,7 @@ const FormatsData = {
     tier: "LC"
   },
   charmeleon: {
-    tier: "ZUBL"
+    tier: "ZU"
   },
   charizard: {
     tier: "UUBL"
@@ -44,7 +44,7 @@ const FormatsData = {
     tier: "LC"
   },
   wartortle: {
-    tier: "PU"
+    tier: "ZU"
   },
   blastoise: {
     tier: "UU"
@@ -131,7 +131,7 @@ const FormatsData = {
     tier: "LC"
   },
   clefairy: {
-    tier: "PU"
+    tier: "ZU"
   },
   clefable: {
     tier: "UUBL"
@@ -185,7 +185,7 @@ const FormatsData = {
     tier: "PU"
   },
   diglett: {
-    tier: "LC"
+    tier: "ZU"
   },
   dugtrio: {
     tier: "NU"
@@ -215,7 +215,7 @@ const FormatsData = {
     tier: "UU"
   },
   poliwag: {
-    tier: "ZUBL"
+    tier: "ZU"
   },
   poliwhirl: {
     tier: "PUBL"
@@ -227,7 +227,7 @@ const FormatsData = {
     tier: "UU"
   },
   abra: {
-    tier: "PU"
+    tier: "ZU"
   },
   kadabra: {
     tier: "UU"
@@ -260,7 +260,7 @@ const FormatsData = {
     tier: "UUBL"
   },
   geodude: {
-    tier: "PU"
+    tier: "ZU"
   },
   graveler: {
     tier: "NU"
@@ -275,7 +275,7 @@ const FormatsData = {
     tier: "NU"
   },
   slowpoke: {
-    tier: "LC"
+    tier: "ZU"
   },
   slowbro: {
     tier: "UU"
@@ -344,7 +344,7 @@ const FormatsData = {
     tier: "NU"
   },
   voltorb: {
-    tier: "PU"
+    tier: "ZU"
   },
   electrode: {
     tier: "UU"
@@ -416,7 +416,7 @@ const FormatsData = {
     tier: "PU"
   },
   staryu: {
-    tier: "ZUBL"
+    tier: "ZU"
   },
   starmie: {
     tier: "OU"
@@ -443,7 +443,7 @@ const FormatsData = {
     tier: "UU"
   },
   magby: {
-    tier: "ZU"
+    tier: "LC"
   },
   magmar: {
     tier: "NU"
@@ -488,7 +488,7 @@ const FormatsData = {
     tier: "NU"
   },
   porygon2: {
-    tier: "UUBL"
+    tier: "(OU)"
   },
   omanyte: {
     tier: "ZU"
@@ -536,7 +536,7 @@ const FormatsData = {
     tier: "LC"
   },
   bayleef: {
-    tier: "PU"
+    tier: "ZU"
   },
   meganium: {
     tier: "UUBL"
@@ -581,7 +581,7 @@ const FormatsData = {
     tier: "LC"
   },
   ariados: {
-    tier: "ZUBL"
+    tier: "ZU"
   },
   chinchou: {
     tier: "NU"
@@ -635,7 +635,7 @@ const FormatsData = {
     tier: "LC"
   },
   sunflora: {
-    tier: "PU"
+    tier: "ZU"
   },
   yanma: {
     tier: "ZU"
@@ -692,7 +692,7 @@ const FormatsData = {
     tier: "PU"
   },
   teddiursa: {
-    tier: "LC"
+    tier: "ZU"
   },
   ursaring: {
     tier: "UUBL"
@@ -722,13 +722,13 @@ const FormatsData = {
     tier: "PU"
   },
   mantine: {
-    tier: "ZUBL"
+    tier: "PU"
   },
   skarmory: {
     tier: "OU"
   },
   houndour: {
-    tier: "PU"
+    tier: "ZU"
   },
   houndoom: {
     tier: "UUBL"

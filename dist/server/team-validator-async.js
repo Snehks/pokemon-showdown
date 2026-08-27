@@ -29,6 +29,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var team_validator_async_exports = {};
 __export(team_validator_async_exports, {
   PM: () => PM,
+  TeamValidator: () => import_team_validator.TeamValidator,
   TeamValidatorAsync: () => TeamValidatorAsync,
   destroy: () => destroy,
   get: () => get,

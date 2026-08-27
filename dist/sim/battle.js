@@ -416,7 +416,7 @@ class Battle {
       this.debug(eventid + " handler suppressed by Mold Breaker");
       return relayVar;
     }
-    if (eventid !== "Start" && eventid !== "TakeItem" && effect.effectType === "Item" && target instanceof import_pokemon.Pokemon && target.ignoringItem()) {
+    if (eventid !== "Start" && eventid !== "TakeItem" && eventid !== "SetAbility" && effect.effectType === "Item" && target instanceof import_pokemon.Pokemon && target.ignoringItem()) {
       this.debug(eventid + " handler suppressed by Embargo, Klutz or Magic Room");
       return relayVar;
     }
@@ -1069,6 +1069,15 @@ class Battle {
       return false;
     }
     return !!move.flags["contact"];
+  }
+  checkMoveBypassesProtect(move, attacker, defender, blockStatus = true) {
+    if ((move.category !== "Status" || blockStatus) && move.flags["protect"] && this.runEvent("HitProtect", attacker, defender, move)) {
+      return false;
+    }
+    if (move.isZOrMaxPowered && !["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) {
+      defender.getMoveHitData(move).bypassProtect = true;
+    }
+    return true;
   }
   skillSwap(source, target) {
     if (source.fainted || target.fainted) return false;
@@ -1726,7 +1735,7 @@ class Battle {
         continue;
       }
       if (targetDamage !== 0) targetDamage = this.clampIntRange(targetDamage, 1);
-      if (effect.id !== "struggle-recoil") {
+      if (effect.id !== "strugglerecoil") {
         if (effect.effectType === "Weather" && !target.runStatusImmunity(effect.id)) {
           this.debug("weather immunity");
           retVals[i] = 0;
@@ -1770,12 +1779,6 @@ class Battle {
           break;
       }
       if (targetDamage && effect.effectType === "Move") {
-        if (this.gen <= 1 && effect.recoil && source) {
-          if (this.dex.currentMod !== "gen1stadium" || target.hp > 0) {
-            const amount = this.clampIntRange(Math.floor(targetDamage * effect.recoil[0] / effect.recoil[1]), 1);
-            this.damage(amount, source, target, "recoil");
-          }
-        }
         if (this.gen <= 4 && effect.drain && source) {
           const amount = this.clampIntRange(Math.floor(targetDamage * effect.drain[0] / effect.drain[1]), 1);
           if (this.gen <= 1) this.lastDamage = amount;
@@ -1795,16 +1798,7 @@ class Battle {
           this.faintMessages(true);
           if (this.gen <= 2) {
             target.faint();
-            if (this.gen <= 1) {
-              this.queue.clear();
-              for (const pokemon of this.getAllActive()) {
-                if (pokemon.volatiles["bide"]?.damage) {
-                  pokemon.volatiles["bide"].damage = 0;
-                  this.hint("Desync Clause Mod activated!");
-                  this.hint("In Gen 1, Bide's accumulated damage is reset to 0 when a Pokemon faints.");
-                }
-              }
-            }
+            if (this.gen <= 1) this.queue.clear();
           }
         }
       }
@@ -1968,6 +1962,12 @@ class Battle {
       }
     }
     return stat;
+  }
+  calculatePP(move, ppUps = 3) {
+    if (move.noPPBoosts) return move.pp;
+    let pp = move.pp * (5 + ppUps) / 5;
+    if (this.gen <= 2 && move.pp === 40) pp -= ppUps;
+    return pp;
   }
   finalModify(relayVar) {
     relayVar = this.modify(relayVar, this.event.modifier);
@@ -2155,13 +2155,6 @@ class Battle {
     }
     if (this.gen <= 1) {
       this.queue.clear();
-      for (const pokemon of this.getAllActive()) {
-        if (pokemon.volatiles["bide"]?.damage) {
-          pokemon.volatiles["bide"].damage = 0;
-          this.hint("Desync Clause Mod activated!");
-          this.hint("In Gen 1, Bide's accumulated damage is reset to 0 when a Pokemon faints.");
-        }
-      }
     } else if (this.gen <= 3 && this.gameType === "singles") {
       for (const pokemon of this.getAllActive()) {
         if (this.gen <= 2) {
@@ -2220,7 +2213,11 @@ class Battle {
     if (!action.pokemon) {
       action.speed = 1;
     } else {
-      action.speed = action.pokemon.getActionSpeed();
+      if (this.gen <= 4 && action.choice === "move" && action.fractionalPriority < 0) {
+        action.speed = -action.pokemon.getStat("spe", false, false);
+      } else {
+        action.speed = action.pokemon.getActionSpeed();
+      }
     }
   }
   runAction(action) {
@@ -2693,14 +2690,14 @@ class Battle {
           item: set.item,
           ability: set.ability,
           moves: set.moves,
-          nature: "",
+          nature: this.format.mod.startsWith("champions") ? set.nature : "",
           gender: pokemon.gender,
           evs: null,
           ivs: null,
           level: set.level
         };
-        if (this.gen === 8) newSet.gigantamax = set.gigantamax;
-        if (this.gen === 9) newSet.teraType = set.teraType;
+        if (this.gen === 8 && !this.ruleTable.has("dynamaxclause")) newSet.gigantamax = set.gigantamax;
+        if (this.gen === 9 && !this.ruleTable.has("terastalclause")) newSet.teraType = set.teraType;
         if (set.moves.some((m) => this.dex.moves.get(m).id === "hiddenpower")) newSet.hpType = set.hpType;
         if ((0, import_dex.toID)(set.species) === "zacian" && (0, import_dex.toID)(set.item) === "rustedsword" || (0, import_dex.toID)(set.species) === "zamazenta" && (0, import_dex.toID)(set.item) === "rustedshield") {
           newSet.species = import_dex.Dex.species.get(set.species + "crowned").name;
@@ -2802,7 +2799,7 @@ class Battle {
    * https://www.smogon.com/forums/threads/10352797
    */
   getOverflowedTurnCount() {
-    return this.gen >= 8 ? (this.turn - 1) % 256 : this.turn - 1;
+    return this.gen >= 8 ? this.trunc(this.turn - 1, 8) : this.turn - 1;
   }
   initEffectState(obj, effectOrder) {
     if (!obj.id) obj.id = "";

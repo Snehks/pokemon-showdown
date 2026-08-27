@@ -27,11 +27,7 @@ const Moves = {
     condition: {
       inherit: true,
       onTryHit(target, source, move) {
-        if (!move.flags["protect"]) {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
-          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
-          return;
-        }
+        if (this.checkMoveBypassesProtect(move, source, target)) return;
         if (move.smartTarget) {
           move.smartTarget = false;
         } else {
@@ -62,11 +58,7 @@ const Moves = {
     condition: {
       inherit: true,
       onTryHit(target, source, move) {
-        if (!move.flags["protect"] || move.category === "Status") {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
-          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
-          return;
-        }
+        if (this.checkMoveBypassesProtect(move, source, target, false)) return;
         if (move.smartTarget) {
           move.smartTarget = false;
         } else {
@@ -97,11 +89,7 @@ const Moves = {
     condition: {
       inherit: true,
       onTryHit(target, source, move) {
-        if (!move.flags["protect"] || move.category === "Status") {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
-          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
-          return;
-        }
+        if (this.checkMoveBypassesProtect(move, source, target, false)) return;
         if (move.smartTarget) {
           move.smartTarget = false;
         } else {
@@ -209,11 +197,7 @@ const Moves = {
     condition: {
       inherit: true,
       onTryHit(target, source, move) {
-        if (!move.flags["protect"] || move.category === "Status") {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
-          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
-          return;
-        }
+        if (this.checkMoveBypassesProtect(move, source, target, false)) return;
         if (move.smartTarget) {
           move.smartTarget = false;
         } else {
@@ -244,11 +228,7 @@ const Moves = {
     condition: {
       inherit: true,
       onTryHit(target, source, move) {
-        if (!move.flags["protect"]) {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
-          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
-          return;
-        }
+        if (this.checkMoveBypassesProtect(move, source, target)) return;
         if (move.smartTarget) {
           move.smartTarget = false;
         } else {
@@ -276,10 +256,7 @@ const Moves = {
     condition: {
       inherit: true,
       onTryHit(target, source, move) {
-        if (!move.flags["protect"] || move.category === "Status") {
-          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
-          return;
-        }
+        if (this.checkMoveBypassesProtect(move, source, target, false)) return;
         if (move.smartTarget) {
           move.smartTarget = false;
         } else {
@@ -310,11 +287,7 @@ const Moves = {
     condition: {
       inherit: true,
       onTryHit(target, source, move) {
-        if (!move.flags["protect"]) {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
-          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
-          return;
-        }
+        if (this.checkMoveBypassesProtect(move, source, target)) return;
         if (move.smartTarget) {
           move.smartTarget = false;
         } else {

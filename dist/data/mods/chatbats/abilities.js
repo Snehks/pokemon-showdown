@@ -628,8 +628,7 @@ const Abilities = {
       while (newMoves.length < 8) {
         const newMove = this.sample(moves);
         if (newMove.basePower === 1) continue;
-        if (newMove.isMax === true) continue;
-        if (newMove.isNonstandard === "Gigantamax") continue;
+        if (newMove.isMax) continue;
         if (newMoves.map((x) => x.id).includes(newMove.id)) continue;
         newMoves.push(newMove);
       }

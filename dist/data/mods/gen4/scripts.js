@@ -24,6 +24,17 @@ module.exports = __toCommonJS(scripts_exports);
 const Scripts = {
   inherit: "gen5",
   gen: 4,
+  pokemon: {
+    inherit: true,
+    getActionSpeed() {
+      let speed = this.getStat("spe", false, false);
+      const trickRoomCheck = this.battle.ruleTable.has("twisteddimensionmod") ? !this.battle.field.getPseudoWeather("trickroom") : this.battle.field.getPseudoWeather("trickroom");
+      if (trickRoomCheck) {
+        speed = -speed;
+      }
+      return speed;
+    }
+  },
   actions: {
     inherit: true,
     runSwitch(pokemon) {
@@ -31,12 +42,15 @@ const Scripts = {
       this.battle.runEvent("SwitchIn", pokemon);
       if (this.battle.gen <= 2) {
         for (const poke of this.battle.getAllActive()) poke.lastMove = null;
-        if (this.battle.gen === 1) pokemon.side.lastSelectedMoveSlot = 0;
-        for (const poke of pokemon.foes()) {
-          if (poke.volatiles["partialtrappinglock"] && poke.moveSlots[poke.side.lastSelectedMoveSlot].id === "metronome") {
-            poke.side.lastSelectedMove = "metronome";
-            if (this.battle.queue.willMove(poke)) {
-              this.battle.queue.changeAction(poke, { choice: "move", poke, moveid: "metronome" });
+        if (this.battle.gen === 1) {
+          pokemon.side.lastSelectedMoveSlot = 0;
+          for (const poke of pokemon.foes()) {
+            if (poke.volatiles["partialtrappinglock"] && poke.moveSlots[poke.side.lastSelectedMoveSlot].id === "metronome") {
+              poke.side.lastSelectedMove = "metronome";
+              poke.side.lastEnemySelectedMove = "metronome";
+              if (this.battle.queue.willMove(poke)) {
+                this.battle.queue.changeAction(poke, { choice: "move", poke, moveid: "metronome" });
+              }
             }
           }
         }
@@ -70,7 +84,7 @@ const Scripts = {
         this.battle.debug(`Spread modifier: ${spreadModifier}`);
         baseDamage = this.battle.modify(baseDamage, spreadModifier);
       }
-      baseDamage = this.battle.runEvent("WeatherModifyDamage", pokemon, target, move, baseDamage);
+      baseDamage = this.battle.priorityEvent("WeatherModifyDamage", pokemon, target, move, baseDamage);
       baseDamage += 2;
       const isCrit = target.getMoveHitData(move).crit;
       if (isCrit) {
@@ -173,8 +187,20 @@ const Scripts = {
       }
       return hitResults;
     },
-    calcRecoilDamage(damageDealt, move) {
-      return this.battle.clampIntRange(Math.floor(damageDealt * move.recoil[0] / move.recoil[1]), 1);
+    applyRecoilDamage(damageDealt, move, pokemon) {
+      let recoilDamage = 0;
+      if (move.struggleRecoil) recoilDamage = this.battle.clampIntRange(Math.floor(pokemon.baseMaxhp / 4), 1);
+      else if (move.mindBlownRecoil || move.chloroblastRecoil) recoilDamage = Math.round(pokemon.maxhp / 2);
+      else if (move.recoil) {
+        recoilDamage = this.battle.clampIntRange(Math.floor(damageDealt * move.recoil[0] / move.recoil[1]), 1);
+      } else return null;
+      if (move.struggleRecoil) {
+        this.battle.directDamage(recoilDamage, pokemon, pokemon, { id: "strugglerecoil" });
+      } else {
+        const effect = move.mindBlownRecoil ? this.dex.conditions.get(move.name) : "recoil";
+        this.battle.damage(recoilDamage, pokemon, pokemon, effect);
+      }
+      return recoilDamage;
     }
   }
 };

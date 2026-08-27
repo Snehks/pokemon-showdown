@@ -35,6 +35,7 @@ var import_prng = require("./prng");
  *
  * @license MIT
  */
+const EXISTENCE_TAGS = ["past", "future", "lgpe", "unobtainable", "cap", "custom", "nonexistent"];
 class PokemonSources {
   constructor(sourcesBefore = 0, sourcesAfter = 0) {
     this.sources = [];
@@ -378,7 +379,7 @@ class TeamValidator {
     const ability = dex.abilities.get(set.ability);
     let outOfBattleSpecies = species;
     let tierSpecies = species;
-    if (ability.id === "battlebond" && (0, import_dex.toID)(species.baseSpecies) === "greninja" && this.format.mod !== "gen9legendsou") {
+    if (ability.id === "battlebond" && (0, import_dex.toID)(species.baseSpecies) === "greninja") {
       outOfBattleSpecies = dex.species.get("greninjabond");
       if (ruleTable.has("obtainableformes")) {
         tierSpecies = outOfBattleSpecies;
@@ -391,7 +392,7 @@ class TeamValidator {
       }
     }
     if (ruleTable.has("obtainableformes")) {
-      const canMegaEvo = dex.gen <= 7 || ruleTable.has("+pokemontag:past");
+      const canMegaEvo = dex.gen <= 7 || ruleTable.has("+tag:past");
       if (item.megaStone?.[species.name]) {
         tierSpecies = dex.species.get(item.megaStone[species.name]);
       } else if (item.id === "redorb" && species.id === "groudon") {
@@ -428,7 +429,10 @@ class TeamValidator {
       if (set.name === set.species) {
         set.name = species.baseSpecies;
       } else {
-        problems.push(`Nickname "${set.name}" too long (should be 18 characters or fewer)`);
+        problems.push(`${set.species}'s nickname "${set.name}" is too long.`);
+        problems.push(
+          `(It's ${set.name.length} characters long, but should be 18 or less. Some characters, like emojis, may count as more than one.)`
+        );
       }
     }
     set.name = dex.getName(set.name);
@@ -529,7 +533,7 @@ class TeamValidator {
         set.hpType = type.name;
       }
     }
-    if (this.gen === 9 && !ruleTable.has("terastalclause") || ruleTable.has("bonustypemod")) {
+    if (this.gen === 9 && !dex.currentMod.startsWith("champions") && !ruleTable.has("terastalclause") || ruleTable.has("bonustypemod")) {
       const type = dex.types.get(set.teraType || species.requiredTeraType || species.types[0]);
       if (!type.exists || type.isNonstandard) {
         problems.push(`${name}'s Terastal type (${set.teraType}) is invalid.`);
@@ -554,6 +558,7 @@ class TeamValidator {
         }
       }
     }
+    let rockHeadBasculin = false;
     if (!set.ability) set.ability = "No Ability";
     if (ruleTable.has("obtainableabilities")) {
       if (dex.gen <= 2 || dex.currentMod === "gen7letsgo") {
@@ -591,13 +596,34 @@ class TeamValidator {
         } else {
           setSources.isHidden = false;
         }
+        if (dex.currentMod === "gen5bw1" && species.id === "basculinbluestriped" && set.ability === "Rock Head") {
+          const eventData = {
+            generation: 5,
+            level: 25,
+            gender: "M",
+            ivs: { hp: 20, atk: 31, def: 20, spa: 20, spd: 20, spe: 20 },
+            nature: "Adamant"
+          };
+          const eventProblems = this.validateEvent(
+            set,
+            setSources,
+            eventData,
+            species,
+            ` to have Rock Head`,
+            `from an in-game trade`
+          );
+          if (eventProblems) problems.push(...eventProblems);
+          rockHeadBasculin = true;
+        }
       }
     }
     ability = dex.abilities.get(set.ability);
     problem = this.checkAbility(set, ability, setHas);
     if (problem) problems.push(problem);
-    if (!set.nature || dex.gen <= 2) {
+    if (dex.gen <= 2) {
       set.nature = "";
+    } else if (!set.nature) {
+      set.nature = "Serious";
     }
     nature = dex.natures.get(set.nature);
     problem = this.checkNature(set, nature, setHas);
@@ -856,7 +882,7 @@ class TeamValidator {
       if (setSources.isHidden && !canUseAbilityPatch && setSources.maxSourceGen() < 5) {
         problems.push(`${name} has a Hidden Ability - it can't use moves from before Gen 5.`);
       }
-      if (species.maleOnlyHidden && setSources.isHidden && setSources.sourcesBefore < 5 && setSources.sources.every((source) => source.charAt(1) === "E")) {
+      if ((species.maleOnlyHidden && setSources.isHidden || rockHeadBasculin) && setSources.sourcesBefore < 5 && setSources.sources.every((source) => source.charAt(1) === "E")) {
         problems.push(`${name} has an unbreedable Hidden Ability - it can't use egg moves.`);
       }
     }
@@ -917,6 +943,7 @@ class TeamValidator {
     const ruleTable = this.ruleTable;
     const dex = this.dex;
     const allowAVs = !ruleTable.has("lgpenormalrules");
+    const useStatPoints = dex.currentMod.startsWith("champions");
     const evLimit = ruleTable.evLimit;
     const canBottleCap = dex.gen >= 7 && (set.level >= (dex.gen < 9 ? 100 : 50) || !ruleTable.has("obtainablemisc"));
     if (!set.evs) set.evs = TeamValidator.fillStats(null, evLimit === null ? 252 : 0);
@@ -924,6 +951,9 @@ class TeamValidator {
     const problems = [];
     const name = set.name || set.species;
     const maxedIVs = Object.values(set.ivs).every((stat) => stat === 31);
+    if (useStatPoints && !maxedIVs) {
+      problems.push(`${name}'s IVs are not maxed out, but this format requires all IVs to be 31.`);
+    }
     for (const moveName of set.moves) {
       const move = dex.moves.get(moveName);
       if (move.id === "hiddenpower" && move.type !== "Normal") {
@@ -1053,7 +1083,8 @@ class TeamValidator {
     }
     for (const stat in set.evs) {
       if (set.evs[stat] < 0) {
-        problems.push(`${name} has less than 0 ${allowAVs ? "Awakening Values" : "EVs"} in ${import_dex.Dex.stats.names[stat]}.`);
+        const statValue = allowAVs ? "Awakening Values" : useStatPoints ? "Stat Points" : "EVs";
+        problems.push(`${name} has less than 0 ${statValue} in ${import_dex.Dex.stats.names[stat]}.`);
       }
     }
     if (dex.currentMod === "gen7letsgo") {
@@ -1063,6 +1094,12 @@ class TeamValidator {
           break;
         } else if (set.evs[stat] > 200) {
           problems.push(`${name} has more than 200 Awakening Values in ${import_dex.Dex.stats.names[stat]}.`);
+        }
+      }
+    } else if (useStatPoints) {
+      for (const stat in set.evs) {
+        if (set.evs[stat] > 32) {
+          problems.push(`${name} has more than 32 Stat Points in ${import_dex.Dex.stats.names[stat]}.`);
         }
       }
     } else {
@@ -1085,7 +1122,13 @@ class TeamValidator {
     for (const stat in set.evs) totalEV += set.evs[stat];
     if (!this.format.debug) {
       if (set.level > 1 && evLimit !== 0 && totalEV === 0) {
-        problems.push(`${name} has exactly 0 EVs - did you forget to EV it? (If this was intentional, add exactly 1 to one of your EVs, which won't change its stats but will tell us that it wasn't a mistake).`);
+        if (useStatPoints) {
+          if (set.nature === "Serious") {
+            problems.push(`${name} has exactly 0 Stat Points - did you forget to invest it? (If this was intentional, change your Nature to a different neutral Nature, which won't change its stats but will tell us that it wasn't a mistake).`);
+          }
+        } else {
+          problems.push(`${name} has exactly 0 EVs - did you forget to EV it? (If this was intentional, add exactly 1 to one of your EVs, which won't change its stats but will tell us that it wasn't a mistake).`);
+        }
       } else if (![508, 510].includes(evLimit) && [508, 510].includes(totalEV)) {
         problems.push(`${name} has exactly ${totalEV} EVs, but this format does not restrict you to 510 EVs (If this was intentional, add exactly 1 to one of your EVs, which won't change its stats but will tell us that it wasn't a mistake).`);
       }
@@ -1094,10 +1137,11 @@ class TeamValidator {
       }
     }
     if (evLimit !== null && totalEV > evLimit) {
+      const statName = useStatPoints ? "Stat Points" : "EVs";
       if (!evLimit) {
-        problems.push(`${name} has EVs, which is not allowed by this format.`);
+        problems.push(`${name} has ${statName}, which is not allowed by this format.`);
       } else {
-        problems.push(`${name} has ${totalEV} total EVs, which is more than this format's limit of ${evLimit}.`);
+        problems.push(`${name} has ${totalEV} total ${statName}, which is more than this format's limit of ${evLimit}.`);
       }
     }
     return problems;
@@ -1443,13 +1487,14 @@ class TeamValidator {
     if (tierSpecies !== species) {
       setHas["pokemon:" + tierSpecies.id] = true;
       if (tierSpecies.isMega || tierSpecies.isPrimal) {
-        setHas["pokemontag:mega"] = true;
+        setHas["tag:mega"] = true;
         isMega = true;
       }
     }
     let isGmax = false;
     if (tierSpecies.canGigantamax && set.gigantamax) {
       setHas["pokemon:" + tierSpecies.id + "gmax"] = true;
+      setHas["tag:gigantamax"] = true;
       isGmax = true;
     }
     if (tierSpecies.baseSpecies === "Greninja" && (0, import_dex.toID)(set.ability) === "battlebond") {
@@ -1458,14 +1503,14 @@ class TeamValidator {
     if (tierSpecies.baseSpecies === "Rockruff" && (0, import_dex.toID)(set.ability) === "owntempo") {
       setHas["pokemon:rockruffdusk"] = true;
     }
-    const tier = tierSpecies.tier === "(PU)" ? "ZU" : tierSpecies.tier === "(NU)" ? "PU" : tierSpecies.tier;
-    const tierTag = "pokemontag:" + (0, import_dex.toID)(tier);
+    const tier = tierSpecies.tier;
+    const tierTag = "tag:" + (0, import_dex.toID)(tier);
     setHas[tierTag] = true;
     const doublesTier = tierSpecies.doublesTier === "(DUU)" ? "DNU" : tierSpecies.doublesTier;
-    const doublesTierTag = "pokemontag:" + (0, import_dex.toID)(doublesTier);
+    const doublesTierTag = "tag:" + (0, import_dex.toID)(doublesTier);
     setHas[doublesTierTag] = true;
-    const ndTier = tierSpecies.natDexTier === "(PU)" ? "ZU" : tierSpecies.natDexTier === "(NU)" ? "PU" : tierSpecies.natDexTier;
-    const ndTierTag = "pokemontag:nd" + (0, import_dex.toID)(ndTier);
+    const ndTier = tierSpecies.natDexTier;
+    const ndTierTag = "tag:nd" + (0, import_dex.toID)(ndTier);
     setHas[ndTierTag] = true;
     if (!tierSpecies.canGigantamax && set.gigantamax) {
       return `${tierSpecies.name} cannot Gigantamax but is flagged as being able to.`;
@@ -1483,13 +1528,13 @@ class TeamValidator {
       if (banReason === "") return null;
     }
     if (isMega) {
-      banReason = ruleTable.check("pokemontag:mega", setHas);
+      banReason = ruleTable.check("tag:mega", setHas);
       if (banReason) {
         return `Mega evolutions are ${banReason}.`;
       }
     }
     if (isGmax) {
-      banReason = ruleTable.check("pokemon:" + tierSpecies.id + "gmax");
+      banReason = ruleTable.check("pokemon:" + tierSpecies.id + "gmax") || ruleTable.check("tag:gigantamax", setHas);
       if (banReason) {
         return `Gigantamaxing ${species.name} is ${banReason}.`;
       }
@@ -1504,59 +1549,67 @@ class TeamValidator {
         return null;
       }
     }
-    let nonexistentCheck = import_tags.Tags.nonexistent.genericFilter(tierSpecies) && ruleTable.check("nonexistent");
-    const EXISTENCE_TAG = ["past", "future", "lgpe", "unobtainable", "cap", "custom", "nonexistent"];
-    for (const ruleid of ruleTable.tagRules) {
-      if (ruleid.startsWith("*")) continue;
-      const tagid = ruleid.slice(12);
-      const tag = import_tags.Tags[tagid];
-      if ((tag.speciesFilter || tag.genericFilter)(tierSpecies)) {
-        const existenceTag = EXISTENCE_TAG.includes(tagid);
-        if (ruleid.startsWith("+")) {
-          if (!existenceTag && nonexistentCheck) continue;
-          return null;
-        }
-        if (existenceTag) {
-          nonexistentCheck = "banned";
-          break;
-        }
-        return `${species.name} is tagged ${tag.name}, which is ${ruleTable.check(ruleid.slice(1)) || "banned"}.`;
-      }
-    }
-    if (nonexistentCheck) {
-      if (tierSpecies.isNonstandard === "Past" || tierSpecies.isNonstandard === "Future") {
-        return `${tierSpecies.name} does not exist in Gen ${dex.gen}.`;
-      }
-      if (tierSpecies.isNonstandard === "LGPE") {
-        return `${tierSpecies.name} does not exist in this game, only in Let's Go Pikachu/Eevee.`;
-      }
-      if (tierSpecies.isNonstandard === "CAP") {
-        return `${tierSpecies.name} is a CAP and does not exist in this game.`;
-      }
-      if (tierSpecies.isNonstandard === "Unobtainable") {
-        return `${tierSpecies.name} is not possible to obtain in this game.`;
-      }
-      if (tierSpecies.isNonstandard === "Gigantamax") {
-        return `${tierSpecies.name} is a placeholder for a Gigantamax sprite, not a real Pok\xE9mon. (This message is likely to be a validator bug.)`;
-      }
-      return `${tierSpecies.name} does not exist in this game.`;
-    }
-    if (nonexistentCheck === "") return null;
+    const tagProblem = this.checkTagRules(set, tierSpecies, setHas);
+    if (tagProblem !== void 0) return tagProblem;
     if (tierSpecies.gmaxUnreleased && set.gigantamax) {
-      banReason = ruleTable.check("pokemontag:unobtainable");
+      banReason = ruleTable.check("tag:unobtainable");
       if (banReason) {
         return `${tierSpecies.name} is flagged as gigantamax, but it cannot gigantamax without hacking or glitches.`;
       }
       if (banReason === "") return null;
     }
-    banReason = ruleTable.check("pokemontag:allpokemon");
+    banReason = ruleTable.check("tag:allpokemon");
     if (banReason) {
       return `${species.name} is not in the list of allowed pokemon.`;
     }
     return null;
   }
-  checkItem(set, item, setHas) {
+  checkTagRules(set, thing, setHas) {
     const dex = this.dex;
+    const ruleTable = this.ruleTable;
+    const displayName = thing.effectType === "Pokemon" ? set.name === thing.name ? set.name : `${set.name} (${thing.name})` : `${set.name}'s ${thing.effectType.toLowerCase()} ${thing.name}`;
+    let nonexistentCheck = import_tags.Tags.nonexistent.genericFilter(thing) && ruleTable.check("nonexistent", setHas);
+    for (const [type, match] of ruleTable.tagRules) {
+      if (type === "*") continue;
+      const tagMatches = ruleTable.matchesTagRule(match, thing);
+      if (!tagMatches) continue;
+      const existenceTag = typeof match === "string" && EXISTENCE_TAGS.includes(match);
+      if (type === "+") {
+        if (!existenceTag && nonexistentCheck) continue;
+        return null;
+      }
+      if (existenceTag) {
+        nonexistentCheck = "banned";
+        break;
+      }
+      const banReason = typeof match === "string" ? ruleTable.check(`tag:${match}`) : ruleTable.check(`numtag:${match[0]}${match[1]}${match[2]}`);
+      return `${displayName} ${ruleTable.describeTagRule(match)}, which is ${banReason || "banned"}.`;
+    }
+    if (nonexistentCheck) {
+      if (thing.isNonstandard === "Unobtainable") {
+        if (thing.effectType === "Move") {
+          return `${displayName} is not obtainable without hacking or glitches${dex.gen >= 9 && thing.gen < dex.gen ? ` in Gen ${dex.gen}` : ``}.`;
+        }
+        return `${displayName} is not obtainable without hacking or glitches.`;
+      }
+      if (thing.effectType === "Pokemon" && thing.placeholderFor) {
+        return `${displayName} is a placeholder for a Gigantamax sprite, not a real Pok\xE9mon. (This message is likely a validator bug.)`;
+      }
+      if (thing.isNonstandard === "Past" || thing.isNonstandard === "Future") {
+        return `${displayName} does not exist in Gen ${dex.gen}.`;
+      }
+      if (thing.isNonstandard === "CAP") {
+        return `${displayName} is made up for Smogon CAP and does not exist in this game.`;
+      }
+      if (thing.isNonstandard === "LGPE") {
+        return `${displayName} does not exist in this game, only in Let's Go Pikachu/Eevee.`;
+      }
+      return `${displayName} does not exist in this game.`;
+    }
+    if (nonexistentCheck === "") return null;
+    return void 0;
+  }
+  checkItem(set, item, setHas) {
     const ruleTable = this.ruleTable;
     setHas["item:" + item.id] = true;
     let banReason = ruleTable.check("item:" + (item.id || "noitem"));
@@ -1568,34 +1621,15 @@ class TeamValidator {
     }
     if (banReason === "") return null;
     if (!item.id) return null;
-    banReason = ruleTable.check("pokemontag:allitems");
+    banReason = ruleTable.check("tag:allitems");
     if (banReason) {
       return `${set.name}'s item ${item.name} is not in the list of allowed items.`;
     }
-    if (item.isNonstandard) {
-      banReason = ruleTable.check("pokemontag:" + (0, import_dex.toID)(item.isNonstandard));
-      if (banReason) {
-        if (item.isNonstandard === "Unobtainable") {
-          return `${item.name} is not obtainable without hacking or glitches.`;
-        }
-        return `${set.name}'s item ${item.name} is tagged ${item.isNonstandard}, which is ${banReason}.`;
-      }
-      if (banReason === "") return null;
-    }
-    if (item.isNonstandard && item.isNonstandard !== "Unobtainable") {
-      banReason = ruleTable.check("nonexistent", setHas);
-      if (banReason) {
-        if (["Past", "Future"].includes(item.isNonstandard)) {
-          return `${set.name}'s item ${item.name} does not exist in Gen ${dex.gen}.`;
-        }
-        return `${set.name}'s item ${item.name} does not exist in this game.`;
-      }
-      if (banReason === "") return null;
-    }
+    const tagProblem = this.checkTagRules(set, item, setHas);
+    if (tagProblem !== void 0) return tagProblem;
     return null;
   }
   checkMove(set, move, setHas) {
-    const dex = this.dex;
     const ruleTable = this.ruleTable;
     setHas["move:" + move.id] = true;
     let banReason = ruleTable.check("move:" + move.id);
@@ -1603,33 +1637,12 @@ class TeamValidator {
       return `${set.name}'s move ${move.name} is ${banReason}.`;
     }
     if (banReason === "") return null;
-    banReason = ruleTable.check("pokemontag:allmoves");
+    banReason = ruleTable.check("tag:allmoves");
     if (banReason) {
       return `${set.name}'s move ${move.name} is not in the list of allowed moves.`;
     }
-    if (move.isNonstandard) {
-      banReason = ruleTable.check("pokemontag:" + (0, import_dex.toID)(move.isNonstandard));
-      if (banReason) {
-        if (move.isNonstandard === "Unobtainable") {
-          return `${move.name} is not obtainable without hacking or glitches${dex.gen >= 9 && move.gen < dex.gen ? ` in Gen ${dex.gen}` : ``}.`;
-        }
-        if (move.isNonstandard === "Gigantamax") {
-          return `${move.name} is not usable without Gigantamaxing its user, ${move.isMax}.`;
-        }
-        return `${set.name}'s move ${move.name} is tagged ${move.isNonstandard}, which is ${banReason}.`;
-      }
-      if (banReason === "") return null;
-    }
-    if (move.isNonstandard && move.isNonstandard !== "Unobtainable") {
-      banReason = ruleTable.check("nonexistent", setHas);
-      if (banReason) {
-        if (["Past", "Future"].includes(move.isNonstandard)) {
-          return `${set.name}'s move ${move.name} does not exist in Gen ${dex.gen}.`;
-        }
-        return `${set.name}'s move ${move.name} does not exist in this game.`;
-      }
-      if (banReason === "") return null;
-    }
+    const tagProblem = this.checkTagRules(set, move, setHas);
+    if (tagProblem !== void 0) return tagProblem;
     return null;
   }
   checkAbility(set, ability, setHas) {
@@ -1650,12 +1663,12 @@ class TeamValidator {
       return `${set.name}'s ability ${ability.name} is ${banReason}.`;
     }
     if (banReason === "") return null;
-    banReason = ruleTable.check("pokemontag:allabilities");
+    banReason = ruleTable.check("tag:allabilities");
     if (banReason) {
       return `${set.name}'s ability ${ability.name} is not in the list of allowed abilities.`;
     }
     if (ability.isNonstandard) {
-      banReason = ruleTable.check("pokemontag:" + (0, import_dex.toID)(ability.isNonstandard));
+      banReason = ruleTable.check("tag:" + (0, import_dex.toID)(ability.isNonstandard));
       if (banReason) {
         return `${set.name}'s ability ${ability.name} is tagged ${ability.isNonstandard}, which is ${banReason}.`;
       }
@@ -1685,7 +1698,7 @@ class TeamValidator {
       return `${set.name}'s nature ${nature.name} is not in the list of allowed natures.`;
     }
     if (nature.isNonstandard) {
-      banReason = ruleTable.check("pokemontag:" + (0, import_dex.toID)(nature.isNonstandard));
+      banReason = ruleTable.check("tag:" + (0, import_dex.toID)(nature.isNonstandard));
       if (banReason) {
         return `${set.name}'s nature ${nature.name} is tagged ${nature.isNonstandard}, which is ${banReason}.`;
       }

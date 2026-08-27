@@ -27,6 +27,7 @@ var import_dex_data = require("./dex-data");
 class DataMove extends import_dex_data.BasicEffect {
   constructor(data) {
     super(data);
+    if (data.placeholderFor) this.id = (0, import_dex_data.toID)(data.placeholderFor);
     this.fullname = `move: ${this.name}`;
     this.effectType = "Move";
     this.type = import_utils.Utils.getString(data.type);

@@ -121,6 +121,7 @@ const Rulesets = {
   },
   godlygiftmod: {
     inherit: true,
+    desc: "Each Pok&eacute;mon receives one base stat from a God (Uber Pok&eacute;mon) depending on its position in the team. If there is no Uber Pok&eacute;mon, it uses the Pok&eacute;mon in the first slot.",
     onValidateTeam(team) {
       const gods = /* @__PURE__ */ new Set();
       for (const set of team) {
@@ -167,7 +168,7 @@ const Rulesets = {
         const isBanned = validator.isBannedSpecies(godSpecies2);
         return isBanned;
       }) || target.side.team[0];
-      const stat = Dex.stats.ids()[target.side.team.indexOf(target.set)];
+      const stat = this.dex.stats.ids()[target.side.team.indexOf(target.set)];
       const newSpecies = this.dex.deepClone(species);
       let godSpecies = this.dex.species.get(god.species);
       if (typeof godSpecies.battleOnly === "string") {

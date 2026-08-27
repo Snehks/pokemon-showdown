@@ -135,11 +135,7 @@ const Abilities = {
   },
   angershell: {
     onDamage(damage, target, source, effect) {
-      if (effect.effectType === "Move" && !effect.multihit && !(effect.hasSheerForce && source.hasAbility("sheerforce"))) {
-        this.effectState.checkedAngerShell = false;
-      } else {
-        this.effectState.checkedAngerShell = true;
-      }
+      this.effectState.checkedAngerShell = !(effect.effectType === "Move" && !effect.multihit && !(effect.hasSheerForce && source.hasAbility("sheerforce")));
     },
     onTryEatItem(item) {
       const healingItems = [
@@ -400,11 +396,7 @@ const Abilities = {
   },
   berserk: {
     onDamage(damage, target, source, effect) {
-      if (effect.effectType === "Move" && !effect.multihit && !(effect.hasSheerForce && source.hasAbility("sheerforce"))) {
-        this.effectState.checkedBerserk = false;
-      } else {
-        this.effectState.checkedBerserk = true;
-      }
+      this.effectState.checkedBerserk = !(effect.effectType === "Move" && !effect.multihit && !(effect.hasSheerForce && source.hasAbility("sheerforce")));
     },
     onTryEatItem(item) {
       const healingItems = [
@@ -1040,7 +1032,6 @@ const Abilities = {
     name: "Dragonize",
     rating: 4,
     num: 312
-    // TODO confirm with generation shift
   },
   dragonsmaw: {
     onModifyAtkPriority: 5,
@@ -1098,7 +1089,7 @@ const Abilities = {
       }
     },
     onWeather(target, source, effect) {
-      if (target.hasItem("utilityumbrella")) return;
+      if (target.effectiveWeather() !== effect.id) return;
       if (effect.id === "raindance" || effect.id === "primordialsea") {
         this.heal(target.baseMaxhp / 8);
       } else if (effect.id === "sunnyday" || effect.id === "desolateland") {
@@ -1131,16 +1122,30 @@ const Abilities = {
     rating: 3.5,
     num: 297
   },
+  eelevate: {
+    isNonstandard: "Future",
+    onSourceAfterFaint(length, target, source, effect) {
+      if (effect && effect.effectType === "Move") {
+        const bestStat = source.getBestStat(true, true);
+        this.boost({ [bestStat]: length }, source);
+      }
+    },
+    // airborneness implemented in sim/pokemon.js:Pokemon#isGrounded
+    flags: { breakable: 1 },
+    name: "Eelevate",
+    rating: 4,
+    num: 313
+  },
   effectspore: {
     onDamagingHit(damage, target, source, move) {
-      if (this.checkMoveMakesContact(move, source, target) && !source.status && source.runStatusImmunity("powder")) {
+      if (this.checkMoveMakesContact(move, source, target) && source.runStatusImmunity("powder")) {
         const r = this.random(100);
         if (r < 11) {
-          source.setStatus("slp", target);
+          source.trySetStatus("slp", target);
         } else if (r < 21) {
-          source.setStatus("par", target);
+          source.trySetStatus("par", target);
         } else if (r < 30) {
-          source.setStatus("psn", target);
+          source.trySetStatus("psn", target);
         }
       }
     },
@@ -1260,6 +1265,27 @@ const Abilities = {
     name: "Filter",
     rating: 3,
     num: 111
+  },
+  firemane: {
+    isNonstandard: "Future",
+    onModifyAtkPriority: 5,
+    onModifyAtk(atk, attacker, defender, move) {
+      if (move.type === "Fire") {
+        this.debug("Fire Mane boost");
+        return this.chainModify(1.5);
+      }
+    },
+    onModifySpAPriority: 5,
+    onModifySpA(atk, attacker, defender, move) {
+      if (move.type === "Fire") {
+        this.debug("Fire Mane boost");
+        return this.chainModify(1.5);
+      }
+    },
+    flags: {},
+    name: "Fire Mane",
+    rating: 3.5,
+    num: 316
   },
   flamebody: {
     onDamagingHit(damage, target, source, move) {
@@ -2089,6 +2115,7 @@ const Abilities = {
     onDamagingHitOrder: 1,
     onDamagingHit(damage, target, source, move) {
       if (!target.hp) {
+        if (!move.smartTarget) damage += Number(move.totalDamage);
         this.damage(target.getUndynamaxedHP(damage), source, target);
       }
     },
@@ -2503,11 +2530,15 @@ const Abilities = {
   },
   megasol: {
     isNonstandard: "Future",
+    onWeatherModifyDamagePriority: 1,
+    onWeatherModifyDamage(damage, attacker, defender, move) {
+      this.dex.conditions.getByID("sunnyday").onWeatherModifyDamage.call(this, damage, attacker, defender, move);
+      return damage;
+    },
     flags: {},
     name: "Mega Sol",
     rating: 3,
-    num: 311
-    // TODO confirm with generation shift
+    num: 315
     // Partially implemented in Pokemon.effectiveWeather() in sim/pokemon.ts
   },
   merciless: {
@@ -2789,7 +2820,7 @@ const Abilities = {
     onSwitchOut(pokemon) {
       if (!pokemon.status) return;
       if (pokemon.showCure === void 0) pokemon.showCure = true;
-      if (pokemon.showCure) this.add("-curestatus", pokemon, pokemon.status, "[from] ability: Natural Cure");
+      if (pokemon.showCure) this.add("-curestatus", pokemon, pokemon.status, "[from] ability: Natural Cure", "[silent]");
       pokemon.clearStatus();
       if (!pokemon.showCure) pokemon.showCure = void 0;
     },
@@ -3177,6 +3208,20 @@ const Abilities = {
     name: "Pickup",
     rating: 0.5,
     num: 53
+  },
+  piercingdrill: {
+    isNonstandard: "Future",
+    onHitProtect(source, target, move) {
+      if (move.flags["contact"]) {
+        target.getMoveHitData(move).bypassProtect = this.effect;
+        return false;
+      }
+    },
+    // breaking protect handled in Battle#checkMoveBypassesProtect()
+    flags: {},
+    name: "Piercing Drill",
+    rating: 1,
+    num: 311
   },
   pixilate: {
     onModifyTypePriority: -1,
@@ -3644,7 +3689,7 @@ const Abilities = {
   },
   raindish: {
     onWeather(target, source, effect) {
-      if (target.hasItem("utilityumbrella")) return;
+      if (target.effectiveWeather() !== effect.id) return;
       if (effect.id === "raindance" || effect.id === "primordialsea") {
         this.heal(target.baseMaxhp / 16);
       }
@@ -4303,7 +4348,7 @@ const Abilities = {
       }
     },
     onWeather(target, source, effect) {
-      if (target.hasItem("utilityumbrella")) return;
+      if (target.effectiveWeather() !== effect.id) return;
       if (effect.id === "sunnyday" || effect.id === "desolateland") {
         this.damage(target.baseMaxhp / 8, target, target);
       }
@@ -4364,6 +4409,18 @@ const Abilities = {
     name: "Speed Boost",
     rating: 4.5,
     num: 3
+  },
+  spicyspray: {
+    isNonstandard: "Future",
+    onDamagingHit(damage, target, source, move) {
+      if (!source.trySetStatus("brn", target) && !source.status && source.hasType("Fire")) {
+        this.add("-immune", source);
+      }
+    },
+    flags: {},
+    name: "Spicy Spray",
+    rating: 3,
+    num: 318
   },
   stakeout: {
     onModifyAtkPriority: 5,
@@ -4842,13 +4899,6 @@ const Abilities = {
   },
   terashell: {
     // effectiveness implemented in sim/pokemon.ts:Pokemon#runEffectiveness
-    // needs two checks to reset between regular moves and future attacks
-    onAnyBeforeMove() {
-      delete this.effectState.resisted;
-    },
-    onAnyAfterMove() {
-      delete this.effectState.resisted;
-    },
     flags: { failroleplay: 1, noreceiver: 1, noentrain: 1, notrace: 1, failskillswap: 1, breakable: 1 },
     name: "Tera Shell",
     rating: 3.5,

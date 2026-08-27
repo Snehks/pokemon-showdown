@@ -27,6 +27,7 @@ var import_utils = require("../lib/utils");
 var import_dex_data = require("./dex-data");
 var import_tags = require("../data/tags");
 const DEFAULT_MOD = "gen9";
+const EXISTENCE_TAGS = ["past", "future", "lgpe", "unobtainable", "cap", "custom", "nonexistent"];
 class RuleTable extends Map {
   constructor() {
     super();
@@ -42,24 +43,26 @@ class RuleTable extends Map {
     if (this.has(`+${thing}`)) return false;
     return this.has(`-${thing}`);
   }
-  isBannedSpecies(species) {
+  isBannedSpecies(species, baseSpecies) {
     if (this.has(`+pokemon:${species.id}`)) return false;
     if (this.has(`-pokemon:${species.id}`)) return true;
-    if (this.has(`+basepokemon:${(0, import_dex_data.toID)(species.baseSpecies)}`)) return false;
     if (this.has(`-basepokemon:${(0, import_dex_data.toID)(species.baseSpecies)}`)) return true;
-    for (const tagid in import_tags.Tags) {
-      const tag = import_tags.Tags[tagid];
-      if (this.has(`-pokemontag:${tagid}`)) {
-        if ((tag.speciesFilter || tag.genericFilter)(species)) return true;
-      }
+    if (this.has(`+basepokemon:${(0, import_dex_data.toID)(species.baseSpecies)}`)) {
+      if (!baseSpecies || baseSpecies.isNonstandard === species.isNonstandard) return false;
     }
-    for (const tagid in import_tags.Tags) {
-      const tag = import_tags.Tags[tagid];
-      if (this.has(`+pokemontag:${tagid}`)) {
-        if ((tag.speciesFilter || tag.genericFilter)(species)) return false;
+    const nonexistentCheck = import_tags.Tags.nonexistent.genericFilter(species) && this.check("nonexistent");
+    for (const [type, match] of this.tagRules) {
+      if (type === "*") continue;
+      if (!this.matchesTagRule(match, species)) continue;
+      const existenceTag = typeof match === "string" && EXISTENCE_TAGS.includes(match);
+      if (type === "+") {
+        if (!existenceTag && nonexistentCheck) continue;
+        return false;
       }
+      return true;
     }
-    return this.has(`-pokemontag:allpokemon`);
+    if (nonexistentCheck) return true;
+    return this.has(`-tag:allpokemon`);
   }
   isRestricted(thing) {
     if (this.has(`+${thing}`)) return false;
@@ -70,35 +73,89 @@ class RuleTable extends Map {
     if (this.has(`*pokemon:${species.id}`)) return true;
     if (this.has(`+basepokemon:${(0, import_dex_data.toID)(species.baseSpecies)}`)) return false;
     if (this.has(`*basepokemon:${(0, import_dex_data.toID)(species.baseSpecies)}`)) return true;
-    for (const tagid in import_tags.Tags) {
-      const tag = import_tags.Tags[tagid];
-      if (this.has(`*pokemontag:${tagid}`)) {
-        if ((tag.speciesFilter || tag.genericFilter)(species)) return true;
-      }
+    for (const [type, match] of this.tagRules) {
+      if (type !== "*" && type !== "+") continue;
+      if (!this.matchesTagRule(match, species)) continue;
+      return type === "*";
     }
-    for (const tagid in import_tags.Tags) {
-      const tag = import_tags.Tags[tagid];
-      if (this.has(`+pokemontag:${tagid}`)) {
-        if ((tag.speciesFilter || tag.genericFilter)(species)) return false;
-      }
-    }
-    return this.has(`*pokemontag:allpokemon`);
+    return this.has(`*tag:allpokemon`);
   }
   getTagRules() {
     const tagRules = [];
     for (const ruleid of this.keys()) {
-      if (/^[+*-]pokemontag:/.test(ruleid)) {
-        const banid = ruleid.slice(12);
-        if (banid === "allpokemon" || banid === "allitems" || banid === "allmoves" || banid === "allabilities" || banid === "allnatures") {
-        } else {
-          tagRules.push(ruleid);
-        }
-      } else if ("+*-".includes(ruleid.charAt(0)) && ruleid.slice(1) === "nonexistent") {
-        tagRules.push(ruleid.charAt(0) + "pokemontag:nonexistent");
-      }
+      const tagRule = RuleTable.parseTagRule(ruleid);
+      if (tagRule) tagRules.push(tagRule);
     }
     this.tagRules = tagRules.reverse();
     return this.tagRules;
+  }
+  getNumericTagValue([tagid], thing) {
+    const tag = import_tags.Tags[tagid];
+    switch (thing.effectType) {
+      case "Pokemon":
+        return (tag.speciesNumCol || tag.genericNumCol)?.(thing);
+      case "Move":
+        return (tag.moveNumCol || tag.genericNumCol)?.(thing);
+      case "Item":
+      case "Ability":
+        return tag.genericNumCol?.(thing);
+      default:
+        return void 0;
+    }
+  }
+  matchesTagRule(match, thing) {
+    if (typeof match === "string") {
+      const tag = import_tags.Tags[match];
+      if (!tag) return false;
+      switch (thing.effectType) {
+        case "Pokemon":
+          return !!(tag.speciesFilter || tag.genericFilter)?.(thing);
+        case "Move":
+          return !!(tag.moveFilter || tag.genericFilter)?.(thing);
+        case "Item":
+        case "Ability":
+          return !!tag.genericFilter?.(thing);
+        default:
+          return false;
+      }
+    }
+    const value = this.getNumericTagValue(match, thing);
+    if (value === void 0) return false;
+    switch (match[1]) {
+      case "<":
+        return value < match[2];
+      case "<=":
+        return value <= match[2];
+      case "=":
+        return value === match[2];
+      case ">=":
+        return value >= match[2];
+      case ">":
+        return value > match[2];
+    }
+  }
+  describeTagRule(match) {
+    if (typeof match === "string") {
+      return `is tagged ${import_tags.Tags[match].name}`;
+    }
+    return `has ${import_tags.Tags[match[0]].name} ${match[1]} ${match[2]}`;
+  }
+  static parseTagRule(ruleid) {
+    const type = ruleid.charAt(0);
+    if (type !== "+" && type !== "*" && type !== "-") return null;
+    const id = ruleid.slice(1);
+    if (id === "nonexistent") return [type, "nonexistent"];
+    const tagMatch = /^tag:(.+)/.exec(id);
+    if (tagMatch) {
+      const tagid = tagMatch[1];
+      if (tagid === "allpokemon" || tagid === "allitems" || tagid === "allmoves" || tagid === "allabilities" || tagid === "allnatures") {
+        return null;
+      }
+      return [type, tagid];
+    }
+    const numTagMatch = /^numtag:([a-z0-9]+)(<=|>=|=|<|>)(-?(?:\d+(?:\.\d*)?|\.\d+))$/.exec(id);
+    if (!numTagMatch) return null;
+    return [type, [numTagMatch[1], numTagMatch[2], Number(numTagMatch[3])]];
   }
   /**
    * - non-empty string: banned, string is the reason
@@ -211,6 +268,9 @@ class RuleTable extends Map {
       if (format.mod === "gen7letsgo") {
         this.evLimit = this.has("lgpenormalrules") ? 0 : null;
       }
+      if (format.mod.startsWith("champions")) {
+        this.evLimit = 66;
+      }
     }
     if (this.maxTeamSize > 24) {
       throw new Error(`Max team size ${this.maxTeamSize}${this.blame("maxteamsize")} is unsupported (we only support up to 24).`);
@@ -280,27 +340,6 @@ class RuleTable extends Map {
     }
     if (timer.maxFirstTurn !== void 0 && (timer.maxFirstTurn < 10 || timer.maxFirstTurn > 1200)) {
       throw new Error(`Timer max first turn value ${timer.maxFirstTurn}${this.blame("timermaxfirstturn")} must be between 10 and 1200 seconds.`);
-    }
-    if (format.cupLevelLimit) {
-      throw new Error(`cupLevelLimit.range[0], cupLevelLimit.range[1], cupLevelLimit.total are now rules, respectively: "Min Level = NUMBER", "Max Level = NUMBER", and "Max Total Level = NUMBER"`);
-    }
-    if (format.teamLength) {
-      throw new Error(`teamLength.validate[0], teamLength.validate[1], teamLength.battle are now rules, respectively: "Min Team Size = NUMBER", "Max Team Size = NUMBER", and "Picked Team Size = NUMBER"`);
-    }
-    if (format.minSourceGen) {
-      throw new Error(`minSourceGen is now a rule: "Min Source Gen = NUMBER"`);
-    }
-    if (format.maxLevel) {
-      throw new Error(`maxLevel is now a rule: "Max Level = NUMBER"`);
-    }
-    if (format.defaultLevel) {
-      throw new Error(`defaultLevel is now a rule: "Default Level = NUMBER"`);
-    }
-    if (format.forcedLevel) {
-      throw new Error(`forcedLevel is now a rule: "Adjust Level = NUMBER"`);
-    }
-    if (format.maxForcedLevel) {
-      throw new Error(`maxForcedLevel is now a rule: "Adjust Level Down = NUMBER"`);
     }
   }
   hasComplexBans() {
@@ -405,14 +444,39 @@ class DexFormats {
       if (format.tournamentShow === void 0) format.tournamentShow = true;
       if (format.bestOfDefault === void 0) format.bestOfDefault = false;
       if (format.teraPreviewDefault === void 0) format.teraPreviewDefault = false;
+      if (format.itemClauseDefault === void 0) format.itemClauseDefault = false;
       if (format.mod === void 0) format.mod = "gen9";
       if (!this.dex.dexes[format.mod]) throw new Error(`Format "${format.name}" requires nonexistent mod: '${format.mod}'`);
+      this.checkDeprecated(format);
       const ruleset = new Format(format);
       this.rulesetCache.set(id, ruleset);
       formatsList.push(ruleset);
     }
     this.formatsListCache = formatsList;
     return this;
+  }
+  checkDeprecated(format) {
+    if (format.cupLevelLimit) {
+      throw new Error(`cupLevelLimit.range[0], cupLevelLimit.range[1], cupLevelLimit.total are now rules, respectively: "Min Level = NUMBER", "Max Level = NUMBER", and "Max Total Level = NUMBER"`);
+    }
+    if (format.teamLength) {
+      throw new Error(`teamLength.validate[0], teamLength.validate[1], teamLength.battle are now rules, respectively: "Min Team Size = NUMBER", "Max Team Size = NUMBER", and "Picked Team Size = NUMBER"`);
+    }
+    if (format.minSourceGen) {
+      throw new Error(`minSourceGen is now a rule: "Min Source Gen = NUMBER"`);
+    }
+    if (format.maxLevel) {
+      throw new Error(`maxLevel is now a rule: "Max Level = NUMBER"`);
+    }
+    if (format.defaultLevel) {
+      throw new Error(`defaultLevel is now a rule: "Default Level = NUMBER"`);
+    }
+    if (format.forcedLevel) {
+      throw new Error(`forcedLevel is now a rule: "Adjust Level = NUMBER"`);
+    }
+    if (format.maxForcedLevel) {
+      throw new Error(`maxForcedLevel is now a rule: "Adjust Level Down = NUMBER"`);
+    }
   }
   /**
    * Returns a sanitized format ID if valid, or throws if invalid.
@@ -429,7 +493,7 @@ class DexFormats {
       rule = rule.replace(/[\r\n|]*/g, "").trim();
       const ruleSpec = this.validateRule(rule);
       if (typeof ruleSpec === "string") {
-        if (ruleSpec === "-pokemontag:allpokemon" || ruleSpec === "+pokemontag:allpokemon") {
+        if (ruleSpec === "-tag:allpokemon" || ruleSpec === "+tag:allpokemon") {
           if (hasPokemonRule) throw new Error(`You can't ban/unban pokemon before banning/unbanning all Pokemon.`);
         }
         if (this.isPokemonRule(ruleSpec)) hasPokemonRule = true;
@@ -496,7 +560,14 @@ class DexFormats {
     return this.formatsListCache;
   }
   isPokemonRule(ruleSpec) {
-    return ruleSpec.slice(1).startsWith("pokemontag:") || ruleSpec.slice(1).startsWith("pokemon:") || ruleSpec.slice(1).startsWith("basepokemon:");
+    if (ruleSpec.slice(1).startsWith("numtag:")) {
+      const tagid = /([a-z0-9]+)/i.exec(ruleSpec)?.[1];
+      if (!tagid) return false;
+      const tag = import_tags.Tags[tagid];
+      if (!tag) return false;
+      return !!(tag.speciesNumCol || tag.genericNumCol);
+    }
+    return ruleSpec.slice(1).startsWith("tag:") || ruleSpec.slice(1).startsWith("pokemon:") || ruleSpec.slice(1).startsWith("basepokemon:");
   }
   getRuleTable(format, depth = 1, repeals) {
     if (format.ruleTable && !repeals) return format.ruleTable;
@@ -538,10 +609,10 @@ class DexFormats {
         repeals.set(ruleSpec.slice(1), depth);
       }
     }
-    let skipPokemonBans = ruleSpecs.filter((r) => r === "+pokemontag:allpokemon").length;
+    let skipPokemonBans = ruleSpecs.filter((r) => r === "+tag:allpokemon").length;
     let hasPokemonBans = false;
     const warnForNoPokemonBans = !!skipPokemonBans && !format.customRules;
-    skipPokemonBans += ruleSpecs.filter((r) => r === "-pokemontag:allpokemon").length;
+    skipPokemonBans += ruleSpecs.filter((r) => r === "-tag:allpokemon").length;
     for (let ruleSpec of ruleSpecs) {
       if (typeof ruleSpec !== "string") {
         if (ruleSpec[0] === "complexTeamBan") {
@@ -571,7 +642,7 @@ class DexFormats {
           throw new Error(`Rule "${ruleSpec}" in "${format.name}" already exists in "${ruleTable.get(ruleSpec) || format.name}"`);
         }
         if (skipPokemonBans) {
-          if (ruleSpec === "-pokemontag:allpokemon" || ruleSpec === "+pokemontag:allpokemon") {
+          if (ruleSpec === "-tag:allpokemon" || ruleSpec === "+tag:allpokemon") {
             skipPokemonBans--;
           } else if (this.isPokemonRule(ruleSpec)) {
             if (!format.customRules) {
@@ -700,7 +771,7 @@ class DexFormats {
     }
     ruleTable.getTagRules();
     ruleTable.resolveNumbers(format, this.dex);
-    const canMegaEvo = this.dex.gen <= 7 || ruleTable.has("+pokemontag:past");
+    const canMegaEvo = (this.dex.gen >= 6 || ruleTable.has("+tag:future")) && (this.dex.gen <= 7 || ruleTable.has("+tag:past"));
     if (ruleTable.has("obtainableformes") && canMegaEvo && ruleTable.isBannedSpecies(this.dex.species.get("rayquazamega")) && !ruleTable.isBannedSpecies(this.dex.species.get("rayquaza"))) {
       ruleTable.set("megarayquazaclause", "");
     }
@@ -724,6 +795,8 @@ class DexFormats {
       case "-":
       case "*":
       case "+":
+        const numericRule = this.validateNumericRule(rule);
+        if (numericRule) return numericRule;
         if (rule.slice(1).includes(">") || rule.slice(1).includes("+")) {
           let buf = rule.slice(1);
           const gtIndex = buf.lastIndexOf(">");
@@ -761,17 +834,31 @@ class DexFormats {
         return id;
     }
   }
-  validPokemonTag(tagid) {
+  validTag(tagid) {
     const tag = import_tags.Tags.hasOwnProperty(tagid) && import_tags.Tags[tagid];
     if (!tag) return false;
-    return !!(tag.speciesFilter || tag.genericFilter);
+    return !!(tag.speciesFilter || tag.moveFilter || tag.genericFilter);
+  }
+  validateNumericRule(rule) {
+    const sign = rule.charAt(0);
+    const match = /^(.*?)(<=|>=|=|<|>)\s*(-?(?:\d+(?:\.\d*)?|\.\d+))$/.exec(rule.slice(1).trim());
+    if (!match) return null;
+    let tagName = match[1].trim();
+    if (tagName.startsWith("tag:")) tagName = tagName.slice(4);
+    if (tagName.includes(":")) return null;
+    const tagid = (0, import_dex_data.toID)(tagName);
+    const tag = import_tags.Tags.hasOwnProperty(tagid) && import_tags.Tags[tagid];
+    if (!tag || !(tag.speciesNumCol || tag.moveNumCol || tag.genericNumCol)) return null;
+    return `${sign}numtag:${tagid}${match[2]}${Number(match[3])}`;
   }
   validateBanRule(rule) {
+    const numericRule = this.validateNumericRule("-" + rule);
+    if (numericRule) return numericRule.slice(1);
     let id = (0, import_dex_data.toID)(rule);
     if (id === "unreleased") return "unreleased";
     if (id === "nonexistent") return "nonexistent";
     const matches = [];
-    let matchTypes = ["pokemon", "move", "ability", "item", "nature", "pokemontag"];
+    let matchTypes = ["pokemon", "move", "ability", "item", "nature", "tag"];
     for (const matchType of matchTypes) {
       if (rule.startsWith(`${matchType}:`)) {
         matchTypes = [matchType];
@@ -800,7 +887,7 @@ class DexFormats {
         case "nature":
           table = this.dex.data.Natures;
           break;
-        case "pokemontag":
+        case "tag":
           const validTags = [
             // all
             "allpokemon",
@@ -809,8 +896,8 @@ class DexFormats {
             "allabilities",
             "allnatures"
           ];
-          if (validTags.includes(ruleid) || this.validPokemonTag(ruleid)) {
-            matches.push("pokemontag:" + ruleid);
+          if (validTags.includes(ruleid) || this.validTag(ruleid)) {
+            matches.push("tag:" + ruleid);
           }
           continue;
         default:

@@ -161,7 +161,7 @@ class RandomGen2Teams extends import_teams.default {
   randomMoveset(types, abilities, teamDetails, species, isLead, movePool, preferredType, role) {
     const preferredTypes = preferredType ? preferredType.split(",") : [];
     const moves = /* @__PURE__ */ new Set();
-    let counter = this.newQueryMoves(moves, species, preferredType, abilities);
+    let counter = this.queryMoves(moves, species, preferredType, abilities);
     this.cullMovePool(
       types,
       moves,
@@ -198,10 +198,14 @@ class RandomGen2Teams extends import_teams.default {
         movePool,
         moves,
         abilities,
-        new Set(types),
+        types,
         counter,
         species,
-        teamDetails
+        teamDetails,
+        isLead,
+        false,
+        preferredType,
+        role
       );
     };
     if (species.requiredMove) {
@@ -307,7 +311,7 @@ class RandomGen2Teams extends import_teams.default {
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
         const moveType = this.getMoveType(move, species, abilities, preferredType);
-        if (!this.noStab.includes(moveid) && (move.basePower || move.basePowerCallback) && types.includes(moveType)) {
+        if (!this.noStab.includes(moveid) && (move.basePower || move.basePowerCallback) && types.has(moveType)) {
           stabMoves.push(moveid);
         }
       }
@@ -543,7 +547,7 @@ class RandomGen2Teams extends import_teams.default {
     let item = void 0;
     const evs = { hp: 255, atk: 255, def: 255, spa: 255, spd: 255, spe: 255 };
     const ivs = { hp: 30, atk: 30, def: 30, spa: 30, spd: 30, spe: 30 };
-    const types = species.types;
+    const types = new Set(species.types);
     const abilities = [];
     const moves = this.randomMoveset(
       types,
@@ -555,7 +559,7 @@ class RandomGen2Teams extends import_teams.default {
       preferredType,
       role
     );
-    const counter = this.newQueryMoves(moves, species, preferredType, abilities);
+    const counter = this.queryMoves(moves, species, preferredType, abilities);
     item = this.getItem(ability, types, moves, counter, teamDetails, species, isLead, preferredType, role);
     const level = this.getLevel(species);
     let hasHiddenPower = false;

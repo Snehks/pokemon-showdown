@@ -53,12 +53,22 @@ class Side {
     /** Only exists in multi battle, for the allied side */
     this.allySide = null;
     /**
-     * The move and the slot are chosen during move selection
-     * lastSelectedMove never resets
-     * lastSelectedMoveSlot resets on every switch
+     * In gen 1, the move and the slot are chosen during move selection
+     * lastSelectedMove (wPlayerSelectedMove) never resets
      */
-    this.lastSelectedMove = "00";
+    this.lastSelectedMove = "nomove";
+    /**
+     * In gen 1, the move and the slot are chosen during move selection
+     * lastSelectedMoveSlot (wPlayerMoveListIndex) resets on every switch
+     */
     this.lastSelectedMoveSlot = 0;
+    /**
+     * Same as lastSelectedMove but from the opponent's POV (wEnemySelectedMove).
+     * There can be discrepancies between this and lastSelectedMove:
+     * if the opponent switches to a Pokemon that is frozen or asleep, lastSelectedMove will not be updated,
+     * but lastEnemySelectedMove will be updated to the move on the opponent's first slot during the next move selection.
+     */
+    this.lastEnemySelectedMove = "nomove";
     const sideScripts = battle.dex.data.Scripts.side;
     if (sideScripts) Object.assign(this, sideScripts);
     this.battle = battle;
@@ -110,6 +120,7 @@ class Side {
       terastallize: false
     };
     this.lastMove = null;
+    this.lastEnemyMove = null;
   }
   toJSON() {
     return import_state.State.serializeSide(this);
@@ -142,7 +153,9 @@ class Side {
       switch (action.choice) {
         case "move":
           let details = ``;
-          if (action.targetLoc && this.active.length > 1) details += ` ${action.targetLoc > 0 ? "+" : ""}${action.targetLoc}`;
+          if (action.targetLoc && this.battle.activePerHalf > 1) {
+            details += ` ${action.targetLoc > 0 ? "+" : ""}${action.targetLoc}`;
+          }
           if (action.mega) details += action.pokemon.item === "ultranecroziumz" ? ` ultra` : ` mega`;
           if (action.megax) details += ` megax`;
           if (action.megay) details += ` megay`;
@@ -840,19 +853,30 @@ ${sideUpdate}`);
   commitChoices() {
     if (this.battle.gen === 1) {
       for (const choice of this.choice.actions) {
-        if (choice.choice !== "move" || !choice.pokemon) continue;
+        const pokemon = choice.pokemon;
+        if (choice.choice !== "move" || !pokemon) continue;
         const move = choice.moveid;
         if (move === "fight") {
-          const pokemon = choice.pokemon;
           if (["frz", "slp"].includes(pokemon.status)) {
+            const moveSlot = pokemon.getMoveSlot(this.lastSelectedMoveSlot);
+            if (moveSlot === null) throw new Error(`moveSlot is null which shouldn't happen`);
+            this.lastEnemySelectedMove = moveSlot.id;
           } else if (pokemon.volatiles["partiallytrapped"]) {
             this.lastSelectedMove = "cannotmove";
+            this.lastEnemySelectedMove = "cannotmove";
           }
         } else if (move === "struggle") {
           this.lastSelectedMove = move;
-        } else if (typeof choice.moveSlot === "number") {
-          this.lastSelectedMove = move;
-          this.lastSelectedMoveSlot = choice.moveSlot;
+          this.lastEnemySelectedMove = move;
+        } else {
+          if (typeof choice.moveSlot === "number") {
+            this.lastSelectedMove = move;
+            this.lastSelectedMoveSlot = choice.moveSlot;
+            this.lastMove = this.battle.dex.moves.get(move);
+          }
+          const moveSlot = pokemon.getMoveSlot(this.lastSelectedMoveSlot);
+          if (moveSlot === null) throw new Error(`moveSlot is null which shouldn't happen`);
+          this.lastEnemySelectedMove = moveSlot.id;
         }
         choice.moveid = this.lastSelectedMove;
       }

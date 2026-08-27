@@ -100,7 +100,7 @@ class RandomGen3Teams extends import_teams.default {
       Ground: (movePool, moves, abilities, types, counter) => !counter.get("Ground"),
       Ice: (movePool, moves, abilities, types, counter) => !counter.get("Ice"),
       Normal: (movePool, moves, abilities, types, counter, species) => !counter.get("Normal"),
-      Poison: (movePool, moves, abilities, types, counter) => !counter.get("Poison") && !counter.get("Bug"),
+      Poison: (movePool, moves, abilities, types, counter) => !counter.get("Poison"),
       Psychic: (movePool, moves, abilities, types, counter, species) => !counter.get("Psychic") && species.baseStats.spa >= 100,
       Rock: (movePool, moves, abilities, types, counter, species) => !counter.get("Rock"),
       Steel: (movePool, moves, abilities, types, counter, species) => !counter.get("Steel") && species.id !== "forretress",
@@ -187,7 +187,7 @@ class RandomGen3Teams extends import_teams.default {
   randomMoveset(types, abilities, teamDetails, species, isLead, movePool, preferredType, role) {
     const preferredTypes = preferredType ? preferredType.split(",") : [];
     const moves = /* @__PURE__ */ new Set();
-    let counter = this.newQueryMoves(moves, species, preferredType, abilities);
+    let counter = this.queryMoves(moves, species, preferredType, abilities);
     this.cullMovePool(
       types,
       moves,
@@ -200,7 +200,7 @@ class RandomGen3Teams extends import_teams.default {
       preferredType,
       role
     );
-    if (movePool.length <= this.maxMoveCount) {
+    if (movePool.length <= this.maxMoveCount || species.id === "unown") {
       while (movePool.length) {
         const moveid = this.sample(movePool);
         counter = this.addMove(
@@ -224,10 +224,14 @@ class RandomGen3Teams extends import_teams.default {
         movePool,
         moves,
         abilities,
-        new Set(types),
+        types,
         counter,
         species,
-        teamDetails
+        teamDetails,
+        isLead,
+        false,
+        preferredType,
+        role
       );
     };
     if (species.requiredMove) {
@@ -335,7 +339,7 @@ class RandomGen3Teams extends import_teams.default {
       for (const moveid of movePool) {
         const move = this.dex.moves.get(moveid);
         const moveType = this.getMoveType(move, species, abilities, preferredType);
-        if (!this.noStab.includes(moveid) && (move.basePower || move.basePowerCallback) && types.includes(moveType)) {
+        if (!this.noStab.includes(moveid) && (move.basePower || move.basePowerCallback) && types.has(moveType)) {
           stabMoves.push(moveid);
         }
       }
@@ -544,7 +548,7 @@ class RandomGen3Teams extends import_teams.default {
     }
     return moves;
   }
-  shouldCullAbility(ability, types, moves, abilities, counter, movePool, teamDetails, species, preferredType, role) {
+  shouldCullAbility(ability, types, moves, abilities, counter, teamDetails, species) {
     switch (ability) {
       case "Chlorophyll":
         return !teamDetails.sun;
@@ -555,23 +559,12 @@ class RandomGen3Teams extends import_teams.default {
     }
     return false;
   }
-  getAbility(types, moves, abilities, counter, movePool, teamDetails, species, preferredType, role) {
+  getAbility(types, moves, abilities, counter, teamDetails, species) {
     if (abilities.length <= 1) return abilities[0];
     if (species.id === "yanma") return counter.get("inaccurate") ? "Compound Eyes" : "Speed Boost";
     const abilityAllowed = [];
     for (const ability of abilities) {
-      if (!this.shouldCullAbility(
-        ability,
-        types,
-        moves,
-        abilities,
-        counter,
-        movePool,
-        teamDetails,
-        species,
-        preferredType,
-        role
-      )) {
+      if (!this.shouldCullAbility(ability, types, moves, abilities, counter, teamDetails, species)) {
         abilityAllowed.push(ability);
       }
     }
@@ -583,12 +576,10 @@ class RandomGen3Teams extends import_teams.default {
     return this.sample(abilities);
   }
   getItem(ability, types, moves, counter, teamDetails, species, isLead, preferredType, role) {
-    if (species.id === "farfetchd") return "Stick";
     if (species.id === "latias" || species.id === "latios") return "Soul Dew";
     if (species.id === "linoone" && role === "Setup Sweeper") return "Silk Scarf";
     if (species.id === "marowak") return "Thick Club";
     if (species.id === "pikachu") return "Light Ball";
-    if (species.id === "shedinja") return "Lum Berry";
     if (species.id === "unown") return counter.get("Physical") ? "Choice Band" : "Twisted Spoon";
     if (species.id === "deoxys" || species.id === "deoxysattack") return "White Herb";
     if (moves.has("trick")) return "Choice Band";
@@ -596,6 +587,7 @@ class RandomGen3Teams extends import_teams.default {
     if (counter.get("Physical") >= 3 && (moves.has("batonpass") || role === "Wallbreaker" && counter.get("Special"))) {
       return "Choice Band";
     }
+    if (species.id === "shedinja") return "Lum Berry";
     if (moves.has("dragondance") && ability !== "Natural Cure" && !moves.has("healbell") && !moves.has("substitute")) return "Lum Berry";
     if (moves.has("bellydrum")) return moves.has("substitute") ? "Salac Berry" : "Lum Berry";
     if (moves.has("raindance") && counter.get("Special") >= 3) return "Petaya Berry";
@@ -605,6 +597,7 @@ class RandomGen3Teams extends import_teams.default {
       if (moves.has("substitute") && counter.get("Physical") >= 3) return "Liechi Berry";
       if (moves.has("substitute") && counter.get("Special") >= 3) return "Petaya Berry";
     }
+    if (species.id === "farfetchd") return "Stick";
     const salacReqs = species.baseStats.spe >= 60 && species.baseStats.spe <= 100 && !counter.get("priority");
     if (moves.has("bulkup") && moves.has("substitute") && counter.get("Status") === 2 && salacReqs) return "Salac Berry";
     if (moves.has("swordsdance") && moves.has("substitute") && counter.get("Status") === 2) {
@@ -633,7 +626,7 @@ class RandomGen3Teams extends import_teams.default {
     let item = void 0;
     const evs = { hp: 85, atk: 85, def: 85, spa: 85, spd: 85, spe: 85 };
     const ivs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
-    const types = species.types;
+    const types = new Set(species.types);
     const abilities = set.abilities;
     const moves = this.randomMoveset(
       types,
@@ -645,18 +638,8 @@ class RandomGen3Teams extends import_teams.default {
       preferredType,
       role
     );
-    const counter = this.newQueryMoves(moves, species, preferredType, abilities);
-    ability = this.getAbility(
-      new Set(types),
-      moves,
-      abilities,
-      counter,
-      movePool,
-      teamDetails,
-      species,
-      preferredType,
-      role
-    );
+    const counter = this.queryMoves(moves, species, preferredType, abilities);
+    ability = this.getAbility(new Set(types), moves, abilities, counter, teamDetails, species);
     item = this.getItem(ability, types, moves, counter, teamDetails, species, isLead, preferredType, role);
     const level = this.getLevel(species);
     let hasHiddenPower = false;
@@ -722,12 +705,14 @@ class RandomGen3Teams extends import_teams.default {
    * Checks if the new species is compatible with the other mons currently on the team.
    */
   getPokemonCompatibility(species, pokemon) {
+    const reversalUsers = ["raticate", "primeape", "hitmonlee", "furret", "yanma", "heracross", "blaziken", "medicham"];
+    const flailUsers = ["dodrio", "farfetchd"];
     const incompatibilityList = [
       // These Pokemon are incompatible because the presence of one actively harms the other.
       // Prevent Shedinja + Tyranitar
       ["shedinja", "tyranitar"],
       // Prevent Reversal/Flail users + Tyranitar
-      [["dodrio", "raticate", "primeape", "hitmonlee", "furret", "yanma", "heracross", "blaziken", "medicham"], "tyranitar"]
+      [[...flailUsers, ...reversalUsers], "tyranitar"]
     ];
     for (const pair of incompatibilityList) {
       const monsArrayA = Array.isArray(pair[0]) ? pair[0] : [pair[0]];

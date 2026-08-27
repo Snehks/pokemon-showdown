@@ -122,7 +122,7 @@ class SSBMoveHTML extends Chat.JSX.Component {
         const lastEntry = idx === arr.length - 1;
         if (!value) return /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\u2713 ", detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
         if (value === "x") return /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\u2717 ", detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
-        return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("font", { color: "#686868" }, detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
+        return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("span", { class: "gray" }, detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
       })), sigMove.desc && sigMove.desc !== sigMove.shortDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), sigMove.desc));
     }
   }
@@ -162,7 +162,7 @@ class SSBItemHTML extends Chat.JSX.Component {
         return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataItemHTML(sigItem) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
           const lastEntry = idx === arr.length - 1;
           if (value === "") return /* @__PURE__ */ Chat.h(Chat.Fragment, null, detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
-          return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("font", { color: "#686868" }, detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
+          return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("span", { class: "gray" }, detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
         })));
       }
     }
@@ -190,7 +190,7 @@ class SSBAbilityHTML extends Chat.JSX.Component {
       return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataAbilityHTML(sigAbil) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
         const lastEntry = idx === arr.length - 1;
         if (value === "") return /* @__PURE__ */ Chat.h(Chat.Fragment, null, detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
-        return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("font", { color: "#686868" }, "$", detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
+        return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("span", { class: "gray" }, "$", detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
       })), sigAbil.desc && sigAbil.shortDesc && sigAbil.desc !== sigAbil.shortDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), sigAbil.desc));
     }
     return /* @__PURE__ */ Chat.h(Chat.Fragment, null);
@@ -254,7 +254,7 @@ class SSBPokemonHTML extends Chat.JSX.Component {
       }
     }
     if (!evos.length) {
-      details[`<font color="#686868">Does Not Evolve</font>`] = "";
+      details[`<span class="gray">Does Not Evolve</span>`] = "";
     } else {
       details["Evolution"] = evos.join(", ");
     }
@@ -264,7 +264,7 @@ class SSBPokemonHTML extends Chat.JSX.Component {
         if (detail.includes("<font")) {
           return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: detail } }), !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
         }
-        return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("font", { color: "#686868" }, detail, ":"), " ", value.includes("<em>") ? /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: value } }) : value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
+        return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("span", { class: "gray" }, detail, ":"), " ", value.includes("<em>") ? /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: value } }) : value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
       })));
     }
   }
@@ -283,7 +283,7 @@ class SSBInnateHTML extends Chat.JSX.Component {
       }
       if (effect.desc) baseAbility.desc = effect.desc;
       if (effect.shortDesc) baseAbility.shortDesc = effect.shortDesc;
-      return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), "Innate Ability:", /* @__PURE__ */ Chat.h("br", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataAbilityHTML(baseAbility) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, /* @__PURE__ */ Chat.h("font", { color: "#686868" }, "Gen:"), " 9"), longDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), longDesc));
+      return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), "Innate Ability:", /* @__PURE__ */ Chat.h("br", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataAbilityHTML(baseAbility) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, /* @__PURE__ */ Chat.h("span", { class: "gray" }, "Gen:"), " 9"), longDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), longDesc));
     }
     return /* @__PURE__ */ Chat.h(Chat.Fragment, null);
   }

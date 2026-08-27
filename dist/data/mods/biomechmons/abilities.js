@@ -195,17 +195,20 @@ const Abilities = {
               1
             );
             this.add("-ability", pokemon, move.name, "Trace");
+            const ppUps = move.noPPBoosts ? 0 : 3;
+            const basePP = this.calculatePP(move, ppUps);
             const newMove = {
               move: move.name,
               id: move.id,
-              pp: move.noPPBoosts ? move.pp : move.pp * 8 / 5,
-              maxpp: move.noPPBoosts ? move.pp : move.pp * 8 / 5,
+              pp: basePP,
+              maxpp: basePP,
               target: move.target,
               disabled: false,
               used: false
             };
             pokemon.baseMoveSlots.push(newMove);
             pokemon.moveSlots.push(newMove);
+            pokemon.ppUps.push(ppUps);
           }
         }
         return;

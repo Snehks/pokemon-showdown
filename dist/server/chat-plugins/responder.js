@@ -69,7 +69,7 @@ class AutoResponder {
     const room = this.room;
     const helpFaqs = import_room_faqs.roomFaqs[room.roomid];
     if (!helpFaqs) return null;
-    const normalized = Chat.normalize(question);
+    const normalized = import_lib.Utils.normalize(question);
     if (this.data.ignore) {
       if (this.data.ignore.some((t) => new RegExp(t, "i").test(normalized))) {
         return null;

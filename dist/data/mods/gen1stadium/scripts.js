@@ -392,6 +392,7 @@ const Scripts = {
         }
         if ((damage || damage === 0) && !target.fainted) {
           damage = this.battle.damage(damage, target, pokemon, move);
+          if (damage && target.hp > 0) this.applyRecoilDamage(damage, move, pokemon);
           if (!(damage || damage === 0)) return false;
           didSomething = true;
         } else if (damage === false && typeof hitResult === "undefined") {
@@ -581,8 +582,8 @@ const Scripts = {
         defense = target.getStat(defType, true);
       }
       if (attack >= 256 || defense >= 256) {
-        attack = this.battle.clampIntRange(Math.floor(attack / 4) % 256, 1);
-        defense = this.battle.clampIntRange(Math.floor(defense / 4) % 256, 1);
+        attack = this.battle.clampIntRange(this.battle.trunc(Math.floor(attack / 4), 8), 1);
+        defense = this.battle.clampIntRange(this.battle.trunc(Math.floor(defense / 4), 8), 1);
       }
       if (move.selfdestruct && defType === "def") {
         defense = this.battle.clampIntRange(Math.floor(defense / 2), 1);

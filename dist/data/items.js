@@ -68,7 +68,7 @@ const Items = {
   },
   absolitez: {
     name: "Absolite Z",
-    spritenum: 576,
+    spritenum: 499,
     megaStone: { "Absol": "Absol-Mega-Z" },
     itemUser: ["Absol"],
     onTakeItem(item, source) {
@@ -419,7 +419,7 @@ const Items = {
   },
   baxcalibrite: {
     name: "Baxcalibrite",
-    spritenum: 0,
+    spritenum: 514,
     megaStone: { "Baxcalibur": "Baxcalibur-Mega" },
     itemUser: ["Baxcalibur"],
     onTakeItem(item, source) {
@@ -951,7 +951,7 @@ const Items = {
   },
   chimechite: {
     name: "Chimechite",
-    spritenum: 0,
+    spritenum: 498,
     megaStone: { "Chimecho": "Chimecho-Mega" },
     itemUser: ["Chimecho"],
     onTakeItem(item, source) {
@@ -1227,7 +1227,7 @@ const Items = {
   },
   crabominite: {
     name: "Crabominite",
-    spritenum: 0,
+    spritenum: 507,
     megaStone: { "Crabominable": "Crabominable-Mega" },
     itemUser: ["Crabominable"],
     onTakeItem(item, source) {
@@ -1255,7 +1255,8 @@ const Items = {
       type: "Ghost"
     },
     onFractionalPriorityPriority: -2,
-    onFractionalPriority(priority, pokemon) {
+    onFractionalPriority(priority, pokemon, target, move) {
+      if (move.category === "Status" && pokemon.hasAbility("myceliummight")) return;
       if (priority <= 0 && (pokemon.hp <= pokemon.maxhp / 4 || pokemon.hp <= pokemon.maxhp / 2 && pokemon.hasAbility("gluttony") && pokemon.abilityState.gluttony)) {
         if (pokemon.eatItem()) {
           this.add("-activate", pokemon, "item: Custap Berry", "[consumed]");
@@ -1321,7 +1322,7 @@ const Items = {
   },
   darkranite: {
     name: "Darkranite",
-    spritenum: 0,
+    spritenum: 504,
     megaStone: { "Darkrai": "Darkrai-Mega" },
     itemUser: ["Darkrai"],
     onTakeItem(item, source) {
@@ -2421,7 +2422,7 @@ const Items = {
   },
   garchompitez: {
     name: "Garchompite Z",
-    spritenum: 573,
+    spritenum: 501,
     megaStone: { "Garchomp": "Garchomp-Mega-Z" },
     itemUser: ["Garchomp"],
     onTakeItem(item, source) {
@@ -2511,7 +2512,7 @@ const Items = {
   },
   glimmoranite: {
     name: "Glimmoranite",
-    spritenum: 0,
+    spritenum: 512,
     megaStone: { "Glimmora": "Glimmora-Mega" },
     itemUser: ["Glimmora"],
     onTakeItem(item, source) {
@@ -2532,7 +2533,7 @@ const Items = {
   },
   golisopite: {
     name: "Golisopite",
-    spritenum: 0,
+    spritenum: 508,
     megaStone: { "Golisopod": "Golisopod-Mega" },
     itemUser: ["Golisopod"],
     onTakeItem(item, source) {
@@ -2544,7 +2545,7 @@ const Items = {
   },
   golurkite: {
     name: "Golurkite",
-    spritenum: 0,
+    spritenum: 505,
     megaStone: { "Golurk": "Golurk-Mega" },
     itemUser: ["Golurk"],
     onTakeItem(item, source) {
@@ -2831,7 +2832,7 @@ const Items = {
   },
   heatranite: {
     name: "Heatranite",
-    spritenum: 0,
+    spritenum: 503,
     megaStone: { "Heatran": "Heatran-Mega" },
     itemUser: ["Heatran"],
     onTakeItem(item, source) {
@@ -3368,8 +3369,8 @@ const Items = {
     onEat(pokemon) {
       const moveSlot = pokemon.moveSlots.find((move) => move.pp === 0) || pokemon.moveSlots.find((move) => move.pp < move.maxpp);
       if (!moveSlot) return;
-      moveSlot.pp += 10;
-      if (moveSlot.pp > moveSlot.maxpp) moveSlot.pp = moveSlot.maxpp;
+      const addedPP = pokemon.hasAbility("ripen") ? 20 : 10;
+      moveSlot.pp = Math.min(moveSlot.pp + addedPP, moveSlot.maxpp);
       this.add("-activate", pokemon, "item: Leppa Berry", moveSlot.move, "[consumed]");
     },
     num: 154,
@@ -3508,7 +3509,7 @@ const Items = {
   },
   lucarionitez: {
     name: "Lucarionite Z",
-    spritenum: 594,
+    spritenum: 502,
     megaStone: { "Lucario": "Lucario-Mega-Z" },
     itemUser: ["Lucario"],
     onTakeItem(item, source) {
@@ -3663,7 +3664,7 @@ const Items = {
   },
   magearnite: {
     name: "Magearnite",
-    spritenum: 0,
+    spritenum: 509,
     megaStone: {
       "Magearna": "Magearna-Mega",
       "Magearna-Original": "Magearna-Original-Mega"
@@ -3924,7 +3925,7 @@ const Items = {
   },
   meowsticite: {
     name: "Meowsticite",
-    spritenum: 0,
+    spritenum: 506,
     megaStone: {
       "Meowstic": "Meowstic-M-Mega",
       "Meowstic-F": "Meowstic-F-Mega"
@@ -5029,7 +5030,7 @@ const Items = {
   },
   raichunitex: {
     name: "Raichunite X",
-    spritenum: 0,
+    spritenum: 496,
     megaStone: { "Raichu": "Raichu-Mega-X" },
     itemUser: ["Raichu"],
     onTakeItem(item, source) {
@@ -5041,7 +5042,7 @@ const Items = {
   },
   raichunitey: {
     name: "Raichunite Y",
-    spritenum: 0,
+    spritenum: 497,
     megaStone: { "Raichu": "Raichu-Mega-Y" },
     itemUser: ["Raichu"],
     onTakeItem(item, source) {
@@ -5559,7 +5560,7 @@ const Items = {
   },
   scovillainite: {
     name: "Scovillainite",
-    spritenum: 0,
+    spritenum: 511,
     megaStone: { "Scovillain": "Scovillain-Mega" },
     itemUser: ["Scovillain"],
     onTakeItem(item, source) {
@@ -5967,7 +5968,7 @@ const Items = {
   },
   staraptite: {
     name: "Staraptite",
-    spritenum: 0,
+    spritenum: 500,
     megaStone: { "Staraptor": "Staraptor-Mega" },
     itemUser: ["Staraptor"],
     onTakeItem(item, source) {
@@ -6254,7 +6255,7 @@ const Items = {
   },
   tatsugirinite: {
     name: "Tatsugirinite",
-    spritenum: 0,
+    spritenum: 513,
     megaStone: {
       "Tatsugiri": "Tatsugiri-Curly-Mega",
       "Tatsugiri-Droopy": "Tatsugiri-Droopy-Mega",
@@ -7800,7 +7801,7 @@ const Items = {
   },
   zeraorite: {
     name: "Zeraorite",
-    spritenum: 0,
+    spritenum: 510,
     megaStone: { "Zeraora": "Zeraora-Mega" },
     itemUser: ["Zeraora"],
     onTakeItem(item, source) {
@@ -7861,6 +7862,7 @@ const Items = {
     },
     num: 155,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   berserkgene: {
@@ -7876,6 +7878,7 @@ const Items = {
     },
     num: 0,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   bitterberry: {
@@ -7896,6 +7899,7 @@ const Items = {
     },
     num: 156,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   burntberry: {
@@ -7918,6 +7922,7 @@ const Items = {
     },
     num: 153,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   goldberry: {
@@ -7942,6 +7947,7 @@ const Items = {
     },
     num: 158,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   iceberry: {
@@ -7964,6 +7970,7 @@ const Items = {
     },
     num: 152,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   mintberry: {
@@ -7986,6 +7993,7 @@ const Items = {
     },
     num: 150,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   miracleberry: {
@@ -8007,6 +8015,7 @@ const Items = {
     },
     num: 157,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   mysteryberry: {
@@ -8046,6 +8055,7 @@ const Items = {
     },
     num: 154,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   pinkbow: {
@@ -8058,6 +8068,7 @@ const Items = {
     },
     num: 251,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   polkadotbow: {
@@ -8070,6 +8081,7 @@ const Items = {
     },
     num: 251,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   przcureberry: {
@@ -8092,6 +8104,7 @@ const Items = {
     },
     num: 149,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   psncureberry: {
@@ -8114,6 +8127,7 @@ const Items = {
     },
     num: 151,
     gen: 2,
+    tags: ["True Past"],
     isNonstandard: "Past"
   },
   // CAP items

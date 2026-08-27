@@ -163,15 +163,10 @@ const Moves = {
   },
   mindblown: {
     inherit: true,
-    onAfterMove(pokemon, target, move) {
-      if (move.mindBlownRecoil && !move.multihit) {
-        const hpBeforeRecoil = pokemon.hp;
-        const calc = calculate(this, pokemon, pokemon, "mindblown");
-        this.damage(Math.round(calc * pokemon.maxhp / 2), pokemon, pokemon, this.dex.conditions.get("Mind Blown"), true);
-        if (pokemon.hp <= pokemon.maxhp / 2 && hpBeforeRecoil > pokemon.maxhp / 2) {
-          this.runEvent("EmergencyExit", pokemon, pokemon);
-        }
-      }
+    onMoveFail(target, source, move) {
+      if (move.multihit) return;
+      const calc = calculate(this, source, source, "mindblown");
+      this.damage(Math.round(calc * source.maxhp / 2), source, source, this.dex.conditions.get("Mind Blown"));
     }
   },
   nightmare: {
@@ -238,11 +233,7 @@ const Moves = {
       },
       onTryHitPriority: 3,
       onTryHit(target, source, move) {
-        if (!move.flags["protect"]) {
-          if (["gmaxoneblow", "gmaxrapidflow"].includes(move.id)) return;
-          if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
-          return;
-        }
+        if (this.checkMoveBypassesProtect(move, source, target)) return;
         if (move.smartTarget) {
           move.smartTarget = false;
         } else {
@@ -270,15 +261,10 @@ const Moves = {
   },
   steelbeam: {
     inherit: true,
-    onAfterMove(pokemon, target, move) {
-      if (move.mindBlownRecoil && !move.multihit) {
-        const hpBeforeRecoil = pokemon.hp;
-        const calc = calculate(this, pokemon, pokemon, "steelbeam");
-        this.damage(Math.round(calc * pokemon.maxhp / 2), pokemon, pokemon, this.dex.conditions.get("Steel Beam"), true);
-        if (pokemon.hp <= pokemon.maxhp / 2 && hpBeforeRecoil > pokemon.maxhp / 2) {
-          this.runEvent("EmergencyExit", pokemon, pokemon);
-        }
-      }
+    onMoveFail(target, source, move) {
+      if (move.multihit) return;
+      const calc = calculate(this, source, source, "steelbeam");
+      this.damage(Math.round(calc * source.maxhp / 2), source, source, this.dex.conditions.get("Mind Blown"));
     }
   },
   supercellslam: {

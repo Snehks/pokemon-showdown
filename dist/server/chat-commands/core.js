@@ -191,7 +191,7 @@ const commands = {
       gitVersion = (await import_lib.ProcessManager.exec(["git", "rev-parse", "--short", "HEAD"])).stdout.trim();
     } catch {
     }
-    this.sendReplyBox(this.tr`Server version: <b>${version}${gitVersion ? ` (commit ${gitVersion})` : ""}</b>`);
+    this.sendReplyBox(this.tr`Server version: <b>${version}` + `${gitVersion ? ` (commit <a href="https://github.com/smogon/pokemon-showdown/commits/${gitVersion}">${gitVersion}</a>)` : ""}</b>`);
   },
   versionhelp: [
     `/version - Get the current server version.`
@@ -326,11 +326,15 @@ const commands = {
     }
     this.checkRecursion();
     const { targetUser, targetUsername, rest: message } = this.splitUser(target);
+    const isCommand = !!Chat.parseCommand(message);
     if (targetUsername === "~") {
       this.pmTarget = null;
       this.room = null;
     } else if (!targetUser) {
       if (Chat.PrivateMessages.offlineIsEnabled) {
+        if (isCommand) {
+          return this.parse(`/offlinemsg ${targetUsername},${message}`);
+        }
         if (user.lastCommand === "pm") {
           return this.parse(`/offlinemsg ${targetUsername},${message}`);
         }
@@ -345,10 +349,14 @@ const commands = {
       return;
     } else {
       this.pmTarget = targetUser;
+      this.pmTargetName = targetUser.name;
       this.room = null;
     }
     if (targetUser && !targetUser.connected) {
       if (Chat.PrivateMessages.offlineIsEnabled) {
+        if (isCommand) {
+          return this.parse(`/offlinemsg ${targetUser.getLastId()},${message}`);
+        }
         if (user.lastCommand === "pm") {
           return this.parse(`/offlinemsg ${targetUser.getLastId()},${message}`);
         }
@@ -361,7 +369,10 @@ const commands = {
     }
     return this.parse(message);
   },
-  msghelp: [`/msg OR /whisper OR /w [username], [message] - Send a private message.`],
+  msghelp: [
+    `/msg OR /whisper OR /w [username], [message] - Send a private message.`,
+    `Commands sent to offline users run immediately, with replies displayed in that user's PM window.`
+  ],
   offlinepm: "offlinemsg",
   opm: "offlinemsg",
   offlinewhisper: "offlinemsg",
@@ -378,9 +389,6 @@ const commands = {
     if (!userid || !message) {
       return this.parse("/help offlinemsg");
     }
-    if (Chat.parseCommand(message)) {
-      throw new Chat.ErrorMessage(`You cannot send commands in offline PMs.`);
-    }
     if (userid === user.id) {
       throw new Chat.ErrorMessage(`You cannot send offline PMs to yourself.`);
     } else if (userid.startsWith("guest")) {
@@ -392,6 +400,12 @@ const commands = {
     }
     if (userid.length > 18) {
       throw new Chat.ErrorMessage(`Invalid userid. Must be <=18 characters in length.`);
+    }
+    if (Chat.parseCommand(message)) {
+      this.room = null;
+      this.pmTarget = null;
+      this.pmTargetName = username;
+      return this.parse(message);
     }
     message = this.checkChat(message);
     if (!message) return;
@@ -461,6 +475,11 @@ const commands = {
   ignorepms: "blockpms",
   ignorepm: "blockpms",
   blockofflinepms: "blockpms",
+  blockdms: "blockpms",
+  blockdm: "blockpms",
+  ignoredms: "blockpms",
+  ignoredm: "blockpms",
+  blockofflinedms: "blockpms",
   async blockpms(target, room, user, connection, cmd) {
     target = target.toLowerCase().trim();
     if (target === "ac") target = "autoconfirmed";
@@ -475,7 +494,7 @@ const commands = {
     } else if (target === "autoconfirmed" || target === "trusted" || target === "unlocked") {
       if (!isOffline) user.settings.blockPMs = target;
       target = this.tr(target);
-      this.sendReply(this.tr`You are now blocking ${msg}private messages, except from staff and ${target} users.`);
+      this.sendReply(this.tr`You are now blocking ${msg}private messages, except from staff, friends, and ${target} users.`);
     } else if (target === "friends") {
       if (!isOffline) user.settings.blockPMs = target;
       this.sendReply(this.tr`You are now blocking ${msg}private messages, except from staff and friends.`);
@@ -496,7 +515,7 @@ const commands = {
   },
   blockpmshelp: [
     `/blockpms - Blocks private messages except from staff. Unblock them with /unblockpms.`,
-    `/blockpms [unlocked/ac/trusted/+/friends] - Blocks private messages except from staff and the specified group.`
+    `/blockpms [unlocked, ac, trusted, friends, +] - Blocks PMs, except for staff, friends, and the specified group(s).`
   ],
   unblockpm: "unblockpms",
   unignorepms: "unblockpms",
@@ -816,7 +835,7 @@ const commands = {
       this.sendReply(this.tr`Battle input log re-requested.`);
     }
   },
-  exportinputloghelp: [`/exportinputlog - Asks players in a battle for permission to export an inputlog. Requires: ~`],
+  exportinputloghelp: [`/exportinputlog - Asks players in a battle for permission to export an inputlog. Requires: + % @ ~`],
   importinputlog(target, room, user, connection) {
     this.checkCan("importinputlog");
     const formatIndex = target.indexOf(`"formatid":"`);
@@ -867,7 +886,10 @@ const commands = {
         team = [indexedSet];
       }
     }
-    let resultString = import_lib.Utils.escapeHTML(Teams.export(team, { hideStats }));
+    let resultString = import_lib.Utils.escapeHTML(Teams.export(team, {
+      hideStats,
+      useStatPoints: toID(battle.format).includes("champions")
+    }));
     if (showAll) {
       resultString = `<details><summary>${this.tr`View team`}</summary>${resultString}</details>`;
     }
@@ -1174,6 +1196,7 @@ const commands = {
     }
     const fromUser = Ladders.challenges.accept(this);
     this.pmTarget = fromUser;
+    this.pmTargetName = fromUser.name;
     this.sendChatMessage(`/text You accepted the battle invite`);
     this.parse(`/join ${targetRoom.roomid}`);
     battle.joinGame(user, slot, playerOpts);
@@ -1440,7 +1463,8 @@ const commands = {
     const { targetUser, targetUsername, rest } = this.splitUser(target);
     if (rest) return this.popupReply(this.tr`This command does not support specifying multiple users`);
     this.pmTarget = targetUser || this.pmTarget;
-    if (!this.pmTarget) return this.popupReply(this.tr`User "${targetUsername}" not found.`);
+    this.pmTargetName = targetUsername || this.pmTargetName;
+    if (!this.pmTarget) return this.popupReply(this.tr`User "${this.pmTargetName || ""}" not found.`);
     const chall = Ladders.challenges.search(user.id, this.pmTarget.id);
     if (!chall || chall.from !== user.id) {
       connection.popup(`You are not challenging ${this.pmTarget.name}. Maybe they accepted/rejected before you cancelled?`);
@@ -1456,7 +1480,8 @@ const commands = {
     const { targetUser, targetUsername, rest } = this.splitUser(target);
     if (rest) return this.popupReply(this.tr`This command does not support specifying multiple users`);
     this.pmTarget = targetUser || this.pmTarget;
-    if (!this.pmTarget) return this.popupReply(this.tr`User "${targetUsername}" not found.`);
+    this.pmTargetName = targetUsername || this.pmTargetName;
+    if (!this.pmTarget) return this.popupReply(this.tr`User "${this.pmTargetName || ""}" not found.`);
     const chall = Ladders.challenges.search(user.id, this.pmTarget.id);
     if (!chall || chall.to !== user.id) {
       connection.popup(`${this.pmTarget.id} is not challenging you. Maybe they cancelled before you accepted?`);
@@ -1475,7 +1500,8 @@ const commands = {
     const { targetUser, targetUsername, rest } = this.splitUser(target);
     if (rest) return this.popupReply(this.tr`This command does not support specifying multiple users`);
     this.pmTarget = targetUser || this.pmTarget;
-    if (!this.pmTarget) return this.popupReply(this.tr`User "${targetUsername}" not found.`);
+    this.pmTargetName = targetUsername || this.pmTargetName;
+    if (!this.pmTarget) return this.popupReply(this.tr`User "${this.pmTargetName || ""}" not found.`);
     const chall = Ladders.challenges.search(user.id, this.pmTarget.id);
     if (!chall || chall.to !== user.id) {
       connection.popup(`${this.pmTarget.id} is not challenging you. Maybe they cancelled before you rejected?`);
