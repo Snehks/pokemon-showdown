@@ -482,6 +482,13 @@ const Scripts = {
       use(battle, pokemon, itemId, data) {
         const healthRatio = parseFloat(data[0]);
         if (pokemon.fainted) {
+          if (pokemon.position < pokemon.side.active.length) {
+            battle.queue.addChoice({
+              choice: "instaswitch",
+              pokemon,
+              target: pokemon
+            });
+          }
           pokemon.fainted = false;
           pokemon.side.pokemonLeft++;
           pokemon.faintQueued = false;

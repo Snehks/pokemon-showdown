@@ -1199,6 +1199,35 @@ hordes, and PvP/NPC/standard formats still enforce the clause.
 
 ---
 
+## Change 60: Dynahax Attract / Entrainment ban (data/mods/pbo/abilities.ts)
+
+Discord report (Dynamax raid abuse):
+
+- Attract infatuated the raid boss, locking it out of Haze (and other moves)
+  for 12+ turns while players stacked -6 debuffs. Infatuation is a VOLATILE,
+  so the `onSetStatus` status immunity never covered it.
+- Entrainment freely passed abilities. Targeting the boss was already in the
+  `onTryHit` blocked Set, but in doubles raids players cast it on their OWN
+  partner (e.g. passing Hustle for a permanent 1.5x Attack boost), which
+  `onTryHit` on the boss can never see.
+
+Fix (all in the `dynahax` ability):
+
+- `attract` + `entrainment` added to `onFoeDisableMove` — unselectable for
+  every raid participant, regardless of target (kills the ally-passing abuse).
+- `attract` added to the `onTryHit` blocked Set — indirect calls (Sleep Talk /
+  Metronome / Assist) execute via `actions.useMove()` and bypass the picker
+  disable.
+- `attract` volatile blocked in `onTryAddVolatile` — covers Cute Charm contact
+  infatuation and any other indirect infatuation source.
+
+**Tests:** `test/sim/abilities/dynahax-attract-entrainment.js` verifies the
+picker disable (singles + doubles ally case), the Sleep Talk indirect call,
+Cute Charm contact infatuation, and that both moves stay usable against
+normal foes.
+
+---
+
 ## Upgrade Checklist
 
 1. `git fetch upstream && git merge upstream/v<new_version>`

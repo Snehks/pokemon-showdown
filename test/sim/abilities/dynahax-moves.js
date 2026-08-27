@@ -76,10 +76,15 @@ describe('Dynahax [Blocked Moves]', () => {
 
 	it('should block Entrainment', () => {
 		battle = common.createBattle({ formatid: FORMAT }, [
-			[{ species: 'Smeargle', ability: 'owntempo', moves: ['entrainment'] }],
+			[{ species: 'Smeargle', ability: 'owntempo', moves: ['entrainment', 'tackle'] }],
 			[{ species: 'Charizard', ability: 'dynahax', moves: ['splash'] }],
 		]);
-		battle.makeChoices('move entrainment', 'move splash');
+		// Change 60: Entrainment is now disabled in the picker (onFoeDisableMove)
+		// so doubles raids can't pass abilities to an ALLY either — it can no
+		// longer be selected at all, instead of only failing when aimed at the boss.
+		const entrainment = battle.p1.activeRequest.active[0].moves.find(move => move.id === 'entrainment');
+		assert(entrainment.disabled, 'Entrainment must be disabled vs a Dynahax boss');
+		battle.makeChoices('move tackle', 'move splash');
 		assert.equal(battle.p2.active[0].ability, 'dynahax');
 	});
 

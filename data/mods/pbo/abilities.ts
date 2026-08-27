@@ -126,6 +126,14 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 		// Self-inflicted: source is null (lockedmove onEnd) or source === target.
 		onTryAddVolatile(status, target, source) {
 			if (status.id === 'confusion' && (!source || source === target)) return null;
+			// [PBO] Infatuation is a volatile, not a status, so onSetStatus never
+			// covered it — Attract locked raid bosses out of Haze for 12+ turns
+			// while players stacked -6 debuffs (Discord report). Also covers Cute
+			// Charm contact infatuation.
+			if (status.id === 'attract') {
+				this.add('-immune', target, '[from] ability: Dynahax');
+				return null;
+			}
 		},
 
 		// Immune to all status conditions
@@ -176,7 +184,12 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 					moveSlot.id === 'doodle' ||
 					moveSlot.id === 'imprison' ||
 					moveSlot.id === 'roleplay' ||
-					moveSlot.id === 'copycat'
+					moveSlot.id === 'copycat' ||
+					// Attract infatuation-locks the boss; Entrainment is disabled for
+					// ALL targets because in doubles raids players cast it on their own
+					// partner (passing Hustle etc.), which onTryHit on the boss never sees.
+					moveSlot.id === 'attract' ||
+					moveSlot.id === 'entrainment'
 				) {
 					pokemon.disableMove(moveSlot.id);
 				}
@@ -188,6 +201,7 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 		onTryHit(target, source, move) {
 			if (target === source) return;
 			const blocked = new Set([
+				'attract',
 				'soak', 'magicpowder', 'trickortreat', 'forestscurse',
 				'doodle', 'perishsong', 'torment', 'taunt', 'encore',
 				'trick', 'switcheroo', 'bestow', 'entrainment', 'skillswap', 'painsplit',

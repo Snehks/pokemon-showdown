@@ -151,6 +151,10 @@ const Abilities = {
     // Self-inflicted: source is null (lockedmove onEnd) or source === target.
     onTryAddVolatile(status, target, source) {
       if (status.id === "confusion" && (!source || source === target)) return null;
+      if (status.id === "attract") {
+        this.add("-immune", target, "[from] ability: Dynahax");
+        return null;
+      }
     },
     // Immune to all status conditions
     // Mirrors: canAddStatus → always false
@@ -181,7 +185,10 @@ const Abilities = {
     // Pattern: same as Imprison's onFoeDisableMove.
     onFoeDisableMove(pokemon) {
       for (const moveSlot of pokemon.moveSlots) {
-        if (moveSlot.id === "destinybond" || moveSlot.id === "grudge" || moveSlot.id === "batonpass" || moveSlot.id === "skillswap" || moveSlot.id === "bestow" || moveSlot.id === "powertrick" || moveSlot.id === "dragoncheer" || moveSlot.id === "guardsplit" || moveSlot.id === "powersplit" || moveSlot.id === "speedswap" || moveSlot.id === "soak" || moveSlot.id === "magicpowder" || moveSlot.id === "trickortreat" || moveSlot.id === "forestscurse" || moveSlot.id === "doodle" || moveSlot.id === "imprison" || moveSlot.id === "roleplay" || moveSlot.id === "copycat") {
+        if (moveSlot.id === "destinybond" || moveSlot.id === "grudge" || moveSlot.id === "batonpass" || moveSlot.id === "skillswap" || moveSlot.id === "bestow" || moveSlot.id === "powertrick" || moveSlot.id === "dragoncheer" || moveSlot.id === "guardsplit" || moveSlot.id === "powersplit" || moveSlot.id === "speedswap" || moveSlot.id === "soak" || moveSlot.id === "magicpowder" || moveSlot.id === "trickortreat" || moveSlot.id === "forestscurse" || moveSlot.id === "doodle" || moveSlot.id === "imprison" || moveSlot.id === "roleplay" || moveSlot.id === "copycat" || // Attract infatuation-locks the boss; Entrainment is disabled for
+        // ALL targets because in doubles raids players cast it on their own
+        // partner (passing Hustle etc.), which onTryHit on the boss never sees.
+        moveSlot.id === "attract" || moveSlot.id === "entrainment") {
           pokemon.disableMove(moveSlot.id);
         }
       }
@@ -191,6 +198,7 @@ const Abilities = {
     onTryHit(target, source, move) {
       if (target === source) return;
       const blocked = /* @__PURE__ */ new Set([
+        "attract",
         "soak",
         "magicpowder",
         "trickortreat",
