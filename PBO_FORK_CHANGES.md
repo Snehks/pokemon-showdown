@@ -70,8 +70,13 @@ these changes by searching for `[PBO]` comments in the source.
 | 55 | `data/mods/pbo/scripts.ts` | Blaziken-S3 event form | Register missing Blaziken-S3 in the Summer 2026 S3 event-form block |
 | 56 | `data/mods/pbo/abilities.ts`, `data/mods/pbo/moves.ts` | Revert Dynahax engine stat protection + hard-block Imprison | Remove Change 53's `onTryBoost` floor, `onResidual` foe-boost wipe, and the Guard Split / Power Split / Speed Swap `onTryHit` entries. Add an `imprison` `onTry` override in `moves.ts` so Imprison fails against a Dynahax boss by **any** route (direct pick, Sleep Talk, Metronome, Assist, Instruct) in single and double battles |
 | 57 | `data/mods/pbo/abilities.ts` | Dynahax percentage-damage move block | Add Nature's Madness, Guardian of Alola, and Ruination to the Dynahax `onTryHit` blocked Set so percentage-HP damage fails against raid bosses |
+| 58 | `data/mods/pbo/abilities.ts`, `data/mods/pbo/moves.ts` | Dynahax indirect banned-move bypass | Add Power Split / Guard Split / Speed Swap to the `onTryHit` blocked Set and hard-block Baton Pass at move level (`onTry`) so indirect calls (Sleep Talk / Metronome / Assist) cannot bypass picker-level bans |
+| 59 | `config/custom-formats.ts` | Remove Sleep Clause from wild battles | Wild encounters are not competitive matches; hordes and co-op wild formats need multiple simultaneous sleepers |
+| 60 | `data/mods/pbo/abilities.ts` | Dynahax Attract / Entrainment ban | Attract infatuation-locked the boss; Entrainment passed abilities to allies in doubles raids. Picker disable + `onTryHit` block + `onTryAddVolatile` block |
+| 61 | `.github/workflows/upstream-sync.yml` | Upstream v0.11.11 sync + daily sync automation | Merged upstream v0.11.11 (zero conflicts); daily workflow keeps a rolling sync PR against master |
+| 62 | `data/mods/pbo/rulesets.ts`, `data/mods/pbo/moves.ts`, `config/custom-formats.ts` | Truant Transfer Clause | Block Entrainment/Skill Swap from Truant users in NPC formats — Entrainment-Durant PvE exploit (picker disable + move-level `onTry` hard block) |
 
-**Total: 57 changes across 14 files.**
+**Total: 62 changes across 15 files.**
 
 ---
 
@@ -1254,6 +1259,40 @@ the conflicted files instead. Two rules:
   the merge-base and makes every future sync re-conflict.
 - Tagging a `v<base>-pbo-vNN` release and re-pinning the game repo's
   `package.json` remain manual, post-review steps.
+
+---
+
+## Change 62: Truant Transfer Clause (data/mods/pbo/rulesets.ts, data/mods/pbo/moves.ts, config/custom-formats.ts)
+
+Production abuse: players run a Truant Durant that uses Entrainment to give
+the NPC's Pokemon Truant, making it loaf every other turn and trivialising any
+PvE fight. Replica DB audit found 15k+ NPC battles using the combo since March
+2026 (7.8k in August alone) with 92-98% win rates, concentrated on Battle
+Tower reward farming. Skill Swap enables the identical transfer, so it is
+covered too.
+
+Fix — new `Truant Transfer Clause` rule, active only in the three NPC formats
+(`gen9pbonpcnationaldex`, `gen9pbonpcdoublesbattle`, `gen9pbocoopnpc2v1`):
+
+- **Picker disable** (`rulesets.ts` `onDisableMove`): a Pokemon whose ability
+  is `truant` cannot select Entrainment or Skill Swap.
+- **Move-level hard block** (`moves.ts` `onTry` on `entrainment` and
+  `skillswap`, gated on `this.ruleTable.has('truanttransferclause')`): indirect
+  calls (Sleep Talk / Metronome / Assist / Instruct) execute via
+  `actions.useMove()` and bypass the picker disable — same lesson as Changes
+  56/58/60. The move fails outright by every route.
+- Raw `pokemon.ability === 'truant'` checks (not `hasAbility`) so Gastro Acid
+  suppression cannot smuggle Truant through — `setAbility` transfers the raw
+  ability either way.
+
+PvP and wild formats do not carry the clause: Entrainment Durant remains a
+legitimate PvP strategy. Ordinary Truant users (Slaking) are unaffected unless
+they carry a transfer move.
+
+**Tests:** game repo `TruantTransferClauseIntegrationTest` verifies the picker
+disable in NPC singles/doubles, the Sleep Talk indirect route failing, vanilla
+Entrainment behavior for non-Truant users in NPC formats, and that PvP is
+unaffected.
 
 ---
 

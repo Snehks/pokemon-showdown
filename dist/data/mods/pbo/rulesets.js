@@ -32,6 +32,28 @@ const Rulesets = {
       }
     }
   },
+  // [PBO] Blocks the Entrainment/Skill Swap Truant-transfer exploit in NPC battles:
+  // a Truant Durant entrains the NPC's Pokemon so it loafs every other turn,
+  // trivialising any PvE fight. The picker disable here handles direct selection;
+  // indirect routes (Sleep Talk / Metronome / Assist / Instruct call moves via
+  // actions.useMove() and never check disabled slots) are hard-blocked at the move
+  // level in moves.ts, gated on this rule being active. PvP formats do not carry
+  // this clause — Entrainment Durant stays legal there.
+  // Raw `pokemon.ability` check (not hasAbility) so Gastro Acid suppression cannot
+  // smuggle Truant through: setAbility transfers the raw ability either way.
+  truanttransferclause: {
+    effectType: "Rule",
+    name: "Truant Transfer Clause",
+    desc: "Pokemon with Truant cannot use Entrainment or Skill Swap.",
+    onDisableMove(pokemon) {
+      if (pokemon.ability !== "truant") return;
+      for (const moveSlot of pokemon.moveSlots) {
+        if (moveSlot.id === "entrainment" || moveSlot.id === "skillswap") {
+          pokemon.disableMove(moveSlot.id);
+        }
+      }
+    }
+  },
   // ── Expedition rulesets ─────────────────────────────────────────────
   // Activated via @@@rulesetId in the format string.
   // Each rule attaches a volatile or modifies battle state for PBO expeditions.

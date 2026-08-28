@@ -247,6 +247,34 @@ const Moves = {
       }
     }
   },
+  // --- Truant Transfer Clause move blocks ---
+  // [PBO] The picker disable (Truant Transfer Clause onDisableMove in rulesets.ts)
+  // only stops a direct pick — Sleep Talk / Metronome / Assist / Instruct call
+  // moves via actions.useMove() without checking disabled slots. Failing here in
+  // onTry — the shared useMove path — blocks every route. Gated on the clause so
+  // PvP and wild formats keep vanilla behavior. Raw `ability` check (not
+  // hasAbility) so Gastro Acid suppression cannot smuggle Truant through:
+  // setAbility transfers the raw ability either way.
+  entrainment: {
+    inherit: true,
+    onTry(source) {
+      if (this.ruleTable.has("truanttransferclause") && source.ability === "truant") {
+        this.attrLastMove("[still]");
+        this.add("-fail", source, "move: Entrainment");
+        return null;
+      }
+    }
+  },
+  skillswap: {
+    inherit: true,
+    onTry(source) {
+      if (this.ruleTable.has("truanttransferclause") && source.ability === "truant") {
+        this.attrLastMove("[still]");
+        this.add("-fail", source, "move: Skill Swap");
+        return null;
+      }
+    }
+  },
   // --- Cosmetic event form overrides ---
   hyperspacefury: {
     inherit: true,
