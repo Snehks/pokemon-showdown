@@ -75,8 +75,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 60 | `data/mods/pbo/abilities.ts` | Dynahax Attract / Entrainment ban | Attract infatuation-locked the boss; Entrainment passed abilities to allies in doubles raids. Picker disable + `onTryHit` block + `onTryAddVolatile` block |
 | 61 | `.github/workflows/upstream-sync.yml` | Upstream v0.11.11 sync + daily sync automation | Merged upstream v0.11.11 (zero conflicts); daily workflow keeps a rolling sync PR against master |
 | 62 | `data/mods/pbo/rulesets.ts`, `data/mods/pbo/moves.ts`, `config/custom-formats.ts` | Truant Transfer Clause | Block Entrainment/Skill Swap from Truant users in NPC formats — Entrainment-Durant PvE exploit (picker disable + move-level `onTry` hard block) |
+| 63 | `data/mods/pbo/items.ts` | Chansey-H Eviolite eligibility | Apply both defensive boosts to Chansey-H without adding an evolution to the cosmetic form |
 
-**Total: 62 changes across 15 files.**
+**Total: 63 changes across 15 files.**
 
 ---
 
@@ -1293,6 +1294,25 @@ they carry a transfer move.
 disable in NPC singles/doubles, the Sleep Talk indirect route failing, vanilla
 Entrainment behavior for non-Truant users in NPC formats, and that PvP is
 unaffected.
+
+---
+
+## 63. Chansey-H Eviolite eligibility
+
+Chansey-H is registered without an evolution chain, so Showdown derives
+`nfe = false`. The inherited Eviolite checks therefore skipped both defensive
+boosts even though PBO's earlier item eligibility explicitly included Chansey-H.
+
+The PBO item override accepts `chanseyh` alongside normally evolvable species
+in `onModifyDef` and `onModifySpD`. The form's evolution data stays unchanged.
+The inherited item metadata and normal item suppression still apply.
+
+**Tests:** `test/sim/items/eviolite.js` checks both defensive stats, physical
+Close Combat and special Thunderbolt damage against a regular Chansey control,
+no-item and fully evolved controls, and Magic Room suppression. At level 100
+with Bold nature and 252 HP / 252 Def / 4 SpD EVs, Chansey-H's effective defenses
+increase from 119 / 247 to 178 / 370. The fixed-seed damage cases change from
+494 to 330 HP for Close Combat and from 91 to 61 HP for Thunderbolt.
 
 ---
 
