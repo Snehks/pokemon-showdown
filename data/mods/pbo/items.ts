@@ -1,4 +1,18 @@
 export const Items: import('../../../sim/dex-items').ModdedItemDataTable = {
+	eviolite: {
+		inherit: true,
+		// [PBO] Chansey-H has no evolution but keeps Chansey's Eviolite eligibility.
+		onModifyDef(def, pokemon) {
+			if (pokemon.baseSpecies.nfe || pokemon.baseSpecies.id === 'chanseyh') {
+				return this.chainModify(1.5);
+			}
+		},
+		onModifySpD(spd, pokemon) {
+			if (pokemon.baseSpecies.nfe || pokemon.baseSpecies.id === 'chanseyh') {
+				return this.chainModify(1.5);
+			}
+		},
+	},
 	metronome: {
 		inherit: true,
 		condition: {
