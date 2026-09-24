@@ -631,6 +631,33 @@ const Scripts = {
       return true;
     }
   },
+  actions: {
+    inherit: true,
+    // [PBO] A Dynahax boss keeps Dynahax through Mega Evolution. The permanent forme change
+    // replaces the ability with the Mega's own, which would reopen every exploit Dynahax blocks
+    // (OHKO moves, Perish Song, Destiny Bond, status...) from the boss's first turn, since NPC AI
+    // mega-evolves on its first move. Otherwise identical to the vanilla runMegaEvo.
+    runMegaEvo(pokemon) {
+      const speciesid = pokemon.canMegaEvo || pokemon.canUltraBurst;
+      if (!speciesid) return false;
+      const keepDynahax = pokemon.ability === "dynahax";
+      pokemon.formeChange(speciesid, pokemon.getItem(), true);
+      if (keepDynahax) {
+        pokemon.setAbility("dynahax", null, null, true);
+        pokemon.baseAbility = "dynahax";
+      }
+      const wasMega = pokemon.canMegaEvo;
+      for (const ally of pokemon.side.pokemon) {
+        if (wasMega) {
+          ally.canMegaEvo = false;
+        } else {
+          ally.canUltraBurst = null;
+        }
+      }
+      this.battle.runEvent("AfterMega", pokemon);
+      return true;
+    }
+  },
   pokemon: {
     inherit: true,
     // [PBO] Always include level in details string.

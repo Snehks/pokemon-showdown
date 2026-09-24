@@ -76,6 +76,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 61 | `.github/workflows/upstream-sync.yml` | Upstream v0.11.11 sync + daily sync automation | Merged upstream v0.11.11 (zero conflicts); daily workflow keeps a rolling sync PR against master |
 | 62 | `data/mods/pbo/rulesets.ts`, `data/mods/pbo/moves.ts`, `config/custom-formats.ts` | Truant Transfer Clause | Block Entrainment/Skill Swap from Truant users in NPC formats — Entrainment-Durant PvE exploit (picker disable + move-level `onTry` hard block) |
 | 63 | `data/mods/pbo/items.ts` | Chansey-H Eviolite eligibility | Apply both defensive boosts to Chansey-H without adding an evolution to the cosmetic form |
+| 64 | `data/mods/pbo/scripts.ts` | Dynahax survives Mega Evolution | `actions.runMegaEvo` restores Dynahax after the permanent forme change so Mega-stone bosses keep every Dynahax block from their first turn |
 
 **Total: 63 changes across 15 files.**
 
@@ -1313,6 +1314,29 @@ no-item and fully evolved controls, and Magic Room suppression. At level 100
 with Bold nature and 252 HP / 252 Def / 4 SpD EVs, Chansey-H's effective defenses
 increase from 119 / 247 to 178 / 370. The fixed-seed damage cases change from
 494 to 330 HP for Close Combat and from 91 to 61 HP for Thunderbolt.
+
+---
+
+## 64. Dynahax survives Mega Evolution
+
+Expedition shared-HP bosses carry Dynahax so OHKO moves, Perish Song, Destiny
+Bond, Endeavor, Super Fang and the other blocked exploits cannot empty the
+shared pool. Two of them hold Mega stones (Swampert @ Swampertite, Venusaur @
+Venusaurite), and PBO NPC AI appends `mega` to its first move. The permanent
+forme change in `formeChange` replaces the ability with the Mega's own, so
+those bosses lost Dynahax before any player move landed.
+
+The PBO `actions.runMegaEvo` override is the vanilla implementation plus one
+step: when the Pokemon's ability was `dynahax` before evolving, it is set back
+with `setAbility('dynahax', null, null, true)` and made the base ability. The
+restore is silent (no `-ability` line) and happens before `AfterMega`. Any other
+Pokemon still takes its Mega ability, and the one-Mega-per-side limit is
+unchanged.
+
+**Tests:** `test/sim/abilities/dynahax-mega.js` checks a Dynahax Swampert
+keeps Dynahax as Swampert-Mega, a Dynahax Venusaur-Mega still blocks a
+guaranteed-accuracy Sheer Cold, the same Sheer Cold KOs a non-Dynahax
+Venusaur-Mega, and a Torrent Swampert still becomes Swift Swim.
 
 ---
 
