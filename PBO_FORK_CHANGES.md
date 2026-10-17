@@ -77,6 +77,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 62 | `data/mods/pbo/rulesets.ts`, `data/mods/pbo/moves.ts`, `config/custom-formats.ts` | Truant Transfer Clause | Block Entrainment/Skill Swap from Truant users in NPC formats — Entrainment-Durant PvE exploit (picker disable + move-level `onTry` hard block) |
 | 63 | `data/mods/pbo/items.ts` | Chansey-H Eviolite eligibility | Apply both defensive boosts to Chansey-H without adding an evolution to the cosmetic form |
 | 64 | `data/mods/pbo/scripts.ts` | Dynahax survives Mega Evolution | `actions.runMegaEvo` restores Dynahax after the permanent forme change so Mega-stone bosses keep every Dynahax block from their first turn |
+| 65 | `data/mods/pbo/scripts.ts` | Halloween 2026 H5 event forms | Register 45 Halloween 2026 cosmetic forms (suffix `H5`) in PBO_EVENT_FORMS |
 
 **Total: 63 changes across 15 files.**
 
@@ -1362,3 +1363,26 @@ the v68 `activeSlotsPerSide` support:
 Symmetric `2v2` continues to use the existing PBO wild doubles format. Engine
 tests verify that every opponent slot can target either human slot, including
 all five opponent actions in `2v5`.
+
+---
+
+## Change 65: Halloween 2026 H5 event forms (data/mods/pbo/scripts.ts)
+
+**What it does:** Registers 45 Halloween 2026 cosmetic event forms (suffix `H5`) in
+the `PBO_EVENT_FORMS` array: Alakazam, Banette, Cacturne, Spectrier, Celebi, Chansey,
+Emboar, Lucario, Scizor, Seviper, Toxapex, Toxicroak, Mimikyu, Zangoose, Aerodactyl,
+Aurorus, Blissey, Cofagrigus, Dragonite, Galvantula, Golisopod, Jirachi, Lapras, Lunala,
+Meowscarada, Primarina, Rampardos, Reuniclus, Solgaleo, Corviknight, Ursaring, Ursaluna,
+Blacephalon, Bisharp, Kingambit, Ceruledge, Espeon, Gardevoir, Glimmora, Grimmsnarl,
+Mawile, Mr. Mime, Obstagoon, Rotom-Wash and Slowbro (all `-H5`). Each entry is a
+`[eventId, baseId, displayName, "H5"]` tuple consumed by the `init()` handler (Change 39).
+
+**Why:** The PBO Halloween 2026 event ships these skinned variants. Without
+registration, the server packs a team referencing e.g. `alakazamh5` and Showdown
+rejects it as an unknown species. There are no H5 Mega forms: the eight species with
+a Mega (Alakazam, Slowbro, Aerodactyl, Scizor, Gardevoir, Mawile, Banette, Lucario)
+Mega-evolve into the regular Mega, as most earlier Halloween forms do.
+
+**Tests:** Verified post-build that all 45 forms resolve via
+`Dex.mod('pbo').species.get(id)` with stats/types/abilities inherited from the base
+species, and that every base id exists in the vanilla Pokedex so `init()` skips none.
