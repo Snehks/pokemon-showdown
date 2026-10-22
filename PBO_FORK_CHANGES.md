@@ -79,8 +79,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 64 | `data/mods/pbo/scripts.ts` | Dynahax survives Mega Evolution | `actions.runMegaEvo` restores Dynahax after the permanent forme change so Mega-stone bosses keep every Dynahax block from their first turn |
 | 65 | `data/mods/pbo/scripts.ts` | Halloween 2026 H5 event forms | Register 45 Halloween 2026 cosmetic forms (suffix `H5`) in PBO_EVENT_FORMS |
 | 66 | `sim/battle.ts` | Upstream sync to `8476966bb` + `faintMessages` shim | Merged 216 upstream commits (July-September 2026 Random Battles balance patches); `faintMessages()` forwards to upstream's renamed `resolveFaints()` because the game server still calls it |
+| 67 | `package.json`, `.github/workflows/upstream-sync.yml` | No build on git installs | Drop the `prepare` script (the committed `dist/` is what installs use) so `npm ci` in the game repo works on any Node version; the daily sync workflow moves to Node 22 |
 
-**Total: 66 changes across 15 files.**
+**Total: 67 changes across 15 files.**
 
 ---
 
@@ -1435,3 +1436,22 @@ passing, 3 failing, all unrelated to the merge (gen 1 Mirror Move partial
 trapping and the Overflow Stat Mod 654 cap, both failing before the merge too,
 and the SQLite worker because native modules were not built). Random battle
 suites (gen 9, all gens, tools, slow tests included): 163 passing.
+
+---
+
+## Change 67: No build on git installs (package.json, .github/workflows/upstream-sync.yml)
+
+Since Change 66, `node build` exits on Node.js older than 22. The `prepare`
+script ran that build on every git install: npm 10 (bundled with Node 20 and 22)
+runs a git dependency's `prepare` during the game repo's `npm ci`, so the install
+failed on any machine with Node older than 22. npm 11 already skips it unless the
+package is allow-listed, which is how the game repo installed v76.
+
+- Removed `"prepare": "node build"` from `package.json`. `dist/` has been
+  committed since `901caf295` (2026-03-04, two minutes after the script was
+  added), and `npm pack` ships all of it, so installs need no build step and no
+  devDependencies.
+- `upstream-sync.yml` sets up Node `22.x` instead of `18.x`. Its own
+  `npm ci` + `node build` step needs Node 22 now.
+
+Build `dist/` with `node build` (or `npm run build`) before committing, as before.
