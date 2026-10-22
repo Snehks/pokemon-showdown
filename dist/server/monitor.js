@@ -91,12 +91,13 @@ const Monitor = new class {
    *********************************************************/
   crashlog(err, source = "The main process", details = null) {
     const error = err || {};
-    if ((error.stack || "").startsWith("@!!@")) {
+    const stack = error.stack || "";
+    const header = /^(\[\d+\] )?@!!@([^\n]*)\n/.exec(stack);
+    if (header) {
+      const [fullHeader, pidPrefix = "", metadata] = header;
       try {
-        const stack = error.stack || "";
-        const nlIndex = stack.indexOf("\n");
-        [error.name, error.message, source, details] = JSON.parse(stack.slice(4, nlIndex));
-        error.stack = stack.slice(nlIndex + 1);
+        [error.name, error.message, source, details] = JSON.parse(metadata);
+        error.stack = pidPrefix + stack.slice(fullHeader.length);
       } catch {
       }
     }

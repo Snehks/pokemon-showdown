@@ -270,7 +270,8 @@ const commands = {
         if (getAliases(room, toID(event.eventName)).length) hasAliases = true;
       }
       for (const potentialCategory of getAllCategories(room)) {
-        if (events.map((event) => toID(event.eventName)).filter((id) => (room.settings.events?.[potentialCategory]).events.includes(id)).length) hasCategories = true;
+        const category = room.settings.events[potentialCategory];
+        if (events.map((event) => toID(event.eventName)).filter((id) => category.events.includes(id)).length) hasCategories = true;
         break;
       }
       let buff = '<table border="1" cellspacing="0" cellpadding="3">';

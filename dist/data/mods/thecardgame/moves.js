@@ -118,7 +118,7 @@ const Moves = {
       this.add("-start", target, "typeadd", "Psychic", "[from] move: Trick-or-Treat");
       if (target.side.active.length === 2 && target.position === 1) {
         const action = this.queue.willMove(target);
-        if (action && action.move.id === "curse") {
+        if (action?.move.id === "curse") {
           action.targetLoc = -1;
         }
       }

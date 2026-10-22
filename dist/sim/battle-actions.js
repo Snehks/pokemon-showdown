@@ -73,6 +73,21 @@ class BattleActions {
   }
   // #region SWITCH
   // ==================================================================
+  runPursuitActivation(pokemon) {
+    if (pokemon.skipPursuit) return;
+    this.battle.runEvent("BeforeSwitchOut", pokemon);
+    this.battle.clearActiveMove();
+    if (this.battle.gen >= 5) {
+      this.battle.eachEvent("Update");
+    }
+    if (pokemon.pursuitActivated) this.battle.resolveFaints({ checkWin: this.battle.gen >= 5 });
+    if (pokemon.hp && !pokemon.switchFlag) {
+      pokemon.pursuitActivated = false;
+      pokemon.skipPursuit = false;
+    } else {
+      pokemon.skipPursuit = true;
+    }
+  }
   switchIn(pokemon, pos, sourceEffect = null, isDrag) {
     if (!pokemon || pokemon.isActive) {
       this.battle.hint("A switch failed because the Pok\xE9mon trying to switch in is already in.");
@@ -90,31 +105,32 @@ class BattleActions {
       if (sourceEffect && typeof sourceEffect.selfSwitch === "string") {
         switchCopyFlag = sourceEffect.selfSwitch;
       }
-      if (!oldActive.skipBeforeSwitchOutEventFlag && !isDrag) {
-        this.battle.runEvent("BeforeSwitchOut", oldActive);
-        if (this.battle.gen >= 5) {
-          this.battle.eachEvent("Update");
-        }
+      if (!isDrag) {
+        this.runPursuitActivation(oldActive);
       }
-      oldActive.skipBeforeSwitchOutEventFlag = false;
       if (!this.battle.runEvent("SwitchOut", oldActive)) {
         return false;
       }
       if (!oldActive.hp) {
-        return "pursuitfaint";
+        if (this.battle.gen >= 5) {
+          this.battle.hint("A Pokemon can't switch between when it runs out of HP and when it faints");
+          return false;
+        }
+        this.battle.hint("Previously chosen switches continue in Gen 2-4 after a Pursuit target faints.");
+      } else {
+        this.battle.singleEvent("End", oldActive.getAbility(), oldActive.abilityState, oldActive);
+        this.battle.singleEvent("End", oldActive.getItem(), oldActive.itemState, oldActive);
+        this.battle.queue.cancelAction(oldActive);
+        let newMove = null;
+        if (this.battle.gen === 4 && sourceEffect) {
+          newMove = oldActive.lastMove;
+        }
+        if (switchCopyFlag) {
+          pokemon.copyVolatileFrom(oldActive, switchCopyFlag);
+        }
+        if (newMove) pokemon.lastMove = newMove;
+        oldActive.clearVolatile();
       }
-      this.battle.singleEvent("End", oldActive.getAbility(), oldActive.abilityState, oldActive);
-      this.battle.singleEvent("End", oldActive.getItem(), oldActive.itemState, oldActive);
-      this.battle.queue.cancelAction(oldActive);
-      let newMove = null;
-      if (this.battle.gen === 4 && sourceEffect) {
-        newMove = oldActive.lastMove;
-      }
-      if (switchCopyFlag) {
-        pokemon.copyVolatileFrom(oldActive, switchCopyFlag);
-      }
-      if (newMove) pokemon.lastMove = newMove;
-      oldActive.clearVolatile();
     }
     if (oldActive) {
       oldActive.isActive = false;
@@ -122,6 +138,8 @@ class BattleActions {
       oldActive.usedItemThisTurn = false;
       oldActive.statsRaisedThisTurn = false;
       oldActive.statsLoweredThisTurn = false;
+      oldActive.pursuitActivated = false;
+      oldActive.skipPursuit = false;
       oldActive.position = pokemon.position;
       if (oldActive.fainted) oldActive.status = "";
       if (this.battle.gen <= 4) {
@@ -139,6 +157,27 @@ class BattleActions {
     for (const moveSlot of pokemon.moveSlots) {
       moveSlot.used = false;
     }
+    if (this.battle.gen <= 4) {
+      if (pokemon.itemKnockedOff && pokemon.item) {
+        this.battle.hint("In Gens 3-4, Knock Off makes a Pok\xE9mon lose its held item every time it switches in.");
+        pokemon.item = "";
+      }
+      if (this.battle.gen <= 2) {
+        for (const poke of this.battle.getAllActive()) poke.lastMove = null;
+        if (this.battle.gen === 1) {
+          pokemon.side.lastSelectedMoveSlot = 0;
+          for (const poke of pokemon.foes()) {
+            if (poke.volatiles["partialtrappinglock"] && poke.moveSlots[poke.side.lastSelectedMoveSlot].id === "metronome") {
+              poke.side.lastSelectedMove = "metronome";
+              poke.side.lastEnemySelectedMove = "metronome";
+              if (this.battle.queue.willMove(poke)) {
+                this.battle.queue.changeAction(poke, { choice: "move", poke, moveid: "metronome" });
+              }
+            }
+          }
+        }
+      }
+    }
     pokemon.abilityState = this.battle.initEffectState({ id: pokemon.ability, target: pokemon });
     pokemon.itemState = this.battle.initEffectState({ id: pokemon.item, target: pokemon });
     this.battle.runEvent("BeforeSwitchIn", pokemon);
@@ -147,14 +186,23 @@ class BattleActions {
     } else {
       this.battle.add(isDrag ? "drag" : "switch", pokemon, pokemon.getFullDetails);
     }
-    if (isDrag && this.battle.gen === 2) pokemon.draggedIn = this.battle.turn;
     pokemon.previouslySwitchedIn++;
-    if (isDrag && this.battle.gen >= 5) {
+    if (this.battle.gen <= 4) {
+      this.battle.runEvent("EntryHazard", pokemon);
+      if (this.battle.gen <= 2 && !pokemon.side.faintedThisTurn && !isDrag) {
+        this.battle.runEvent("AfterSwitchInSelf", pokemon);
+      }
+      if (!pokemon.hp) return false;
+      if (this.battle.gen === 3 && this.battle.turn > 0) {
+        this.battle.runEvent("AfterEntryHazard", pokemon);
+      }
+    }
+    if (isDrag) {
       this.runSwitch(pokemon);
     } else {
       this.battle.queue.insertChoice({ choice: "runSwitch", pokemon });
     }
-    return true;
+    return !!pokemon.hp;
   }
   dragIn(side, pos) {
     const pokemon = this.battle.getRandomSwitchable(side);
@@ -165,8 +213,7 @@ class BattleActions {
     if (!this.battle.runEvent("DragOut", oldActive)) {
       return false;
     }
-    if (!this.switchIn(pokemon, pos, null, true)) return false;
-    return true;
+    return this.switchIn(pokemon, pos, null, true);
   }
   runSwitch(pokemon) {
     const switchersIn = [pokemon];
@@ -181,7 +228,11 @@ class BattleActions {
     for (const poke of switchersIn) {
       if (!poke.hp) continue;
       poke.isStarted = true;
-      poke.draggedIn = null;
+    }
+    if (this.battle.gen === 4) {
+      for (const poke of this.battle.getAllActive()) {
+        poke.removeVolatile("substitutebroken");
+      }
     }
     return true;
   }
@@ -269,7 +320,7 @@ class BattleActions {
     }
     const oldActiveMove = move;
     const moveDidSomething = this.useMove(baseMove, pokemon, { target, sourceEffect, zMove, maxMove });
-    this.battle.lastSuccessfulMoveThisTurn = moveDidSomething ? this.battle.activeMove && this.battle.activeMove.id : null;
+    this.battle.lastSuccessfulMoveThisTurn = moveDidSomething ? this.battle.activeMove?.id ?? null : null;
     if (this.battle.activeMove) move = this.battle.activeMove;
     this.battle.singleEvent("AfterMove", move, null, pokemon, target, move);
     this.battle.runEvent("AfterMove", pokemon, target, move);
@@ -289,7 +340,7 @@ class BattleActions {
       );
       const targetOf1stDance = this.battle.activeTarget;
       for (const dancer of dancers) {
-        if (this.battle.faintMessages()) break;
+        if (this.battle.resolveFaints()) break;
         if (dancer.fainted) continue;
         this.battle.add("-activate", dancer, "ability: Dancer");
         const dancersTarget = !targetOf1stDance.isAlly(dancer) && pokemon.isAlly(dancer) ? targetOf1stDance : pokemon;
@@ -298,7 +349,14 @@ class BattleActions {
       }
     }
     if (noLock && pokemon.volatiles["lockedmove"]) delete pokemon.volatiles["lockedmove"];
-    this.battle.faintMessages();
+    if (this.battle.gen <= 4) {
+      for (const faintData of this.battle.faintQueue) {
+        if (faintData.faintEventDone) continue;
+        faintData.faintEventDone = true;
+        this.battle.runEvent("Faint", faintData.target, faintData.source, faintData.effect);
+      }
+    }
+    this.battle.resolveFaints();
     this.battle.checkWin();
     if (this.battle.gen <= 4) {
       this.battle.activeMove = oldActiveMove;
@@ -445,20 +503,17 @@ class BattleActions {
       const originalHp = pokemon.hp;
       this.battle.singleEvent("MoveFail", move, null, target, pokemon, move);
       if (pokemon && pokemon !== target && move.category !== "Status") {
-        if (pokemon.hp <= pokemon.maxhp / 2 && originalHp > pokemon.maxhp / 2) {
-          this.battle.runEvent("EmergencyExit", pokemon, pokemon);
-        }
+        this.battle.runEvent("EmergencyExit", pokemon, pokemon, void 0, originalHp);
       }
       return false;
     }
-    if (!(move.hasSheerForce && pokemon.hasAbility("sheerforce")) && !move.flags["futuremove"]) {
+    if (this.battle.gen <= 4) this.battle.resolveFaints({ checkWin: false });
+    if (!this.battle.suppressingSecondaries() && !move.flags["futuremove"]) {
       const originalHp = pokemon.hp;
       this.battle.singleEvent("AfterMoveSecondarySelf", move, null, pokemon, target, move);
       this.battle.runEvent("AfterMoveSecondarySelf", pokemon, target, move);
       if (pokemon && pokemon !== target && move.category !== "Status") {
-        if (pokemon.hp <= pokemon.maxhp / 2 && originalHp > pokemon.maxhp / 2) {
-          this.battle.runEvent("EmergencyExit", pokemon, pokemon);
-        }
+        this.battle.runEvent("EmergencyExit", pokemon, pokemon, void 0, originalHp);
       }
     }
     return true;
@@ -705,10 +760,8 @@ class BattleActions {
     return void 0;
   }
   afterMoveSecondaryEvent(targets, pokemon, move) {
-    if (!(move.hasSheerForce && pokemon.hasAbility("sheerforce"))) {
-      this.battle.singleEvent("AfterMoveSecondary", move, null, targets[0], pokemon, move);
-      this.battle.runEvent("AfterMoveSecondary", targets, pokemon, move);
-    }
+    this.battle.singleEvent("AfterMoveSecondary", move, null, targets[0], pokemon, move);
+    this.battle.runEvent("AfterMoveSecondary", targets, pokemon, move);
     return void 0;
   }
   /** NOTE: used only for moves that target sides/fields rather than pokemon */
@@ -845,7 +898,7 @@ class BattleActions {
     }
     if (hit === 1) return damage.fill(false);
     if (nullDamage) damage.fill(false);
-    this.battle.faintMessages(false, false, !pokemon.hp);
+    if (this.battle.gen >= 5) this.battle.resolveFaints({ checkWin: !pokemon.hp });
     if (move.multihit && typeof move.smartTarget !== "boolean") {
       this.battle.add("-hitcount", targets[0], hit - 1);
     }
@@ -866,15 +919,13 @@ class BattleActions {
     if (move.ohko && !targets[0].hp) this.battle.add("-ohko");
     if (!damage.some((val) => !!val || val === 0)) return damage;
     this.battle.eachEvent("Update");
-    this.afterMoveSecondaryEvent(targetsCopy.filter((val) => !!val), pokemon, move);
-    if (!(move.hasSheerForce && pokemon.hasAbility("sheerforce"))) {
+    if (!this.battle.suppressingSecondaries()) {
+      this.afterMoveSecondaryEvent(targetsCopy.filter((val) => !!val), pokemon, move);
       for (const [i, d] of damage.entries()) {
         const curDamage = targets.length === 1 ? move.totalDamage : d;
         if (typeof curDamage === "number" && targets[i].hp) {
           const targetHPBeforeDamage = (targets[i].hurtThisTurn || 0) + curDamage;
-          if (targets[i].hp <= targets[i].maxhp / 2 && targetHPBeforeDamage > targets[i].maxhp / 2) {
-            this.battle.runEvent("EmergencyExit", targets[i], pokemon);
-          }
+          this.battle.runEvent("EmergencyExit", targets[i], pokemon, void 0, targetHPBeforeDamage);
         }
       }
     }
@@ -961,9 +1012,7 @@ class BattleActions {
       if (this.battle.gen < 5) {
         this.battle.runEvent("DamagingHit", damagedTargets, pokemon, move, damagedDamage);
       }
-      if (pokemon.hp && pokemon.hp <= pokemon.maxhp / 2 && pokemonOriginalHP > pokemon.maxhp / 2) {
-        this.battle.runEvent("EmergencyExit", pokemon);
-      }
+      this.battle.runEvent("EmergencyExit", pokemon, void 0, void 0, pokemonOriginalHP);
     }
     return [damage, targets];
   }
@@ -1109,7 +1158,7 @@ class BattleActions {
         }
       }
       this.battle.debug("move failed because it did nothing");
-    } else if (move.selfSwitch && source.hp && !source.volatiles["commanded"]) {
+    } else if (move.selfSwitch && source.hp && !source.volatiles["commanded"] && (this.battle.canSwitch(source.side) || move.id === "revivalblessing")) {
       source.switchFlag = move.id;
     }
     return damage;
@@ -1178,9 +1227,7 @@ class BattleActions {
       const effect = move.mindBlownRecoil ? this.dex.conditions.get(move.name) : "recoil";
       this.battle.damage(recoilDamage, pokemon, pokemon, effect);
     }
-    if (pokemon.hp <= pokemon.maxhp / 2 && hpBeforeRecoil > pokemon.maxhp / 2) {
-      this.battle.runEvent("EmergencyExit", pokemon, pokemon);
-    }
+    this.battle.runEvent("EmergencyExit", pokemon, pokemon, void 0, hpBeforeRecoil);
     return recoilDamage;
   }
   getZMove(move, pokemon, skipChecks) {

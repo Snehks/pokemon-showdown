@@ -768,7 +768,7 @@ const commands = {
       }
       const otd = otds.get(otdId);
       if (!otd) {
-        throw new Chat.ErrorMessage(`OTD ${otd} not found.`);
+        throw new Chat.ErrorMessage(`OTD ${otdId} not found.`);
       }
       const targetRoom = Rooms.get(roomid);
       if (!targetRoom) {

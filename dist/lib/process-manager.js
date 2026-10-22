@@ -41,7 +41,7 @@ __export(process_manager_exports, {
 });
 module.exports = __toCommonJS(process_manager_exports);
 var child_process = __toESM(require("child_process"));
-var cluster = __toESM(require("cluster"));
+var import_cluster = __toESM(require("cluster"));
 var path = __toESM(require("path"));
 var Streams = __toESM(require("./streams"));
 var import_fs = require("./fs");
@@ -322,7 +322,7 @@ class RawProcessWrapper {
     /** Not managed by RawProcessWrapper itself */
     this.load = 0;
     if (isCluster) {
-      this.process = cluster.fork(env);
+      this.process = import_cluster.default.fork(env);
       this.workerid = this.process.id;
     } else {
       this.process = child_process.fork(file, [], { cwd: import_fs.FS.ROOT_PATH, env });
@@ -542,11 +542,10 @@ class StreamProcessManager extends ProcessManager {
     return new StreamProcessWrapper(this.filename, this.messageCallback);
   }
   async pipeStream(taskId2, stream2) {
-    let done = false;
-    while (!done) {
+    while (true) {
       try {
-        let value;
-        ({ value, done } = await stream2.next());
+        const { value, done } = await stream2.next();
+        if (done) break;
         process.send(`${taskId2}
 PUSH
 ${value}`);
@@ -616,12 +615,12 @@ class RawProcessManager extends ProcessManager {
     this.spawnSubscription = null;
     this.unspawnSubscription = null;
     /** worker ID of cluster worker - cluster child process only (0 otherwise) */
-    this.workerid = cluster.worker?.id || 0;
+    this.workerid = import_cluster.default.worker?.id || 0;
     this.isCluster = !!options.isCluster;
     this._setupChild = options.setupChild;
     this.env = options.env;
     if (this.isCluster && this.isParentProcess) {
-      cluster.setupMaster({
+      import_cluster.default.setupMaster({
         exec: this.filename,
         cwd: import_fs.FS.ROOT_PATH
       });
@@ -654,11 +653,10 @@ class RawProcessManager extends ProcessManager {
     this.unspawnSubscription?.(process2);
   }
   async pipeStream(stream2) {
-    let done = false;
-    while (!done) {
+    while (true) {
       try {
-        let value;
-        ({ value, done } = await stream2.next());
+        const { value, done } = await stream2.next();
+        if (done) break;
         process.send(value);
       } catch (err) {
         process.send(`THROW

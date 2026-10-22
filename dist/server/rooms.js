@@ -82,6 +82,7 @@ class BasicRoom {
     this.tour = null;
     this.roomid = roomid;
     this.title = title || roomid;
+    this.validateTitle(this.title, this.roomid);
     this.parent = null;
     this.userCount = 0;
     this.game = null;
@@ -142,7 +143,6 @@ class BasicRoom {
     this.tour = null;
     this.game = null;
     this.battle = null;
-    this.validateTitle(this.title, this.roomid);
   }
   toString() {
     return this.roomid;
@@ -312,8 +312,8 @@ class BasicRoom {
     if (this.parent) return this.parent.getMuteTime(user);
   }
   getGame(constructor, subGame = false) {
-    if (subGame && this.subGame && this.subGame.constructor.name === constructor.name) return this.subGame;
-    if (this.game && this.game.constructor.name === constructor.name) return this.game;
+    if (subGame && this.subGame?.constructor.name === constructor.name) return this.subGame;
+    if (this.game?.constructor.name === constructor.name) return this.game;
     return null;
   }
   getMinorActivity(constructor) {
@@ -409,7 +409,7 @@ class BasicRoom {
       autoconfirmed = user.autoconfirmed;
     }
     for (const [i, entry] of this.muteQueue.entries()) {
-      if (entry.userid === userid || user && entry.guestNum === user.guestNum || autoconfirmed && entry.autoconfirmed === autoconfirmed) {
+      if (entry.userid === userid || entry.guestNum === user?.guestNum || autoconfirmed && entry.autoconfirmed === autoconfirmed) {
         if (i === 0) {
           this.muteQueue.splice(0, 1);
           this.runMuteTimer(true);
@@ -498,7 +498,7 @@ class BasicRoom {
     }
     if (this.settings.modjoin) {
       const modjoin = this.settings.modjoin === true ? this.settings.modchat : this.settings.modjoin;
-      message += ` [${modjoin} or higher to join]`;
+      if (modjoin) message += ` [${modjoin} or higher to join]`;
     }
     if (this.settings.slowchat) {
       message += ` [Slowchat ${this.settings.slowchat}s]`;
@@ -591,7 +591,7 @@ ${staffIntro}`;
     }
     this.subRooms = null;
   }
-  setPrivate(privacy) {
+  setPrivate(privacy, password) {
     this.settings.isPrivate = privacy;
     this.saveSettings();
     if (privacy) {
@@ -605,8 +605,10 @@ ${staffIntro}`;
     if (this.battle || this.bestOf) {
       if (privacy) {
         if (this.roomid.endsWith("pw")) return true;
-        let password = "";
-        for (let i = 0; i < 31; i++) password += ALPHABET[crypto.randomInt(0, ALPHABET.length - 1)];
+        if (!password) {
+          password = "";
+          for (let i = 0; i < 31; i++) password += ALPHABET[crypto.randomInt(0, ALPHABET.length - 1)];
+        }
         this.rename(this.title, `${this.roomid}-${password}pw`, true);
       } else {
         if (!this.roomid.endsWith("pw")) return true;
@@ -812,7 +814,7 @@ ${staffIntro}`;
   }
   runAutoModchat() {
     if (!this.settings.autoModchat || this.settings.autoModchat.active) return;
-    const staff = Object.values(this.users).filter((u) => this.auth.atLeast(u, "%") && u.statusType === "online");
+    const staff = Object.values(this.users).filter((u) => this.auth.atLeast(u, "%"));
     if (!staff.length) {
       const { time } = this.settings.autoModchat;
       if (!time || time < 5) {
@@ -897,8 +899,8 @@ ${staffIntro}`;
     Rooms.rooms.delete(this.roomid);
     if (this.roomid === "lobby") Rooms.lobby = null;
   }
-  tr(strings, ...keys) {
-    return Chat.tr(this.settings.language || "english", strings, ...keys);
+  TL(strings, ...keys) {
+    return Chat.TLto(this.settings.language || "english", strings, ...keys);
   }
 }
 class GlobalRoomState {
@@ -1146,6 +1148,13 @@ class GlobalRoomState {
       if (format.teraPreviewDefault) displayCode |= 128;
       if (format.itemClauseDefault) displayCode |= 256;
       this.formatList += "," + displayCode.toString(16);
+      const virtualDisplayCode = displayCode & ~(4 | 8);
+      for (const formatAlias in Ladders.virtualFormats) {
+        const entry = Ladders.virtualFormats[formatAlias];
+        if (entry.format === format.id) {
+          this.formatList += `|${entry.name},${virtualDisplayCode.toString(16)}`;
+        }
+      }
     }
     return this.formatList;
   }
@@ -1612,7 +1621,7 @@ ${this.log.broadcastBuffer.join("\n")}`);
     if (silent) connection = void 0;
     const isPrivate = this.settings.isPrivate || this.hideReplay;
     const hidden = options === "auto" ? 10 : options === "forpunishment" || this.unlistReplay ? 2 : isPrivate ? 1 : 0;
-    if (isPrivate && hidden === 10) {
+    if (isPrivate && hidden !== 2) {
       password = battle.password ||= import_replays.Replays.generatePassword();
     }
     if (battle.replaySaved !== true && hidden === 10) {

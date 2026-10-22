@@ -163,7 +163,7 @@ class LadderStore {
     if (index >= 0) {
       rating = ladder[index][1];
     }
-    if (user && user.id === userid) {
+    if (user?.id === userid) {
       user.mmrCache[formatid] = rating;
     }
     return rating;
@@ -255,7 +255,11 @@ class LadderStore {
       room.add(e.stack);
       room.update();
     }
-    return [p1score, p1newElo, p2newElo];
+    return [
+      p1score,
+      p1newElo === void 0 ? null : { elo: p1newElo },
+      p2newElo === void 0 ? null : { elo: p2newElo }
+    ];
   }
   /**
    * Returns a promise for a <tr> with all ratings for the current format.

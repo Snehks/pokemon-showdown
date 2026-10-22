@@ -131,7 +131,7 @@ const Scripts = {
       if (handler.callback) {
         this.singleEvent(handlerEventid, effect, handler.state, handler.effectHolder, null, null, void 0, handler.callback);
       }
-      this.faintMessages();
+      this.resolveFaints();
       if (this.ended) return;
     }
   },
@@ -155,7 +155,7 @@ const Scripts = {
     }
     const dynamaxEnding = [];
     for (const pokemon of this.getAllActive()) {
-      if (pokemon.volatiles["dynamax"]?.turns === 3) {
+      if (pokemon.volatiles["dynamax"]?.turns <= 0) {
         dynamaxEnding.push(pokemon);
       }
     }

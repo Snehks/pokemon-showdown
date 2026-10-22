@@ -152,7 +152,7 @@ class RandomPlayerAI extends import_battle_stream.BattlePlayer {
             return move;
           }
         } else {
-          throw new Error(`${this.constructor.name} unable to make choice ${i}. request='${typeof request}', chosen='${chosen}', (mega=${canMegaEvo}, ultra=${canUltraBurst}, zmove=${canZMove}, dynamax='${canDynamax}', terastallize=${canTerastallize})`);
+          throw new Error(`${this.constructor.name} unable to make choice ${i}. request='${typeof request}', chosen='${chosen.join(",")}', (mega=${canMegaEvo}, ultra=${canUltraBurst}, zmove=${canZMove}, dynamax='${canDynamax}', terastallize=${canTerastallize})`);
         }
       });
       this.choose(choices.join(`, `));

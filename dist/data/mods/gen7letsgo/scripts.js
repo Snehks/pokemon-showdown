@@ -93,6 +93,7 @@ const Scripts = {
     set.happiness = 70;
     const friendshipValue = tr((set.happiness / 255 / 10 + 1) * 100);
     stat = tr(stat * friendshipValue / 100);
+    stat += set.evs[statName];
     return stat;
   }
 };

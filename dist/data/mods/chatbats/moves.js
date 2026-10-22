@@ -326,7 +326,7 @@ const Moves = {
         return priority;
       }
       const action = this.queue.willMove(foe);
-      if (!action || action.choice !== "move") {
+      if (action?.choice !== "move") {
         return priority;
       }
       const move = action.move;
@@ -343,7 +343,7 @@ const Moves = {
         return basePower;
       }
       const action = this.queue.willMove(foe);
-      if (!action || action.choice !== "move") {
+      if (action?.choice !== "move") {
         return basePower;
       }
       const move = action.move;
@@ -1215,7 +1215,7 @@ const Moves = {
     },
     self: {
       onHit(source) {
-        source.skipBeforeSwitchOutEventFlag = true;
+        source.skipPursuit = true;
       }
     },
     selfSwitch: true,

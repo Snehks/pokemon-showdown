@@ -745,7 +745,7 @@ class RipgrepLogSearcher extends FSLogSearcher {
         results[date][user] += isNaN(parsed) ? 0 : parsed;
       } else {
         const parts = line?.split("|").map(toID);
-        if (!parts || parts[1] !== "c") continue;
+        if (parts?.[1] !== "c") continue;
         const id = parts[2];
         if (!id) continue;
         if (!results[date][id]) results[date][id] = 0;
@@ -786,7 +786,7 @@ class DatabaseLogSearcher extends Searcher {
     let curDate = "";
     let parsedSearchStr = `"${parsedSearch.join(", ")}" `;
     const argStr = Object.entries(search).map(([key, val]) => `${key}${val[1] ? "!=" : "="}${val[0]}`);
-    if (argStr.length) parsedSearchStr += `<small> (arguments: ${argStr})</small>`;
+    if (argStr.length) parsedSearchStr += `<small> (arguments: ${argStr.join(",")})</small>`;
     let buf = import_lib.Utils.html`<div class="pad"><strong>Results on ${roomid} for ${parsedSearchStr} during the month ${month}:</strong>`;
     buf += limit ? ` ${results.length} (capped at ${limit})` : "";
     buf += `<hr />`;

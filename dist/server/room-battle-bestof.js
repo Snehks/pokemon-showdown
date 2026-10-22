@@ -447,8 +447,9 @@ class BestOfGame extends import_room_game.RoomGame {
   }
   forfeitPlayer(loser, message = "") {
     if (this.ended || this.winner) return false;
+    message ||= " forfeited the series.";
     this.winner = this.players.find((p) => p !== loser);
-    this.room.add(`||${loser.name}${message || " forfeited."}`);
+    this.room.add(`||${loser.name}${message}`);
     this.end(this.winner.id);
     const lastBattle = Rooms.get(this.games[this.games.length - 1].room)?.battle;
     if (lastBattle && !lastBattle.ended) lastBattle.forfeit(loser.id, message);

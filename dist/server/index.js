@@ -83,10 +83,9 @@ try {
   require("source-map-support").install();
 } catch (e) {
 }
-try {
-  fetch;
-} catch (e) {
-  throw new Error("We require Node.js version 22 or later; you're using " + process.version);
+if (typeof fetch === "undefined") {
+  console.error("We require Node.js version 24 or later; you're using " + process.version);
+  process.exit(1);
 }
 try {
   require.resolve("ts-chacha20");

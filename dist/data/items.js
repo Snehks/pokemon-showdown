@@ -32,7 +32,7 @@ const Items = {
     // Neutralizing Gas protection implemented in Pokemon.ignoringAbility() within sim/pokemon.ts
     // and in Neutralizing Gas itself within data/abilities.ts
     onSetAbility(ability, target, source, effect) {
-      if (effect && effect.effectType === "Ability" && effect.name !== "Trace") {
+      if (effect?.effectType === "Ability" && effect.name !== "Trace") {
         this.add("-ability", source, effect);
       }
       this.add("-block", target, "item: Ability Shield");
@@ -522,6 +522,12 @@ const Items = {
     num: 544,
     gen: 5
   },
+  blackaugurite: {
+    name: "Black Augurite",
+    num: 1691,
+    gen: 8,
+    isNonstandard: "Legends"
+  },
   blackbelt: {
     name: "Black Belt",
     spritenum: 32,
@@ -530,7 +536,7 @@ const Items = {
     },
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Fighting") {
+      if (move?.type === "Fighting") {
         return this.chainModify([4915, 4096]);
       }
     },
@@ -545,7 +551,7 @@ const Items = {
     },
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Dark") {
+      if (move?.type === "Dark") {
         return this.chainModify([4915, 4096]);
       }
     },
@@ -569,6 +575,12 @@ const Items = {
     },
     num: 281,
     gen: 4
+  },
+  blankplate: {
+    name: "Blank Plate",
+    num: 1780,
+    gen: 8,
+    isNonstandard: "Legends"
   },
   blastoisinite: {
     name: "Blastoisinite",
@@ -718,7 +730,7 @@ const Items = {
     spritenum: 673,
     onMemory: "Bug",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -733,7 +745,7 @@ const Items = {
     name: "Burn Drive",
     spritenum: 54,
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 649 || pokemon.baseSpecies.num === 649) {
+      if (source?.baseSpecies.num === 649 || pokemon.baseSpecies.num === 649) {
         return false;
       }
       return true;
@@ -794,7 +806,7 @@ const Items = {
     },
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Fire") {
+      if (move?.type === "Fire") {
         return this.chainModify([4915, 4096]);
       }
     },
@@ -937,7 +949,7 @@ const Items = {
     name: "Chill Drive",
     spritenum: 67,
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 649 || pokemon.baseSpecies.num === 649) {
+      if (source?.baseSpecies.num === 649 || pokemon.baseSpecies.num === 649) {
         return false;
       }
       return true;
@@ -1309,7 +1321,7 @@ const Items = {
     spritenum: 683,
     onMemory: "Dark",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -1446,7 +1458,7 @@ const Items = {
     name: "Douse Drive",
     spritenum: 103,
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 649 || pokemon.baseSpecies.num === 649) {
+      if (source?.baseSpecies.num === 649 || pokemon.baseSpecies.num === 649) {
         return false;
       }
       return true;
@@ -1464,12 +1476,12 @@ const Items = {
     onPlate: "Dragon",
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Dragon") {
+      if (move?.type === "Dragon") {
         return this.chainModify([4915, 4096]);
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -1498,7 +1510,7 @@ const Items = {
     },
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Dragon") {
+      if (move?.type === "Dragon") {
         return this.chainModify([4915, 4096]);
       }
     },
@@ -1548,7 +1560,7 @@ const Items = {
     spritenum: 682,
     onMemory: "Dragon",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -1586,12 +1598,12 @@ const Items = {
     onPlate: "Dark",
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Dark") {
+      if (move?.type === "Dark") {
         return this.chainModify([4915, 4096]);
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -1651,12 +1663,12 @@ const Items = {
     onPlate: "Ground",
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Ground") {
+      if (move?.type === "Ground") {
         return this.chainModify([4915, 4096]);
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -1733,19 +1745,23 @@ const Items = {
     onAnySwitchIn() {
       if (!this.effectState.eject) return;
       this.effectState.target.useItem();
+      delete this.effectState.eject;
     },
     onAnyAfterMega() {
       if (!this.effectState.eject) return;
       this.effectState.target.useItem();
+      delete this.effectState.eject;
     },
     onAnyAfterMove() {
       if (!this.effectState.eject) return;
       this.effectState.target.useItem();
+      delete this.effectState.eject;
     },
     onResidualOrder: 29,
     onResidual(pokemon) {
       if (!this.effectState.eject) return;
       this.effectState.target.useItem();
+      delete this.effectState.eject;
     },
     onUseItem(item, pokemon) {
       if (!this.canSwitch(pokemon.side)) return false;
@@ -1792,7 +1808,7 @@ const Items = {
     spritenum: 679,
     onMemory: "Electric",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -1940,7 +1956,7 @@ const Items = {
     },
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Fairy") {
+      if (move?.type === "Fairy") {
         return this.chainModify([4915, 4096]);
       }
     },
@@ -1966,7 +1982,7 @@ const Items = {
     spritenum: 684,
     onMemory: "Fairy",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -2027,7 +2043,7 @@ const Items = {
     spritenum: 668,
     onMemory: "Fighting",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -2094,7 +2110,7 @@ const Items = {
     spritenum: 676,
     onMemory: "Fire",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -2132,12 +2148,12 @@ const Items = {
     onPlate: "Fighting",
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Fighting") {
+      if (move?.type === "Fighting") {
         return this.chainModify([4915, 4096]);
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -2167,12 +2183,12 @@ const Items = {
     onPlate: "Fire",
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Fire") {
+      if (move?.type === "Fire") {
         return this.chainModify([4915, 4096]);
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -2233,7 +2249,7 @@ const Items = {
     spritenum: 669,
     onMemory: "Flying",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -2264,7 +2280,7 @@ const Items = {
     },
     onDamagePriority: -40,
     onDamage(damage, target, source, effect) {
-      if (this.randomChance(1, 10) && damage >= target.hp && effect && effect.effectType === "Move") {
+      if (this.randomChance(1, 10) && damage >= target.hp && effect?.effectType === "Move") {
         this.add("-activate", target, "item: Focus Band");
         return target.hp - 1;
       }
@@ -2280,7 +2296,7 @@ const Items = {
     },
     onDamagePriority: -40,
     onDamage(damage, target, source, effect) {
-      if (target.hp === target.maxhp && damage >= target.hp && effect && effect.effectType === "Move") {
+      if (target.hp === target.maxhp && damage >= target.hp && effect?.effectType === "Move") {
         if (target.useItem()) {
           return target.hp - 1;
         }
@@ -2487,7 +2503,7 @@ const Items = {
     spritenum: 674,
     onMemory: "Ghost",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -2586,7 +2602,7 @@ const Items = {
     spritenum: 678,
     onMemory: "Grass",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -2728,7 +2744,7 @@ const Items = {
     spritenum: 671,
     onMemory: "Ground",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -2783,7 +2799,7 @@ const Items = {
     },
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Rock") {
+      if (move?.type === "Rock") {
         return this.chainModify([4915, 4096]);
       }
     },
@@ -2958,7 +2974,7 @@ const Items = {
     spritenum: 681,
     onMemory: "Ice",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -2989,7 +3005,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -3041,7 +3057,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -3079,7 +3095,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -3351,6 +3367,12 @@ const Items = {
     },
     num: 234,
     gen: 2
+  },
+  legendplate: {
+    name: "Legend Plate",
+    num: 1828,
+    gen: 8,
+    isNonstandard: "Legends"
   },
   leppaberry: {
     name: "Leppa Berry",
@@ -3852,7 +3874,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -4120,7 +4142,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -4491,6 +4513,12 @@ const Items = {
     num: 193,
     gen: 4
   },
+  peatblock: {
+    name: "Peat Block",
+    num: 1692,
+    gen: 8,
+    isNonstandard: "Legends"
+  },
   pechaberry: {
     name: "Pecha Berry",
     spritenum: 333,
@@ -4615,12 +4643,12 @@ const Items = {
     onPlate: "Fairy",
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Fairy") {
+      if (move?.type === "Fairy") {
         return this.chainModify([4915, 4096]);
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -4686,7 +4714,7 @@ const Items = {
     spritenum: 670,
     onMemory: "Poison",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -4885,7 +4913,7 @@ const Items = {
     spritenum: 680,
     onMemory: "Psychic",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -5276,7 +5304,7 @@ const Items = {
     spritenum: 672,
     onMemory: "Rock",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -5400,7 +5428,7 @@ const Items = {
     name: "Rusted Shield",
     spritenum: 699,
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 889 || pokemon.baseSpecies.num === 889) {
+      if (source?.baseSpecies.num === 889 || pokemon.baseSpecies.num === 889) {
         return false;
       }
       return true;
@@ -5413,7 +5441,7 @@ const Items = {
     name: "Rusted Sword",
     spritenum: 698,
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 888 || pokemon.baseSpecies.num === 888) {
+      if (source?.baseSpecies.num === 888 || pokemon.baseSpecies.num === 888) {
         return false;
       }
       return true;
@@ -5590,7 +5618,7 @@ const Items = {
     },
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Water") {
+      if (move?.type === "Water") {
         return this.chainModify([4915, 4096]);
       }
     },
@@ -5606,7 +5634,7 @@ const Items = {
     },
     onBasePowerPriority: 15,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Flying") {
+      if (move?.type === "Flying") {
         return this.chainModify([4915, 4096]);
       }
     },
@@ -5670,7 +5698,7 @@ const Items = {
     name: "Shock Drive",
     spritenum: 442,
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 649 || pokemon.baseSpecies.num === 649) {
+      if (source?.baseSpecies.num === 649 || pokemon.baseSpecies.num === 649) {
         return false;
       }
       return true;
@@ -5791,7 +5819,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -5930,7 +5958,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -5950,7 +5978,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -6073,7 +6101,7 @@ const Items = {
     spritenum: 675,
     onMemory: "Steel",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -6132,7 +6160,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -6354,7 +6382,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -7534,7 +7562,7 @@ const Items = {
     spritenum: 677,
     onMemory: "Water",
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
+      if (source?.baseSpecies.num === 773 || pokemon.baseSpecies.num === 773) {
         return false;
       }
       return true;
@@ -7790,7 +7818,7 @@ const Items = {
       }
     },
     onTakeItem(item, pokemon, source) {
-      if (source && source.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
+      if (source?.baseSpecies.num === 493 || pokemon.baseSpecies.num === 493) {
         return false;
       }
       return true;
@@ -7850,7 +7878,7 @@ const Items = {
     },
     onResidualOrder: 10,
     onResidual(pokemon) {
-      if (pokemon.hp <= pokemon.maxhp / 2) {
+      if (pokemon.hp < pokemon.maxhp / 2) {
         pokemon.eatItem();
       }
     },
@@ -7935,7 +7963,7 @@ const Items = {
     },
     onResidualOrder: 10,
     onResidual(pokemon) {
-      if (pokemon.hp <= pokemon.maxhp / 2) {
+      if (pokemon.hp < pokemon.maxhp / 2) {
         pokemon.eatItem();
       }
     },
@@ -8029,7 +8057,7 @@ const Items = {
     onUpdate(pokemon) {
       if (!pokemon.hp) return;
       const moveSlot = pokemon.lastMove && pokemon.getMoveData(pokemon.lastMove.id);
-      if (moveSlot && moveSlot.pp === 0) {
+      if (moveSlot?.pp === 0) {
         pokemon.addVolatile("leppaberry");
         pokemon.volatiles["leppaberry"].moveSlot = moveSlot;
         pokemon.eatItem();

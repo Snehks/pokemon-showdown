@@ -24,7 +24,6 @@ __export(utils_exports, {
   bufReadHex: () => bufReadHex,
   bufWriteHex: () => bufWriteHex,
   clampIntRange: () => clampIntRange,
-  clearRequireCache: () => clearRequireCache,
   compare: () => compare,
   deepClone: () => deepClone,
   deepFreeze: () => deepFreeze,
@@ -44,7 +43,6 @@ __export(utils_exports, {
   sortBy: () => sortBy,
   splitFirst: () => splitFirst,
   stripHTML: () => stripHTML,
-  uncacheModuleTree: () => uncacheModuleTree,
   visualize: () => visualize,
   waitUntil: () => waitUntil
 });
@@ -238,25 +236,6 @@ function clampIntRange(num, min, max) {
   if (max !== void 0 && num > max) num = max;
   return num;
 }
-function clearRequireCache(options = {}) {
-  const excludes = [...options?.exclude || [], "/node_modules/"];
-  for (const path in require.cache) {
-    if (excludes.some((p) => path.includes(p))) continue;
-    const mod = require.cache[path];
-    if (!mod) continue;
-    uncacheModuleTree(mod, excludes);
-    delete require.cache[path];
-  }
-}
-function uncacheModuleTree(mod, excludes) {
-  const children = mod.children;
-  if (!children?.length || excludes.some((p) => mod.filename.includes(p))) return;
-  delete mod.children;
-  for (const child of children) {
-    if (excludes.some((p) => child.filename.includes(p))) continue;
-    uncacheModuleTree(child, excludes);
-  }
-}
 function deepClone(obj) {
   if (obj === null || typeof obj !== "object") return obj;
   if (Array.isArray(obj)) return obj.map((prop) => deepClone(prop));
@@ -357,7 +336,6 @@ const Utils = {
   deepClone,
   deepFreeze,
   clampIntRange,
-  clearRequireCache,
   randomElement,
   forceWrap,
   splitFirst,

@@ -401,7 +401,7 @@ const FormatsData = {
     tier: "PU"
   },
   pinsir: {
-    tier: "ZU"
+    tier: "ZUBL"
   },
   tauros: {
     tier: "OU"

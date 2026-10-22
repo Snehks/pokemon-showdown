@@ -241,6 +241,7 @@ class MySQLDatabase extends Database {
     for (let i = 0; i < query.values.length; i++) {
       const value = query.values[i];
       if (query.sql[i + 1].startsWith("`") || query.sql[i + 1].startsWith('"')) {
+        if (value === null) throw new Error(`SQL identifiers cannot be null`);
         sql = sql.slice(0, -1) + this.escapeId(`${value}`) + query.sql[i + 1].slice(1);
       } else {
         sql += "?" + query.sql[i + 1];
@@ -253,7 +254,7 @@ class MySQLDatabase extends Database {
     return new Promise((resolve, reject) => {
       this.connection.query(query, values, (e, results) => {
         if (e) {
-          return reject(new Error(`${e.message} (${query}) (${values}) [${e.code}]`));
+          return reject(new Error(`${e.message} (${query}) (${values.join(",")}) [${e.code}]`));
         }
         if (Array.isArray(results)) {
           for (const row of results) {
@@ -287,6 +288,7 @@ class PGDatabase extends Database {
     for (let i = 0; i < query.values.length; i++) {
       const value = query.values[i];
       if (query.sql[i + 1].startsWith("`") || query.sql[i + 1].startsWith('"')) {
+        if (value === null) throw new Error(`SQL identifiers cannot be null`);
         sql = sql.slice(0, -1) + this.escapeId(`${value}`) + query.sql[i + 1].slice(1);
       } else {
         paramCount++;

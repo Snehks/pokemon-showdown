@@ -43,6 +43,7 @@ var import_private_messages = require("./private-messages");
 var pathModule = __toESM(require("path"));
 var JSX = __toESM(require("./chat-jsx"));
 var import_chat_db = require("./chat-db");
+var import_dex_text = require("../sim/dex-text");
 var import_chat_formatter = require("./chat-formatter");
 /**
  * Chat
@@ -82,6 +83,7 @@ try {
 }
 const EMOJI_REGEX = /[\p{Emoji_Modifier_Base}\p{Emoji_Presentation}\uFE0F]/u;
 const TRANSLATION_DIRECTORY = pathModule.resolve(__dirname, "..", "translations");
+const DEX_TRANSLATION_DIRECTORY = pathModule.resolve(__dirname, "..", "data", "text");
 class PatternTester {
   constructor() {
     this.elements = [];
@@ -246,8 +248,8 @@ class MessageContext {
     if (!target.trim()) return this.user;
     return Users.get(target, exactName);
   }
-  tr(strings, ...keys) {
-    return Chat.tr(this.language, strings, ...keys);
+  get TL() {
+    return Chat.getTranslator(this.language);
   }
 }
 class PageContext extends MessageContext {
@@ -339,7 +341,7 @@ ${content}`);
       }
       Monitor.crashlog(err, "A chat page", {
         user: this.user.name,
-        room: this.room && this.room.roomid,
+        room: this.room?.roomid ?? null,
         pageid: this.pageid
       });
       this.setHTML(
@@ -363,7 +365,7 @@ class CommandContext extends MessageContext {
   constructor(options) {
     super(
       options.user,
-      options.room && options.room.settings.language ? options.room.settings.language : options.user.language
+      options.room?.settings.language ? options.room.settings.language : options.user.language
     );
     this.message = options.message || ``;
     this.recursionDepth = options.recursionDepth || 0;
@@ -568,7 +570,7 @@ It needs to be sent to a user or room.`);
     if (user.can("show", null, room)) return true;
     const lastActiveSeconds = (Date.now() - user.lastMessageTime) / 1e3;
     if (lastActiveSeconds < room.settings.slowchat) {
-      throw new Chat.ErrorMessage(this.tr`This room has slow-chat enabled. You can only talk once every ${room.settings.slowchat} seconds.`);
+      throw new Chat.ErrorMessage(this.TL`This room has slow-chat enabled. You can only talk once every ${room.settings.slowchat} seconds.`);
     }
     return true;
   }
@@ -848,7 +850,7 @@ It needs to be sent to a user or room.`);
     }
     const broadcastMessage = (suppressMessage || this.message).toLowerCase().replace(/[^a-z0-9\s!,]/g, "");
     const cooldownMessage = overrideCooldown === true ? null : overrideCooldown || broadcastMessage;
-    if (cooldownMessage && this.room && this.room.lastBroadcast === cooldownMessage && this.room.lastBroadcastTime >= Date.now() - BROADCAST_COOLDOWN) {
+    if (cooldownMessage && this.room?.lastBroadcast === cooldownMessage && this.room.lastBroadcastTime >= Date.now() - BROADCAST_COOLDOWN) {
       throw new Chat.ErrorMessage(`You can't broadcast this because it was just broadcasted. If this was intentional, use !rebroadcast ${this.message}`);
     }
     const message = this.checkChat(suppressMessage || this.message);
@@ -894,47 +896,47 @@ It needs to be sent to a user or room.`);
     const user = this.user;
     const connection = this.connection;
     if (!user.named) {
-      throw new Chat.ErrorMessage(this.tr`You must choose a name before you can talk.`);
+      throw new Chat.ErrorMessage(this.TL`You must choose a name before you can talk.`);
     }
     if (!user.can("bypassall")) {
-      const lockType = user.namelocked ? this.tr`namelocked` : user.locked ? this.tr`locked` : ``;
+      const lockType = user.namelocked ? this.TL`namelocked` : user.locked ? this.TL`locked` : ``;
       const lockExpiration = Punishments.checkLockExpiration(user.namelocked || user.locked);
       if (room) {
         if (lockType && !room.settings.isHelp) {
-          this.sendReply(`|html|<a href="view-help-request--appeal" class="button">${this.tr`Get help with this`}</a>`);
+          this.sendReply(`|html|<a href="view-help-request--appeal" class="button">${this.TL`Get help with this`}</a>`);
           if (user.locked === "#hostfilter") {
-            throw new Chat.ErrorMessage(this.tr`You are locked due to your proxy / VPN and can't talk in chat.`);
+            throw new Chat.ErrorMessage(this.TL`You are locked due to your proxy / VPN and can't talk in chat.`);
           } else {
-            throw new Chat.ErrorMessage(this.tr`You are ${lockType} and can't talk in chat. ${lockExpiration}`);
+            throw new Chat.ErrorMessage(this.TL`You are ${lockType} and can't talk in chat. ${lockExpiration}`);
           }
         }
         if (!room.persist && !room.roomid.startsWith("help-") && !(user.registered || user.autoconfirmed)) {
           this.sendReply(
-            this.tr`|html|<div class="message-error">You must be registered to chat in temporary rooms (like battles).</div>` + this.tr`You may register in the <button name="openOptions"><i class="fa fa-cog"></i> Options</button> menu.`
+            this.TL`|html|<div class="message-error">You must be registered to chat in temporary rooms (like battles).</div>` + this.TL`You may register in the <button name="openOptions"><i class="fa fa-cog"></i> Options</button> menu.`
           );
           throw new Chat.Interruption();
         }
         if (room.isMuted(user)) {
-          throw new Chat.ErrorMessage(this.tr`You are muted and cannot talk in this room.`);
+          throw new Chat.ErrorMessage(this.TL`You are muted and cannot talk in this room.`);
         }
         if (room.settings.modchat && !room.auth.atLeast(user, room.settings.modchat)) {
           if (room.settings.modchat === "autoconfirmed") {
             this.errorReply(
-              this.tr`Moderated chat is set. To speak in this room, your account must be autoconfirmed, which means being registered for at least one week and winning at least one rated game (any game started through the 'Battle!' button).`
+              this.TL`Moderated chat is set. To speak in this room, your account must be autoconfirmed, which means being registered for at least one week and winning at least one rated game (any game started through the 'Battle!' button).`
             );
             if (!user.registered) {
-              this.sendReply(this.tr`|html|You may register in the <button name="openOptions"><i class="fa fa-cog"></i> Options</button> menu.`);
+              this.sendReply(this.TL`|html|You may register in the <button name="openOptions"><i class="fa fa-cog"></i> Options</button> menu.`);
             }
             throw new Chat.Interruption();
           }
           if (room.settings.modchat === "trusted") {
             throw new Chat.ErrorMessage(
-              this.tr`Because moderated chat is set, your account must be staff in a public room or have a global rank to speak in this room.`
+              this.TL`Because moderated chat is set, your account must be staff in a public room or have a global rank to speak in this room.`
             );
           }
-          const groupName = Config.groups[room.settings.modchat] && Config.groups[room.settings.modchat].name || room.settings.modchat;
+          const groupName = Config.groups[room.settings.modchat]?.name || room.settings.modchat;
           throw new Chat.ErrorMessage(
-            this.tr`Because moderated chat is set, you must be of rank ${groupName} or higher to speak in this room.`
+            this.TL`Because moderated chat is set, you must be of rank ${groupName} or higher to speak in this room.`
           );
         }
         if (!this.bypassRoomCheck && !(user.id in room.users)) {
@@ -945,57 +947,57 @@ It needs to be sent to a user or room.`);
       if (targetUser) {
         if (!(user.registered || user.autoconfirmed)) {
           this.sendReply(
-            this.tr`|html|<div class="message-error">You must be registered to send private messages.</div>` + this.tr`You may register in the <button name="openOptions"><i class="fa fa-cog"></i> Options</button> menu.`
+            this.TL`|html|<div class="message-error">You must be registered to send private messages.</div>` + this.TL`You may register in the <button name="openOptions"><i class="fa fa-cog"></i> Options</button> menu.`
           );
           throw new Chat.Interruption();
         }
         if (targetUser.id !== user.id && !(targetUser.registered || targetUser.autoconfirmed)) {
-          throw new Chat.ErrorMessage(this.tr`That user is unregistered and cannot be PMed.`);
+          throw new Chat.ErrorMessage(this.TL`That user is unregistered and cannot be PMed.`);
         }
         if (lockType && !targetUser.can("lock")) {
-          this.sendReply(`|html|<a href="view-help-request--appeal" class="button">${this.tr`Get help with this`}</a>`);
+          this.sendReply(`|html|<a href="view-help-request--appeal" class="button">${this.TL`Get help with this`}</a>`);
           if (user.locked === "#hostfilter") {
-            throw new Chat.ErrorMessage(this.tr`You are locked due to your proxy / VPN and can only private message members of the global moderation team.`);
+            throw new Chat.ErrorMessage(this.TL`You are locked due to your proxy / VPN and can only private message members of the global moderation team.`);
           } else {
-            throw new Chat.ErrorMessage(this.tr`You are ${lockType} and can only private message members of the global moderation team. ${lockExpiration}`);
+            throw new Chat.ErrorMessage(this.TL`You are ${lockType} and can only private message members of the global moderation team. ${lockExpiration}`);
           }
         }
         if (targetUser.locked && !user.can("lock")) {
-          throw new Chat.ErrorMessage(this.tr`The user "${targetUser.name}" is locked and cannot be PMed.`);
+          throw new Chat.ErrorMessage(this.TL`The user "${targetUser.name}" is locked and cannot be PMed.`);
         }
         if (Config.pmmodchat && !Users.globalAuth.atLeast(user, Config.pmmodchat) && !Users.Auth.hasPermission(targetUser, "promote", Config.pmmodchat)) {
-          const groupName = Config.groups[Config.pmmodchat] && Config.groups[Config.pmmodchat].name || Config.pmmodchat;
-          throw new Chat.ErrorMessage(this.tr`On this server, you must be of rank ${groupName} or higher to PM users.`);
+          const groupName = Config.groups[Config.pmmodchat]?.name || Config.pmmodchat;
+          throw new Chat.ErrorMessage(this.TL`On this server, you must be of rank ${groupName} or higher to PM users.`);
         }
         if (!this.checkCanPM(targetUser)) {
           Chat.maybeNotifyBlocked("pm", targetUser, user);
           if (!targetUser.can("lock")) {
-            throw new Chat.ErrorMessage(this.tr`This user is blocking private messages right now.`);
+            throw new Chat.ErrorMessage(this.TL`This user is blocking private messages right now.`);
           } else {
-            this.sendReply(`|html|${this.tr`If you need help, try opening a <a href="view-help-request" class="button">help ticket</a>`}`);
-            throw new Chat.ErrorMessage(this.tr`This ${Config.groups[targetUser.tempGroup].name} is too busy to answer private messages right now. Please contact a different staff member.`);
+            this.sendReply(`|html|${this.TL`If you need help, try opening a <a href="view-help-request" class="button">help ticket</a>`}`);
+            throw new Chat.ErrorMessage(this.TL`This ${Config.groups[targetUser.tempGroup].name} is too busy to answer private messages right now. Please contact a different staff member.`);
           }
         }
         if (!this.checkCanPM(user, targetUser)) {
-          throw new Chat.ErrorMessage(this.tr`You are blocking private messages right now.`);
+          throw new Chat.ErrorMessage(this.TL`You are blocking private messages right now.`);
         }
       }
     }
     if (typeof message !== "string") return true;
     if (!message) {
-      throw new Chat.ErrorMessage(this.tr`Your message can't be blank.`);
+      throw new Chat.ErrorMessage(this.TL`Your message can't be blank.`);
     }
     let length = message.length;
     length += 10 * message.replace(/[^\ufdfd]*/g, "").length;
     if (length > MAX_MESSAGE_LENGTH && !user.can("ignorelimits")) {
-      throw new Chat.ErrorMessage(this.tr`Your message is too long: ` + message);
+      throw new Chat.ErrorMessage(this.TL`Your message is too long: ` + message);
     }
     message = message.replace(
       /[\u0300-\u036f\u0483-\u0489\u0610-\u0615\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06ED\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]{3,}/g,
       ""
     );
     if (/[\u3164\u115f\u1160\u239b-\u23b9]/.test(message)) {
-      throw new Chat.ErrorMessage(this.tr`Your message contains banned characters.`);
+      throw new Chat.ErrorMessage(this.TL`Your message contains banned characters.`);
     }
     if (Config.restrictLinks && !user.autoconfirmed) {
       if (this.checkBannedLinks(message).length && !(targetUser?.can("lock") || room?.settings.isHelp)) {
@@ -1012,13 +1014,13 @@ It needs to be sent to a user or room.`);
     }
     if (room?.settings.highTraffic && toID(message).replace(/[^a-z]+/, "").length < 2 && !user.can("show", null, room)) {
       throw new Chat.ErrorMessage(
-        this.tr`Due to this room being a high traffic room, your message must contain at least two letters.`
+        this.TL`Due to this room being a high traffic room, your message must contain at least two letters.`
       );
     }
     if (room) {
       const normalized = message.trim();
       if (!user.can("bypassall") && ["help", "lobby"].includes(room.roomid) && normalized === user.lastMessage && Date.now() - user.lastMessageTime < MESSAGE_COOLDOWN && !Config.nothrottle) {
-        throw new Chat.ErrorMessage(this.tr`You can't send the same message again so soon.`);
+        throw new Chat.ErrorMessage(this.TL`You can't send the same message again so soon.`);
       }
       user.lastMessage = message;
       user.lastMessageTime = Date.now();
@@ -1135,10 +1137,10 @@ It needs to be sent to a user or room.`);
         if (tagName === "!--") continue;
         if (isClosingTag) {
           if (LEGAL_AUTOCLOSE_TAGS.includes(tagName)) continue;
-          if (!stack.length) {
+          const expectedTagName = stack.pop();
+          if (expectedTagName === void 0) {
             throw new Chat.ErrorMessage(`Extraneous </${tagName}> without an opening tag.`);
           }
-          const expectedTagName = stack.pop();
           if (tagName !== expectedTagName) {
             throw new Chat.ErrorMessage(`Extraneous </${tagName}> where </${expectedTagName}> was expected.`);
           }
@@ -1171,7 +1173,7 @@ It needs to be sent to a user or room.`);
           }
         }
         if (tagName === "button") {
-          if ((!this.room || this.room.settings.isPersonal || this.room.settings.isPrivate === true) && !this.user.can("lock")) {
+          if ((this.room === null || this.room.settings.isPersonal || this.room.settings.isPrivate === true) && !this.user.can("lock")) {
             const buttonName = / name ?= ?"([^"]*)"/i.exec(tagContent)?.[1];
             const buttonValue = / value ?= ?"([^"]*)"/i.exec(tagContent)?.[1];
             const msgCommandRegex = /^\/(?:msg|pm|w|whisper|botmsg) /;
@@ -1326,8 +1328,6 @@ const Chat = new class {
      *********************************************************/
     /** language id -> language name */
     this.languages = /* @__PURE__ */ new Map();
-    /** language id -> (english string -> translated string) */
-    this.translations = /* @__PURE__ */ new Map();
     /**
      * SQL handler
      *
@@ -1377,7 +1377,7 @@ const Chat = new class {
   namefilter(name, user) {
     if (!Config.disablebasicnamefilter) {
       name = name.replace(
-        // eslint-disable-next-line no-misleading-character-class
+        // oxlint-disable-next-line no-misleading-character-class
         /[^a-zA-Z0-9 /\\.~()<>^*%&=+$#_'?!"\u00A1-\u00BF\u00D7\u00F7\u02B9-\u0362\u2012-\u2027\u2030-\u205E\u2050-\u205F\u2190-\u23FA\u2500-\u2BD1\u2E80-\u32FF\u3400-\u9FFF\uF900-\uFAFF\uFE00-\uFE6F\uAC00-\uD7A3\u1100-\u11F9\u3131-\u318E-]+/g,
         ""
       );
@@ -1393,7 +1393,7 @@ const Chat = new class {
       );
       if (nameSymbols.length > 4 || /[^a-z0-9][a-z0-9][^a-z0-9]/.test(name.toLowerCase() + " ") || /[\u00ae\u00a9].*[a-zA-Z0-9]/.test(name)) {
         name = name.replace(
-          // eslint-disable-next-line no-misleading-character-class
+          // oxlint-disable-next-line no-misleading-character-class
           /[\u00A1-\u00BF\u00D7\u00F7\u02B9-\u0362\u2012-\u2027\u2030-\u205E\u2050-\u205F\u2190-\u23FA\u2500-\u2BD1\u2E80-\u32FF\u3400-\u9FFF\uF900-\uFAFF\uFE00-\uFE6F]+/g,
           ""
         ).replace(/[^A-Za-z0-9]{2,}/g, " ").trim();
@@ -1444,75 +1444,43 @@ const Chat = new class {
     }
     return status;
   }
+  getDexLanguage(language = null) {
+    return Dex.text.findLanguage(language || "english")?.code || "en";
+  }
+  getTranslator(language = null) {
+    const code = Dex.text.findLanguage(language || "english")?.code || "en";
+    return (0, import_dex_text.TLfor)(code);
+  }
+  getLanguageName(language) {
+    return Dex.text.findLanguage(language)?.fullName || "Unknown Language";
+  }
+  getLanguageID(language) {
+    const languageID = Dex.text.findLanguage(language)?.legacyId;
+    return languageID && Chat.languages.has(languageID) ? languageID : null;
+  }
   async loadTranslations() {
     const directories = await (0, import_lib.FS)(TRANSLATION_DIRECTORY).readdir();
     Chat.languages.set("english", "English");
     for (const dirname of directories) {
-      if (/[^a-z0-9]/.test(dirname)) continue;
-      const dir = (0, import_lib.FS)(`${TRANSLATION_DIRECTORY}/${dirname}`);
-      const languageID = toID(dirname);
-      const files = await dir.readdir();
-      for (const filename of files) {
+      const language = Dex.text.findLanguage(dirname);
+      if (language?.code !== dirname) continue;
+      const files = await (0, import_lib.FS)(`${TRANSLATION_DIRECTORY}/${dirname}`).readdir();
+      const catalogs = [];
+      for (const filename of files.sort()) {
         if (!filename.endsWith(".js")) continue;
-        const content = require(`${TRANSLATION_DIRECTORY}/${dirname}/${filename}`).translations;
-        if (!Chat.translations.has(languageID)) {
-          Chat.translations.set(languageID, /* @__PURE__ */ new Map());
-        }
-        const translationsSoFar = Chat.translations.get(languageID);
-        if (content.name && !Chat.languages.has(languageID)) {
-          Chat.languages.set(languageID, content.name);
-        }
-        if (content.strings) {
-          for (const key in content.strings) {
-            const keyLabels = [];
-            const valLabels = [];
-            const newKey = key.replace(/\${.+?}/g, (str) => {
-              keyLabels.push(str);
-              return "${}";
-            }).replace(/\[TN: ?.+?\]/g, "");
-            const val = content.strings[key].replace(/\${.+?}/g, (str) => {
-              valLabels.push(str);
-              return "${}";
-            }).replace(/\[TN: ?.+?\]/g, "");
-            translationsSoFar.set(newKey, [val, keyLabels, valLabels]);
-          }
-        }
+        catalogs.push(require(`${TRANSLATION_DIRECTORY}/${dirname}/${filename}`).translations);
       }
-      if (!Chat.languages.has(languageID)) {
-        Chat.languages.set(languageID, "Unknown Language");
-      }
+      const uiCatalog = `${DEX_TRANSLATION_DIRECTORY}/${dirname}/ui.js`;
+      if (await (0, import_lib.FS)(uiCatalog).exists()) catalogs.push(require(uiCatalog).translations);
+      (0, import_dex_text.TLadd)(dirname, catalogs);
+      const englishName = /\(([^()]*)\)$/.exec(language.fullName)?.[1] || language.name;
+      Chat.languages.set(language.legacyId, englishName);
     }
   }
-  tr(language, strings = "", ...keys) {
-    if (!language) language = "english";
-    const trString = typeof strings === "string" ? strings : strings.join("${}");
-    if (Chat.translationsLoaded && !Chat.translations.has(language)) {
-      throw new Error(`Trying to translate to a nonexistent language: ${language}`);
-    }
-    if (!strings.length) {
-      return (fStrings, ...fKeys) => Chat.tr(language, fStrings, ...fKeys);
-    }
-    const entry = Chat.translations.get(language)?.get(trString);
-    let [translated, keyLabels, valLabels] = entry || ["", [], []];
-    if (!translated) translated = trString;
-    if (keys.length) {
-      let reconstructed = "";
-      const left = keyLabels.slice();
-      for (const [i, str] of translated.split("${}").entries()) {
-        reconstructed += str;
-        if (keys[i]) {
-          let index = left.indexOf(valLabels[i]);
-          if (index < 0) {
-            index = left.findIndex((val) => !!val);
-          }
-          if (index < 0) index = i;
-          reconstructed += keys[index];
-          left[index] = null;
-        }
-      }
-      translated = reconstructed;
-    }
-    return translated;
+  TLto(language, strings, ...keys) {
+    const translator = this.getTranslator(language);
+    if (strings === void 0) return translator;
+    return typeof strings === "string" ? translator(strings, keys[0]) : translator(strings, ...keys);
   }
   async prepareDatabase() {
     if (process.send) return;
@@ -2023,11 +1991,15 @@ const Chat = new class {
   getReadmoreCodeBlock(str, cutoff) {
     return Chat.getReadmoreBlock(str, true, cutoff);
   }
-  getDataPokemonHTML(species, gen = 8, tier = "") {
+  getDataPokemonHTML(species, options = {}) {
+    const { dex = Dex, tier = "" } = options;
+    const lang = Chat.getDexLanguage(options.language);
+    const gen = dex.gen;
+    const text = dex.text.get(species, lang);
     let buf = '<li class="result">';
     buf += `<span class="col numcol">${tier || species.tier}</span> `;
     buf += `<span class="col iconcol"><psicon pokemon="${species.id}"/></span> `;
-    buf += `<span class="col pokemonnamecol" style="white-space:nowrap"><a href="https://${Config.routes.dex}/pokemon/${species.id}" target="_blank">${species.name}</a></span> `;
+    buf += `<span class="col pokemonnamecol" style="white-space:nowrap"><a href="https://${Config.routes.dex}/pokemon/${species.id}" target="_blank">${text.name}</a></span> `;
     buf += '<span class="col typecol">';
     if (species.types) {
       for (const type of species.types) {
@@ -2037,17 +2009,17 @@ const Chat = new class {
     buf += "</span> ";
     if (gen >= 3) {
       buf += '<span style="float:left;min-height:26px">';
-      if (species.abilities["1"] && (gen >= 4 || Dex.abilities.get(species.abilities["1"]).gen === 3)) {
-        buf += `<span class="col twoabilitycol">${species.abilities["0"]}<br />${species.abilities["1"]}</span>`;
+      if (species.abilities["1"] && (gen >= 4 || dex.abilities.get(species.abilities["1"]).gen === 3)) {
+        buf += `<span class="col twoabilitycol">${dex.text.get(dex.abilities.get(species.abilities["0"]), lang).name}<br />${dex.text.get(dex.abilities.get(species.abilities["1"]), lang).name}</span>`;
       } else {
-        buf += `<span class="col abilitycol">${species.abilities["0"]}</span>`;
+        buf += `<span class="col abilitycol">${dex.text.get(dex.abilities.get(species.abilities["0"]), lang).name}</span>`;
       }
       if (species.abilities["H"] && species.abilities["S"]) {
-        buf += `<span class="col twoabilitycol${species.unreleasedHidden ? " unreleasedhacol" : ""}"><em>${species.abilities["H"]}<br /><span style="display: inline-block;">(${species.abilities["S"]})</span></em></span>`;
+        buf += `<span class="col twoabilitycol${species.unreleasedHidden ? " unreleasedhacol" : ""}"><em>${dex.text.get(dex.abilities.get(species.abilities["H"]), lang).name}<br /><span style="display: inline-block;">(${dex.text.get(dex.abilities.get(species.abilities["S"]), lang).name})</span></em></span>`;
       } else if (species.abilities["H"]) {
-        buf += `<span class="col abilitycol${species.unreleasedHidden ? " unreleasedhacol" : ""}"><em>${species.abilities["H"]}</em></span>`;
+        buf += `<span class="col abilitycol${species.unreleasedHidden ? " unreleasedhacol" : ""}"><em>${dex.text.get(dex.abilities.get(species.abilities["H"]), lang).name}</em></span>`;
       } else if (species.abilities["S"]) {
-        buf += `<span class="col abilitycol"><em>(${species.abilities["S"]})</em></span>`;
+        buf += `<span class="col abilitycol"><em>(${dex.text.get(dex.abilities.get(species.abilities["S"]), lang).name})</em></span>`;
       } else {
         buf += '<span class="col abilitycol"></span>';
       }
@@ -2069,9 +2041,11 @@ const Chat = new class {
     buf += "</li>";
     return `<div class="message"><ul class="utilichart">${buf}<li style="clear:both"></li></ul></div>`;
   }
-  getDataMoveHTML(move, isChampions = false) {
+  getDataMoveHTML(move, options = {}) {
+    const { dex = Dex } = options;
+    const text = dex.text.get(move, Chat.getDexLanguage(options.language));
     let buf = `<ul class="utilichart"><li class="result">`;
-    buf += `<span class="col movenamecol"><a href="https://${Config.routes.dex}/moves/${move.id}">${move.name}</a></span> `;
+    buf += `<span class="col movenamecol"><a href="https://${Config.routes.dex}/moves/${move.id}">${text.name}</a></span> `;
     const encodedMoveType = encodeURIComponent(move.type);
     buf += `<span class="col typecol"><img src="//${Config.routes.client}/sprites/types/${encodedMoveType}.png" alt="${move.type}" width="32" height="14">`;
     buf += `<img src="//${Config.routes.client}/sprites/categories/${move.category}.png" alt="${move.category}" width="32" height="14"></span> `;
@@ -2081,23 +2055,33 @@ const Chat = new class {
     buf += `<span class="col widelabelcol"><em>Accuracy</em><br>${typeof move.accuracy === "number" ? `${move.accuracy}%` : "\u2014"}</span> `;
     const basePP = move.pp || 1;
     let pp = Math.floor(move.noPPBoosts ? basePP : basePP * 8 / 5);
-    if (isChampions) pp = move.noPPBoosts ? basePP : (basePP / 5 + 1) * 4;
+    if (dex.currentMod.startsWith("champions")) pp = move.noPPBoosts ? basePP : (basePP / 5 + 1) * 4;
     buf += `<span class="col pplabelcol"><em>PP</em><br>${pp}</span> `;
-    buf += `<span class="col movedesccol">${move.shortDesc || move.desc}</span> `;
+    if (!options.hideShortDescription) {
+      buf += `<span class="col movedesccol">${text.shortDesc || text.desc}</span> `;
+    }
     buf += `</li><li style="clear:both"></li></ul>`;
     return buf;
   }
-  getDataAbilityHTML(ability) {
+  getDataAbilityHTML(ability, options = {}) {
+    const { dex = Dex } = options;
+    const text = dex.text.get(ability, Chat.getDexLanguage(options.language));
     let buf = `<ul class="utilichart"><li class="result">`;
-    buf += `<span class="col namecol"><a href="https://${Config.routes.dex}/abilities/${ability.id}">${ability.name}</a></span> `;
-    buf += `<span class="col abilitydesccol">${ability.shortDesc || ability.desc}</span> `;
+    buf += `<span class="col namecol"><a href="https://${Config.routes.dex}/abilities/${ability.id}">${text.name}</a></span> `;
+    if (!options.hideShortDescription) {
+      buf += `<span class="col abilitydesccol">${text.shortDesc || text.desc}</span> `;
+    }
     buf += `</li><li style="clear:both"></li></ul>`;
     return buf;
   }
-  getDataItemHTML(item) {
+  getDataItemHTML(item, options = {}) {
+    const { dex = Dex } = options;
+    const text = dex.text.get(item, Chat.getDexLanguage(options.language));
     let buf = `<ul class="utilichart"><li class="result">`;
-    buf += `<span class="col itemiconcol"><psicon item="${item.id}"></span> <span class="col namecol"><a href="https://${Config.routes.dex}/items/${item.id}">${item.name}</a></span> `;
-    buf += `<span class="col itemdesccol">${item.shortDesc || item.desc}</span> `;
+    buf += `<span class="col itemiconcol"><psicon item="${item.id}"></span> <span class="col namecol"><a href="https://${Config.routes.dex}/items/${item.id}">${text.name}</a></span> `;
+    if (!options.hideShortDescription) {
+      buf += `<span class="col itemdesccol">${text.shortDesc || text.desc}</span> `;
+    }
     buf += `</li><li style="clear:both"></li></ul>`;
     return buf;
   }

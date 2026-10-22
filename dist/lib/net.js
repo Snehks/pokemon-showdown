@@ -180,7 +180,7 @@ class NetRequest {
    * @param body POST body
    */
   getStream(opts = {}) {
-    if (typeof Config !== "undefined" && Config.noNetRequests) {
+    if (global.Config?.noNetRequests) {
       throw new Error(`Net requests are disabled.`);
     }
     const stream = new NetStream(this.uri, opts);

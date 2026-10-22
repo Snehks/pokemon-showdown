@@ -78,8 +78,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 63 | `data/mods/pbo/items.ts` | Chansey-H Eviolite eligibility | Apply both defensive boosts to Chansey-H without adding an evolution to the cosmetic form |
 | 64 | `data/mods/pbo/scripts.ts` | Dynahax survives Mega Evolution | `actions.runMegaEvo` restores Dynahax after the permanent forme change so Mega-stone bosses keep every Dynahax block from their first turn |
 | 65 | `data/mods/pbo/scripts.ts` | Halloween 2026 H5 event forms | Register 45 Halloween 2026 cosmetic forms (suffix `H5`) in PBO_EVENT_FORMS |
+| 66 | `sim/battle.ts` | Upstream sync to `8476966bb` + `faintMessages` shim | Merged 216 upstream commits (July-September 2026 Random Battles balance patches); `faintMessages()` forwards to upstream's renamed `resolveFaints()` because the game server still calls it |
 
-**Total: 63 changes across 15 files.**
+**Total: 66 changes across 15 files.**
 
 ---
 
@@ -1386,3 +1387,51 @@ Mega-evolve into the regular Mega, as most earlier Halloween forms do.
 **Tests:** Verified post-build that all 45 forms resolve via
 `Dex.mod('pbo').species.get(id)` with stats/types/abilities inherited from the base
 species, and that every base id exists in the vanilla Pokedex so `init()` skips none.
+
+---
+
+## Change 66: Upstream sync to 8476966bb + `faintMessages` shim (sim/battle.ts)
+
+Merged `upstream/master` at `8476966bb` (2026-10-22), 216 commits after the
+v0.11.11 sync at `739a5e1fe`. Three textual conflicts:
+
+- `.gitignore`: kept PBO's `!/config/custom-formats.ts` and upstream's new
+  `!/config/config-example.js`.
+- `package-lock.json`: took upstream's lockfile. PBO's `package.json` only adds
+  the `prepare` script, which the lockfile does not record.
+- `sim/battle.ts`: kept PBO's `updatePP()` and took upstream's rename of
+  `faintMessages(lastFirst, forceCheck, checkWin)` to
+  `resolveFaints({lastFaintFirst, checkWinIfNoFaints, checkWin})`.
+
+**New PBO code:** the game server's `ShowdownRunner` calls
+`battle.faintMessages(false, true)` when it faints Pokemon server-side and when
+it settles a forfeit. A `[PBO]` `faintMessages()` method with the old signature
+forwards to `resolveFaints()`, so the same game code runs on this tag and on
+older ones. Every other PBO change merged without edits (the PBO diff against
+upstream is unchanged apart from this method).
+
+**Notable upstream changes:**
+
+- Random Battles: July, August and September 2026 balance patches (gen 3-9
+  `sets.json`, gen 9 `doubles-sets.json`, gen 3 and 5-9 `teams.ts`) and the new
+  Champions Random Doubles. With 300 fixed seeds per format, PBO's roulette
+  formats now roll a different team for 23% (gen 9 singles) to 77% (gen 8) of
+  seeds. Gen 8 Random Doubles is still absent upstream.
+- Battle engine: gen 3-4 `SwitchIn` overhaul, gen 3-4 Knock Off fix, Future
+  Sight no longer bypasses Endure, Poison Puppeteer vs Baneful Bunker fix,
+  `gameType` read from the Battle instead of the Format, Team Preview choice
+  parsing fix, translated battle text.
+- Tooling: `node build` now exits on Node.js older than 22 (this also runs
+  through the `prepare` script on git installs). TypeScript 7 and oxlint replace
+  TypeScript 5 and ESLint. `dist/` still targets ES2020, and the merged sim adds
+  no runtime API newer than Node 22.9, the Node embedded in Javet 4.0.0.
+- Mods removed upstream (`ccapm2025`, `woomod`, `championsregma` renamed to
+  `championsregmb`) keep their old `dist/` files, as after earlier syncs. PBO
+  formats never load them.
+
+**Tests:** build passes. `tsc` reports the same 147 errors in TypeScript
+sources as before the merge (all pre-existing, in PBO mod files). Mocha: 2693
+passing, 3 failing, all unrelated to the merge (gen 1 Mirror Move partial
+trapping and the Overflow Stat Mod 654 cap, both failing before the merge too,
+and the SQLite worker because native modules were not built). Random battle
+suites (gen 9, all gens, tools, slow tests included): 163 passing.

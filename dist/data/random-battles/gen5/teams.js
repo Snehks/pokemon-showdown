@@ -147,6 +147,11 @@ const PRIORITY_POKEMON = [
   "shedinja",
   "shiftry"
 ];
+const NO_LEAD_POKEMON = [
+  "dugtrio",
+  "gothitelle",
+  "wobbuffet"
+];
 class RandomGen5Teams extends import_teams.default {
   constructor(format, prng) {
     super(format, prng);
@@ -956,6 +961,8 @@ class RandomGen5Teams extends import_teams.default {
     let numMaxLevelPokemon = 0;
     const pokemonList = Object.keys(this.randomSets);
     const [pokemonPool, baseSpeciesPool] = this.getPokemonPool(type, pokemon, isMonotype, pokemonList);
+    let leadsRemaining = 1;
+    if (ruleTable.has("pickedteamsize") || ruleTable.has("teampreview")) leadsRemaining = 0;
     while (baseSpeciesPool.length && pokemon.length < this.maxTeamSize) {
       const baseSpecies = this.sampleNoReplace(baseSpeciesPool);
       const species = this.dex.species.get(this.sample(pokemonPool[baseSpecies]));
@@ -999,12 +1006,21 @@ class RandomGen5Teams extends import_teams.default {
         }
         if (!this.getPokemonCompatibility(species, pokemon)) continue;
       }
-      const set = this.randomSet(
-        species,
-        teamDetails,
-        pokemon.length === 0 && !ruleTable.has("pickedteamsize") && !ruleTable.has("teampreview")
-      );
-      pokemon.push(set);
+      let set;
+      if (leadsRemaining) {
+        if (NO_LEAD_POKEMON.includes(species.id)) {
+          if (pokemon.length + leadsRemaining === this.maxTeamSize) continue;
+          set = this.randomSet(species, teamDetails, false);
+          pokemon.push(set);
+        } else {
+          set = this.randomSet(species, teamDetails, true);
+          pokemon.unshift(set);
+          leadsRemaining--;
+        }
+      } else {
+        set = this.randomSet(species, teamDetails, false);
+        pokemon.push(set);
+      }
       if (pokemon.length === this.maxTeamSize) break;
       baseFormes[species.baseSpecies] = 1;
       for (const typeName of types) {

@@ -42,7 +42,7 @@ const WHITELISTED_NAMES_FILE = "config/name-whitelist.tsv";
 const RANGELOCK_DURATION = 60 * 60 * 1e3;
 const LOCK_DURATION = 48 * 60 * 60 * 1e3;
 const GLOBALBAN_DURATION = 7 * 24 * 60 * 60 * 1e3;
-const BATTLEBAN_DURATION = 48 * 60 * 60 * 1e3;
+const BATTLEBAN_DURATION = 4 * 7 * 24 * 60 * 60 * 1e3;
 const GROUPCHATBAN_DURATION = 7 * 24 * 60 * 60 * 1e3;
 const MOBILE_PUNISHMENT_DURATIION = 6 * 60 * 60 * 1e3;
 const ROOMBAN_DURATION = 48 * 60 * 60 * 1e3;
@@ -993,13 +993,15 @@ const Punishments = new class {
   battleban(user, expireTime, id, ...reason) {
     if (!expireTime) expireTime = Date.now() + BATTLEBAN_DURATION;
     const punishment = { type: "BATTLEBAN", id, expireTime, reason: reason.join(" ") };
-    for (const games of user.games.keys()) {
-      const game = Rooms.get(games).getGame(Tournaments.Tournament);
-      if (!game) continue;
-      if (game.isTournamentStarted) {
-        game.disqualifyUser(user.id, null, null);
-      } else if (!game.isTournamentStarted) {
-        game.removeUser(user.id);
+    if (typeof user === "object") {
+      for (const games of user.games.keys()) {
+        const game = Rooms.get(games).getGame(Tournaments.Tournament);
+        if (!game) continue;
+        if (game.isTournamentStarted) {
+          game.disqualifyUser(user.id, null, null);
+        } else if (!game.isTournamentStarted) {
+          game.removeUser(user.id);
+        }
       }
     }
     return Punishments.punish(user, punishment, false);
@@ -1014,17 +1016,20 @@ const Punishments = new class {
   }
   isBattleBanned(user) {
     if (!user) throw new Error(`Trying to check if a non-existent user is battlebanned.`);
-    let punishment = Punishments.userids.getByType(user.id, "BATTLEBAN");
+    const id = toID(user);
+    let punishment = Punishments.userids.getByType(id, "BATTLEBAN");
     if (punishment) return punishment;
-    if (user.autoconfirmed) {
-      punishment = Punishments.userids.getByType(user.autoconfirmed, "BATTLEBAN");
-      if (punishment) return punishment;
-    }
-    for (const ip of user.ips) {
-      punishment = Punishments.ips.getByType(ip, "BATTLEBAN");
-      if (punishment) {
-        if (Punishments.isSharedIp(ip) && user.autoconfirmed) return;
-        return punishment;
+    if (typeof user === "object") {
+      if (user.autoconfirmed) {
+        punishment = Punishments.userids.getByType(user.autoconfirmed, "BATTLEBAN");
+        if (punishment) return punishment;
+      }
+      for (const ip of user.ips) {
+        punishment = Punishments.ips.getByType(ip, "BATTLEBAN");
+        if (punishment) {
+          if (Punishments.isSharedIp(ip) && user.autoconfirmed) return;
+          return punishment;
+        }
       }
     }
   }
@@ -1436,7 +1441,7 @@ Or you can ${appealLink}.` : ``}`
       }
       if ((id === "LOCK" || id === "NAMELOCK") && punishUserid !== userid && Punishments.isSharedIp(user.latestIp)) {
         if (!user.autoconfirmed) {
-          user.semilocked = `#sharedip ${user.locked}`;
+          user.semilocked = `#sharedip ${punishUserid}`;
         }
         user.locked = null;
         user.namelocked = null;
@@ -1617,6 +1622,7 @@ Or you can ${appealLink}.` : ``}`
       expiresText = `soon`;
     }
     if (expiresIn > 1) return ` (expires ${expiresText})`;
+    return ``;
   }
   isRoomBanned(user, roomid) {
     if (!user) throw new Error(`Trying to check if a non-existent user is room banned.`);

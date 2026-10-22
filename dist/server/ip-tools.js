@@ -56,7 +56,7 @@ function removeNohost(hostname) {
   if (hostname?.includes("-nohost")) {
     const parts = hostname.split(".");
     const suffix = parts.pop();
-    return `${parts.join(".")}?/${suffix?.replace("-nohost", "")}`;
+    return `${parts.join(".")}?/${suffix.replace("-nohost", "")}`;
   }
   return hostname;
 }

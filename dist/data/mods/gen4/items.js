@@ -185,7 +185,7 @@ const Items = {
     condition: {
       duration: 1,
       onDamage(damage, target, source, effect) {
-        if (effect && effect.effectType === "Move" && damage >= target.hp) {
+        if (effect?.effectType === "Move" && damage >= target.hp) {
           this.effectState.activated = true;
           return target.hp - 1;
         }
@@ -489,7 +489,7 @@ const Items = {
     condition: {
       duration: 1,
       onAfterMoveSecondarySelf(source, target, move) {
-        if (move && move.effectType === "Move" && source?.volatiles["lifeorb"]) {
+        if (move?.effectType === "Move" && source?.volatiles["lifeorb"]) {
           this.damage(source.baseMaxhp / 10, source, source, this.dex.items.get("lifeorb"));
           source.removeVolatile("lifeorb");
         }
@@ -624,6 +624,14 @@ const Items = {
         this.queue.cancelAction(pokemon);
         this.add("-activate", pokemon, "item: Quick Claw");
         this.runAction(action);
+      }
+    }
+  },
+  quickpowder: {
+    inherit: true,
+    onModifySpe(spe, pokemon) {
+      if (pokemon.species.name === "Ditto") {
+        return this.chainModify(2);
       }
     }
   },
@@ -892,6 +900,11 @@ const Items = {
   toxicplate: {
     inherit: true,
     onTakeItem: true
+  },
+  whiteherb: {
+    inherit: true,
+    onAnySwitchInPriority: void 0
+    // no inherit
   },
   widelens: {
     inherit: true,

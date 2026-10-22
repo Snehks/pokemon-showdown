@@ -40,7 +40,7 @@ class SSBSetHTML extends Chat.JSX.Component {
 }
 class SSBMoveHTML extends Chat.JSX.Component {
   render() {
-    const { sigMove, dex } = this.props;
+    const { sigMove, dex, language } = this.props;
     const details = {
       Priority: String(sigMove.priority),
       Gen: String(sigMove.gen || 9)
@@ -117,19 +117,20 @@ class SSBMoveHTML extends Chat.JSX.Component {
     if (sigMove.isNonstandard === "Unobtainable") {
       details[`Unobtainable in Gen ${dex.gen}`] = "";
     }
-    if (sigMove.shortDesc || sigMove.desc) {
-      return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataMoveHTML(sigMove) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
+    const moveText = dex.text.get(sigMove);
+    if (moveText.shortDesc || moveText.desc) {
+      return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataMoveHTML(sigMove, { dex, language }) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
         const lastEntry = idx === arr.length - 1;
         if (!value) return /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\u2713 ", detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
         if (value === "x") return /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\u2717 ", detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
         return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("span", { class: "gray" }, detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
-      })), sigMove.desc && sigMove.desc !== sigMove.shortDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), sigMove.desc));
+      })), moveText.desc && moveText.desc !== moveText.shortDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), moveText.desc));
     }
   }
 }
 class SSBItemHTML extends Chat.JSX.Component {
   render() {
-    const { set, dex, baseDex } = this.props;
+    const { set, dex, baseDex, language } = this.props;
     if (!Array.isArray(set.item)) {
       const baseItem = baseDex.items.get(set.item);
       const sigItem = dex.items.get(set.item);
@@ -158,8 +159,10 @@ class SSBItemHTML extends Chat.JSX.Component {
       if (sigItem.isNonstandard && sigItem.isNonstandard !== "Custom") {
         details[`Unobtainable in Gen ${dex.gen}`] = "";
       }
-      if (!baseItem.exists || (baseItem.desc || baseItem.shortDesc) !== (sigItem.desc || sigItem.shortDesc)) {
-        return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataItemHTML(sigItem) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
+      const baseText = baseDex.text.get(baseItem);
+      const itemText = dex.text.get(sigItem);
+      if (!baseItem.exists || baseText.desc !== itemText.desc || baseText.shortDesc !== itemText.shortDesc) {
+        return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataItemHTML(sigItem, { dex, language }) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
           const lastEntry = idx === arr.length - 1;
           if (value === "") return /* @__PURE__ */ Chat.h(Chat.Fragment, null, detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
           return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("span", { class: "gray" }, detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
@@ -171,7 +174,7 @@ class SSBItemHTML extends Chat.JSX.Component {
 }
 class SSBAbilityHTML extends Chat.JSX.Component {
   render() {
-    const { set, dex, baseDex } = this.props;
+    const { set, dex, baseDex, language } = this.props;
     const customMegaAbilities = ["Sableye", "Ampharos"];
     if (!Array.isArray(set.ability) && (customMegaAbilities.includes(set.species) || !baseDex.abilities.get(set.ability).exists)) {
       let sigAbil = baseDex.deepClone(dex.abilities.get(set.ability));
@@ -179,26 +182,29 @@ class SSBAbilityHTML extends Chat.JSX.Component {
         const megaAbil = dex.species.get(`${set.species}-Mega`).abilities[0];
         sigAbil = baseDex.deepClone(dex.abilities.get(megaAbil));
       }
-      if (!sigAbil.desc && !sigAbil.shortDesc) {
-        sigAbil.desc = `This ability doesn't have a description. Try contacting the SSB dev team.`;
+      let abilityText = dex.text.get(sigAbil);
+      if (!abilityText.desc && !abilityText.shortDesc) {
+        const desc = `This ability doesn't have a description. Try contacting the SSB dev team.`;
+        Object.assign(sigAbil, { desc, shortDesc: desc });
+        abilityText = dex.text.get(sigAbil);
       }
       const details = {
         Gen: String(sigAbil.gen || 9) || "CAP"
       };
       if (sigAbil.flags["cantsuppress"]) details["Not affected by Gastro Acid"] = "";
       if (sigAbil.flags["breakable"]) details["Ignored by Mold Breaker"] = "";
-      return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataAbilityHTML(sigAbil) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
+      return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataAbilityHTML(sigAbil, { dex, language }) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
         const lastEntry = idx === arr.length - 1;
         if (value === "") return /* @__PURE__ */ Chat.h(Chat.Fragment, null, detail, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
         return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("span", { class: "gray" }, "$", detail, ":"), " ", value, !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
-      })), sigAbil.desc && sigAbil.shortDesc && sigAbil.desc !== sigAbil.shortDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), sigAbil.desc));
+      })), abilityText.desc && abilityText.shortDesc && abilityText.desc !== abilityText.shortDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), abilityText.desc));
     }
     return /* @__PURE__ */ Chat.h(Chat.Fragment, null);
   }
 }
 class SSBPokemonHTML extends Chat.JSX.Component {
   render() {
-    const { species, dex, baseDex } = this.props;
+    const { species, dex, baseDex, language } = this.props;
     const origSpecies = baseDex.species.get(species);
     const newSpecies = dex.species.get(species);
     let weighthit = 20;
@@ -259,7 +265,14 @@ class SSBPokemonHTML extends Chat.JSX.Component {
       details["Evolution"] = evos.join(", ");
     }
     if (newSpecies.types.join("/") !== origSpecies.types.join("/") || Object.values(newSpecies.abilities).join("/") !== Object.values(origSpecies.abilities).join("/") || Object.values(newSpecies.baseStats).join("/") !== Object.values(origSpecies.baseStats).join("/")) {
-      return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataPokemonHTML(newSpecies, dex.gen, "SSB") } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
+      return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), /* @__PURE__ */ Chat.h(
+        "span",
+        {
+          dangerouslySetInnerHTML: {
+            __html: Chat.getDataPokemonHTML(newSpecies, { dex, tier: "SSB", language })
+          }
+        }
+      ), /* @__PURE__ */ Chat.h("font", { size: "1" }, Object.entries(details).map(([detail, value], idx, arr) => {
         const lastEntry = idx === arr.length - 1;
         if (detail.includes("<font")) {
           return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: detail } }), !lastEntry && /* @__PURE__ */ Chat.h(Chat.Fragment, null, "\xA0|\u205F\u200A"));
@@ -271,26 +284,25 @@ class SSBPokemonHTML extends Chat.JSX.Component {
 }
 class SSBInnateHTML extends Chat.JSX.Component {
   render() {
-    const { name, dex, baseDex } = this.props;
+    const { name, dex, baseDex, language } = this.props;
     let effect = dex.conditions.get(name + "user");
     if (!effect.exists) effect = dex.conditions.get(name);
     const longDesc = ``;
     const baseAbility = baseDex.deepClone(baseDex.abilities.get("noability"));
     if (effect.innateName) {
       baseAbility.name = effect.innateName;
-      if (!effect.desc && !effect.shortDesc) {
-        baseAbility.desc = baseAbility.shortDesc = "This innate does not have a description.";
-      }
-      if (effect.desc) baseAbility.desc = effect.desc;
-      if (effect.shortDesc) baseAbility.shortDesc = effect.shortDesc;
-      return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), "Innate Ability:", /* @__PURE__ */ Chat.h("br", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataAbilityHTML(baseAbility) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, /* @__PURE__ */ Chat.h("span", { class: "gray" }, "Gen:"), " 9"), longDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), longDesc));
+      const effectText = effect;
+      const desc = effectText.desc || effectText.shortDesc || "This innate does not have a description.";
+      const shortDesc = effectText.shortDesc || effectText.desc || "This innate does not have a description.";
+      Object.assign(baseAbility, { desc, shortDesc });
+      return /* @__PURE__ */ Chat.h(Chat.Fragment, null, /* @__PURE__ */ Chat.h("hr", null), "Innate Ability:", /* @__PURE__ */ Chat.h("br", null), /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: Chat.getDataAbilityHTML(baseAbility, { dex, language }) } }), /* @__PURE__ */ Chat.h("font", { size: "1" }, /* @__PURE__ */ Chat.h("span", { class: "gray" }, "Gen:"), " 9"), longDesc && /* @__PURE__ */ Chat.h("details", null, /* @__PURE__ */ Chat.h("summary", null, /* @__PURE__ */ Chat.h("strong", null, "In-Depth Description")), longDesc));
     }
     return /* @__PURE__ */ Chat.h(Chat.Fragment, null);
   }
 }
 class SSBSetsHTML extends Chat.JSX.Component {
   render() {
-    const target = this.props.target;
+    const { target, language } = this.props;
     const targetID = toID(target);
     const baseDex = Dex;
     const dex = Dex.forFormat("gen9superstaffbrosultimate");
@@ -317,14 +329,38 @@ class SSBSetsHTML extends Chat.JSX.Component {
         {
           dangerouslySetInnerHTML: { __html: `<details><summary><psicon pokemon="${set.species}" /><strong>${`${setName.split("-").slice(1).join("-")} forme`}</strong></summary>` }
         }
-      ), /* @__PURE__ */ Chat.h(SSBSetHTML, { set, dex, baseDex }), (!set.skip || set.signatureMove !== import_random_teams.ssbSets[set.skip].signatureMove) && /* @__PURE__ */ Chat.h(SSBMoveHTML, { sigMove, dex }), /* @__PURE__ */ Chat.h(SSBItemHTML, { set, dex, baseDex }), /* @__PURE__ */ Chat.h(SSBAbilityHTML, { set, dex, baseDex }), /* @__PURE__ */ Chat.h(SSBInnateHTML, { name: setName, dex, baseDex }), /* @__PURE__ */ Chat.h(SSBPokemonHTML, { species: set.species, dex, baseDex }), !Array.isArray(set.item) && item.megaStone && /* @__PURE__ */ Chat.h(
+      ), /* @__PURE__ */ Chat.h(SSBSetHTML, { set, dex, baseDex }), (!set.skip || set.signatureMove !== import_random_teams.ssbSets[set.skip].signatureMove) && /* @__PURE__ */ Chat.h(
+        SSBMoveHTML,
+        {
+          sigMove,
+          dex,
+          language
+        }
+      ), /* @__PURE__ */ Chat.h(SSBItemHTML, { set, dex, baseDex, language }), /* @__PURE__ */ Chat.h(SSBAbilityHTML, { set, dex, baseDex, language }), /* @__PURE__ */ Chat.h(SSBInnateHTML, { name: setName, dex, baseDex, language }), /* @__PURE__ */ Chat.h(SSBPokemonHTML, { species: set.species, dex, baseDex, language }), !Array.isArray(set.item) && item.megaStone && /* @__PURE__ */ Chat.h(
         SSBPokemonHTML,
         {
           species: Object.values(item.megaStone)[0],
           dex,
-          baseDex
+          baseDex,
+          language
         }
-      ), ["Rayquaza"].includes(set.species) && /* @__PURE__ */ Chat.h(SSBPokemonHTML, { species: `${set.species}-Mega`, dex, baseDex }), ["Cinderace"].includes(set.species) && /* @__PURE__ */ Chat.h(SSBPokemonHTML, { species: `${set.species}-Gmax`, dex, baseDex }), set.skip && /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: `</details>` } }));
+      ), ["Rayquaza"].includes(set.species) && /* @__PURE__ */ Chat.h(
+        SSBPokemonHTML,
+        {
+          species: `${set.species}-Mega`,
+          dex,
+          baseDex,
+          language
+        }
+      ), ["Cinderace"].includes(set.species) && /* @__PURE__ */ Chat.h(
+        SSBPokemonHTML,
+        {
+          species: `${set.species}-Gmax`,
+          dex,
+          baseDex,
+          language
+        }
+      ), set.skip && /* @__PURE__ */ Chat.h("span", { dangerouslySetInnerHTML: { __html: `</details>` } }));
     });
   }
 }
@@ -341,7 +377,7 @@ const commands = {
   ssb(target, room, user) {
     if (!this.runBroadcast()) return;
     if (!target) return this.parse(`/help ssb`);
-    return this.sendReplyBox(/* @__PURE__ */ Chat.h(SSBSetsHTML, { target }));
+    return this.sendReplyBox(/* @__PURE__ */ Chat.h(SSBSetsHTML, { target, language: this.language }));
   },
   ssbhelp: [
     `/ssb [staff member] - Displays a staff member's Super Staff Bros. set and custom features.`

@@ -1234,7 +1234,7 @@ const Moves = {
     onAfterMoveSecondarySelf(source) {
       if (this.canSwitch(source.side)) {
         this.actions.useMove("batonpass", source);
-        source.skipBeforeSwitchOutEventFlag = false;
+        source.skipPursuit = false;
       }
     },
     target: "self",
@@ -6330,7 +6330,7 @@ const Moves = {
       },
       onTryHitPriority: 4,
       onTryHit(target, source, effect) {
-        if (effect && effect.name === "Puffy Spiky Destruction") {
+        if (effect?.name === "Puffy Spiky Destruction") {
           this.add("-activate", target, "move: Misty Terrain");
           return null;
         }

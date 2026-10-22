@@ -45,6 +45,16 @@ const Rulesets = {
       "Evasion Clause"
     ]
   },
+  standarddoubles: {
+    inherit: true,
+    ruleset: [
+      "Standard AG",
+      "Nickname Clause",
+      "OHKO Clause",
+      "Evasion Moves Clause",
+      "Gravity Sleep Clause"
+    ]
+  },
   standarddraft: {
     inherit: true,
     ruleset: [

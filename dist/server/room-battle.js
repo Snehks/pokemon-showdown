@@ -497,6 +497,7 @@ class RoomBattle extends import_room_game.RoomGame {
       return;
     }
     request.isWait = false;
+    request.choice = "";
     void this.stream.write(`>${player.slot} undo`);
   }
   joinGame(user, slot, playerOpts) {
@@ -504,21 +505,27 @@ class RoomBattle extends import_room_game.RoomGame {
       user.popup(`You have already joined this battle.`);
       return false;
     }
-    const validSlots = this.players.filter((player) => !player.id).map((player) => player.slot);
+    const validSlots = this.players.filter((player) => !player.id && !player.eliminated).map((player) => player.slot);
     if (slot && !validSlots.includes(slot)) {
-      user.popup(`This battle already has a user in slot ${slot}.`);
+      if (this[slot]?.eliminated) {
+        user.popup(`The player in slot ${slot} has already been eliminated.`);
+      } else if (this.players.some((player) => player.slot === slot)) {
+        user.popup(`This battle already has a user in slot ${slot}.`);
+      } else {
+        user.popup(`Slot "${slot}" doesn't exist in this battle.`);
+      }
       return false;
     }
     if (!validSlots.length) {
-      user.popup(`This battle already has ${this.playerCap} players.`);
+      user.popup(`This battle has no available player slots.`);
       return false;
     }
-    slot ??= this.players.find((player) => player.invite === user.id)?.slot;
+    slot ||= validSlots.find((validSlot) => this[validSlot].invite === user.id);
     if (!slot && validSlots.length > 1) {
       user.popup(`Which slot would you like to join into? Use something like \`/joingame ${validSlots[0]}\``);
       return false;
     }
-    slot ??= validSlots[0];
+    slot ||= validSlots[0];
     if (this[slot].invite === user.id) {
       this.room.auth.set(user.id, Users.PLAYER_SYMBOL);
     } else if (!user.can("joinbattle", null, this.room)) {
@@ -673,7 +680,7 @@ class RoomBattle extends import_room_game.RoomGame {
     this.room.parent?.game?.onBattleWin?.(this.room, winnerid);
     if (this.room.hideReplay) {
       this.room.settings.modjoin = "%";
-      this.room.setPrivate("hidden");
+      this.room.setPrivate("hidden", this.password);
     }
     this.room.update();
     for (const player of this.players) {
@@ -692,14 +699,18 @@ class RoomBattle extends import_room_game.RoomGame {
     }
     const p1 = this.p1.name;
     const p2 = this.p2.name;
-    const [score, p1rating, p2rating] = await Ladders(this.ladder).updateRating(
+    const playerIsBot = this.players.map((player) => player.getUser()?.isUserBot);
+    const [score, ...ratings] = await Ladders(this.ladder).updateRating(
       p1,
       p2,
       p1score,
       this.room
     );
-    void this.logBattle(score, p1rating, p2rating);
-    Chat.runHandlers("onBattleRanked", this, winnerid, [p1rating, p2rating], [p1, p2].map(toID));
+    for (const [i, rating] of ratings.entries()) {
+      if (rating) rating.isBot = playerIsBot[i];
+    }
+    void this.logBattle(score, ...ratings);
+    Chat.runHandlers("onBattleRanked", this, winnerid, ratings, [p1, p2].map(toID));
   }
   async logBattle(p1score, p1rating = null, p2rating = null, p3rating = null, p4rating = null) {
     if (Dex.formats.get(this.format, true).noLog) return;
@@ -716,12 +727,12 @@ class RoomBattle extends import_room_game.RoomGame {
       }
     }
     logData.p1rating = p1rating;
-    if (this.replaySaved) logData.replaySaved = this.replaySaved;
     logData.p2rating = p2rating;
     if (this.playerCap > 2) {
       logData.p3rating = p3rating;
       logData.p4rating = p4rating;
     }
+    if (this.replaySaved) logData.replaySaved = this.replaySaved;
     logData.endType = this.endType;
     if (!p1rating) logData.ladderError = true;
     const date = /* @__PURE__ */ new Date();
@@ -835,7 +846,7 @@ class RoomBattle extends import_room_game.RoomGame {
   forfeitPlayer(player, message = "") {
     if (this.ended || !this.started || player.eliminated) return false;
     player.eliminated = true;
-    this.room.add(`|-message|${player.name}${message || " forfeited."}`);
+    this.room.add(`|-message|${player.name}${message || " was made to forfeit."}`);
     this.endType = "forfeit";
     if (this.playerCap > 2) {
       player.sendRoom(`|request|null`);
@@ -1131,7 +1142,7 @@ if (!PM.isParentProcess) {
       const repr = JSON.stringify([error.name, error.message, source, details]);
       process.send(`THROW
 @!!@${repr}
-${error.stack}`);
+${error.stack ?? error}`);
     },
     slow(text) {
       process.send(`CALLBACK

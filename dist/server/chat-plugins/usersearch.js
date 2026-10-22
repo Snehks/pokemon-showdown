@@ -146,7 +146,7 @@ const commands = {
         `${user.name} added the ${count} "${targets.join(", ")}" to the usersearch name list.`
       );
       this.globalModlog(`USERSEARCH ADD`, null, targets.join(", "));
-      if (!room || room.roomid !== "staff") {
+      if (room?.roomid !== "staff") {
         this.sendReply(`You added the ${count} "${targets.join(", ")}" to the usersearch name list.`);
       }
       saveNames();
@@ -174,7 +174,7 @@ const commands = {
         `${user.name} removed the ${count} "${targets.join(", ")}" from the usersearch name list.`
       );
       this.globalModlog(`USERSEARCH REMOVE`, null, targets.join(", "));
-      if (!room || room.roomid !== "staff") {
+      if (room?.roomid !== "staff") {
         this.sendReply(`You removed the ${count} "${targets.join(", ")}"" from the usersearch name list.`);
       }
       saveNames();

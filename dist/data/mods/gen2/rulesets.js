@@ -79,7 +79,7 @@ const Rulesets = {
   nc2000movelegality: {
     effectType: "ValidatorRule",
     name: "NC 2000 Move Legality",
-    desc: "Prevents Pok\xE9mon from having moves that would only be obtainable in Pok\xE9mon Crystal.",
+    desc: "Prevents Pokemon from having moves that would only be obtainable in Pok&eacute;mon Crystal.",
     onValidateSet(set) {
       const illegalCombos = {
         arbok: { crunch: "E" },

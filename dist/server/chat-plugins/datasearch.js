@@ -104,7 +104,7 @@ const commands = {
       }
     }
     const defaultFormat = this.extractFormat(room?.settings.defaultFormat || room?.battle?.format);
-    if (!target.includes("mod=")) {
+    if (!getMod(target).count) {
       const dex = defaultFormat.dex;
       if (dex) target += `, mod=${dex.currentMod}`;
     }
@@ -162,7 +162,7 @@ const commands = {
     }
     if (!qty) targetsBuffer.push("random1");
     const defaultFormat = this.extractFormat(room?.settings.defaultFormat || room?.battle?.format);
-    if (!target.includes("mod=")) {
+    if (!getMod(target).count) {
       const dex = defaultFormat.dex;
       if (dex) targetsBuffer.push(`mod=${dex.currentMod}`);
     }
@@ -217,7 +217,7 @@ const commands = {
     }
     if (!qty) targetsBuffer.push("random1");
     const defaultFormat = this.extractFormat(room?.settings.defaultFormat || room?.battle?.format);
-    if (!target.includes("mod=")) {
+    if (!getMod(target).count) {
       const dex = defaultFormat.dex;
       if (dex) targetsBuffer.push(`mod=${dex.currentMod}`);
     }
@@ -323,7 +323,7 @@ const commands = {
         target = split.join(",");
       }
     }
-    if (!target.includes("mod=")) {
+    if (!getMod(target).count) {
       const dex = this.extractFormat(room?.settings.defaultFormat || room?.battle?.format).dex;
       if (dex) target += `, mod=${dex.currentMod}`;
     }
@@ -1255,7 +1255,7 @@ function runDexsearch(target, cmd2, message, isTest) {
           if (inequalityString.startsWith(">")) directions.push("greater");
           if (statKey in allStatAliases) statKey = allStatAliases[statKey];
           if (compareType in allStatAliases) compareType = allStatAliases[compareType];
-          if (!allStats.slice(0, 6).includes(statKey) || !allStats.slice(0, 6).includes(compareType))
+          if (!allStats.includes(statKey) || !allStats.includes(compareType))
             return { error: `'${target}' did not contain a valid stat to compare with another stat.` };
         }
         if (inequalityString.endsWith("=")) directions.push("equal");
@@ -1527,7 +1527,7 @@ function runDexsearch(target, cmd2, message, isTest) {
     }
   }
   let results = [];
-  for (const mon of Object.values(dex).sort()) {
+  for (const mon of import_lib.Utils.sortBy(Object.values(dex), (species) => species.name)) {
     if (singleTypeSearch !== null && mon.types.length === 1 !== singleTypeSearch) continue;
     const isRegionalForm = (["Alola", "Galar", "Hisui"].includes(mon.forme) || mon.forme.startsWith("Paldea")) && mon.baseSpecies !== "Pikachu";
     const maskForm = mon.baseSpecies === "Ogerpon" && !mon.forme.endsWith("Tera");
@@ -1561,7 +1561,7 @@ function runDexsearch(target, cmd2, message, isTest) {
       ).join(", ");
     };
     var mapPokemonResults = mapPokemonResults2;
-    results.sort();
+    import_lib.Utils.sortBy(results, (species) => species.name);
     if (sort) {
       const direction = sort.slice(-1);
       import_lib.Utils.sortBy(results, (species) => getSortValue(species) * (direction === "+" ? 1 : -1));
@@ -2109,7 +2109,7 @@ function runMovesearch(target, cmd2, message, isTest) {
   for (const moveid of validMoves) {
     const move = mod.moves.get(moveid);
     if (move.gen <= mod.gen) {
-      if (!nationalSearch && move.isNonstandard || nationalSearch && move.isNonstandard && !["Past", "Unobtainable"].includes(move.isNonstandard) || move.isMax && mod.gen !== 8) {
+      if (!nationalSearch && move.isNonstandard && move.isNonstandard !== "Gmax" || nationalSearch && move.isNonstandard && !["Gmax", "Past", "Unobtainable"].includes(move.isNonstandard) || move.isMax && mod.gen !== 8) {
         continue;
       } else {
         dex[moveid] = move;
@@ -2298,7 +2298,7 @@ function runMovesearch(target, cmd2, message, isTest) {
       }
       if (matched) continue;
       for (const searchStatus in alts.volatileStatus) {
-        let canStatus = !!(move.secondary && move.secondary.volatileStatus === searchStatus || move.secondaries?.some((entry) => entry.volatileStatus === searchStatus) || move.volatileStatus === searchStatus || // This is slightly hacky, but none of the proper trapping moves in moves.ts mechanically use 'trapped' as
+        let canStatus = !!(move.secondary?.volatileStatus === searchStatus || move.secondaries?.some((entry) => entry.volatileStatus === searchStatus) || move.volatileStatus === searchStatus || // This is slightly hacky, but none of the proper trapping moves in moves.ts mechanically use 'trapped' as
         // a volatilestatus despite it being one.
         "trapped" === searchStatus && (move.onHit && /\b(?:target|pokemon)\.addVolatile\("trapped",/.test(move.onHit.toString()) || move.secondary?.onHit && /\b(?:target|pokemon)\.addVolatile\("trapped",/.test(move.secondary.onHit.toString()) || move.self?.onHit && /\b(?:target|pokemon)\.addVolatile\("trapped",/.test(move.self.onHit.toString())));
         if (searchStatus === "partiallytrapped") {
@@ -2336,12 +2336,10 @@ function runMovesearch(target, cmd2, message, isTest) {
   }
   if (results.length > 1) {
     let mapMoveResults2 = function(inputArray) {
-      return inputArray.map(
-        (result) => `<a href="//${Config.routes.dex}/moves/${toID(result)}" target="_blank" class="subtle" style="white-space:nowrap">${result}</a>` + (sort ? (
-          // eslint-disable-next-line @typescript-eslint/no-base-to-string
-          ` (${dex[toID(result)][sort.slice(0, -1)] === true ? "-" : dex[toID(result)][sort.slice(0, -1)]})`
-        ) : "")
-      ).join(", ");
+      return inputArray.map((result) => {
+        const value = sort ? dex[toID(result)][sort.slice(0, -1)] : "";
+        return `<a href="//${Config.routes.dex}/moves/${toID(result)}" target="_blank" class="subtle" style="white-space:nowrap">${result}</a>` + (sort ? ` (${value === true ? "-" : value})` : "");
+      }).join(", ");
     };
     var mapMoveResults = mapMoveResults2;
     results.sort();
@@ -2592,7 +2590,7 @@ function runItemsearch(target, cmd2, message) {
     let bestMatched = 0;
     for (const item of dex.items.all()) {
       let matched = 0;
-      let descWords = item.desc || "";
+      let descWords = dex.text.get(item).desc || "";
       if (/[1-9.]+x/.test(descWords)) descWords += " increases";
       if (item.isBerry) descWords += " berry";
       descWords = descWords.replace(/super[-\s]effective/g, "supereffective");
@@ -2776,7 +2774,7 @@ function runAbilitysearch(target, cmd2, message) {
   const dex = maxGen ? Dex.mod(`gen${maxGen}`) : Dex;
   for (const ability of dex.abilities.all()) {
     let matched = 0;
-    let descWords = ability.desc || ability.shortDesc || "";
+    let descWords = dex.text.get(ability).desc;
     if (/[1-9.]+x/.test(descWords)) descWords += " increases";
     descWords = descWords.replace(/super[-\s]effective/g, "supereffective");
     const descWordsArray = import_lib.Utils.normalize(descWords).split(" ");
@@ -2925,7 +2923,7 @@ function runLearn(target, cmd2, formatid) {
   if (setSources.sources.length) {
     setSources.sources = setSources.sources.map((source) => {
       if (source.charAt(1) !== "E") return source;
-      const fathers = validator.findEggMoveFathers(source, species, setSources, true);
+      const fathers = validator.findEggMoveFathers(source, species, setSources, 2, true);
       if (!fathers) return "";
       return source + ":" + fathers.join(",");
     }).filter(Boolean);
@@ -3091,7 +3089,7 @@ if (!PM.isParentProcess) {
       const repr = JSON.stringify([error.name, error.message, source, details]);
       process.send(`THROW
 @!!@${repr}
-${error.stack}`);
+${error.stack ?? error}`);
     }
   };
   if (Config.crashguard) {

@@ -63,7 +63,7 @@ const Items = {
   blackbelt: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -71,7 +71,7 @@ const Items = {
   blackglasses: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -106,7 +106,7 @@ const Items = {
   charcoal: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -191,7 +191,7 @@ const Items = {
   dracoplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -199,7 +199,7 @@ const Items = {
   dragonfang: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -216,7 +216,7 @@ const Items = {
   dreadplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -224,7 +224,7 @@ const Items = {
   earthplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -241,7 +241,7 @@ const Items = {
   fairyfeather: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -276,7 +276,7 @@ const Items = {
   fistplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -284,7 +284,7 @@ const Items = {
   flameplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -358,7 +358,7 @@ const Items = {
   hardstone: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -375,7 +375,7 @@ const Items = {
   icicleplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -383,7 +383,7 @@ const Items = {
   insectplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -399,7 +399,7 @@ const Items = {
   ironplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -459,7 +459,7 @@ const Items = {
   magnet: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -467,7 +467,7 @@ const Items = {
   meadowplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -475,7 +475,7 @@ const Items = {
   metalcoat: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -483,7 +483,7 @@ const Items = {
   mindplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -491,7 +491,7 @@ const Items = {
   miracleseed: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -499,7 +499,7 @@ const Items = {
   mysticwater: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -507,7 +507,7 @@ const Items = {
   nevermeltice: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -538,7 +538,7 @@ const Items = {
   oddincense: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -574,7 +574,7 @@ const Items = {
   pixieplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -582,7 +582,7 @@ const Items = {
   poisonbarb: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -622,7 +622,7 @@ const Items = {
   rockincense: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -639,7 +639,7 @@ const Items = {
   roseincense: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -661,7 +661,7 @@ const Items = {
   seaincense: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -669,7 +669,7 @@ const Items = {
   sharpbeak: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -691,7 +691,7 @@ const Items = {
   silkscarf: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -699,7 +699,7 @@ const Items = {
   silverpowder: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -707,7 +707,7 @@ const Items = {
   skyplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -723,7 +723,7 @@ const Items = {
   softsand: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -739,7 +739,7 @@ const Items = {
   spelltag: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -747,7 +747,7 @@ const Items = {
   splashplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -755,7 +755,7 @@ const Items = {
   spookyplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -772,7 +772,7 @@ const Items = {
   stoneplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -794,7 +794,7 @@ const Items = {
   toxicplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -802,7 +802,7 @@ const Items = {
   twistedspoon: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -833,7 +833,7 @@ const Items = {
   waveincense: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -855,7 +855,7 @@ const Items = {
   zapplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === user.teraType) {
+      if (move?.type === user.teraType) {
         return this.chainModify([4915, 4096]);
       }
     }

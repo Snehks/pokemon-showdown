@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../data/mods/gen9mnmlimitedsupply/moves.ts"],
+  "sourcesContent": ["export const Moves: import('../../../sim/dex-moves').ModdedMoveDataTable = {\n\tterablast: {\n\t\tinherit: true,\n\t\tonModifyType(move, pokemon, target) {\n\t\t\tif (pokemon.terastallized) {\n\t\t\t\tmove.type = pokemon.teraType;\n\t\t\t} else {\n\t\t\t\tswitch (pokemon.item) {\n\t\t\t\tcase 'dousedrive':\n\t\t\t\t\tmove.type = 'Water';\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'burndrive':\n\t\t\t\t\tmove.type = 'Fire';\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'shockdrive':\n\t\t\t\t\tmove.type = 'Electric';\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'chilldrive':\n\t\t\t\t\tmove.type = 'Ice';\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t},\n};\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,QAA8D;AAAA,EAC1E,WAAW;AAAA,IACV,SAAS;AAAA,IACT,aAAa,MAAM,SAAS,QAAQ;AACnC,UAAI,QAAQ,eAAe;AAC1B,aAAK,OAAO,QAAQ;AAAA,MACrB,OAAO;AACN,gBAAQ,QAAQ,MAAM;AAAA,UACtB,KAAK;AACJ,iBAAK,OAAO;AACZ;AAAA,UACD,KAAK;AACJ,iBAAK,OAAO;AACZ;AAAA,UACD,KAAK;AACJ,iBAAK,OAAO;AACZ;AAAA,UACD,KAAK;AACJ,iBAAK,OAAO;AACZ;AAAA,QACD;AAAA,MACD;AAAA,IACD;AAAA,EACD;AACD;",
+  "names": []
+}

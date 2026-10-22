@@ -110,7 +110,7 @@ class FSPath {
   readIfExists() {
     return new Promise((resolve, reject) => {
       fs.readFile(this.path, "utf8", (err, data) => {
-        if (err && err.code === "ENOENT") return resolve("");
+        if (err?.code === "ENOENT") return resolve("");
         err ? reject(err) : resolve(data);
       });
     });
@@ -307,7 +307,7 @@ class FSPath {
     if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.unlink(this.path, (err) => {
-        if (err && err.code === "ENOENT") return resolve();
+        if (err?.code === "ENOENT") return resolve();
         err ? reject(err) : resolve();
       });
     });
@@ -348,7 +348,7 @@ class FSPath {
     if (global.Config?.nofswriting) return Promise.resolve();
     return new Promise((resolve, reject) => {
       fs.mkdir(this.path, mode, (err) => {
-        if (err && err.code === "EEXIST") return resolve();
+        if (err?.code === "EEXIST") return resolve();
         err ? reject(err) : resolve();
       });
     });

@@ -508,7 +508,7 @@ const commands = {
     }
     const species = dex.species.get(searchResults[0].name);
     const babyModifier = isBaby ? "baby" : "";
-    const doublesModifier = isDoubles && mod === "gen9" ? "doubles" : "";
+    const doublesModifier = isDoubles && dex.gen === 9 ? "doubles" : "";
     const freeForAllModifier = isFFA && mod === "gen9" ? "freeforall" : "";
     const noDMaxModifier = isNoDMax ? "nodmax" : "";
     const formatName = `${mod}${freeForAllModifier}${babyModifier}random${doublesModifier}battle${noDMaxModifier}`;

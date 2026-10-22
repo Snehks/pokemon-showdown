@@ -43,7 +43,7 @@ const Abilities = {
   callillumise: {
     onDamagePriority: -30,
     onDamage(damage, target, source, effect) {
-      if (damage >= target.hp) {
+      if (damage >= target.hp && !target.m.called) {
         this.add("-ability", target, "Call Illumise");
         this.effectState.callillumise = true;
         return target.hp - 1;
@@ -77,6 +77,7 @@ const Abilities = {
       this.heal(pokemon.maxhp);
       pokemon.setAbility("Tinted Lens", null, null, true);
       pokemon.baseAbility = pokemon.ability;
+      pokemon.m.called = true;
       this.add("-ability", pokemon, "Tinted Lens");
     },
     flags: {
@@ -96,7 +97,7 @@ const Abilities = {
   callvolbeat: {
     onDamagePriority: -30,
     onDamage(damage, target, source, effect) {
-      if (damage >= target.hp) {
+      if (damage >= target.hp && !target.m.called) {
         this.add("-ability", target, "Call Volbeat");
         this.effectState.callvolbeat = true;
         return target.hp - 1;
@@ -130,6 +131,7 @@ const Abilities = {
       this.heal(pokemon.maxhp);
       pokemon.setAbility("Dancer", null, null, true);
       pokemon.baseAbility = pokemon.ability;
+      pokemon.m.called = true;
       this.add("-ability", pokemon, "Dancer");
     },
     flags: {
@@ -315,7 +317,7 @@ const Abilities = {
   kingofthehill: {
     // sharpness + mountaineer + prevents hazard immunity
     onDamage(damage, target, source, effect) {
-      if (effect && effect.id === "stealthrock") {
+      if (effect?.id === "stealthrock") {
         return false;
       }
     },

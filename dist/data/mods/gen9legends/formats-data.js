@@ -1421,7 +1421,7 @@ const FormatsData = {
     isNonstandard: null
   },
   garchompmegaz: {
-    isNonstandard: "Unobtainable"
+    isNonstandard: null
   },
   munchlax: {
     isNonstandard: "Past"
@@ -2094,7 +2094,7 @@ const FormatsData = {
     isNonstandard: null
   },
   greninjabond: {
-    isNonstandard: "Unobtainable"
+    isNonstandard: "Past"
   },
   greninjamega: {
     isNonstandard: null
@@ -2588,7 +2588,7 @@ const FormatsData = {
     isNonstandard: null
   },
   magearnaoriginal: {
-    isNonstandard: "Unobtainable"
+    isNonstandard: null
   },
   magearnamega: {
     isNonstandard: null

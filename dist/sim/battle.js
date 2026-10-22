@@ -221,7 +221,10 @@ class Battle {
     this.add("message", "The battle's RNG was reset.");
   }
   suppressingAbility(target) {
-    return this.activePokemon && this.activePokemon.isActive && (this.activePokemon !== target || this.gen < 8) && this.activeMove && this.activeMove.ignoreAbility && !target?.hasItem("Ability Shield");
+    return this.activePokemon?.isActive && (this.activePokemon !== target || this.gen < 8) && this.activeMove?.ignoreAbility && !target?.hasItem("Ability Shield");
+  }
+  suppressingSecondaries() {
+    return this.activeMove?.hasSheerForce && this.activePokemon?.hasAbility("sheerforce");
   }
   setActiveMove(move, pokemon, target) {
     this.activeMove = move || null;
@@ -355,6 +358,8 @@ class Battle {
           expectedStateLocation = handler.state.target.itemState;
         } else if (effect.effectType === "Status") {
           expectedStateLocation = handler.state.target.statusState;
+        } else if (effect.effectType === "Pokemon") {
+          expectedStateLocation = handler.state.target.speciesState;
         } else {
           expectedStateLocation = handler.state.target.volatiles[effect.id];
         }
@@ -384,7 +389,7 @@ class Battle {
       if (handler.callback) {
         this.singleEvent(handlerEventid, effect, handler.state, handler.effectHolder, null, null, void 0, handler.callback);
       }
-      this.faintMessages();
+      this.resolveFaints();
       if (this.ended) return;
     }
   }
@@ -656,7 +661,7 @@ class Battle {
           if (eventid in AttackingEvents) {
             this.debug(eventid + " handler suppressed by Mold Breaker");
             continue;
-          } else if (eventid === "Damage" && sourceEffect && sourceEffect.effectType === "Move") {
+          } else if (eventid === "Damage" && sourceEffect?.effectType === "Move") {
             this.debug(eventid + " handler suppressed by Mold Breaker");
             continue;
           }
@@ -776,9 +781,13 @@ class Battle {
   }
   getCallback(target, effect, callbackName) {
     let callback = effect[callbackName];
-    if (callback === void 0 && target instanceof import_pokemon.Pokemon && this.gen >= 5 && callbackName === "onSwitchIn" && !effect.onAnySwitchIn && (["Ability", "Item"].includes(effect.effectType) || // Innate abilities/items
-    effect.effectType === "Status" && ["ability", "item"].includes(effect.id.split(":")[0]))) {
-      callback = effect.onStart;
+    if (target instanceof import_pokemon.Pokemon && callbackName === "onSwitchIn") {
+      if (callback === void 0 && !effect.onAnySwitchIn && (["Ability", "Item"].includes(effect.effectType) || effect.effectType === "Status" && ["ability", "item"].includes(effect.id.split(":")[0]))) {
+        callback = effect.onStart;
+      }
+      if (this.gen === 3 && effect.onAfterEntryHazard && (effect.effectType === "Ability" || effect.effectType === "Status" && effect.id.split(":")[0] === "ability")) {
+        callback = this.turn === 0 ? effect.onAfterEntryHazard : void 0;
+      }
     }
     return callback;
   }
@@ -1093,6 +1102,9 @@ class Battle {
     if (!sourceCanBeSet) return sourceCanBeSet;
     if (this.gen <= 4 || source.isAlly(target)) {
       this.add("-activate", source, "Skill Swap", "", "", `[of] ${target}`);
+      if (this.gen > 4) {
+        this.hint("Skill Swap does not announce the abilities of the Pok\xE9mon when used between allies.");
+      }
     } else {
       this.add("-activate", source, "Skill Swap", targetAbility.name, sourceAbility.name, `[of] ${target}`);
     }
@@ -1280,7 +1292,7 @@ class Battle {
     if (!side.pokemonLeft) return;
     side.pokemonLeft = 0;
     side.active[0]?.faint();
-    this.faintMessages(false, true);
+    this.resolveFaints({ checkWinIfNoFaints: true });
     if (!this.ended && side.requestState) {
       side.emitRequest({ wait: true, side: side.getRequestData() });
       side.clearChoice();
@@ -1297,10 +1309,11 @@ class Battle {
   }
   possibleSwitches(side) {
     if (!side.pokemonLeft) return [];
+    const queuedSwitchIns = this.queue.getSwitches(side).map((action) => action.target);
     const canSwitchIn = [];
     for (let i = side.active.length; i < side.pokemon.length; i++) {
       const pokemon = side.pokemon[i];
-      if (!pokemon.fainted) {
+      if (!pokemon.fainted && !queuedSwitchIns.includes(pokemon)) {
         canSwitchIn.push(pokemon);
       }
     }
@@ -1339,7 +1352,7 @@ class Battle {
     this.lastSuccessfulMoveThisTurn = null;
     const dynamaxEnding = [];
     for (const pokemon of this.getAllActive()) {
-      if (pokemon.volatiles["dynamax"]?.turns === 3) {
+      if (pokemon.volatiles["dynamax"]?.turns <= 0) {
         dynamaxEnding.push(pokemon);
       }
     }
@@ -1520,7 +1533,7 @@ class Battle {
       this.add("bigerror", `You will auto-tie if the battle doesn't end in ${turnsLeftText} (on turn 1000).`);
     }
     if (!this.ruleTable.has("endlessbattleclause")) return;
-    if (this.format.gameType === "freeforall") return;
+    if (this.gameType === "freeforall") return;
     if (!stalenessBySide.every((s) => !!s) || !stalenessBySide.some((s) => s === "external")) return;
     const canSwitch = [];
     for (const [i, trapped] of trappedBySide.entries()) {
@@ -1560,7 +1573,7 @@ class Battle {
   }
   start() {
     if (this.deserialized) return;
-    if (!this.sides.every((side) => !!side)) throw new Error(`Missing sides: ${this.sides}`);
+    if (!this.sides.every((side) => !!side)) throw new Error(`Missing sides: ${this.sides.join(",")}`);
     if (this.started) throw new Error(`Battle already started`);
     const format = this.format;
     this.started = true;
@@ -1794,8 +1807,8 @@ class Battle {
       for (const [i, target] of targetArray.entries()) {
         if (!retVals[i] || !target) continue;
         if (target.hp <= 0) {
-          this.debug(`instafaint: ${this.faintQueue.map((entry) => entry.target.name)}`);
-          this.faintMessages(true);
+          this.debug(`instafaint: ${this.faintQueue.map((entry) => entry.target.name).join(",")}`);
+          this.resolveFaints({ lastFaintFirst: true });
           if (this.gen <= 2) {
             target.faint();
             if (this.gen <= 1) this.queue.clear();
@@ -1856,7 +1869,6 @@ class Battle {
         this.add("-damage", target, target.getHealth);
         break;
     }
-    if (target.fainted) this.faint(target);
     return damage;
   }
   heal(damage, target, source = null, effect = null) {
@@ -2094,6 +2106,7 @@ class Battle {
   }
   checkFainted() {
     for (const side of this.sides) {
+      if (!this.canSwitch(side)) continue;
       for (const pokemon of side.active) {
         if (pokemon.fainted) {
           pokemon.status = "fnt";
@@ -2110,14 +2123,34 @@ class Battle {
       }
     }
   }
+  // [PBO] Upstream renamed faintMessages() to resolveFaints(); the game server still calls
+  // battle.faintMessages(false, true) for server-side faints and forfeits.
   faintMessages(lastFirst = false, forceCheck = false, checkWin = true) {
+    return this.resolveFaints({ lastFaintFirst: lastFirst, checkWinIfNoFaints: forceCheck, checkWin });
+  }
+  /**
+   * Resolves the faint queue (with Gen 2–4 weirdness)
+   * - run `BeforeFaint` and `Faint` events
+   * - show faint messages
+   * - sets `pokemon.fainted` etc
+   * - cancel actions as required by the generation
+   * - ends the battle if a side has no pokemon left
+   * @returns true: battle ended from fainting, false: otherwise, undefined: battle already ended
+   */
+  resolveFaints({ lastFaintFirst = false, checkWinIfNoFaints = false, checkWin = true } = {}) {
     if (this.ended) return;
+    if (this.gen <= 4 && this.getAllActive().some((pokemon) => typeof pokemon.switchFlag === "string")) {
+      const pokemon = this.activePokemon;
+      if (!pokemon?.hp || this.activeMove?.id !== pokemon.switchFlag || !this.sides.every((side) => side.hasAlly(pokemon) || side.pokemon.every((foe) => !foe.hp))) {
+        return false;
+      }
+    }
     const length = this.faintQueue.length;
     if (!length) {
-      if (forceCheck && this.checkWin()) return true;
+      if (checkWinIfNoFaints && this.checkWin()) return true;
       return false;
     }
-    if (lastFirst) {
+    if (lastFaintFirst) {
       this.faintQueue.unshift(this.faintQueue[this.faintQueue.length - 1]);
       this.faintQueue.pop();
     }
@@ -2127,10 +2160,15 @@ class Battle {
       faintData = this.faintQueue.shift();
       const pokemon = faintData.target;
       if (!pokemon.fainted && this.runEvent("BeforeFaint", pokemon, faintData.source, faintData.effect)) {
+        if (this.gen <= 4 && !faintData.faintEventDone) {
+          this.runEvent("Faint", pokemon, faintData.source, faintData.effect);
+        }
         this.add("faint", pokemon);
         if (pokemon.side.pokemonLeft) pokemon.side.pokemonLeft--;
         if (pokemon.side.totalFainted < 100) pokemon.side.totalFainted++;
-        this.runEvent("Faint", pokemon, faintData.source, faintData.effect);
+        if (this.gen >= 5 && !faintData.faintEventDone) {
+          this.runEvent("Faint", pokemon, faintData.source, faintData.effect);
+        }
         this.singleEvent("End", pokemon.getAbility(), pokemon.abilityState, pokemon);
         this.singleEvent("End", pokemon.getItem(), pokemon.itemState, pokemon);
         if (pokemon.formeRegression && !pokemon.transformed) {
@@ -2150,7 +2188,10 @@ class Battle {
           pokemon.formeRegression = false;
         }
         pokemon.side.faintedThisTurn = pokemon;
-        if (this.faintQueue.length >= faintQueueLeft) checkWin = true;
+        if (this.faintQueue.length >= faintQueueLeft) {
+          if (pokemon.pursuitActivated && this.gen <= 2) break;
+          if (!(pokemon.pursuitActivated && this.gen <= 4)) checkWin = true;
+        }
       }
     }
     if (this.gen <= 1) {
@@ -2316,17 +2357,7 @@ class Battle {
         if (action.choice === "switch" && action.pokemon.status) {
           this.singleEvent("CheckShow", this.dex.abilities.getByID("naturalcure"), null, action.pokemon);
         }
-        if (this.actions.switchIn(action.target, action.pokemon.position, action.sourceEffect) === "pursuitfaint") {
-          if (this.gen <= 4) {
-            this.hint("Previously chosen switches continue in Gen 2-4 after a Pursuit target faints.");
-            action.priority = -101;
-            this.queue.unshift(action);
-            break;
-          } else {
-            this.hint("A Pokemon can't switch between when it runs out of HP and when it faints");
-            break;
-          }
-        }
+        this.actions.switchIn(action.target, action.pokemon.position, action.sourceEffect);
         break;
       case "revivalblessing":
         action.pokemon.side.pokemonLeft++;
@@ -2377,11 +2408,12 @@ class Battle {
         this.add("");
         this.clearActiveMove(true);
         this.updateSpeed();
-        residualPokemon = this.getAllActive().map((pokemon) => [pokemon, pokemon.getUndynamaxedHP()]);
+        residualPokemon = this.getAllActive().map((pokemon) => [pokemon, pokemon.hp]);
         this.fieldEvent("Residual");
         if (!this.ended) this.add("upkeep");
         break;
     }
+    if (this.gen <= 4) this.clearActiveMove();
     for (const side of this.sides) {
       for (const pokemon of side.active) {
         if (pokemon.forceSwitchFlag) {
@@ -2390,10 +2422,22 @@ class Battle {
         }
       }
     }
-    this.clearActiveMove();
-    this.faintMessages();
+    if (this.gen > 4) this.clearActiveMove();
+    let nextAction = this.queue.peek();
+    const isSwitch = ["switch", "instaswitch"].includes(action.choice);
+    const deferFaintsUntilAfterSwitches = this.gen === 2 && isSwitch && !!nextAction && ["switch", "instaswitch"].includes(nextAction.choice);
+    if (!deferFaintsUntilAfterSwitches) {
+      const deferWinForReplacementBatch = this.gen === 4 && action.choice === "instaswitch" && nextAction?.choice === "instaswitch";
+      const deferWinForPivotAbility = this.gen === 4 && action.choice === "instaswitch" && !!action.sourceEffect && nextAction?.choice === "runSwitch";
+      const checkWin = !(deferWinForReplacementBatch || deferWinForPivotAbility);
+      this.resolveFaints({ checkWinIfNoFaints: checkWin, checkWin });
+    }
     if (this.ended) return true;
-    if (!this.queue.peek() || this.gen <= 3 && ["move", "residual"].includes(this.queue.peek().choice)) {
+    nextAction = this.queue.peek();
+    const checkFaintedAfterSwitch = this.gen === 3 && isSwitch;
+    const checkFaintedAfterMoves = this.gen <= 3 && !!nextAction && ["move", "residual"].includes(nextAction.choice);
+    const replacementBatchFinished = this.gen === 4 && action.choice === "instaswitch" && !!nextAction && nextAction.choice !== "instaswitch" && this.queue.peek(true)?.choice === "runSwitch";
+    if (!nextAction || checkFaintedAfterSwitch || checkFaintedAfterMoves || replacementBatchFinished) {
       this.checkFainted();
     } else if (["megaEvo", "megaEvoX", "megaEvoY"].includes(action.choice) && this.gen === 7) {
       this.eachEvent("Update");
@@ -2406,23 +2450,15 @@ class Battle {
         }
       }
       return false;
-    } else if (this.queue.peek()?.choice === "instaswitch") {
-      return false;
     }
-    if (this.gen >= 5 && action.choice !== "start") {
+    if (this.gen >= 5 && action.choice !== "start" && nextAction?.choice !== "instaswitch") {
       this.eachEvent("Update");
       for (const [pokemon, originalHP] of residualPokemon) {
-        const maxhp = pokemon.getUndynamaxedHP(pokemon.maxhp);
-        if (pokemon.hp && pokemon.getUndynamaxedHP() <= maxhp / 2 && originalHP > maxhp / 2) {
-          this.runEvent("EmergencyExit", pokemon);
-        }
+        this.runEvent("EmergencyExit", pokemon, void 0, void 0, originalHP);
       }
     }
     if (action.choice === "runSwitch") {
-      const pokemon = action.pokemon;
-      if (pokemon.hp && pokemon.hp <= pokemon.maxhp / 2 && pokemonOriginalHP > pokemon.maxhp / 2) {
-        this.runEvent("EmergencyExit", pokemon);
-      }
+      this.runEvent("EmergencyExit", action.pokemon, void 0, void 0, pokemonOriginalHP);
     }
     const switches = this.sides.map(
       (side) => side.active.some((pokemon) => pokemon && !!pokemon.switchFlag)
@@ -2440,10 +2476,8 @@ class Battle {
         if (!reviveSwitch) switches[i] = false;
       } else if (switches[i]) {
         for (const pokemon of this.sides[i].active) {
-          if (pokemon.hp && pokemon.switchFlag && pokemon.switchFlag !== "revivalblessing" && !pokemon.skipBeforeSwitchOutEventFlag) {
-            this.runEvent("BeforeSwitchOut", pokemon);
-            pokemon.skipBeforeSwitchOutEventFlag = true;
-            this.faintMessages();
+          if (pokemon.hp && pokemon.switchFlag && pokemon.switchFlag !== "revivalblessing") {
+            this.actions.runPursuitActivation(pokemon);
             if (this.ended) return true;
             if (pokemon.fainted) {
               switches[i] = this.sides[i].active.some((sidePokemon) => sidePokemon && !!sidePokemon.switchFlag);
@@ -2458,8 +2492,11 @@ class Battle {
         return true;
       }
     }
-    if (this.gen < 5) this.eachEvent("Update");
-    if (this.gen >= 8 && (this.queue.peek()?.choice === "move" || this.queue.peek()?.choice === "runDynamax")) {
+    if (this.gen < 5 && action.choice !== "start" && !isSwitch) {
+      this.eachEvent("Update");
+    }
+    nextAction = this.queue.peek();
+    if (this.gen >= 8 && nextAction && ["move", "runDynamax"].includes(nextAction.choice)) {
       this.updateSpeed();
       for (const queueAction of this.queue.list) {
         if (queueAction.pokemon) this.getActionSpeed(queueAction);

@@ -24,6 +24,13 @@ module.exports = __toCommonJS(items_exports);
 const Items = {
   berryjuice: {
     inherit: true,
+    onResidual(pokemon) {
+      if (pokemon.hp < pokemon.maxhp / 2) {
+        if (this.runEvent("TryHeal", pokemon, null, this.effect, 20) && pokemon.useItem()) {
+          this.heal(20);
+        }
+      }
+    },
     isNonstandard: null
   },
   blackbelt: {
@@ -84,7 +91,7 @@ const Items = {
   focusband: {
     inherit: true,
     onDamage(damage, target, source, effect) {
-      if (this.randomChance(30, 256) && damage >= target.hp && effect && effect.effectType === "Move") {
+      if (this.randomChance(30, 256) && damage >= target.hp && effect?.effectType === "Move") {
         this.add("-activate", target, "item: Focus Band");
         return target.hp - 1;
       }

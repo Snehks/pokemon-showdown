@@ -116,11 +116,22 @@ const PM = new import_lib.ProcessManager.QueryProcessManager(
       if (e.message.startsWith("Request timeout") || e.statusCode === 429 || e.code === "ETIMEDOUT") {
         return null;
       }
-      Monitor.crashlog(e, "A Perspective API request", { request: JSON.stringify(requestData) });
+      if (e.statusCode === 503) {
+        Monitor.adminlog(`A Perspective API request failed: ${e.name}: ${e.message}`);
+      } else {
+        Monitor.crashlog(e, "A Perspective API request", { request: JSON.stringify(requestData) });
+      }
       return null;
     }
   },
-  PM_TIMEOUT
+  PM_TIMEOUT,
+  (message) => {
+    if (message.startsWith("ADMINLOG\n")) {
+      Monitor.adminlog(message.slice(9));
+    } else if (message.startsWith("SLOW\n")) {
+      Monitor.slow(message.slice(5));
+    }
+  }
 );
 class RemoteClassifier {
   static {
@@ -182,7 +193,12 @@ if (!PM.isParentProcess) {
       const repr = JSON.stringify([error.name, error.message, source, details]);
       process.send(`THROW
 @!!@${repr}
-${error.stack}`);
+${error.stack ?? error}`);
+    },
+    adminlog(text) {
+      process.send(`CALLBACK
+ADMINLOG
+${text}`);
     },
     slow(text) {
       process.send(`CALLBACK

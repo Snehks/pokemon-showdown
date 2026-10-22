@@ -152,7 +152,7 @@ class StaticServer {
     if (!result.alreadySent && !errorCallback?.(result)) {
       res.writeHead(result.status, result.headers);
       if (result.status >= 400 && req.method !== "HEAD") {
-        res.write(`${result.status} ${result.message}`);
+        res.write(`${result.status} ${result.message ?? "Unknown Status"}`);
       }
       res.end();
     }

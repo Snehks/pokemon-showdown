@@ -431,7 +431,7 @@ const FormatsData = {
     doublesTier: "NFE"
   },
   gengar: {
-    tier: "OU",
+    tier: "(OU)",
     doublesTier: "DOU"
   },
   gengarmega: {
@@ -572,7 +572,7 @@ const FormatsData = {
     tier: "LC"
   },
   starmie: {
-    tier: "OU",
+    tier: "(OU)",
     doublesTier: "(DUU)"
   },
   mimejr: {
@@ -626,7 +626,7 @@ const FormatsData = {
     doublesTier: "(DUU)"
   },
   pinsirmega: {
-    tier: "OU",
+    tier: "(OU)",
     doublesTier: "(DUU)"
   },
   tauros: {
@@ -1097,7 +1097,7 @@ const FormatsData = {
     doublesTier: "DOU"
   },
   tyranitarmega: {
-    tier: "(OU)",
+    tier: "OU",
     doublesTier: "(DOU)"
   },
   lugia: {
@@ -1231,7 +1231,7 @@ const FormatsData = {
     doublesTier: "DUU"
   },
   gardevoirmega: {
-    tier: "OU",
+    tier: "(OU)",
     doublesTier: "DOU"
   },
   gallade: {
@@ -1253,7 +1253,7 @@ const FormatsData = {
     tier: "LC"
   },
   breloom: {
-    tier: "OU",
+    tier: "(OU)",
     doublesTier: "DOU"
   },
   slakoth: {
@@ -1358,7 +1358,7 @@ const FormatsData = {
     doublesTier: "(DUU)"
   },
   manectricmega: {
-    tier: "OU",
+    tier: "(OU)",
     doublesTier: "(DUU)"
   },
   plusle: {
@@ -1666,7 +1666,7 @@ const FormatsData = {
     doublesTier: "(DUU)"
   },
   latiasmega: {
-    tier: "(OU)",
+    tier: "OU",
     doublesTier: "(DUU)"
   },
   latios: {
@@ -1996,7 +1996,7 @@ const FormatsData = {
     doublesTier: "(DUU)"
   },
   azelf: {
-    tier: "OU",
+    tier: "(OU)",
     doublesTier: "(DUU)"
   },
   dialga: {

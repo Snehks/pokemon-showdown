@@ -187,6 +187,11 @@ const PRIORITY_POKEMON = [
   "scizormega",
   "shedinja"
 ];
+const NO_LEAD_POKEMON = [
+  "dugtrio",
+  "gothitelle",
+  "wobbuffet"
+];
 class RandomGen7Teams extends import_teams2.RandomGen8Teams {
   constructor(format, prng) {
     super(format, prng);
@@ -455,19 +460,21 @@ class RandomGen7Teams extends import_teams2.RandomGen8Teams {
         );
       }
     }
-    if (movePool.includes("thunderwave") && abilities.includes("Prankster")) {
-      counter = this.addMove(
-        "thunderwave",
-        moves,
-        types,
-        abilities,
-        teamDetails,
-        species,
-        isLead,
-        movePool,
-        preferredType,
-        role
-      );
+    for (const moveid of ["encore", "thunderwave"]) {
+      if (movePool.includes(moveid) && abilities.includes("Prankster")) {
+        counter = this.addMove(
+          moveid,
+          moves,
+          types,
+          abilities,
+          teamDetails,
+          species,
+          isLead,
+          movePool,
+          preferredType,
+          role
+        );
+      }
     }
     if (movePool.includes("shadowsneak") && species.id === "kecleon") {
       counter = this.addMove(
@@ -882,8 +889,7 @@ class RandomGen7Teams extends import_teams2.RandomGen8Teams {
       if (species.name === "Mew") return "Mewnium Z";
       if (species.name === "Mimikyu") return "Mimikium Z";
       if (species.name === "Necrozma-Dusk-Mane" || species.name === "Necrozma-Dawn-Wings") {
-        if (moves.has("autotomize") && moves.has("sunsteelstrike")) return "Solganium Z";
-        if (moves.has("autotomize") && moves.has("moongeistbeam")) return "Lunalium Z";
+        if (!moves.has("outrage")) return species.name === "Necrozma-Dusk-Mane" ? "Solganium Z" : "Lunalium Z";
         return "Ultranecrozium Z";
       }
       if (preferredType === "Normal") return "Normalium Z";
@@ -1243,7 +1249,12 @@ class RandomGen7Teams extends import_teams2.RandomGen8Teams {
         const item = this.dex.items.get(set.item);
         if (item.zMove && teamDetails.zMove) continue;
         if (set.ability === "Illusion" && pokemon.length < 1) continue;
-        pokemon.unshift(set);
+        if (set.ability === "Wonder Guard" && ruleTable.has("chimera1v1rule")) continue;
+        if (NO_LEAD_POKEMON.includes(species.id) && pokemon.length === this.maxTeamSize - 1 && !ruleTable.has("pickedteamsize") && !ruleTable.has("teampreview")) {
+          pokemon.push(set);
+        } else {
+          pokemon.unshift(set);
+        }
         if (pokemon.length === this.maxTeamSize) break;
         baseFormes[species.baseSpecies] = 1;
         for (const typeName of types) {

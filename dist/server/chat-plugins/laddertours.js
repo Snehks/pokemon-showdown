@@ -81,8 +81,7 @@ class LadderTracker {
     const roomid = battle.roomid;
     const [rating, rmsg] = this.getRating(battle);
     if (!this.tracking(battle, rating) || skipid && skipid >= roomid) return;
-    const style = (p) => this.stylePlayer(p);
-    const msg = `Battle started between ${style(battle.p1.name)} and ${style(battle.p2.name)}`;
+    const msg = import_lib.Utils.html`Battle started between <username>${battle.p1.name}</username> and <username>${battle.p2.name}</username>`;
     this.addHTML(`<a href="/${roomid}" class="ilink">${msg}. ${rmsg}</a></div>`, true);
     if (!this.lastid || this.lastid < roomid) this.lastid = roomid;
   }
@@ -120,9 +119,6 @@ class LadderTracker {
   averageRating(a, b) {
     const rating = Math.round((a + b) / 2);
     return [rating, `(avg rating: ${rating})`];
-  }
-  stylePlayer(player) {
-    return `<username>${player}</username>`;
   }
   tracking(battle, rating) {
     const minElo = Math.floor(Number(battle.rated) || 0);

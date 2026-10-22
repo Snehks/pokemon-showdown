@@ -633,7 +633,10 @@ class ScavengerHunt extends Rooms.RoomGame {
         if (game) {
           game.setTimer(duration);
           room.add(`|c|~|[ScavengerManager] A scavenger hunt by ${Chat.toListString(next.hosts.map((h) => h.name))} has been automatically started. It will automatically end in ${duration} minutes.`).update();
-          room.modlog({ action: "SCAV NEW", note: `${game.gameType.toUpperCase()}: creators - ${game.hosts.map((h) => h.id)}` });
+          room.modlog({
+            action: "SCAV NEW",
+            note: `${game.gameType.toUpperCase()}: creators - ${game.hosts.map((h) => h.id).join(",")}`
+          });
         }
         room.saveSettings();
       }, 2 * 6e4);
@@ -889,7 +892,7 @@ const ScavengerCommands = {
       room = this.requireRoom();
       this.checkCan("mute", null, room);
       const game = room.scavgame;
-      if (!game || game.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
+      if (game?.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
       let [teamName, leader] = target.split(",");
       teamName = teamName.trim();
       if (game.teams[teamName]) throw new Chat.ErrorMessage(`The team ${teamName} already exists.`);
@@ -904,7 +907,7 @@ const ScavengerCommands = {
       room = this.requireRoom();
       this.checkCan("mute", null, room);
       const game = room.scavgame;
-      if (!game || game.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
+      if (game?.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
       if (!game.teams[target]) throw new Chat.ErrorMessage(`The team ${target} does not exist.`);
       delete game.teams[target];
       game.announce(import_lib.Utils.html`The team "${target}" has been removed.`);
@@ -912,7 +915,7 @@ const ScavengerCommands = {
     addplayer(target, room, user) {
       room = this.requireRoom();
       const game = room.scavgame;
-      if (!game || game.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
+      if (game?.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
       let userTeam;
       for (const teamID in game.teams) {
         const team = game.teams[teamID];
@@ -939,7 +942,7 @@ const ScavengerCommands = {
     editplayers(target, room, user) {
       room = this.requireRoom();
       const game = room.scavgame;
-      if (!game || game.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
+      if (game?.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
       this.checkCan("mute", null, room);
       const parts = target.split(",");
       const teamName = parts[0].trim();
@@ -981,7 +984,7 @@ const ScavengerCommands = {
       if (!this.runBroadcast()) return false;
       room = this.requireRoom();
       const game = room.scavgame;
-      if (!game || game.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
+      if (game?.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
       const display = [];
       for (const teamID in game.teams) {
         const team = game.teams[teamID];
@@ -992,7 +995,7 @@ const ScavengerCommands = {
     guesses(target, room, user) {
       room = this.requireRoom();
       const game = room.scavgame;
-      if (!game || game.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
+      if (game?.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
       const team = game.getPlayerTeam(user);
       if (!team) throw new Chat.ErrorMessage("You are not currently part of this Team Scavs game.");
       this.sendReplyBox(import_lib.Utils.html`<strong>Question #${team.question} guesses:</strong> ${team.answers.sort().join(", ")}`);
@@ -1001,7 +1004,7 @@ const ScavengerCommands = {
     note(target, room, user) {
       room = this.requireRoom();
       const game = room.scavgame;
-      if (!game || game.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
+      if (game?.id !== "teamscavs") throw new Chat.ErrorMessage("There is currently no game of Team Scavs going on.");
       const team = game.getPlayerTeam(user);
       if (!team) throw new Chat.ErrorMessage("You are not currently part of this Team Scavs game.");
       if (!target) throw new Chat.ErrorMessage("Please include a message as the note.");
@@ -1113,7 +1116,7 @@ const ScavengerCommands = {
       mod
     });
     this.privateModAction(`A new scavenger hunt was created by ${user.name}.`);
-    this.modlog("SCAV NEW", null, `${gameType.toUpperCase()}: creators - ${hosts.map((h) => h.id)}`);
+    this.modlog("SCAV NEW", null, `${gameType.toUpperCase()}: creators - ${hosts.map((h) => h.id).join(",")}`);
   },
   status(target, room, user) {
     room = this.requireRoom();
@@ -1455,7 +1458,7 @@ const ScavengerCommands = {
       }
     );
     if (huntId) this.sendReply(`|uhtmlchange|scav-queue|${formatQueue(room.settings.scavQueue, user, room)}`);
-    this.modlog("SCAV NEW", null, `from queue: creators - ${next.hosts.map((h) => h.id)}`);
+    this.modlog("SCAV NEW", null, `from queue: creators - ${next.hosts.map((h) => h.id).join(",")}`);
     room.saveSettings();
   },
   enablequeue: "disablequeue",
@@ -1580,7 +1583,7 @@ const ScavengerCommands = {
     if (!room.settings.scavSettings) room.settings.scavSettings = {};
     if (!target) {
       const points = [];
-      const source = Object.entries(Object.assign(DEFAULT_BLITZ_POINTS, room.settings.scavSettings.blitzPoints || {}));
+      const source = Object.entries({ ...DEFAULT_BLITZ_POINTS, ...room.settings.scavSettings.blitzPoints });
       for (const entry of source) {
         points.push(`${entry[0]}: ${entry[1]}`);
       }
@@ -1650,7 +1653,7 @@ const ScavengerCommands = {
       const points = [];
       const source = Object.entries({
         ...DEFAULT_POINTS,
-        ...room.settings.scavSettings.winPoints || {}
+        ...room.settings.scavSettings.winPoints
       });
       for (const entry of source) {
         points.push(`${entry[0]}: ${entry[1].map((p, i) => `(${i + 1}) ${p}`).join(", ")}`);

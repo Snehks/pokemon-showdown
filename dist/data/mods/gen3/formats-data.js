@@ -218,7 +218,7 @@ const FormatsData = {
     tier: "LC"
   },
   poliwhirl: {
-    tier: "ZUBL"
+    tier: "ZU"
   },
   poliwrath: {
     tier: "RU"
@@ -284,7 +284,7 @@ const FormatsData = {
     tier: "UU"
   },
   magnemite: {
-    tier: "ZU"
+    tier: "ZUBL"
   },
   magneton: {
     tier: "OU"
@@ -491,7 +491,7 @@ const FormatsData = {
     tier: "(OU)"
   },
   omanyte: {
-    tier: "PU"
+    tier: "ZU"
   },
   omastar: {
     tier: "UU"
@@ -641,7 +641,7 @@ const FormatsData = {
     tier: "ZU"
   },
   yanma: {
-    tier: "ZUBL"
+    tier: "ZU"
   },
   wooper: {
     tier: "LC"
@@ -707,7 +707,7 @@ const FormatsData = {
     tier: "LC"
   },
   magcargo: {
-    tier: "PU"
+    tier: "ZU"
   },
   swinub: {
     tier: "LC"
@@ -734,7 +734,7 @@ const FormatsData = {
     tier: "OU"
   },
   houndour: {
-    tier: "PU"
+    tier: "ZU"
   },
   houndoom: {
     tier: "UUBL"
@@ -785,7 +785,7 @@ const FormatsData = {
     tier: "LC"
   },
   grovyle: {
-    tier: "ZU"
+    tier: "PU"
   },
   sceptile: {
     tier: "UUBL"
@@ -812,7 +812,7 @@ const FormatsData = {
     tier: "LC"
   },
   mightyena: {
-    tier: "ZU"
+    tier: "PU"
   },
   zigzagoon: {
     tier: "NFE"
@@ -902,7 +902,7 @@ const FormatsData = {
     tier: "RUBL"
   },
   shedinja: {
-    tier: "PU"
+    tier: "ZU"
   },
   whismur: {
     tier: "LC"
@@ -938,7 +938,7 @@ const FormatsData = {
     tier: "LC"
   },
   lairon: {
-    tier: "ZUBL"
+    tier: "PU"
   },
   aggron: {
     tier: "RU"

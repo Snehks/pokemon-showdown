@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../data/mods/championsregmb/moves.ts"],
+  "sourcesContent": ["export const Moves: import('../../../sim/dex-moves').ModdedMoveDataTable = {\n\tstrengthsap: {\n\t\tinherit: true,\n\t\tpp: 10,\n\t},\n\twish: {\n\t\tinherit: true,\n\t\tpp: 10,\n\t},\n};\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,QAA8D;AAAA,EAC1E,aAAa;AAAA,IACZ,SAAS;AAAA,IACT,IAAI;AAAA,EACL;AAAA,EACA,MAAM;AAAA,IACL,SAAS;AAAA,IACT,IAAI;AAAA,EACL;AACD;",
+  "names": []
+}

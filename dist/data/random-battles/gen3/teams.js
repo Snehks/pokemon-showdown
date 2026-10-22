@@ -82,6 +82,10 @@ const MOVE_PAIRS = [
   ["focuspunch", "substitute"],
   ["batonpass", "spiderweb"]
 ];
+const NO_LEAD_POKEMON = [
+  "dugtrio",
+  "wobbuffet"
+];
 class RandomGen3Teams extends import_teams.default {
   constructor(format, prng) {
     super(format, prng);
@@ -599,7 +603,6 @@ class RandomGen3Teams extends import_teams.default {
     }
     if (species.id === "farfetchd") return "Stick";
     const salacReqs = species.baseStats.spe >= 60 && species.baseStats.spe <= 100 && !counter.get("priority");
-    if (moves.has("bulkup") && moves.has("substitute") && counter.get("Status") === 2 && salacReqs) return "Salac Berry";
     if (moves.has("swordsdance") && moves.has("substitute") && counter.get("Status") === 2) {
       if (salacReqs) return "Salac Berry";
       if (species.baseStats.spe > 100 && counter.get("Physical") >= 2) return "Liechi Berry";
@@ -742,6 +745,8 @@ class RandomGen3Teams extends import_teams.default {
     let numMaxLevelPokemon = 0;
     const pokemonList = Object.keys(this.randomSets);
     const [pokemonPool, baseSpeciesPool] = this.getPokemonPool(type, pokemon, isMonotype, pokemonList);
+    let leadsRemaining = 1;
+    if (ruleTable.has("pickedteamsize") || ruleTable.has("teampreview")) leadsRemaining = 0;
     while (baseSpeciesPool.length && pokemon.length < this.maxTeamSize) {
       const baseSpecies = this.sampleNoReplace(baseSpeciesPool);
       const species = this.dex.species.get(this.sample(pokemonPool[baseSpecies]));
@@ -782,8 +787,21 @@ class RandomGen3Teams extends import_teams.default {
         }
         if (!this.getPokemonCompatibility(species, pokemon)) continue;
       }
-      const set = this.randomSet(species, teamDetails);
-      pokemon.push(set);
+      let set;
+      if (leadsRemaining) {
+        if (NO_LEAD_POKEMON.includes(species.id)) {
+          if (pokemon.length + leadsRemaining === this.maxTeamSize) continue;
+          set = this.randomSet(species, teamDetails, false);
+          pokemon.push(set);
+        } else {
+          set = this.randomSet(species, teamDetails, true);
+          pokemon.unshift(set);
+          leadsRemaining--;
+        }
+      } else {
+        set = this.randomSet(species, teamDetails, false);
+        pokemon.push(set);
+      }
       if (pokemon.length === this.maxTeamSize) break;
       baseFormes[species.baseSpecies] = 1;
       for (const typeName of types) {

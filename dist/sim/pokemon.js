@@ -213,8 +213,8 @@ class Pokemon {
     this.teraType = this.set.teraType || this.types[0];
     this.switchFlag = false;
     this.forceSwitchFlag = false;
-    this.skipBeforeSwitchOutEventFlag = false;
-    this.draggedIn = null;
+    this.pursuitActivated = false;
+    this.skipPursuit = false;
     this.newlySwitched = false;
     this.beingCalledBack = false;
     this.lastMove = null;
@@ -538,10 +538,7 @@ class Pokemon {
           target = possibleTarget;
         }
         if (this.battle.activePerHalf > 1 && !move.tracksTarget) {
-          const isCharging = move.flags["charge"] && !this.volatiles["twoturnmove"] && !(move.id.startsWith("solarb") && ["sunnyday", "desolateland"].includes(this.effectiveWeather(move))) && !(move.id === "electroshot" && ["raindance", "primordialsea"].includes(this.effectiveWeather(move))) && !(this.hasItem("powerherb") && move.id !== "skydrop");
-          if (!isCharging) {
-            target = this.battle.priorityEvent("RedirectTarget", this, this, move, target);
-          }
+          target = this.battle.priorityEvent("RedirectTarget", this, this, move, target);
         }
         if (move.smartTarget) {
           targets = this.getSmartTargets(target, move);
@@ -685,7 +682,7 @@ class Pokemon {
       switch (moveSlot.id) {
         case "curse":
           if (!this.hasType("Ghost")) {
-            target = this.battle.dex.moves.get("curse").nonGhostTarget;
+            target = "self";
           }
           break;
         case "pollenpuff":
@@ -1270,6 +1267,7 @@ class Pokemon {
   }
   setStatus(status, source = null, sourceEffect = null, ignoreImmunities = false) {
     if (!this.hp) return false;
+    if (!this.isActive && status) return false;
     status = this.battle.dex.conditions.get(status);
     if (this.battle.event) {
       if (!source) source = this.battle.event.source;
@@ -1389,7 +1387,7 @@ class Pokemon {
           break;
         default:
           if (item.isGem) {
-            this.battle.add("-enditem", this, item, "[from] gem");
+            this.battle.add("-enditem", this, item, "[from] gem", `[move] ${this.battle.activeMove.name}`);
           } else {
             this.battle.add("-enditem", this, item);
           }
@@ -1410,7 +1408,7 @@ class Pokemon {
   }
   takeItem(source) {
     if (!source) source = this;
-    if (this.battle.gen <= 4 && (this.itemKnockedOff || source.itemKnockedOff)) return false;
+    if (this.battle.gen === 4 && (this.itemKnockedOff || source.itemKnockedOff)) return false;
     if (!this.item) return;
     const item = this.getItem();
     if (this.battle.runEvent("TakeItem", this, source, null, item)) {
@@ -1644,7 +1642,7 @@ class Pokemon {
   isSkyDropped() {
     if (this.volatiles["skydrop"]) return true;
     for (const foeActive of this.side.foe.active) {
-      if (foeActive.volatiles["skydrop"] && foeActive.volatiles["skydrop"].source === this) {
+      if (foeActive.volatiles["skydrop"]?.source === this) {
         return true;
       }
     }
@@ -1661,7 +1659,7 @@ class Pokemon {
   effectiveWeather(sourceEffect, message) {
     if (!sourceEffect && this.battle.effect) sourceEffect = this.battle.effect;
     const weather = this.battle.field.effectiveWeather();
-    if (this.battle.activePokemon?.hasAbility("megasol") && sourceEffect && (sourceEffect.id === "megasol" || sourceEffect.effectType === "Move" || sourceEffect.effectType === "Weather") && sourceEffect.id !== "electroshot") {
+    if (this.battle.activePokemon?.hasAbility("megasol") && sourceEffect && (sourceEffect.id === "megasol" || sourceEffect.effectType === "Move" || sourceEffect.effectType === "Weather")) {
       if (weather !== "sunnyday" && message) this.battle.add("-activate", this, "ability: Mega Sol");
       return "sunnyday";
     }

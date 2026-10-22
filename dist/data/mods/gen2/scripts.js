@@ -325,7 +325,7 @@ const Scripts = {
           return false;
         }
         if (moveData.boosts && !target.fainted) {
-          if (pokemon.volatiles["lockon"] && target === pokemon.volatiles["lockon"].source && target.isSemiInvulnerable() && !isSelf) {
+          if (target === pokemon.volatiles["lockon"]?.source && target.isSemiInvulnerable() && !isSelf) {
             if (!isSecondary) this.battle.add("-fail", target);
             return false;
           }
@@ -425,7 +425,7 @@ const Scripts = {
           this.battle.add("-fail", target);
         }
       }
-      if (move.selfSwitch && pokemon.hp) {
+      if (move.selfSwitch && pokemon.hp && !pokemon.volatiles["commanded"] && (this.battle.canSwitch(pokemon.side) || move.id === "revivalblessing")) {
         pokemon.switchFlag = move.id;
       }
       return damage;

@@ -480,7 +480,7 @@ const ssbSets = {
       "Metronome"
     ],
     signatureMove: "Role System",
-    // eslint-disable-next-line @stylistic/max-len
+    // oxlint-disable-next-line @stylistic/max-len
     evs: { hp: 85, atk: 85, def: 85, spa: 85, spd: 85, spe: 85 },
     nature: "Hardy",
     teraType: ["Ghost", "Poison", "Fairy"],
@@ -733,7 +733,7 @@ const ssbSets = {
     gender: "F",
     moves: ["Flare Blitz", "Wave Crash", "Volt Tackle"],
     signatureMove: "Insert boar pun here",
-    // eslint-disable-next-line @stylistic/max-len
+    // oxlint-disable-next-line @stylistic/max-len
     evs: { hp: 252, atk: 252, def: 4 },
     nature: "Adamant",
     teraType: ["Fire", "Water", "Fighting", "Electric"],
@@ -1900,7 +1900,7 @@ const ssbSets = {
     gender: ["M", "M", "F"],
     moves: ["Sunny Day", "Natural Gift", ["Bitter Blade", "Sappy Seed", "Stored Power", "Counter"]],
     signatureMove: "Fruitful Longbow",
-    // eslint-disable-next-line @stylistic/max-len
+    // oxlint-disable-next-line @stylistic/max-len
     evs: { hp: 184, atk: 112, def: 36, spd: 88, spe: 88 },
     ivs: { spa: 29 },
     nature: "Impish",

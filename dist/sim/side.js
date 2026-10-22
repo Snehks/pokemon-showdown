@@ -126,7 +126,7 @@ class Side {
     return import_state.State.serializeSide(this);
   }
   get requestState() {
-    if (!this.activeRequest || this.activeRequest.wait) return "";
+    if (this.activeRequest === null || this.activeRequest.wait) return "";
     if (this.activeRequest.teamPreview) return "teampreview";
     if (this.activeRequest.forceSwitch) return "switch";
     return "move";
@@ -771,14 +771,23 @@ ${sideUpdate}`);
       return this.emitChoiceError(`Can't choose for Team Preview: You're not in a Team Preview phase`);
     }
     const ruleTable = this.battle.ruleTable;
-    let positions = data ? data.split(data.includes(",") ? "," : "").map((datum) => parseInt(datum) - 1) : [...this.pokemon.keys()];
+    let isBracketed = false;
+    let teamData = data;
+    if (data?.startsWith("[") && data.endsWith("]")) {
+      isBracketed = true;
+      teamData = data.slice(1, -1).trim();
+    }
+    let positions = teamData ? teamData.split(isBracketed || teamData.includes(",") || this.pokemon.length >= 10 ? "," : "").map((datum) => parseInt(datum) - 1) : [...this.pokemon.keys()];
     const pickedTeamSize = this.pickedTeamSize();
-    positions.splice(pickedTeamSize);
+    if (!isBracketed) positions.splice(pickedTeamSize);
     if (positions.length < pickedTeamSize) {
       for (let i = 0; i < pickedTeamSize; i++) {
         if (!positions.includes(i)) positions.push(i);
         if (positions.length >= pickedTeamSize) break;
       }
+    }
+    if (positions.length !== pickedTeamSize) {
+      return this.emitChoiceError(`Can't choose for Team Preview: You must choose exactly ${pickedTeamSize} Pok\xE9mon`);
     }
     for (const [index, pos] of positions.entries()) {
       if (isNaN(pos) || pos < 0 || pos >= this.pokemon.length) {
@@ -832,17 +841,18 @@ ${sideUpdate}`);
     let forcedPasses = 0;
     if (this.battle.requestState === "switch") {
       const canSwitchOut = this.active.filter((pokemon) => pokemon?.switchFlag).length;
-      const canSwitchIn = this.pokemon.slice(this.active.length).filter((pokemon) => pokemon && !pokemon.fainted).length;
+      const canSwitchIn = this.battle.canSwitch(this);
       forcedSwitches = Math.min(canSwitchOut, canSwitchIn);
       forcedPasses = canSwitchOut - forcedSwitches;
     }
+    const switchIns = this.battle.queue.getSwitches(this).map((action) => action.target.position);
     this.choice = {
       cantUndo: false,
       error: ``,
       actions: [],
       forcedSwitchesLeft: forcedSwitches,
       forcedPassesLeft: forcedPasses,
-      switchIns: /* @__PURE__ */ new Set(),
+      switchIns: new Set(switchIns),
       zMove: false,
       mega: false,
       ultra: false,

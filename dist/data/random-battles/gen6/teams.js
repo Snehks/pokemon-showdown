@@ -440,19 +440,21 @@ class RandomGen6Teams extends import_teams2.default {
         );
       }
     }
-    if (movePool.includes("thunderwave") && abilities.includes("Prankster")) {
-      counter = this.addMove(
-        "thunderwave",
-        moves,
-        types,
-        abilities,
-        teamDetails,
-        species,
-        isLead,
-        movePool,
-        preferredType,
-        role
-      );
+    for (const moveid of ["encore", "thunderwave"]) {
+      if (movePool.includes(moveid) && abilities.includes("Prankster")) {
+        counter = this.addMove(
+          moveid,
+          moves,
+          types,
+          abilities,
+          teamDetails,
+          species,
+          isLead,
+          movePool,
+          preferredType,
+          role
+        );
+      }
     }
     if (movePool.includes("shadowsneak") && species.id === "kecleon") {
       counter = this.addMove(

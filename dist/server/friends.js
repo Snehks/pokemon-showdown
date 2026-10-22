@@ -60,8 +60,8 @@ function sendPM(message, to, from) {
   const receiverID = toID(to);
   const sendingUser = Users.get(senderID);
   const receivingUser = Users.get(receiverID);
-  const fromIdentity = sendingUser ? sendingUser.getIdentity() : ` ${senderID}`;
-  const toIdentity = receivingUser ? receivingUser.getIdentity() : ` ${receiverID}`;
+  const fromIdentity = sendingUser?.connected ? sendingUser.getIdentity() : ` ${senderID}`;
+  const toIdentity = receivingUser?.connected ? receivingUser.getIdentity() : ` ${receiverID}`;
   if (from === "~") {
     return receivingUser?.send(`|pm|~|${toIdentity}|${message}`);
   }
@@ -391,7 +391,7 @@ if (!PM.isParentProcess) {
       const repr = JSON.stringify([error.name, error.message, source, details]);
       process.send(`THROW
 @!!@${repr}
-${error.stack}`);
+${error.stack ?? error}`);
     },
     slow(message) {
       process.send(`CALLBACK

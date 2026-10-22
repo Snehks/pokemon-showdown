@@ -73,7 +73,7 @@ const Scripts = {
       side.dynamaxUsed = this.gen !== 8;
     }
     if (this.deserialized) return;
-    if (!this.sides.every((side) => !!side)) throw new Error(`Missing sides: ${this.sides}`);
+    if (!this.sides.every((side) => !!side)) throw new Error(`Missing sides: ${this.sides.join(",")}`);
     if (this.started) throw new Error(`Battle already started`);
     this.started = true;
     if (this.gameType === "multi") {

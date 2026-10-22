@@ -41,7 +41,7 @@ const Abilities = {
   disguise: {
     inherit: true,
     onDamage(damage, target, source, effect) {
-      if (effect && effect.effectType === "Move" && ["mimikyu", "mimikyutotem"].includes(target.species.id) && !target.transformed) {
+      if (effect?.effectType === "Move" && ["mimikyu", "mimikyutotem"].includes(target.species.id) && !target.transformed) {
         if (["rollout", "iceball"].includes(effect.id)) {
           source.volatiles[effect.id].contactHitCount--;
         }
@@ -62,7 +62,7 @@ const Abilities = {
   iceface: {
     inherit: true,
     onDamage(damage, target, source, effect) {
-      if (effect && effect.effectType === "Move" && effect.category === "Physical" && target.species.id === "eiscue" && !target.transformed) {
+      if (effect?.effectType === "Move" && effect.category === "Physical" && target.species.id === "eiscue" && !target.transformed) {
         if (["rollout", "iceball"].includes(effect.id)) {
           source.volatiles[effect.id].contactHitCount--;
         }

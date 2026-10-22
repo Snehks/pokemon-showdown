@@ -60,10 +60,11 @@ class MultiRandomRunner {
   }
   async run() {
     let games = [];
-    let format;
     let lastFormat = false;
     let failures = 0;
-    while (format = this.getNextFormat()) {
+    while (true) {
+      const format = this.getNextFormat();
+      if (!format) break;
       if (this.all && lastFormat && format !== lastFormat) {
         if (this.isAsync) await Promise.all(games);
         games = [];

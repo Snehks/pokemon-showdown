@@ -52,11 +52,12 @@ class DataMove extends import_dex_data.BasicEffect {
     this.ignoreImmunity = data.ignoreImmunity !== void 0 ? data.ignoreImmunity : this.category === "Status";
     this.pp = Number(data.pp);
     this.noPPBoosts = !!(data.noPPBoosts ?? data.isZ);
+    this.status = data.status || void 0;
+    this.weather = data.weather || void 0;
     this.isZ = data.isZ || false;
     this.isMax = data.isMax || false;
     this.flags = data.flags || {};
     this.selfSwitch = (typeof data.selfSwitch === "string" ? data.selfSwitch : data.selfSwitch) || void 0;
-    this.nonGhostTarget = data.nonGhostTarget || "";
     this.ignoreAbility = data.ignoreAbility || false;
     this.damage = data.damage;
     this.spreadHit = data.spreadHit || false;
@@ -181,11 +182,9 @@ class DexMoves {
     }
     if (id && this.dex.data.Moves.hasOwnProperty(id)) {
       const moveData = this.dex.data.Moves[id];
-      const moveTextData = this.dex.getDescs("Moves", id, moveData);
       move = new DataMove({
         name: id,
-        ...moveData,
-        ...moveTextData
+        ...moveData
       });
       if (move.gen > this.dex.gen) {
         move.isNonstandard = "Future";
@@ -194,7 +193,7 @@ class DexMoves {
         const parentMod = this.dex.mod(this.dex.parentMod);
         if (moveData === parentMod.data.Moves[id]) {
           const parentMove = parentMod.moves.getByID(id);
-          if (move.isNonstandard === parentMove.isNonstandard && move.desc === parentMove.desc && move.shortDesc === parentMove.shortDesc) {
+          if (move.isNonstandard === parentMove.isNonstandard) {
             move = parentMove;
           }
         }

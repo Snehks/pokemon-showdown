@@ -54,8 +54,10 @@ function getDefaultStats() {
       gen9babyrandombattle: { mons: {} },
       gen9chatbats: { mons: {} },
       gen9ccapm2025randombattle: { mons: {} },
+      gen9mixandmegalimitedsupplyrandombattle: { mons: {} },
       gen9superstaffbrosultimate: { mons: {} },
       gen9championsrandombattle: { mons: {} },
+      gen9championsrandomdoublesbattle: { mons: {} },
       gen8randombattle: { mons: {} },
       gen7randombattle: { mons: {} },
       gen6randombattle: { mons: {} },
@@ -103,10 +105,9 @@ function getSpeciesName(set, format) {
     return "Polteageist";
   } else if (species === "Sinistcha-Masterpiece") {
     return "Sinistcha";
-  } else if (species === "Squawkabilly-Blue") {
-    return "Squawkabilly";
-  } else if (species === "Squawkabilly-White") {
-    return "Squawkabilly-Yellow";
+  } else if (species.startsWith("Squawkabilly-")) {
+    if (species === "Squawkabilly-Blue") return "Squawkabilly";
+    return format.id === "gen9randombattle" ? "Squawkabilly-Yellow" : "Squawkabilly";
   } else if (species.startsWith("Basculin-")) {
     return "Basculin";
   } else if (species.startsWith("Sawsbuck-")) {
@@ -169,11 +170,13 @@ async function collectStats(battle, winner, players) {
   let eloFloor = stats.elo;
   const format = Dex.formats.get(battle.format);
   if (format.mod.startsWith("champions")) {
-    eloFloor = 1200;
+    eloFloor = format.gameType === "doubles" ? 1200 : 1250;
   } else if (format.mod === "gen2") {
     eloFloor = 1150;
   } else if (format.team === "randomBaby") {
     eloFloor = 1e3;
+  } else if (format.mod === "gen9mnmlimitedsupply") {
+    eloFloor = 1100;
   } else if (format.mod !== `gen${Dex.gen}`) {
     eloFloor = 1300;
   } else if (format.gameType === "doubles") {

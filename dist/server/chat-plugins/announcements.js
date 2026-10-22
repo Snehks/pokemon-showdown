@@ -23,6 +23,7 @@ __export(announcements_exports, {
   start: () => start
 });
 module.exports = __toCommonJS(announcements_exports);
+var import_lib = require("../../lib");
 class Announcement extends Rooms.MinorActivity {
   constructor(room, options) {
     super(room);
@@ -50,7 +51,7 @@ class Announcement extends Rooms.MinorActivity {
     this.displayTo(user, connection);
   }
   destroy() {
-    this.room.send(`|uhtmlchange|announcement${this.activityNumber}|<div class="infobox">(${this.room.tr`The announcement has ended.`})</div>`);
+    this.room.send(`|uhtmlchange|announcement${this.activityNumber}|<div class="infobox">(${this.room.TL`The announcement has ended.`})</div>`);
     this.room.setMinorActivity(null);
   }
   toJSON() {
@@ -75,21 +76,21 @@ const commands = {
       room = this.requireRoom();
       if (!target) return this.parse("/help announcement new");
       target = target.trim();
-      if (room.battle) throw new Chat.ErrorMessage(this.tr`Battles do not support announcements.`);
+      if (room.battle) throw new Chat.ErrorMessage(this.TL`Battles do not support announcements.`);
       const text = this.filter(target);
-      if (target !== text) throw new Chat.ErrorMessage(this.tr`You are not allowed to use filtered words in announcements.`);
+      if (target !== text) throw new Chat.ErrorMessage(this.TL`You are not allowed to use filtered words in announcements.`);
       const supportHTML = cmd === "htmlcreate";
       this.checkCan("minigame", null, room);
       if (supportHTML) this.checkCan("declare", null, room);
       this.checkChat();
       if (room.minorActivity) {
-        throw new Chat.ErrorMessage(this.tr`There is already a poll or announcement in progress in this room.`);
+        throw new Chat.ErrorMessage(this.TL`There is already a poll or announcement in progress in this room.`);
       }
       const source = supportHTML ? this.checkHTML(Chat.collapseLineBreaksHTML(target)) : Chat.formatText(target, true);
       room.setMinorActivity(new Announcement(room, { source }));
       this.roomlog(`${user.name} used ${message}`);
       this.modlog("ANNOUNCEMENT");
-      return this.privateModAction(room.tr`An announcement was started by ${user.name}.`);
+      return this.privateModAction(room.TL`An announcement was started by ${user.name}.`);
     },
     newhelp: [`/announcement create [announcement] - Creates an announcement. Requires: % @ # ~`],
     htmledit: "edit",
@@ -99,7 +100,7 @@ const commands = {
       if (!target) return this.parse("/help announcement edit");
       target = target.trim();
       const text = this.filter(target);
-      if (target !== text) throw new Chat.ErrorMessage(this.tr`You are not allowed to use filtered words in announcements.`);
+      if (target !== text) throw new Chat.ErrorMessage(this.TL`You are not allowed to use filtered words in announcements.`);
       const supportHTML = cmd === "htmledit";
       this.checkCan("minigame", null, room);
       if (supportHTML) this.checkCan("declare", null, room);
@@ -109,7 +110,7 @@ const commands = {
       announcement.save();
       this.roomlog(`${user.name} used ${message}`);
       this.modlog("ANNOUNCEMENT EDIT");
-      this.privateModAction(room.tr`The announcement was edited by ${user.name}.`);
+      this.privateModAction(room.TL`The announcement was edited by ${user.name}.`);
       this.parse("/announcement display");
     },
     edithelp: [`/announcement edit [announcement] - Edits the announcement. Requires: % @ # ~`],
@@ -119,12 +120,12 @@ const commands = {
       if (target) {
         this.checkCan("minigame", null, room);
         if (target === "clear") {
-          if (!announcement.endTimer()) throw new Chat.ErrorMessage(this.tr`There is no timer to clear.`);
-          return this.add(this.tr`The announcement timer was turned off.`);
+          if (!announcement.endTimer()) throw new Chat.ErrorMessage(this.TL`There is no timer to clear.`);
+          return this.add(this.TL`The announcement timer was turned off.`);
         }
         const timeoutMins = parseFloat(target);
         if (isNaN(timeoutMins) || timeoutMins <= 0 || timeoutMins > 7 * 24 * 60) {
-          throw new Chat.ErrorMessage(this.tr`Time should be a number of minutes less than one week.`);
+          throw new Chat.ErrorMessage(this.TL`Time should be a number of minutes less than one week.`);
         }
         announcement.setTimer({ timeoutMins });
         room.add(`The announcement timer was turned on: the announcement will end in ${timeoutMins} minute${Chat.plural(timeoutMins)}.`);
@@ -135,7 +136,7 @@ const commands = {
         if (announcement.timeout) {
           return this.sendReply(`The announcement timer is on and will end in ${announcement.timeoutMins} minute${Chat.plural(announcement.timeoutMins)}.`);
         } else {
-          return this.sendReply(this.tr`The announcement timer is off.`);
+          return this.sendReply(this.TL`The announcement timer is off.`);
         }
       }
     },
@@ -152,7 +153,7 @@ const commands = {
       const announcement = this.requireMinorActivity(Announcement);
       announcement.end(room);
       this.modlog("ANNOUNCEMENT END");
-      this.privateModAction(room.tr`The announcement was ended by ${user.name}.`);
+      this.privateModAction(room.TL`The announcement was ended by ${user.name}.`);
     },
     endhelp: [`/announcement end - Ends a announcement and displays the results. Requires: % @ # ~`],
     show: "",
@@ -166,6 +167,10 @@ const commands = {
         announcement.display();
       } else {
         announcement.displayTo(user, connection);
+        if (user.can("declare", null, room, "announcement")) {
+          const content = import_lib.Utils.escapeHTML(announcement.source).replace(/\n/g, "<br />");
+          this.sendReply(`|uhtml|announcementsource|<div class="infobox"><details><summary>Source:</summary><code style="white-space: pre-wrap; display: table; tab-size: 3">/announcement htmlcreate ${content}</code></details></div>`);
+        }
       }
     },
     displayhelp: [`/announcement display - Displays the announcement`]

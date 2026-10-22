@@ -23,6 +23,7 @@ __export(dex_data_exports, {
   DexStats: () => DexStats,
   DexTypes: () => DexTypes,
   Nature: () => Nature,
+  OTHER_NAME_TABLES: () => OTHER_NAME_TABLES,
   TypeInfo: () => TypeInfo,
   assignMissingFields: () => assignMissingFields,
   toID: () => toID
@@ -49,6 +50,18 @@ function assignMissingFields(self, data) {
     self[k] = data[k];
   }
 }
+const OTHER_NAME_TABLES = [
+  "TypeNames",
+  "NatureNames",
+  "GenderNames",
+  "EggGroupNames",
+  "ColorNames",
+  "StatusNames",
+  "TargetNames",
+  "StatNames",
+  "StatMediumNames",
+  "StatShortNames"
+];
 class BasicEffect {
   constructor(data) {
     this.name = import_utils.Utils.getString(data.name).trim();
@@ -58,14 +71,10 @@ class BasicEffect {
     this.exists = data.exists ?? !!this.id;
     this.num = data.num || 0;
     this.gen = data.gen || 0;
-    this.shortDesc = data.shortDesc || "";
-    this.desc = data.desc || "";
     this.isNonstandard = data.isNonstandard || null;
     this.duration = data.duration;
     this.noCopy = !!data.noCopy;
     this.affectsFainted = !!data.affectsFainted;
-    this.status = data.status || void 0;
-    this.weather = data.weather || void 0;
     this.sourceEffect = data.sourceEffect || "";
   }
   toString() {

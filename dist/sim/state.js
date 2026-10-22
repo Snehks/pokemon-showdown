@@ -280,7 +280,7 @@ const State = new class {
         }
         return o;
       default:
-        throw new TypeError(`Unexpected typeof === '${typeof obj}': ${obj}`);
+        throw new TypeError(`Unexpected typeof === '${typeof obj}': ${String(obj)}`);
     }
   }
   deserializeWithRefs(obj, battle) {
@@ -309,7 +309,7 @@ const State = new class {
       case "function":
       // lol wtf
       default:
-        throw new TypeError(`Unexpected typeof === '${typeof obj}': ${obj}`);
+        throw new TypeError(`Unexpected typeof === '${typeof obj}': ${String(obj)}`);
     }
   }
   isReferable(obj) {

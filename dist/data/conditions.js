@@ -26,9 +26,9 @@ const Conditions = {
     name: "brn",
     effectType: "Status",
     onStart(target, source, sourceEffect) {
-      if (sourceEffect && sourceEffect.id === "flameorb") {
+      if (sourceEffect?.id === "flameorb") {
         this.add("-status", target, "brn", "[from] item: Flame Orb");
-      } else if (sourceEffect && sourceEffect.effectType === "Ability") {
+      } else if (sourceEffect?.effectType === "Ability") {
         this.add("-status", target, "brn", "[from] ability: " + sourceEffect.name, `[of] ${source}`);
       } else {
         this.add("-status", target, "brn");
@@ -44,7 +44,7 @@ const Conditions = {
     name: "par",
     effectType: "Status",
     onStart(target, source, sourceEffect) {
-      if (sourceEffect && sourceEffect.effectType === "Ability") {
+      if (sourceEffect?.effectType === "Ability") {
         this.add("-status", target, "par", "[from] ability: " + sourceEffect.name, `[of] ${source}`);
       } else {
         this.add("-status", target, "par");
@@ -70,9 +70,9 @@ const Conditions = {
     name: "slp",
     effectType: "Status",
     onStart(target, source, sourceEffect) {
-      if (sourceEffect && sourceEffect.effectType === "Ability") {
+      if (sourceEffect?.effectType === "Ability") {
         this.add("-status", target, "slp", "[from] ability: " + sourceEffect.name, `[of] ${source}`);
-      } else if (sourceEffect && sourceEffect.effectType === "Move") {
+      } else if (sourceEffect?.effectType === "Move") {
         this.add("-status", target, "slp", `[from] move: ${sourceEffect.name}`);
       } else {
         this.add("-status", target, "slp");
@@ -104,7 +104,7 @@ const Conditions = {
     name: "frz",
     effectType: "Status",
     onStart(target, source, sourceEffect) {
-      if (sourceEffect && sourceEffect.effectType === "Ability") {
+      if (sourceEffect?.effectType === "Ability") {
         this.add("-status", target, "frz", "[from] ability: " + sourceEffect.name, `[of] ${source}`);
       } else {
         this.add("-status", target, "frz");
@@ -144,7 +144,7 @@ const Conditions = {
     name: "psn",
     effectType: "Status",
     onStart(target, source, sourceEffect) {
-      if (sourceEffect && sourceEffect.effectType === "Ability") {
+      if (sourceEffect?.effectType === "Ability") {
         this.add("-status", target, "psn", "[from] ability: " + sourceEffect.name, `[of] ${source}`);
       } else {
         this.add("-status", target, "psn");
@@ -160,9 +160,9 @@ const Conditions = {
     effectType: "Status",
     onStart(target, source, sourceEffect) {
       this.effectState.stage = 0;
-      if (sourceEffect && sourceEffect.id === "toxicorb") {
+      if (sourceEffect?.id === "toxicorb") {
         this.add("-status", target, "tox", "[from] item: Toxic Orb");
-      } else if (sourceEffect && sourceEffect.effectType === "Ability") {
+      } else if (sourceEffect?.effectType === "Ability") {
         this.add("-status", target, "tox", "[from] ability: " + sourceEffect.name, `[of] ${source}`);
       } else {
         this.add("-status", target, "tox");
@@ -387,9 +387,15 @@ const Conditions = {
     onStart(target) {
       this.effectState.targetSlot = target.getSlot();
       this.effectState.endingTurn = this.turn - 1 + 2;
-      if (this.effectState.endingTurn >= 254) {
+      if (this.gen >= 8 && this.effectState.endingTurn >= 256) {
         this.hint(`In Gen 8+, Future attacks will never resolve when used on the 255th turn or later.`);
       }
+    },
+    onRestart() {
+      if (this.gen >= 8 && this.effectState.endingTurn >= 256) {
+        this.hint(`A previous future attack is stuck on this slot and will never resolve.`);
+      }
+      return false;
     },
     onResidualOrder: 3,
     onResidual(target) {
@@ -404,8 +410,6 @@ const Conditions = {
         return;
       }
       this.add("-end", target, "move: " + move.name);
-      target.removeVolatile("Protect");
-      target.removeVolatile("Endure");
       if (data.source.hasAbility("infiltrator") && this.gen >= 6) {
         data.moveData.infiltrates = true;
       }
@@ -728,7 +732,7 @@ const Conditions = {
     duration: 0,
     onEffectivenessPriority: -1,
     onEffectiveness(typeMod, target, type, move) {
-      if (move && move.effectType === "Move" && move.category !== "Status" && type === "Flying" && typeMod > 0) {
+      if (move?.effectType === "Move" && move.category !== "Status" && type === "Flying" && typeMod > 0) {
         this.add("-fieldactivate", "Delta Stream");
         return 0;
       }
@@ -749,7 +753,7 @@ const Conditions = {
     name: "Dynamax",
     noCopy: true,
     onStart(pokemon) {
-      this.effectState.turns = 0;
+      this.effectState.turns = 3;
       pokemon.removeVolatile("minimize");
       pokemon.removeVolatile("substitute");
       if (pokemon.volatiles["torment"]) {
@@ -785,7 +789,7 @@ const Conditions = {
     },
     onResidualPriority: -100,
     onResidual() {
-      this.effectState.turns++;
+      this.effectState.turns--;
     },
     onEnd(pokemon) {
       this.add("-end", pokemon, "Dynamax");

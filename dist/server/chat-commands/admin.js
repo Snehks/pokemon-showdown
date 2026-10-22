@@ -64,6 +64,25 @@ ${log}`;
     });
   });
 }
+function clearRequireCache(options = {}) {
+  const excludes = [...options?.exclude || [], "/node_modules/"];
+  for (const filepath in require.cache) {
+    if (excludes.some((p) => filepath.includes(p))) continue;
+    const mod = require.cache[filepath];
+    if (!mod) continue;
+    uncacheModuleTree(mod, excludes);
+    delete require.cache[filepath];
+  }
+}
+function uncacheModuleTree(mod, excludes) {
+  const children = mod.children;
+  if (!children?.length || excludes.some((p) => mod.filename.includes(p))) return;
+  delete mod.children;
+  for (const child of children) {
+    if (excludes.some((p) => child.filename.includes(p))) continue;
+    uncacheModuleTree(child, excludes);
+  }
+}
 function keysIncludingNonEnumerable(obj) {
   const methods = /* @__PURE__ */ new Set();
   let current = obj;
@@ -567,7 +586,7 @@ ${buf}`);
       if (!["all", "formats", "battles", "validator", "learnsets"].includes(target2)) {
         exclude.push("/sim/");
       }
-      import_lib.Utils.clearRequireCache({ exclude });
+      clearRequireCache({ exclude });
       const reRequire = (0, import_module.createRequire)(__filename);
       if (target2 === "all") {
         if (lock["all"]) {
@@ -885,7 +904,7 @@ ${buf}`);
     processes.delete(`${process.pid}`);
     for (const manager of import_lib.ProcessManager.processManagers) {
       for (const [i, process2] of manager.processes.entries()) {
-        const pid = process2.getProcess().pid;
+        const pid = process2.getProcess().pid ?? "ERROR";
         let managerName = manager.basename;
         if (managerName.startsWith("index.")) {
           managerName = manager.filename.split(path.sep).slice(-2).join(path.sep);
@@ -893,15 +912,15 @@ ${buf}`);
         buf += `<strong>${pid}</strong> - ${managerName} ${i} (load ${process2.getLoad()}`;
         const info = processes.get(`${pid}`);
         const display = [];
-        if (info.cpu) display.push(`CPU: ${info.cpu}`);
-        if (info.time) display.push(`time: ${info.time}`);
-        if (info.ram) display.push(`RAM: ${info.ram}`);
-        if (display.length) buf += `, ${display.join(", ")})`;
-        buf += `<br />`;
+        if (info?.cpu) display.push(`CPU: ${info.cpu}`);
+        if (info?.time) display.push(`time: ${info.time}`);
+        if (info?.ram) display.push(`RAM: ${info.ram}`);
+        if (display.length) buf += `, ${display.join(", ")}`;
+        buf += `)<br />`;
         processes.delete(`${pid}`);
       }
       for (const [i, process2] of manager.releasingProcesses.entries()) {
-        const pid = process2.getProcess().pid;
+        const pid = process2.getProcess().pid ?? "ERROR";
         buf += `<strong>${pid}</strong> - PENDING RELEASE ${manager.basename} ${i} (load ${process2.getLoad()}`;
         const info = processes.get(`${pid}`);
         if (info) {
@@ -909,9 +928,9 @@ ${buf}`);
           if (info.cpu) display.push(`CPU: ${info.cpu}`);
           if (info.time) display.push(`time: ${info.time}`);
           if (info.ram) display.push(`RAM: ${info.ram}`);
-          if (display.length) buf += `, ${display.join(", ")})`;
+          if (display.length) buf += `, ${display.join(", ")}`;
         }
-        buf += `<br />`;
+        buf += `)<br />`;
         processes.delete(`${pid}`);
       }
     }
@@ -1127,6 +1146,22 @@ exports.Learnsets = {
   endemergencyhelp: [
     `/endemergency - Turns off emergency mode. Requires: ~`
   ],
+  async setbot(target2, room2, user2) {
+    this.checkCan("rangeban");
+    const [owner, bot] = target2.split(",").map(toID);
+    if (!owner || !bot) return this.popupReply(`Invalid owner/bot usernames specified.`);
+    const [res, error] = await LoginServer.request("setbot", {
+      bot,
+      owner
+    });
+    if (error || res.actionerror) {
+      this.popupReply(error?.message || res?.actionerror);
+      return null;
+    }
+    if (res.success) return this.popupReply(`User ${bot} successfully registered as ${owner}'s bot.`);
+    return this.popupReply(`Registration for ${bot} and ${owner} failed without an error message. Try again later.`);
+  },
+  setbothelp: [`/setbot [owner], [bot] - Registers the [bot] account as a bot belonging to [owner]. Requires: ~`],
   remainingbattles() {
     this.checkCan("lockdown");
     if (!Rooms.global.lockdown) {
@@ -1485,7 +1520,7 @@ const pages = {
     }
     const bot = Users.get(botid);
     if (!bot) {
-      return `<div class="pad"><h2>The bot "${bot}" is not available.</h2></div>`;
+      return import_lib.Utils.html`<div class="pad"><h2>The bot "${botid}" is not available.</h2></div>`;
     }
     let canSend = Users.globalAuth.get(bot) === "*";
     let room2;

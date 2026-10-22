@@ -26,7 +26,7 @@ const Conditions = {
     name: "slp",
     effectType: "Status",
     onStart(target, source, sourceEffect) {
-      if (sourceEffect && sourceEffect.effectType === "Move") {
+      if (sourceEffect?.effectType === "Move") {
         this.add("-status", target, "slp", `[from] move: ${sourceEffect.name}`);
       } else {
         this.add("-status", target, "slp");
@@ -37,7 +37,7 @@ const Conditions = {
         this.add("-end", target, "Nightmare", "[silent]");
       }
     },
-    onSwitchIn(target) {
+    onSwitchOut(target) {
       this.effectState.time += this.effectState.skippedTime;
       this.effectState.skippedTime = 0;
     },

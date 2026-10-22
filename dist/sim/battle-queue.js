@@ -163,6 +163,9 @@ class BattleQueue {
     if (action.move) {
       let target = null;
       action.move = this.battle.dex.getActiveMove(action.move);
+      if (this.battle.dex.currentMod.startsWith("champions") && action.move.id === "curse" && !action.pokemon.hasType("Ghost")) {
+        action.move.target = "self";
+      }
       if (!action.targetLoc) {
         target = this.battle.getRandomTarget(action.pokemon, action.move);
         if (target) action.targetLoc = action.pokemon.getLocOf(target);
@@ -225,7 +228,7 @@ class BattleQueue {
   cancelAction(pokemon) {
     const oldLength = this.list.length;
     for (let i = 0; i < this.list.length; i++) {
-      if (this.list[i].pokemon === pokemon) {
+      if (this.list[i].pokemon === pokemon && this.list[i].choice !== "runSwitch") {
         this.list.splice(i, 1);
         i--;
       }
@@ -248,6 +251,11 @@ class BattleQueue {
       }
     }
     return null;
+  }
+  getSwitches(side) {
+    return this.list.filter(
+      (action) => ["switch", "instaswitch"].includes(action.choice) && (!side || action.pokemon.side === side)
+    );
   }
   /**
    * Inserts the passed action into the action queue when it normally

@@ -101,7 +101,7 @@ class RoundRobin {
     if (!this.isBracketFrozen) return "BracketNotFrozen";
     const playerIndex = this.players.indexOf(user);
     for (const [col, match] of this.matches[playerIndex].entries()) {
-      if (!match || match.state !== "available") continue;
+      if (match?.state !== "available") continue;
       const p2 = this.players[col];
       match.state = "finished";
       match.result = "loss";
@@ -116,7 +116,7 @@ class RoundRobin {
     }
     for (const [row, challenges] of this.matches.entries()) {
       const match = challenges[playerIndex];
-      if (!match || match.state !== "available") continue;
+      if (match?.state !== "available") continue;
       const p1 = this.players[row];
       match.state = "finished";
       match.result = "win";
@@ -153,7 +153,7 @@ class RoundRobin {
     const col = this.players.indexOf(p2);
     if (row < 0 || col < 0) return "UserNotAdded";
     const match = this.matches[row][col];
-    if (!match || match.state !== "available") return "InvalidMatch";
+    if (match?.state !== "available") return "InvalidMatch";
     match.state = "finished";
     match.result = result;
     match.score = score.slice(0);

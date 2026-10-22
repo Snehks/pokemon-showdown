@@ -302,7 +302,7 @@ export class Side {
 	}
 
 	get requestState(): RequestState {
-		if (!this.activeRequest || this.activeRequest.wait) return '';
+		if (this.activeRequest === null || this.activeRequest.wait) return '';
 		if (this.activeRequest.teamPreview) return 'teampreview';
 		if (this.activeRequest.forceSwitch) return 'switch';
 		return 'move';
@@ -346,7 +346,7 @@ export class Side {
 				if (action.zmove) details += ` zmove`;
 				if (action.maxMove) details += ` dynamax`;
 				if (action.terastallize) details += ` terastallize`;
-				return `move ${action.moveid}${details}`;
+				return `move ${action.moveid!}${details}`;
 			case 'switch':
 			case 'instaswitch':
 			case 'revivalblessing':
@@ -959,7 +959,7 @@ export class Side {
 				}
 			}
 			if (slot < 0) {
-				return this.emitChoiceError(`Can't switch: You do not have a Pokémon named "${slotText}" to switch to`);
+				return this.emitChoiceError(`Can't switch: You do not have a Pokémon named "${slotText!}" to switch to`);
 			}
 		}
 		if (slot >= this.pokemon.length) {
@@ -1043,13 +1043,21 @@ export class Side {
 		}
 
 		const ruleTable = this.battle.ruleTable;
-		let positions = data ? data.split(data.includes(',') ? ',' : '').map(datum => parseInt(datum) - 1) :
+		let isBracketed = false;
+		let teamData = data;
+		if (data?.startsWith('[') && data.endsWith(']')) {
+			isBracketed = true;
+			teamData = data.slice(1, -1).trim();
+		}
+		let positions = teamData ?
+			teamData.split(isBracketed || teamData.includes(',') || this.pokemon.length >= 10 ? ',' : '')
+				.map(datum => parseInt(datum) - 1) :
 			[...this.pokemon.keys()]; // autoChoose
 		const pickedTeamSize = this.pickedTeamSize();
 
 		// make sure positions is exactly of length pickedTeamSize
 		// - If too big: the client automatically sends a full list, so we just trim it down to size
-		positions.splice(pickedTeamSize);
+		if (!isBracketed) positions.splice(pickedTeamSize);
 		// - If too small: we intentionally support only sending leads and having the sim fill in the rest
 		if (positions.length < pickedTeamSize) {
 			for (let i = 0; i < pickedTeamSize; i++) {
@@ -1059,6 +1067,9 @@ export class Side {
 			}
 		}
 
+		if (positions.length !== pickedTeamSize) {
+			return this.emitChoiceError(`Can't choose for Team Preview: You must choose exactly ${pickedTeamSize} Pokémon`);
+		}
 		for (const [index, pos] of positions.entries()) {
 			if (isNaN(pos) || pos < 0 || pos >= this.pokemon.length) {
 				return this.emitChoiceError(`Can't choose for Team Preview: You do not have a Pokémon in slot ${pos + 1}`);
@@ -1118,17 +1129,21 @@ export class Side {
 		let forcedPasses = 0;
 		if (this.battle.requestState === 'switch') {
 			const canSwitchOut = this.active.filter(pokemon => pokemon?.switchFlag).length;
-			const canSwitchIn = this.pokemon.slice(this.active.length).filter(pokemon => pokemon && !pokemon.fainted).length;
+			const canSwitchIn = this.battle.canSwitch(this);
 			forcedSwitches = Math.min(canSwitchOut, canSwitchIn);
 			forcedPasses = canSwitchOut - forcedSwitches;
 		}
+
+		// should only be relevant for Gen 3
+		const switchIns = this.battle.queue.getSwitches(this).map(action => action.target.position);
+
 		this.choice = {
 			cantUndo: false,
 			error: ``,
 			actions: [],
 			forcedSwitchesLeft: forcedSwitches,
 			forcedPassesLeft: forcedPasses,
-			switchIns: new Set(),
+			switchIns: new Set(switchIns),
 			zMove: false,
 			mega: false,
 			ultra: false,

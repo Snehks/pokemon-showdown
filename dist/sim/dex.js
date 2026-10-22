@@ -42,6 +42,7 @@ var import_dex_moves = require("./dex-moves");
 var import_dex_items = require("./dex-items");
 var import_dex_abilities = require("./dex-abilities");
 var import_dex_species = require("./dex-species");
+var import_dex_text = require("./dex-text");
 var import_dex_formats = require("./dex-formats");
 var import_utils = require("../lib/utils");
 var import_tags = require("../data/tags");
@@ -129,13 +130,14 @@ class ModdedDex {
     this.currentMod = mod;
     this.dataDir = this.isBase ? DATA_DIR : MODS_DIR + "/" + this.currentMod;
     this.dataCache = null;
-    this.textCache = null;
+    this.textCache = {};
     this.formats = new import_dex_formats.DexFormats(this);
     this.abilities = new import_dex_abilities.DexAbilities(this);
     this.items = new import_dex_items.DexItems(this);
     this.moves = new import_dex_moves.DexMoves(this);
     this.species = new import_dex_species.DexSpecies(this);
     this.conditions = new import_dex_conditions.DexConditions(this);
+    this.text = new import_dex_text.DexText(this);
     this.natures = new Data.DexNatures(this);
     this.types = new Data.DexTypes(this);
     this.stats = new Data.DexStats(this);
@@ -231,7 +233,7 @@ class ModdedDex {
       return true;
     }
     const typeData = this.types.get(targetTyping);
-    if (typeData && typeData.damageTaken[sourceType] === 3) return false;
+    if (typeData?.damageTaken[sourceType] === 3) return false;
     return true;
   }
   getEffectiveness(source, target) {
@@ -268,34 +270,6 @@ class ModdedDex {
       return !!(tag.moveFilter || tag.genericFilter)?.(thing);
     }
     return !!tag.genericFilter?.(thing);
-  }
-  getDescs(table, id, dataEntry) {
-    if (dataEntry.shortDesc) {
-      return {
-        desc: dataEntry.desc,
-        shortDesc: dataEntry.shortDesc
-      };
-    }
-    const entry = this.loadTextData()[table][id];
-    if (!entry) return null;
-    const descs = {
-      desc: "",
-      shortDesc: ""
-    };
-    for (let i = this.gen; i < dexes["base"].gen; i++) {
-      const curDesc = entry[`gen${i}`]?.desc;
-      const curShortDesc = entry[`gen${i}`]?.shortDesc;
-      if (!descs.desc && curDesc) {
-        descs.desc = curDesc;
-      }
-      if (!descs.shortDesc && curShortDesc) {
-        descs.shortDesc = curShortDesc;
-      }
-      if (descs.desc && descs.shortDesc) break;
-    }
-    if (!descs.shortDesc) descs.shortDesc = entry.shortDesc || "";
-    if (!descs.desc) descs.desc = entry.desc || descs.shortDesc;
-    return descs;
   }
   /**
    * Ensure we're working on a copy of a move (and make a copy if we aren't)
@@ -462,8 +436,8 @@ class ModdedDex {
       }
     }
   }
-  loadTextFile(name, exportName) {
-    return require(`${DATA_DIR}/text/${name}`)[exportName];
+  loadTextFile(name, exportName, optional = false) {
+    return import_dex_text.DexText.loadTextFile(name, exportName, optional);
   }
   includeMods() {
     if (!this.isBase) throw new Error(`This must be called on the base Dex`);
@@ -484,16 +458,84 @@ class ModdedDex {
     this.loadData();
     return this;
   }
-  loadTextData() {
-    if (dexes["base"].textCache) return dexes["base"].textCache;
-    dexes["base"].textCache = {
-      Pokedex: this.loadTextFile("pokedex", "PokedexText"),
-      Moves: this.loadTextFile("moves", "MovesText"),
-      Abilities: this.loadTextFile("abilities", "AbilitiesText"),
-      Items: this.loadTextFile("items", "ItemsText"),
-      Default: this.loadTextFile("default", "DefaultText")
+  loadTextData(lang = "en") {
+    if (!this.gen) this.loadData();
+    lang ||= "en";
+    const cacheKey = `${this.currentMod}:${lang}`;
+    const cached = dexes["base"].textCache[cacheKey];
+    if (cached) return cached;
+    const englishData = import_dex_text.DexText.loadRawTextData();
+    const localizedData = lang === "en" ? englishData : import_dex_text.DexText.loadRawTextData(lang);
+    return dexes["base"].textCache[cacheKey] = {
+      Pokedex: this.resolvePokedexTable(englishData.Pokedex, localizedData.Pokedex),
+      Tags: import_dex_text.DexText.resolveTagsTable(englishData.Tags, localizedData.Tags),
+      Moves: this.resolveTextTable(englishData.Moves, localizedData.Moves),
+      Abilities: this.resolveTextTable(englishData.Abilities, localizedData.Abilities),
+      Items: this.resolveTextTable(englishData.Items, localizedData.Items),
+      Default: localizedData.Default,
+      ...import_dex_text.DexText.resolveOtherNameTables(englishData, localizedData)
     };
-    return dexes["base"].textCache;
+  }
+  resolvePokedexTable(englishTable, localizedTable) {
+    const FIELDS = ["name", "baseSpecies", "forme", "grammar"];
+    const merge = (english, localized) => {
+      const entry = {};
+      for (const field of FIELDS) {
+        const value = localized?.[field] ?? english?.[field];
+        if (value) entry[field] = value;
+      }
+      return entry;
+    };
+    const mergedTable = {};
+    for (const id in englishTable) {
+      mergedTable[id] = merge(englishTable[id], localizedTable[id]);
+    }
+    for (const id in localizedTable) {
+      if (!(id in englishTable)) mergedTable[id] = merge(void 0, localizedTable[id]);
+    }
+    const table = {};
+    for (const id in mergedTable) {
+      const entry = mergedTable[id];
+      const species = this.species.get(id);
+      const baseEntry = mergedTable[toID(species.baseSpecies)];
+      table[id] = {
+        ...entry,
+        name: entry.name || species.name,
+        baseSpecies: baseEntry?.baseSpecies ?? baseEntry?.name ?? species.baseSpecies
+      };
+    }
+    return table;
+  }
+  resolveTextTable(englishTable, localizedTable) {
+    const table = {};
+    for (const id in englishTable) {
+      const englishEntry = englishTable[id];
+      const localizedEntry = localizedTable[id];
+      const desc = this.resolveTextField(localizedEntry, englishEntry, "desc");
+      const shortDesc = this.resolveTextField(localizedEntry, englishEntry, "shortDesc");
+      table[id] = {
+        ...localizedEntry || englishEntry,
+        name: localizedEntry?.name ?? englishEntry.name,
+        desc: desc || shortDesc,
+        shortDesc: shortDesc || desc
+      };
+    }
+    return table;
+  }
+  resolveTextField(localizedEntry, englishEntry, field) {
+    const englishMod = englishEntry[this.currentMod];
+    if (englishMod?.[field]) {
+      const localizedMod = localizedEntry?.[this.currentMod];
+      return localizedMod?.[field] || englishMod?.[field];
+    }
+    for (let gen = this.gen; gen < Dex.gen; gen++) {
+      const englishGen = englishEntry[`gen${gen}`];
+      if (!englishGen?.[field]) continue;
+      const localizedGen = localizedEntry?.[`gen${gen}`];
+      const desc = localizedGen?.[field] || englishGen?.[field];
+      if (desc) return desc;
+    }
+    return localizedEntry?.[field] || englishEntry[field] || "";
   }
   getAlias(id) {
     return this.loadAliases().get(id);

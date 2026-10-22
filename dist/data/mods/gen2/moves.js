@@ -108,7 +108,7 @@ const Moves = {
       const lastAttackedBy = pokemon.getLastAttackedBy();
       if (!lastAttackedBy?.move || !lastAttackedBy.thisTurn) return false;
       const lastMove = lastAttackedBy.source.lastMove;
-      if (!lastMove || lastAttackedBy.move !== lastMove.id) return false;
+      if (lastAttackedBy.move !== lastMove?.id) return false;
       if (this.getCategory(lastAttackedBy.move) === "Physical") {
         return 2 * lastAttackedBy.damage;
       }
@@ -142,6 +142,23 @@ const Moves = {
       // no inherit
     }
   },
+  destinybond: {
+    inherit: true,
+    condition: {
+      inherit: true,
+      onFaint(target, source, effect) {
+        if (!source || !effect || target.isAlly(source)) return;
+        if (effect.effectType === "Move" && !effect.flags["futuremove"]) {
+          if (source.volatiles["dynamax"]) {
+            this.add("-hint", "Dynamaxed Pok\xE9mon are immune to Destiny Bond.");
+            return;
+          }
+          this.add("-activate", target, "move: Destiny Bond");
+          source.faint();
+        }
+      }
+    }
+  },
   detect: {
     inherit: true,
     priority: 2
@@ -160,7 +177,7 @@ const Moves = {
         if (["attract", "curse", "foresight", "meanlook", "mimic", "nightmare", "spiderweb", "transform"].includes(move.id)) {
           return false;
         }
-        if (source.volatiles["lockon"] && target === source.volatiles["lockon"].source) return;
+        if (target === source.volatiles["lockon"]?.source) return;
         return false;
       },
       onSourceModifyDamage: void 0,
@@ -227,7 +244,7 @@ const Moves = {
         if (["attract", "curse", "foresight", "meanlook", "mimic", "nightmare", "spiderweb", "transform"].includes(move.id)) {
           return false;
         }
-        if (source.volatiles["lockon"] && target === source.volatiles["lockon"].source) return;
+        if (target === source.volatiles["lockon"]?.source) return;
         return false;
       },
       onSourceModifyDamage: void 0,
@@ -381,7 +398,7 @@ const Moves = {
       const lastAttackedBy = pokemon.getLastAttackedBy();
       if (!lastAttackedBy?.move || !lastAttackedBy.thisTurn) return false;
       const lastMove = lastAttackedBy.source.lastMove;
-      if (!lastMove || lastAttackedBy.move !== lastMove.id) return false;
+      if (lastAttackedBy.move !== lastMove?.id) return false;
       if (this.getCategory(lastAttackedBy.move) === "Special") {
         return 2 * lastAttackedBy.damage;
       }
@@ -520,7 +537,13 @@ const Moves = {
       onFoeBeforeSwitchOut(pokemon) {
         const source = this.effectState.source;
         this.debug("Pursuit start");
-        if (this.effectState.targetLoc !== source.getLocOf(pokemon) || !source.isAdjacent(pokemon) || !source.hp || source.volatiles["encore"] && source.volatiles["encore"].move !== "pursuit" || !this.queue.cancelMove(source)) return;
+        if (this.effectState.targetLoc !== source.getLocOf(pokemon) || !source.isAdjacent(pokemon) || !source.hp || source.volatiles["encore"] && source.volatiles["encore"].move !== "pursuit" || !this.queue.cancelMove(source)) {
+          return;
+        }
+        if (!pokemon.pursuitActivated) {
+          this.add("-activate", pokemon, "move: Pursuit");
+          pokemon.pursuitActivated = true;
+        }
         if (source.canMegaEvo || source.canUltraBurst) {
           for (const [actionIndex, action] of this.queue.entries()) {
             if (action.pokemon === source && action.choice === "megaEvo") {

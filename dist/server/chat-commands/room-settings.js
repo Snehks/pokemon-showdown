@@ -339,12 +339,13 @@ const commands = {
       return this.sendReply(`This room's primary language is ${Chat.languages.get(room.settings.language || "") || "English"}`);
     }
     this.checkCan("editroom", null, room);
-    const targetLanguage = toID(target);
-    if (!Chat.languages.has(targetLanguage)) throw new Chat.ErrorMessage(`"${target}" is not a supported language.`);
+    const targetLanguage = Chat.getLanguageID(target);
+    if (!targetLanguage) throw new Chat.ErrorMessage(`"${target}" is not a supported language.`);
     room.settings.language = targetLanguage === "english" ? false : targetLanguage;
     room.saveSettings();
-    this.modlog(`LANGUAGE`, null, Chat.languages.get(targetLanguage));
-    this.sendReply(`The room's language has been set to ${Chat.languages.get(targetLanguage)}`);
+    const languageName = Chat.languages.get(targetLanguage);
+    this.modlog(`LANGUAGE`, null, languageName);
+    this.sendReply(`The room's language has been set to ${languageName}`);
   },
   roomlanguagehelp: [
     `/roomlanguage [language] - Sets the the language for the room, which changes language of a few commands. Requires # ~`,
@@ -1228,7 +1229,7 @@ const commands = {
       this.sendReply('|raw|<div class="infobox infobox-limited">' + room.settings.introMessage.replace(/\n/g, "") + "</div>");
       if (!this.broadcasting && user.can("declare", null, room, "roomintro") && cmd !== "topic") {
         const code = import_lib.Utils.escapeHTML(room.settings.introMessage).replace(/\n/g, "<br />");
-        this.sendReplyBox(`<details open><summary>Source:</summary><code style="white-space: pre-wrap; display: table; tab-size: 3">/roomintro ${code}</code></details>`);
+        this.sendReplyBox(`<details><summary>Source:</summary><code style="white-space: pre-wrap; display: table; tab-size: 3">/roomintro ${code}</code></details>`);
       }
       return;
     }
@@ -1273,7 +1274,7 @@ const commands = {
       this.sendReply(`|raw|<div class="infobox">${room.settings.staffMessage.replace(/\n/g, ``)}</div>`);
       if (user.can("ban", null, room, "staffintro") && cmd !== "stafftopic") {
         const code = import_lib.Utils.escapeHTML(room.settings.staffMessage).replace(/\n/g, "<br />");
-        this.sendReplyBox(`<details open><summary>Source:</summary><code style="white-space: pre-wrap; display: table; tab-size: 3">/staffintro ${code}</code></details>`);
+        this.sendReplyBox(`<details><summary>Source:</summary><code style="white-space: pre-wrap; display: table; tab-size: 3">/staffintro ${code}</code></details>`);
       }
       return;
     }
@@ -1373,7 +1374,7 @@ const commands = {
     if (!target) {
       if (!this.runBroadcast()) return;
       return this.sendReplyBox(
-        `This room is currently displaying ${room.settings.dataCommandTierDisplay} as the tier when using /data.`
+        room.settings.dataCommandTierDisplay ? `This room is currently displaying ${room.settings.dataCommandTierDisplay} as the tier when using /data.` : `This room does not have a tier set for /data.`
       );
     }
     this.checkCan("declare", null, room);

@@ -22,6 +22,24 @@ __export(abilities_exports, {
 });
 module.exports = __toCommonJS(abilities_exports);
 const Abilities = {
+  airlock: {
+    inherit: true,
+    onSwitchInPriority: 4,
+    onAfterEntryHazard(pokemon) {
+      this.effect.onStart.call(this, pokemon);
+    },
+    onSwitchIn: void 0
+    // no inherit
+  },
+  cloudnine: {
+    inherit: true,
+    onSwitchInPriority: 4,
+    onAfterEntryHazard(pokemon) {
+      this.effect.onStart.call(this, pokemon);
+    },
+    onSwitchIn: void 0
+    // no inherit
+  },
   cutecharm: {
     inherit: true,
     onDamagingHit(damage, target, source, move) {
@@ -31,6 +49,24 @@ const Abilities = {
         }
       }
     }
+  },
+  drizzle: {
+    inherit: true,
+    onSwitchInPriority: 3,
+    onAfterEntryHazard(pokemon) {
+      this.effect.onStart.call(this, pokemon);
+    },
+    onSwitchIn: void 0
+    // no inherit
+  },
+  drought: {
+    inherit: true,
+    onSwitchInPriority: 3,
+    onAfterEntryHazard(pokemon) {
+      this.effect.onStart.call(this, pokemon);
+    },
+    onSwitchIn: void 0
+    // no inherit
   },
   effectspore: {
     inherit: true,
@@ -70,6 +106,12 @@ const Abilities = {
   },
   forecast: {
     inherit: true,
+    onSwitchInPriority: 3,
+    onAfterEntryHazard(pokemon) {
+      this.effect.onStart.call(this, pokemon);
+    },
+    onSwitchIn: void 0,
+    // no inherit
     flags: {}
   },
   hustle: {
@@ -83,6 +125,8 @@ const Abilities = {
   },
   intimidate: {
     inherit: true,
+    onSwitchInPriority: 2,
+    // before Trace
     onStart(pokemon) {
       let activated = false;
       for (const target of pokemon.adjacentFoes()) {
@@ -191,6 +235,15 @@ const Abilities = {
       }
     }
   },
+  sandstream: {
+    inherit: true,
+    onSwitchInPriority: 3,
+    onAfterEntryHazard(pokemon) {
+      this.effect.onStart.call(this, pokemon);
+    },
+    onSwitchIn: void 0
+    // no inherit
+  },
   shadowtag: {
     inherit: true,
     onFoeTrapPokemon(pokemon) {
@@ -211,6 +264,8 @@ const Abilities = {
     inherit: true,
     onUpdate: void 0,
     // no inherit
+    onSwitchInPriority: 1,
+    // after Intimidate, before items
     onStart(pokemon) {
       const target = pokemon.side.randomFoe();
       if (!target || target.fainted) return;

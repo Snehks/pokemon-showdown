@@ -27,12 +27,12 @@ var import_utils = require("../lib/utils");
 var import_dex_data = require("./dex-data");
 var import_tags = require("../data/tags");
 const DEFAULT_MOD = "gen9";
-const EXISTENCE_TAGS = ["past", "future", "lgpe", "unobtainable", "cap", "custom", "nonexistent"];
+const EXISTENCE_TAGS = ["past", "future", "lgpe", "legends", "unobtainable", "cap", "custom", "nonexistent"];
 class RuleTable extends Map {
   constructor() {
     super();
-    this.complexBans = [];
-    this.complexTeamBans = [];
+    this.complexBans = /* @__PURE__ */ new Map();
+    this.complexTeamBans = /* @__PURE__ */ new Map();
     this.checkCanLearn = null;
     this.onChooseTeam = null;
     this.timer = null;
@@ -179,34 +179,15 @@ class RuleTable extends Map {
     const source = this.get(key);
     return source ? ` from ${source}` : ``;
   }
-  getComplexBanIndex(complexBans, rule) {
-    const ruleId = (0, import_dex_data.toID)(rule);
-    let complexBanIndex = -1;
-    for (let i = 0; i < complexBans.length; i++) {
-      if ((0, import_dex_data.toID)(complexBans[i][0]) === ruleId) {
-        complexBanIndex = i;
-        break;
-      }
-    }
-    return complexBanIndex;
-  }
   addComplexBan(rule, source, limit, bans) {
-    const complexBanIndex = this.getComplexBanIndex(this.complexBans, rule);
-    if (complexBanIndex !== -1) {
-      if (this.complexBans[complexBanIndex][2] === Infinity) return;
-      this.complexBans[complexBanIndex] = [rule, source, limit, bans];
-    } else {
-      this.complexBans.push([rule, source, limit, bans]);
-    }
+    const ruleId = (0, import_dex_data.toID)(rule);
+    if (this.complexBans.get(ruleId)?.[2] === Infinity) return;
+    this.complexBans.set(ruleId, [rule, source, limit, bans]);
   }
   addComplexTeamBan(rule, source, limit, bans) {
-    const complexBanTeamIndex = this.getComplexBanIndex(this.complexTeamBans, rule);
-    if (complexBanTeamIndex !== -1) {
-      if (this.complexTeamBans[complexBanTeamIndex][2] === Infinity) return;
-      this.complexTeamBans[complexBanTeamIndex] = [rule, source, limit, bans];
-    } else {
-      this.complexTeamBans.push([rule, source, limit, bans]);
-    }
+    const ruleId = (0, import_dex_data.toID)(rule);
+    if (this.complexTeamBans.get(ruleId)?.[2] === Infinity) return;
+    this.complexTeamBans.set(ruleId, [rule, source, limit, bans]);
   }
   /** After a RuleTable has been filled out, resolve its hardcoded numeric properties */
   resolveNumbers(format, dex) {
@@ -343,7 +324,7 @@ class RuleTable extends Map {
     }
   }
   hasComplexBans() {
-    return this.complexBans?.length > 0 || this.complexTeamBans?.length > 0;
+    return this.complexBans.size > 0 || this.complexTeamBans.size > 0;
   }
 }
 class Format extends import_dex_data.BasicEffect {
@@ -482,6 +463,9 @@ class DexFormats {
    * Returns a sanitized format ID if valid, or throws if invalid.
    */
   validate(name) {
+    if (name.length > 32 * 1024) {
+      throw new Error(`Custom formats must be at most 32 KB long.`);
+    }
     const [formatName, customRulesString] = name.split("@@@", 2);
     const format = this.get(formatName);
     if (format.effectType !== "Format") throw new Error(`Unrecognized format "${formatName}"`);
@@ -622,7 +606,7 @@ class DexFormats {
           const complexBan = ruleSpec.slice(1);
           ruleTable.addComplexBan(complexBan[0], complexBan[1], complexBan[2], complexBan[3]);
         } else {
-          throw new Error(`Unrecognized rule spec ${ruleSpec}`);
+          throw new Error(`Unrecognized rule spec ${ruleSpec.join(",")}`);
         }
         continue;
       }
@@ -716,7 +700,7 @@ class DexFormats {
       }
       ruleTable.set(subformat.id, "");
       if (depth > 16) {
-        throw new Error(`Excessive ruleTable recursion in ${format.name}: ${ruleSpec} of ${format.ruleset}`);
+        throw new Error(`Excessive ruleTable recursion in ${format.name}: ${ruleSpec} of ${format.ruleset.join(",")}`);
       }
       const subRuleTable = this.getRuleTable(subformat, depth + 1, repeals);
       for (const [ruleid, sourceFormat] of subRuleTable) {
@@ -743,10 +727,10 @@ class DexFormats {
         }
         ruleTable.set(ruleid, sourceFormat || subformat.name);
       }
-      for (const [subRule, source, limit, bans] of subRuleTable.complexBans) {
+      for (const [subRule, source, limit, bans] of subRuleTable.complexBans.values()) {
         ruleTable.addComplexBan(subRule, source || subformat.name, limit, bans);
       }
-      for (const [subRule, source, limit, bans] of subRuleTable.complexTeamBans) {
+      for (const [subRule, source, limit, bans] of subRuleTable.complexTeamBans.values()) {
         ruleTable.addComplexTeamBan(subRule, source || subformat.name, limit, bans);
       }
       if (subRuleTable.checkCanLearn) {
@@ -858,7 +842,7 @@ class DexFormats {
     if (id === "unreleased") return "unreleased";
     if (id === "nonexistent") return "nonexistent";
     const matches = [];
-    let matchTypes = ["pokemon", "move", "ability", "item", "nature", "tag"];
+    let matchTypes = ["pokemon", "move", "ability", "item", "type", "teratype", "nature", "tag"];
     for (const matchType of matchTypes) {
       if (rule.startsWith(`${matchType}:`)) {
         matchTypes = [matchType];
@@ -884,6 +868,12 @@ class DexFormats {
         case "ability":
           table = this.dex.data.Abilities;
           break;
+        case "type":
+          table = this.dex.data.TypeChart;
+          break;
+        case "teratype":
+          table = this.dex.data.TypeChart;
+          break;
         case "nature":
           table = this.dex.data.Natures;
           break;
@@ -898,6 +888,8 @@ class DexFormats {
           ];
           if (validTags.includes(ruleid) || this.validTag(ruleid)) {
             matches.push("tag:" + ruleid);
+          } else if (this.validTag(id)) {
+            matches.push("tag:" + id);
           }
           continue;
         default:

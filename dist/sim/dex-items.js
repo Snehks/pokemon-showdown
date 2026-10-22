@@ -61,7 +61,7 @@ class Item extends import_dex_data.BasicEffect {
       }
     }
     if (this.isBerry) this.fling = { basePower: 10 };
-    if (this.id.endsWith("plate")) this.fling = { basePower: 90 };
+    if (this.onPlate && this.id.endsWith("plate")) this.fling = { basePower: 90 };
     if (this.onDrive) this.fling = { basePower: 70 };
     if (this.megaStone) this.fling = { basePower: 80 };
     if (this.onMemory) this.fling = { basePower: 50 };
@@ -98,11 +98,9 @@ class DexItems {
     }
     if (id && this.dex.data.Items.hasOwnProperty(id)) {
       const itemData = this.dex.data.Items[id];
-      const itemTextData = this.dex.getDescs("Items", id, itemData);
       item = new Item({
         name: id,
-        ...itemData,
-        ...itemTextData
+        ...itemData
       });
       if (item.gen > this.dex.gen) {
         item.isNonstandard = "Future";
@@ -111,7 +109,7 @@ class DexItems {
         const parent = this.dex.mod(this.dex.parentMod);
         if (itemData === parent.data.Items[id]) {
           const parentItem = parent.items.getByID(id);
-          if (item.isNonstandard === parentItem.isNonstandard && item.desc === parentItem.desc && item.shortDesc === parentItem.shortDesc) {
+          if (item.isNonstandard === parentItem.isNonstandard) {
             item = parentItem;
           }
         }

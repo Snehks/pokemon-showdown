@@ -334,7 +334,7 @@ const Moves = {
     },
     onHit(pokemon) {
       let success = true;
-      if (this.format.gameType !== "doubles" && this.format.gameType !== "triples") success = false;
+      if (this.gameType !== "doubles" && this.gameType !== "triples") success = false;
       if (pokemon.side.active.length === 3 && pokemon.position === 1) success = false;
       const newPosition = pokemon.position === 0 ? pokemon.side.active.length - 1 : 0;
       if (!pokemon.side.active[newPosition]) success = false;
@@ -1033,13 +1033,13 @@ const Moves = {
           }
         }
         if (this.checkMoveMakesContact(move, source, target)) {
-          source.trySetStatus("psn", target);
+          source.trySetStatus("psn", target, this.dex.getActiveMove("Baneful Bunker"));
         }
         return this.NOT_FAIL;
       },
       onHit(target, source, move) {
         if (move.isZOrMaxPowered && this.checkMoveMakesContact(move, source, target)) {
-          source.trySetStatus("psn", target);
+          source.trySetStatus("psn", target, this.dex.getActiveMove("Baneful Bunker"));
         }
       }
     },
@@ -1120,7 +1120,7 @@ const Moves = {
     },
     self: {
       onHit(source) {
-        source.skipBeforeSwitchOutEventFlag = true;
+        source.skipPursuit = true;
       }
     },
     selfSwitch: "copyvolatile",
@@ -1298,7 +1298,7 @@ const Moves = {
       },
       onDamagePriority: -101,
       onDamage(damage, target, source, move) {
-        if (!move || move.effectType !== "Move" || !source) return;
+        if (move?.effectType !== "Move" || !source) return;
         this.effectState.totalDamage += damage;
         this.effectState.lastDamageSource = source;
       },
@@ -2081,13 +2081,13 @@ const Moves = {
           }
         }
         if (this.checkMoveMakesContact(move, source, target)) {
-          source.trySetStatus("brn", target);
+          source.trySetStatus("brn", target, this.dex.getActiveMove("Burning Bulwark"));
         }
         return this.NOT_FAIL;
       },
       onHit(target, source, move) {
         if (move.isZOrMaxPowered && this.checkMoveMakesContact(move, source, target)) {
-          source.trySetStatus("brn", target);
+          source.trySetStatus("brn", target, this.dex.getActiveMove("Burning Bulwark"));
         }
       }
     },
@@ -2252,7 +2252,7 @@ const Moves = {
     priority: 0,
     flags: { contact: 1, protect: 1, mirror: 1, metronome: 1, slicing: 1 },
     onAfterHit(target, source, move) {
-      if (!move.hasSheerForce && source.hp) {
+      if (!move.hasSheerForce) {
         for (const side of source.side.foeSidesWithConditions()) {
           side.addSideCondition("spikes");
         }
@@ -3327,8 +3327,8 @@ const Moves = {
     volatileStatus: "curse",
     onModifyMove(move, source, target) {
       if (!source.hasType("Ghost")) {
-        move.target = move.nonGhostTarget;
-      } else if (source.isAlly(target)) {
+        move.target = "self";
+      } else if (!target || source.isAlly(target)) {
         move.target = "randomNormal";
       }
     },
@@ -3354,7 +3354,6 @@ const Moves = {
       }
     },
     target: "normal",
-    nonGhostTarget: "self",
     type: "Ghost",
     zMove: { effect: "curse" },
     contestType: "Tough"
@@ -3552,7 +3551,7 @@ const Moves = {
         this.add("-singlemove", pokemon, "Destiny Bond");
       },
       onFaint(target, source, effect) {
-        if (!source || !effect || target.isAlly(source)) return;
+        if (!source?.hp || !effect || target.isAlly(source)) return;
         if (effect.effectType === "Move" && !effect.flags["futuremove"]) {
           if (source.volatiles["dynamax"]) {
             this.add("-hint", "Dynamaxed Pok\xE9mon are immune to Destiny Bond.");
@@ -3717,7 +3716,7 @@ const Moves = {
     flags: { protect: 1, reflectable: 1, mirror: 1, bypasssub: 1, metronome: 1 },
     volatileStatus: "disable",
     onTryHit(target) {
-      if (!target.lastMove || target.lastMove.isZOrMaxPowered || target.lastMove.isMax || target.lastMove.id === "struggle") {
+      if (target.lastMove === null || target.lastMove.isZOrMaxPowered || target.lastMove.isMax || target.lastMove.id === "struggle") {
         return false;
       }
     },
@@ -6771,7 +6770,8 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
+    // G-Max moves are not hackable
     name: "G-Max Befuddle",
     pp: 5,
     priority: 0,
@@ -6794,7 +6794,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Cannonade",
     pp: 10,
     priority: 0,
@@ -6832,7 +6832,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Centiferno",
     pp: 5,
     priority: 0,
@@ -6854,7 +6854,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Chi Strike",
     pp: 5,
     priority: 0,
@@ -6895,7 +6895,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Cuddle",
     pp: 5,
     priority: 0,
@@ -6917,7 +6917,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Depletion",
     pp: 5,
     priority: 0,
@@ -6945,7 +6945,7 @@ const Moves = {
     accuracy: true,
     basePower: 160,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Drum Solo",
     pp: 5,
     priority: 0,
@@ -6961,7 +6961,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Finale",
     pp: 5,
     priority: 0,
@@ -6983,7 +6983,7 @@ const Moves = {
     accuracy: true,
     basePower: 160,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Fireball",
     pp: 5,
     priority: 0,
@@ -6999,7 +6999,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Foam Burst",
     pp: 5,
     priority: 0,
@@ -7021,7 +7021,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Gold Rush",
     pp: 5,
     priority: 0,
@@ -7043,7 +7043,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Gravitas",
     pp: 5,
     priority: 0,
@@ -7061,7 +7061,7 @@ const Moves = {
     accuracy: true,
     basePower: 160,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Hydrosnipe",
     pp: 5,
     priority: 0,
@@ -7077,7 +7077,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Malodor",
     pp: 5,
     priority: 0,
@@ -7099,7 +7099,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Meltdown",
     pp: 5,
     priority: 0,
@@ -7121,7 +7121,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max One Blow",
     pp: 5,
     priority: 0,
@@ -7136,7 +7136,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Rapid Flow",
     pp: 5,
     priority: 0,
@@ -7151,7 +7151,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Replenish",
     pp: 5,
     priority: 0,
@@ -7180,7 +7180,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Resonance",
     pp: 5,
     priority: 0,
@@ -7198,7 +7198,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Sandblast",
     pp: 5,
     priority: 0,
@@ -7220,7 +7220,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Smite",
     pp: 5,
     priority: 0,
@@ -7242,7 +7242,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Snooze",
     pp: 5,
     priority: 0,
@@ -7267,7 +7267,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Steelsurge",
     pp: 5,
     priority: 0,
@@ -7301,7 +7301,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Stonesurge",
     pp: 5,
     priority: 0,
@@ -7323,7 +7323,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Stun Shock",
     pp: 10,
     priority: 0,
@@ -7350,7 +7350,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Sweetness",
     pp: 10,
     priority: 0,
@@ -7372,7 +7372,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Tartness",
     pp: 10,
     priority: 0,
@@ -7394,7 +7394,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Terror",
     pp: 10,
     priority: 0,
@@ -7416,7 +7416,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Vine Lash",
     pp: 10,
     priority: 0,
@@ -7454,7 +7454,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Volcalith",
     pp: 10,
     priority: 0,
@@ -7492,7 +7492,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Volt Crash",
     pp: 10,
     priority: 0,
@@ -7514,7 +7514,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Wildfire",
     pp: 10,
     priority: 0,
@@ -7552,7 +7552,7 @@ const Moves = {
     accuracy: true,
     basePower: 10,
     category: "Physical",
-    isNonstandard: "Past",
+    isNonstandard: "Gmax",
     name: "G-Max Wind Rage",
     pp: 10,
     priority: 0,
@@ -7913,9 +7913,7 @@ const Moves = {
     priority: 0,
     flags: { snatch: 1, metronome: 1 },
     onModifyMove(move, pokemon) {
-      if (pokemon.hasAbility("megasol") && !this.field.isWeather("sunnyday")) {
-        delete move.boosts;
-      } else if (["sunnyday", "desolateland"].includes(pokemon.effectiveWeather())) {
+      if (["sunnyday", "desolateland"].includes(pokemon.effectiveWeather())) {
         move.boosts = { atk: 2, spa: 2 };
       }
     },
@@ -7944,7 +7942,7 @@ const Moves = {
         this.add("-singlemove", pokemon, "Grudge");
       },
       onFaint(target, source, effect) {
-        if (!source || source.fainted || !effect) return;
+        if (!source?.hp || !effect) return;
         if (effect.effectType === "Move" && !effect.flags["futuremove"] && source.lastMove) {
           let move = source.lastMove;
           if (move.isMax && move.baseMove) move = this.dex.moves.get(move.baseMove);
@@ -9304,7 +9302,7 @@ const Moves = {
     },
     onAfterMove(source, target, move) {
       const iceballData = source.volatiles["iceball"];
-      if (iceballData && iceballData.hitCount === 5 && iceballData.contactHitCount < 5) {
+      if (iceballData?.hitCount === 5 && iceballData.contactHitCount < 5) {
         source.addVolatile("rolloutstorage");
         source.volatiles["rolloutstorage"].contactHitCount = iceballData.contactHitCount;
       }
@@ -9317,7 +9315,7 @@ const Moves = {
         this.effectState.contactHitCount = 0;
       },
       onResidual(target) {
-        if (target.lastMove && target.lastMove.id === "struggle") {
+        if (target.lastMove?.id === "struggle") {
           delete target.volatiles["iceball"];
         }
       }
@@ -12849,16 +12847,11 @@ const Moves = {
     volatileStatus: "noretreat",
     onTry(source, target, move) {
       if (source.volatiles["noretreat"]) return false;
-      if (source.volatiles["trapped"]) {
-        delete move.volatileStatus;
-      }
     },
     condition: {
       onStart(pokemon) {
+        if (!pokemon.addVolatile("trapped")) return false;
         this.add("-start", pokemon, "move: No Retreat");
-      },
-      onTrapPokemon(pokemon) {
-        pokemon.tryTrap();
       }
     },
     boosts: {
@@ -13734,7 +13727,7 @@ const Moves = {
       onTryMovePriority: -1,
       onTryMove(pokemon, target, move) {
         if (move.type === "Fire") {
-          this.add("-activate", pokemon, "move: Powder");
+          this.add("-activate", pokemon, "move: Powder", `[move] ${move.name}`);
           this.damage(this.clampIntRange(Math.round(pokemon.maxhp / 4), 1));
           this.attrLastMove("[still]");
           return false;
@@ -14448,7 +14441,13 @@ const Moves = {
       onFoeBeforeSwitchOut(pokemon) {
         const source = this.effectState.source;
         this.debug("Pursuit start");
-        if (!source.isAdjacent(pokemon) || !source.hp || source.volatiles["encore"] && source.volatiles["encore"].move !== "pursuit" || !this.queue.cancelMove(source)) return;
+        if (!source.isAdjacent(pokemon) || !source.hp || source.volatiles["encore"] && source.volatiles["encore"].move !== "pursuit" || !this.queue.cancelMove(source)) {
+          return;
+        }
+        if (!pokemon.pursuitActivated) {
+          this.add("-activate", pokemon, "move: Pursuit");
+          pokemon.pursuitActivated = true;
+        }
         if (source.canMegaEvo || source.canUltraBurst || source.canTerastallize) {
           for (const [actionIndex, action] of this.queue.entries()) {
             if (action.pokemon === source) {
@@ -15424,7 +15423,7 @@ const Moves = {
     },
     onAfterMove(source, target, move) {
       const rolloutData = source.volatiles["rollout"];
-      if (rolloutData && rolloutData.hitCount === 5 && rolloutData.contactHitCount < 5) {
+      if (rolloutData?.hitCount === 5 && rolloutData.contactHitCount < 5) {
         source.addVolatile("rolloutstorage");
         source.volatiles["rolloutstorage"].contactHitCount = rolloutData.contactHitCount;
       }
@@ -15437,7 +15436,7 @@ const Moves = {
         this.effectState.contactHitCount = 0;
       },
       onResidual(target) {
-        if (target.lastMove && target.lastMove.id === "struggle") {
+        if (target.lastMove?.id === "struggle") {
           delete target.volatiles["rollout"];
         }
       }
@@ -16207,7 +16206,7 @@ const Moves = {
     },
     self: {
       onHit(source) {
-        source.skipBeforeSwitchOutEventFlag = true;
+        source.skipPursuit = true;
       }
     },
     selfSwitch: "shedtail",
@@ -16723,6 +16722,7 @@ const Moves = {
       noassist: 1,
       failinstruct: 1
     },
+    tracksTarget: true,
     onModifyMove(move, source) {
       if (!source.volatiles["skydrop"]) {
         move.accuracy = true;
@@ -16730,7 +16730,7 @@ const Moves = {
       }
     },
     onMoveFail(target, source) {
-      if (source.volatiles["twoturnmove"] && source.volatiles["twoturnmove"].duration === 1) {
+      if (source.volatiles["twoturnmove"]?.duration === 1) {
         source.removeVolatile("skydrop");
         source.removeVolatile("twoturnmove");
         if (target === this.effectState.target) {
@@ -18098,7 +18098,7 @@ const Moves = {
     priority: 0,
     flags: { contact: 1, protect: 1, mirror: 1, metronome: 1, slicing: 1 },
     onAfterHit(target, source, move) {
-      if (!move.hasSheerForce && source.hp) {
+      if (!move.hasSheerForce) {
         for (const side of source.side.foeSidesWithConditions()) {
           side.addSideCondition("stealthrock");
         }
@@ -19946,7 +19946,7 @@ const Moves = {
       this.add("-start", target, "typeadd", "Ghost", "[from] move: Trick-or-Treat");
       if (target.side.active.length === 2 && target.position === 1) {
         const action = this.queue.willMove(target);
-        if (action && action.move.id === "curse") {
+        if (action?.move.id === "curse") {
           action.targetLoc = -1;
         }
       }
@@ -20242,9 +20242,9 @@ const Moves = {
       const activeTeam = target.side.activeTeam();
       const foeActiveTeam = target.side.foe.activeTeam();
       for (const [i, allyActive] of activeTeam.entries()) {
-        if (allyActive && allyActive.status === "slp") allyActive.cureStatus();
+        if (allyActive?.status === "slp") allyActive.cureStatus();
         const foeActive = foeActiveTeam[i];
-        if (foeActive && foeActive.status === "slp") foeActive.cureStatus();
+        if (foeActive?.status === "slp") foeActive.cureStatus();
       }
     },
     condition: {
@@ -20257,7 +20257,7 @@ const Moves = {
           target.removeVolatile("uproar");
           return;
         }
-        if (target.lastMove && target.lastMove.id === "struggle") {
+        if (target.lastMove?.id === "struggle") {
           delete target.volatiles["uproar"];
         }
         this.add("-start", target, "Uproar", "[upkeep]");
@@ -20945,9 +20945,15 @@ const Moves = {
       onStart(pokemon, source) {
         this.effectState.hp = source.maxhp / 2;
         this.effectState.startingTurn = this.getOverflowedTurnCount();
-        if (this.effectState.startingTurn === 255) {
+        if (this.gen >= 8 && this.effectState.startingTurn === 255) {
           this.hint(`In Gen 8+, Wish will never resolve when used on the ${this.turn}th turn.`);
         }
+      },
+      onRestart() {
+        if (this.gen >= 8 && this.effectState.startingTurn === 255) {
+          this.hint(`A previous Wish is stuck on this slot and will never resolve.`);
+        }
+        return false;
       },
       onResidualOrder: 4,
       onResidual(target) {

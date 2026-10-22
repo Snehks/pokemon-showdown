@@ -523,7 +523,13 @@ const Moves = {
       onFoeBeforeSwitchOut(pokemon) {
         const source = this.effectState.source;
         this.debug("Pursuit start");
-        if (this.effectState.targetLoc !== source.getLocOf(pokemon) || ["frz", "slp"].includes(source.status) || source.hasAbility("truant") && source.volatiles["truant"] || !source.isAdjacent(pokemon) || !source.hp || source.volatiles["encore"] && source.volatiles["encore"].move !== "pursuit" || !this.queue.cancelMove(source)) return;
+        if (this.effectState.targetLoc !== source.getLocOf(pokemon) || ["frz", "slp"].includes(source.status) || source.hasAbility("truant") && source.volatiles["truant"] || !source.isAdjacent(pokemon) || !source.hp || source.volatiles["encore"] && source.volatiles["encore"].move !== "pursuit" || !this.queue.cancelMove(source)) {
+          return;
+        }
+        if (!pokemon.pursuitActivated) {
+          this.add("-activate", pokemon, "move: Pursuit");
+          pokemon.pursuitActivated = true;
+        }
         if (source.canMegaEvo || source.canUltraBurst) {
           for (const [actionIndex, action] of this.queue.entries()) {
             if (action.pokemon === source && action.choice === "megaEvo") {
@@ -536,7 +542,7 @@ const Moves = {
         const move = this.dex.getActiveMove("pursuit");
         source.deductPP(move.id);
         source.moveUsed(move, pokemon.position);
-        if (this.actions.useMove(move, source, { target: pokemon }) && source.getItem().isChoice) {
+        if (this.actions.useMove(move, source, { target: pokemon, sourceEffect: this.effectState.sourceEffect }) && source.getItem().isChoice) {
           source.addVolatile("choicelock");
         }
       }

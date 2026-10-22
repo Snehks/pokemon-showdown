@@ -50,7 +50,7 @@ const Rulesets = {
   selfkoclause: {
     effectType: "Rule",
     name: "Self-KO Clause",
-    desc: "If a player's last Pokemon uses Self-Destruct or Explosion, they automatically lose the battle.",
+    desc: "Causes a player to lose the battle if their last Pokemon uses Self-Destruct or Explosion",
     onBegin() {
       this.add("rule", "Self-KO Clause: If a player's last Pokemon uses Self-Destruct/Explosion, they automatically lose");
     }

@@ -28,13 +28,14 @@ __export(ladders_challenges_exports, {
 });
 module.exports = __toCommonJS(ladders_challenges_exports);
 class BattleReady {
-  constructor(userid, formatid, settings, rating = 0, challengeType = "challenge") {
+  constructor(userid, formatid, settings, rating = 0, challengeType = "challenge", custom) {
     this.userid = userid;
     this.formatid = formatid;
     this.settings = settings;
     this.rating = rating;
     this.challengeType = challengeType;
     this.time = Date.now();
+    this.custom = custom;
   }
 }
 class AbstractChallenge {
@@ -138,7 +139,7 @@ class Challenges extends Map {
   resolveAcceptCommand(context) {
     const targetid = context.target;
     const chall = this.search(context.user.id, targetid);
-    if (!chall || chall.to !== context.user.id || chall.acceptCommand !== context.message) {
+    if (chall?.to !== context.user.id || chall.acceptCommand !== context.message) {
       throw new Chat.ErrorMessage(`Challenge not found. You are using the wrong command. Challenges should be accepted with /accept`);
     }
     return chall;

@@ -122,6 +122,7 @@ const SETUP = [
   "quiverdance",
   "rockpolish",
   "shellsmash",
+  "shelter",
   "shiftgear",
   "swordsdance",
   "tailglow",
@@ -229,16 +230,27 @@ const PRIORITY_POKEMON = [
   "scizor"
 ];
 const NO_LEAD_POKEMON = [
-  "Zacian",
-  "Zamazenta"
+  "dugtrio",
+  "gothitelle",
+  "ironthorns",
+  "kingambit",
+  "zacian",
+  "zaciancrowned",
+  "zamazenta",
+  "zamazentacrowned"
 ];
 const DOUBLES_NO_LEAD_POKEMON = [
-  "Basculegion",
-  "Houndstone",
-  "Iron Bundle",
-  "Roaring Moon",
-  "Zacian",
-  "Zamazenta"
+  "basculegion",
+  "basculegionf",
+  "dugtrio",
+  "gothitelle",
+  "houndstone",
+  "ironbundle",
+  "roaringmoon",
+  "zacian",
+  "zaciancrowned",
+  "zamazenta",
+  "zamazentacrowned"
 ];
 const DEFENSIVE_TERA_BLAST_USERS = [
   "alcremie",
@@ -536,12 +548,13 @@ class RandomTeams {
         [RECOVERY_MOVES, ["healpulse", "lifedew"]],
         ["healpulse", "lifedew"],
         ["haze", "icywind"],
-        [["hydropump", "muddywater"], ["muddywater", "scald"]],
+        [["hydropump", "muddywater"], ["muddywater", "scald", "weatherball"]],
         ["disable", "encore"],
         ["freezedry", "icebeam"],
         ["energyball", "leafstorm"],
         ["earthpower", "sandsearstorm"],
-        ["coaching", ["helpinghand", "howl"]]
+        [PROTECT_MOVES, PROTECT_MOVES],
+        ["coaching", ["helpinghand", "howl", "pollenpuff"]]
       ];
       for (const pair of doublesIncompatiblePairs) this.incompatibleMoves(moves, movePool, pair[0], pair[1]);
       if (role !== "Offensive Protect") this.incompatibleMoves(moves, movePool, PROTECT_MOVES, ["flipturn", "uturn"]);
@@ -606,7 +619,6 @@ class RandomTeams {
     }
     if (species.id === "quagsire") this.incompatibleMoves(moves, movePool, "spikes", "icebeam");
     if (species.id === "cyclizar") this.incompatibleMoves(moves, movePool, "taunt", "knockoff");
-    if (species.id === "camerupt") this.incompatibleMoves(moves, movePool, "roar", "willowisp");
     if (species.id === "coalossal") this.incompatibleMoves(moves, movePool, "flamethrower", "overheat");
   }
   // Checks for and removes incompatible moves, starting with the first move in movesA.
@@ -654,6 +666,16 @@ class RandomTeams {
       if (species.name.endsWith("Wellspring")) return "Water";
       if (species.name.endsWith("Hearthflame")) return "Fire";
       if (species.name.endsWith("Cornerstone")) return "Rock";
+    }
+    if (move.name === "Terrain Pulse") {
+      if (abilities.includes("Grassy Surge") || abilities.includes("Seed Sower")) return "Grass";
+      if (abilities.includes("Psychic Surge")) return "Psychic";
+      if (abilities.includes("Electric Surge")) return "Electric";
+    }
+    const sunAbilities = ["Chlorophyll", "Drought", "Mega Sol", "Orichalcum Pulse"];
+    if (move.name === "Weather Ball") {
+      if (abilities.some((a) => sunAbilities.includes(a)) || species.isMega && Object.values(species.abilities).some((a) => sunAbilities.includes(a))) return "Fire";
+      if (abilities.includes("Drizzle")) return "Water";
     }
     const moveType = move.type;
     if (moveType === "Normal") {
@@ -788,6 +810,23 @@ class RandomTeams {
       if (movePool.includes("defog")) {
         counter = this.addMove(
           "defog",
+          moves,
+          types,
+          abilities,
+          teamDetails,
+          species,
+          isLead,
+          movePool,
+          teraType,
+          role,
+          isDoubles
+        );
+      }
+    }
+    if (["dragontail", "roar", "whirlwind"].some((m) => movePool.includes(m)) && species.baseStats.spe <= 60) {
+      if (movePool.includes("stealthrock") && !teamDetails.stealthRock) {
+        counter = this.addMove(
+          "stealthrock",
           moves,
           types,
           abilities,
@@ -1391,7 +1430,7 @@ class RandomTeams {
     }
     if (species.baseStats.spe <= 70 && (moves.has("ragepowder") || moves.has("followme"))) return "Rocky Helmet";
     if (ability === "Intimidate" && this.dex.getEffectiveness("Rock", species) >= 1 && (!types.has("Flying") || this.dex.getEffectiveness("Rock", species) >= 2)) return "Heavy-Duty Boots";
-    if (role === "Doubles Support" && ability === "Prankster" && moves.has("tailwind") && this.randomChance(3, 4)) return "Covert Cloak";
+    if (role === "Doubles Support" && ability === "Prankster" && moves.has("tailwind") && this.randomChance(1, 4)) return "Covert Cloak";
     if (role === "Bulky Protect" && counter.get("setup") || ["irondefense", "coil", "acidarmor", "wish"].some((m) => moves.has(m)) || counter.get("recovery") && !moves.has("strengthsap") && !counter.get("speedcontrol") && !offensiveRole || PROTECT_MOVES.some((m) => moves.has(m)) && moves.has("leechseed") || species.id === "regigigas") return "Leftovers";
     if (moves.has("hypervoice") && !types.has("Normal")) return "Throat Spray";
     if (role === "Doubles Fast Attacker" && !counter.get("recoil") && species.baseStats.hp + species.baseStats.def + species.baseStats.spd <= 230) return "Focus Sash";
@@ -1472,6 +1511,9 @@ class RandomTeams {
     }
     if (species.baseSpecies === "Basculin") return "Basculin" + this.sample(["", "-Blue-Striped"]);
     if (species.baseSpecies === "Magearna") return "Magearna" + this.sample(["", "-Original"]);
+    if (species.baseSpecies === "Squawkabilly" && (this.format.mod.startsWith("champions") || this.format.gameType !== "singles")) {
+      return "Squawkabilly" + this.sample(["", "-Blue", "-White", "-Yellow"]);
+    }
     if (species.baseSpecies === "Keldeo" && this.gen <= 7) return "Keldeo" + this.sample(["", "-Resolute"]);
     if (species.baseSpecies === "Pikachu" && this.gen >= 8 && !this.format.mod.startsWith("champions")) {
       return "Pikachu" + this.sample(
@@ -1648,8 +1690,8 @@ class RandomTeams {
       [rainSetters, [...sandSetters, ...snowSetters]],
       [sandSetters, snowSetters],
       // Prevent conflicting terrain abilities from generating together
-      [["pincurchin", "miraidon"], ["indeedee", "indeedeef", "rillaboom"]],
-      ["rillaboom", ["indeedee", "indeedeef"]]
+      [["pincurchin", "miraidon"], ["indeedee", "indeedeef", "rillaboom", "arboliva"]],
+      [["rillaboom", "arboliva"], ["indeedee", "indeedeef"]]
     ];
     const incompatibilityList = isDoubles ? doublesIncompatiblePokemon : incompatiblePokemon;
     for (const pair of incompatibilityList) {
@@ -1740,7 +1782,7 @@ class RandomTeams {
       if (potd?.exists && (pokemon.length === 1 || this.maxTeamSize === 1)) species = potd;
       let set;
       if (leadsRemaining) {
-        if (isDoubles && DOUBLES_NO_LEAD_POKEMON.includes(species.baseSpecies) || !isDoubles && NO_LEAD_POKEMON.includes(species.baseSpecies)) {
+        if (isDoubles && DOUBLES_NO_LEAD_POKEMON.includes(species.id) || !isDoubles && NO_LEAD_POKEMON.includes(species.id)) {
           if (pokemon.length + leadsRemaining === this.maxTeamSize) continue;
           set = this.randomSet(species, teamDetails, false, isDoubles);
           pokemon.push(set);

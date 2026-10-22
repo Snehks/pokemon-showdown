@@ -430,7 +430,7 @@ if (!database.isParentProcess) {
       const repr = JSON.stringify([error.name, error.message, source, details]);
       process.send(`THROW
 @!!@${repr}
-${error.stack}`);
+${error.stack ?? error}`);
     }
   };
   process.on("uncaughtException", (err) => {

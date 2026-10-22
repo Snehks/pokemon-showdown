@@ -63,8 +63,6 @@ const Moves = {
   },
   metronome: {
     inherit: true,
-    desc: "A random move that was introduced in gen 1 is selected for use, other than Counter, Mimic, Mirror Move, Struggle, or Transform.",
-    shortDesc: "Picks a random move from gen 1.",
     onHit(target) {
       const moves = this.dex.moves.all().filter((move) => (!move.isNonstandard || move.isNonstandard === "Unobtainable") && move.flags["metronome"] && move.gen === 1);
       let randomMove = "";
@@ -102,8 +100,6 @@ const Moves = {
   },
   teleport: {
     inherit: true,
-    desc: "If this move is successful and the user has not fainted, the user switches out even if it is trapped and is replaced immediately by a selected party member. The user does not switch out if there are no unfainted party members.",
-    shortDesc: "User switches out.",
     priority: -6,
     selfSwitch: true,
     onTry(source) {

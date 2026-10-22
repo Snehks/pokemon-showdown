@@ -165,6 +165,11 @@ const PRIORITY_POKEMON = [
   "mimikyu",
   "scizor"
 ];
+const NO_LEAD_POKEMON = [
+  "dugtrio",
+  "gothitelle",
+  "wobbuffet"
+];
 class RandomGen8Teams extends import_teams.RandomTeams {
   constructor(format, prng) {
     super(format, prng);
@@ -1095,6 +1100,8 @@ class RandomGen8Teams extends import_teams.RandomTeams {
     let numMaxLevelPokemon = 0;
     const pokemonList = Object.keys(this.randomSets);
     const [pokemonPool, baseSpeciesPool] = this.getPokemonPool(type, pokemon, isMonotype, pokemonList);
+    let leadsRemaining = this.format.gameType === "doubles" ? 2 : 1;
+    if (ruleTable.has("pickedteamsize") || ruleTable.has("teampreview")) leadsRemaining = 0;
     while (baseSpeciesPool.length && pokemon.length < this.maxTeamSize) {
       const baseSpecies = this.sampleNoReplace(baseSpeciesPool);
       const species = this.dex.species.get(this.sample(pokemonPool[baseSpecies]));
@@ -1146,12 +1153,21 @@ class RandomGen8Teams extends import_teams.RandomTeams {
         if (!this.getPokemonCompatibility(species, pokemon)) continue;
       }
       if (!this.forceMonotype && isMonotype && typeComboCount[typeCombo] >= 3 * limitFactor) continue;
-      const set = this.randomSet(
-        species,
-        teamDetails,
-        pokemon.length === 0 && !ruleTable.has("pickedteamsize") && !ruleTable.has("teampreview")
-      );
-      pokemon.push(set);
+      let set;
+      if (leadsRemaining) {
+        if (NO_LEAD_POKEMON.includes(species.id)) {
+          if (pokemon.length + leadsRemaining === this.maxTeamSize) continue;
+          set = this.randomSet(species, teamDetails, false);
+          pokemon.push(set);
+        } else {
+          set = this.randomSet(species, teamDetails, true);
+          pokemon.unshift(set);
+          leadsRemaining--;
+        }
+      } else {
+        set = this.randomSet(species, teamDetails, false);
+        pokemon.push(set);
+      }
       if (pokemon.length === this.maxTeamSize) break;
       baseFormes[species.baseSpecies] = 1;
       for (const typeName of types) {

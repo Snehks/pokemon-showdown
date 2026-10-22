@@ -282,7 +282,7 @@ const FormatsData = {
     natDexTier: "RU"
   },
   raichualola: {
-    tier: "PUBL",
+    tier: "PU",
     doublesTier: "(DUU)",
     natDexTier: "RU"
   },
@@ -3626,7 +3626,7 @@ const FormatsData = {
     natDexTier: "RUBL"
   },
   virizion: {
-    tier: "PUBL",
+    tier: "PU",
     doublesTier: "(DUU)",
     natDexTier: "RU"
   },
@@ -4633,7 +4633,7 @@ const FormatsData = {
     natDexTier: "OU"
   },
   guzzlord: {
-    tier: "PUBL",
+    tier: "PU",
     doublesTier: "(DUU)",
     natDexTier: "RU"
   },

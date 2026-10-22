@@ -46,7 +46,7 @@ const Conditions = {
     name: "slp",
     effectType: "Status",
     onStart(target, source, sourceEffect) {
-      if (sourceEffect && sourceEffect.effectType === "Move") {
+      if (sourceEffect?.effectType === "Move") {
         this.add("-status", target, "slp", `[from] move: ${sourceEffect.name}`);
       } else {
         this.add("-status", target, "slp");
@@ -147,6 +147,14 @@ const Conditions = {
     onStart(pokemon) {
       if (!pokemon.lastMove) return false;
       this.effectState.move = pokemon.lastMove.id;
+    }
+  },
+  mustrecharge: {
+    inherit: true,
+    onBeforeMove(pokemon) {
+      this.add("cant", pokemon, "recharge");
+      pokemon.removeVolatile("mustrecharge");
+      return null;
     }
   },
   futuremove: {

@@ -192,7 +192,10 @@ const commands = {
     for (const toPromote of users) {
       const userid = toID(toPromote);
       if (!userid) return this.parse("/help roompromote");
-      const oldSymbol = room.auth.getDirect(userid);
+      let oldSymbol = room.auth.getDirect(userid);
+      if (room.auth.has(userid) && oldSymbol === Users.Auth.defaultSymbol()) {
+        oldSymbol = "whitelist";
+      }
       let shouldPopup;
       try {
         shouldPopup = runPromote(user, room, userid, nextSymbol, toPromote, force);
@@ -494,7 +497,7 @@ To look up auth for a user, use /userauth ${target}`;
     if (room?.settings.isPersonal && !user.can("warn")) {
       throw new Chat.ErrorMessage("Warning is unavailable in group chats.");
     }
-    const globalWarn = !room || ["staff", "adminlog"].includes(room.roomid) || room.roomid.startsWith("help-") || room.battle && (!room.parent || room.parent.type !== "chat");
+    const globalWarn = !room || ["staff", "adminlog"].includes(room.roomid) || room.roomid.startsWith("help-") || room.battle && room.parent?.type !== "chat";
     const { targetUser, inputUsername, targetUsername, rest: reason } = this.splitUser(target);
     const targetID = toID(targetUsername);
     const { privateReason, publicReason } = this.parseSpoiler(reason);
@@ -1142,7 +1145,7 @@ Your ban will expire in a few days.`
     }
     Punishments.punishRange(ip, reason, time, "BAN");
     const duration = year ? "year" : "hour";
-    if (!this.room || this.room.roomid !== "staff") {
+    if (this.room?.roomid !== "staff") {
       this.sendReply(`You ${duration}-banned the ${ipDesc}.`);
     }
     this.room = Rooms.get("staff") || null;
@@ -1310,13 +1313,13 @@ Your ban will expire in a few days.`
     if (!Users.Auth.hasPermission(user, "promote", currentGroup)) {
       throw new Chat.ErrorMessage([
         `/${cmd} - Access denied for promoting from ${currentGroup}`,
-        `You can only promote to/from: ${Users.Auth.listJurisdiction(user, "promote")}`
+        `You can only promote to/from: ${Users.Auth.listJurisdiction(user, "promote").join(",")}`
       ]);
     }
     if (!Users.Auth.hasPermission(user, "promote", nextGroup)) {
       throw new Chat.ErrorMessage([
         `/${cmd} - Access denied for promoting to ${groupName}`,
-        `You can only promote to/from: ${Users.Auth.listJurisdiction(user, "promote")}`
+        `You can only promote to/from: ${Users.Auth.listJurisdiction(user, "promote").join(",")}`
       ]);
     }
     if (!Users.isUsernameKnown(userid)) {
@@ -1699,9 +1702,9 @@ Your ban will expire in a few days.`
   forceclearstatus(target, room, user) {
     const { targetUser, rest: reason } = this.requireUser(target, { allowOffline: true });
     this.checkCan("forcerename", targetUser);
-    if (!targetUser.userMessage) throw new Chat.ErrorMessage(this.tr`${targetUser.name} does not have a status set.`);
+    if (!targetUser.userMessage) throw new Chat.ErrorMessage(this.TL`${targetUser.name} does not have a status set.`);
     const displayReason = reason ? `: ${reason}` : ``;
-    this.privateGlobalModAction(this.tr`${targetUser.name}'s status "${targetUser.userMessage}" was cleared by ${user.name}${displayReason}.`);
+    this.privateGlobalModAction(this.TL`${targetUser.name}'s status "${targetUser.userMessage}" was cleared by ${user.name}${displayReason}.`);
     this.globalModlog("CLEARSTATUS", targetUser, ` from "${targetUser.userMessage}"${displayReason}`);
     targetUser.clearStatus();
     targetUser.popup(`${user.name} has cleared your status message for being inappropriate${displayReason || "."}`);
@@ -1782,7 +1785,7 @@ Your ban will expire in a few days.`
     if (!unlocked) {
       throw new Chat.ErrorMessage(`User '${target}' is not namelocked.`);
     }
-    this.addGlobalModAction(`${unlocked} was unnamelocked by ${user.name}.${reason}`);
+    this.addGlobalModAction(`${unlocked.join(",")} was unnamelocked by ${user.name}.${reason}`);
     this.globalModlog("UNNAMELOCK", toID(target));
     this.parse(`/allowname ${toID(target)}`);
     if (targetUser) targetUser.popup(`${user.name} has unnamelocked you.`);
@@ -1885,7 +1888,7 @@ Your ban will expire in a few days.`
       throw new Chat.ErrorMessage(`This room is not going to last long enough for a blacklist to matter - just ban the user`);
     }
     const punishment = Punishments.isRoomBanned(targetUser, room.roomid);
-    if (punishment && punishment.type === "BLACKLIST") {
+    if (punishment?.type === "BLACKLIST") {
       throw new Chat.ErrorMessage(`This user is already blacklisted from this room.`);
     }
     const force = cmd === "forceblacklist" || cmd === "forcebl";
@@ -1949,9 +1952,18 @@ Your ban will expire in a few days.`
   forcebattleban: "battleban",
   async battleban(target, room, user, connection, cmd) {
     room = this.requireRoom();
+    const force = cmd.includes("force");
     if (!target) return this.parse(`/help battleban`);
+    this.checkCan("rangeban");
     const { targetUser, targetUsername, rest: reason } = this.splitUser(target);
-    if (!targetUser) throw new Chat.ErrorMessage(`User ${targetUsername} not found.`);
+    const targetID = toID(targetUsername);
+    if (!targetUser) {
+      if (!force) throw new Chat.ErrorMessage(`User ${targetUsername} not found. Use /forcebattleban to ban anyway.`);
+      if (user.lastCommand !== "battleban") {
+        user.lastCommand = "battleban";
+        throw new Chat.ErrorMessage(`User ${targetID} not found. Check spelling? If you're sure, use /forcebattleban ${targetID} again.`);
+      }
+    }
     if (target.length > MAX_REASON_LENGTH) {
       throw new Chat.ErrorMessage(`The reason is too long. It cannot exceed ${MAX_REASON_LENGTH} characters.`);
     }
@@ -1962,34 +1974,24 @@ Your ban will expire in a few days.`
     if (!room.battle && !includesUrl && cmd !== "forcebattleban") {
       throw new Chat.ErrorMessage(`Battle bans require a battle replay if used outside of a battle; if the battle has expired, use /forcebattleban.`);
     }
-    if (!user.can("rangeban", targetUser)) {
-      throw new Chat.ErrorMessage([
-        `Battlebans have been deprecated. Alternatives:`,
-        `- timerstalling and bragging about it: lock`,
-        `- other timerstalling: they're not timerstalling, leave them alone`,
-        `- bad nicknames: lock, locks prevent nicknames from appearing; you should always have been locking for this`,
-        `- ladder cheating: gban, get a moderator if necessary`,
-        `- serious ladder cheating: permaban, get an administrator`,
-        `- other: get an administrator`
-      ]);
+    if (Punishments.isBattleBanned(targetID)) {
+      throw new Chat.ErrorMessage(`User '${targetID}' is already banned from battling.`);
     }
-    if (Punishments.isBattleBanned(targetUser)) {
-      throw new Chat.ErrorMessage(`User '${targetUser.name}' is already banned from battling.`);
-    }
-    this.privateGlobalModAction(`${targetUser.name} was banned from starting new battles by ${user.name} (${reason})`);
-    if (targetUser.trusted) {
+    this.privateGlobalModAction(`${targetUser?.name || targetID} was banned from starting new battles by ${user.name} (${reason})`);
+    if (targetUser?.trusted) {
       Monitor.log(`[CrisisMonitor] Trusted user ${targetUser.name} was banned from battling by ${user.name}, and should probably be demoted.`);
     }
     this.globalModlog("BATTLEBAN", targetUser, reason);
-    Ladders.cancelSearches(targetUser);
-    await Punishments.battleban(targetUser, null, null, reason);
-    targetUser.popup(`|modal|${user.name} has prevented you from starting new battles for 2 days (${reason})`);
+    if (targetUser) {
+      Ladders.cancelSearches(targetUser);
+      targetUser.popup(`|modal|${user.name} has prevented you from starting new battles for 2 days (${reason})`);
+    }
+    await Punishments.battleban(targetUser || targetID, null, null, reason);
     if (room.battle) this.parse("/savereplay forpunishment");
     return true;
   },
   battlebanhelp: [
-    `/battleban [username], [reason] - [DEPRECATED]`,
-    `Prevents the user from starting new battles for 2 days and shows them the [reason]. Requires: ~`
+    `/battleban [username], [reason] - Prevents the user from starting new battles for one month and shows them the [reason]. Requires: ~`
   ],
   unbattleban(target, room, user) {
     if (!target) return this.parse("/help unbattleban");

@@ -526,7 +526,7 @@ const chatfilter = function(message, user, room) {
     const { location, condition, monitor } = Chat.monitors[list];
     if (!monitor) continue;
     if (location === "BATTLES" && !(room?.battle && room.battle.challengeType !== "challenge")) continue;
-    if (location === "PUBLIC" && room && room.settings.isPrivate === true) continue;
+    if (location === "PUBLIC" && room?.settings.isPrivate === true) continue;
     switch (condition) {
       case "notTrusted":
         if (user.trusted && !isStaffRoom) continue;

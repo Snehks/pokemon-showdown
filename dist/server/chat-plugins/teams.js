@@ -46,7 +46,7 @@ const ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz".split("");
 let teamsDB = null;
 let teamsTable;
 function refresh(context) {
-  return `<button class="button" name="send" value="/j ${context.pageid}" style="float: right"> <i class="fa fa-refresh"></i> ${context.tr("Refresh")}</button>`;
+  return `<button class="button" name="send" value="/j ${context.pageid}" style="float: right"> <i class="fa fa-refresh"></i> ${context.TL("Refresh")}</button>`;
 }
 const TeamsHandler = new class {
   constructor() {
@@ -274,12 +274,12 @@ const TeamsHandler = new class {
         title: team.name,
         private: team.privacy
       }}) RETURNING teamid`;
-      return { teamid: loaded?.teamid, teamName: team.name, privacy: team.privacy };
+      return { teamid: loaded.teamid, teamName: team.name, privacy: team.privacy };
     }
   }
   generatePassword(len = 20) {
     let pw = "";
-    for (let i = 0; i < len; i++) pw += ALPHABET[crypto.randomInt(0, ALPHABET.length - 1)];
+    for (let i = 0; i < len; i++) pw += ALPHABET[crypto.randomInt(0, ALPHABET.length)];
     return pw;
   }
   updateViews(teamid) {
@@ -419,15 +419,10 @@ const commands = {
       if (!result) {
         return;
       }
-      const page = isEdit ? "edit" : "upload";
       if (result) {
         connection.send(`|queryresponse|teamupload|` + JSON.stringify(result));
-        connection.send(`>view-teams-${page}
-|deinit`);
-        this.parse(`/join view-teams-view-${result.teamid}`);
-      } else {
-        this.parse(`/join view-teams-${page}`);
       }
+      connection.popup(`Access your team now at https://psim.us/t/${result.teamid}!`);
     },
     ""(target) {
       return this.parse("/teams user " + toID(target) || this.user.id);
@@ -644,6 +639,9 @@ const pages = {
       if (!data) {
         throw new Chat.ErrorMessage(`Team ${teamID} not found.`);
       }
+      if (data.ownerid !== user.id && !user.can("rangeban")) {
+        throw new Chat.ErrorMessage(`Access denied.`);
+      }
       let buf = `<div class="ladder pad"><h2>Edit team ${teamID}</h2>${refresh(this)}<hr />`;
       buf += `<form data-submitsend="/teams update ${teamID},{name},{format},{privacy},{team}">`;
       buf += `<strong>Team name</strong><br />`;
@@ -657,7 +655,7 @@ const pages = {
         privacy.reverse();
       }
       buf += `<select name="privacy" />`;
-      buf += `${privacy.map((v) => `<option value="${v}">${Number(v) ? "Yes" : "No"}</option>`)}`;
+      buf += privacy.map((v) => `<option value="${v}">${Number(v) ? "Yes" : "No"}</option>`).join("");
       buf += `</select><br />`;
       buf += `<strong>Team:</strong><br />`;
       const teamStr = Teams.export(Teams.import(data.team), {

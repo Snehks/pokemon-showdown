@@ -32,10 +32,12 @@ const PokedexText = {
     name: "Venusaur"
   },
   venusaurmega: {
-    name: "Venusaur-Mega"
+    name: "Venusaur-Mega",
+    forme: "Mega Venusaur"
   },
   venusaurgmax: {
-    name: "Venusaur-Gmax"
+    name: "Venusaur-Gmax",
+    forme: "Gigantamax"
   },
   charmander: {
     name: "Charmander"
@@ -47,13 +49,16 @@ const PokedexText = {
     name: "Charizard"
   },
   charizardmegax: {
-    name: "Charizard-Mega-X"
+    name: "Charizard-Mega-X",
+    forme: "Mega Charizard X"
   },
   charizardmegay: {
-    name: "Charizard-Mega-Y"
+    name: "Charizard-Mega-Y",
+    forme: "Mega Charizard Y"
   },
   charizardgmax: {
-    name: "Charizard-Gmax"
+    name: "Charizard-Gmax",
+    forme: "Gigantamax"
   },
   squirtle: {
     name: "Squirtle"
@@ -65,10 +70,12 @@ const PokedexText = {
     name: "Blastoise"
   },
   blastoisemega: {
-    name: "Blastoise-Mega"
+    name: "Blastoise-Mega",
+    forme: "Mega Blastoise"
   },
   blastoisegmax: {
-    name: "Blastoise-Gmax"
+    name: "Blastoise-Gmax",
+    forme: "Gigantamax"
   },
   caterpie: {
     name: "Caterpie"
@@ -80,7 +87,8 @@ const PokedexText = {
     name: "Butterfree"
   },
   butterfreegmax: {
-    name: "Butterfree-Gmax"
+    name: "Butterfree-Gmax",
+    forme: "Gigantamax"
   },
   weedle: {
     name: "Weedle"
@@ -92,7 +100,8 @@ const PokedexText = {
     name: "Beedrill"
   },
   beedrillmega: {
-    name: "Beedrill-Mega"
+    name: "Beedrill-Mega",
+    forme: "Mega Beedrill"
   },
   pidgey: {
     name: "Pidgey"
@@ -104,22 +113,26 @@ const PokedexText = {
     name: "Pidgeot"
   },
   pidgeotmega: {
-    name: "Pidgeot-Mega"
+    name: "Pidgeot-Mega",
+    forme: "Mega Pidgeot"
   },
   rattata: {
     name: "Rattata"
   },
   rattataalola: {
-    name: "Rattata-Alola"
+    name: "Rattata-Alola",
+    forme: "Alolan Form"
   },
   raticate: {
     name: "Raticate"
   },
   raticatealola: {
-    name: "Raticate-Alola"
+    name: "Raticate-Alola",
+    forme: "Alolan Form"
   },
   raticatealolatotem: {
-    name: "Raticate-Alola-Totem"
+    name: "Raticate-Alola-Totem",
+    forme: "Totem (Alolan Form)"
   },
   spearow: {
     name: "Spearow"
@@ -137,70 +150,97 @@ const PokedexText = {
     name: "Pikachu"
   },
   pikachucosplay: {
-    name: "Pikachu-Cosplay"
+    name: "Pikachu-Cosplay",
+    forme: "Cosplay Pikachu"
   },
   pikachurockstar: {
-    name: "Pikachu-Rock-Star"
+    name: "Pikachu-Rock-Star",
+    forme: "Pikachu Rock Star"
   },
   pikachubelle: {
-    name: "Pikachu-Belle"
+    name: "Pikachu-Belle",
+    forme: "Pikachu Belle"
   },
   pikachupopstar: {
-    name: "Pikachu-Pop-Star"
+    name: "Pikachu-Pop-Star",
+    forme: "Pikachu Pop Star"
   },
   pikachuphd: {
-    name: "Pikachu-PhD"
+    name: "Pikachu-PhD",
+    forme: "Pikachu, Ph.D."
   },
   pikachulibre: {
-    name: "Pikachu-Libre"
+    name: "Pikachu-Libre",
+    forme: "Pikachu Libre"
   },
   pikachuoriginal: {
-    name: "Pikachu-Original"
+    name: "Pikachu-Original",
+    forme: "Original Cap"
   },
   pikachuhoenn: {
-    name: "Pikachu-Hoenn"
+    name: "Pikachu-Hoenn",
+    forme: "Hoenn Cap"
   },
   pikachusinnoh: {
-    name: "Pikachu-Sinnoh"
+    name: "Pikachu-Sinnoh",
+    forme: "Sinnoh Cap"
   },
   pikachuunova: {
-    name: "Pikachu-Unova"
+    name: "Pikachu-Unova",
+    forme: "Unova Cap"
   },
   pikachukalos: {
-    name: "Pikachu-Kalos"
+    name: "Pikachu-Kalos",
+    forme: "Kalos Cap"
   },
   pikachualola: {
-    name: "Pikachu-Alola"
+    name: "Pikachu-Alola",
+    forme: "Alola Cap"
   },
   pikachupartner: {
-    name: "Pikachu-Partner"
+    name: "Pikachu-Partner",
+    forme: "Partner Cap"
   },
   pikachustarter: {
-    name: "Pikachu-Starter"
+    name: "Pikachu-Starter",
+    forme: "Partner Pikachu"
   },
   pikachugmax: {
-    name: "Pikachu-Gmax"
+    name: "Pikachu-Gmax",
+    forme: "Gigantamax"
   },
   pikachuworld: {
-    name: "Pikachu-World"
+    name: "Pikachu-World",
+    forme: "World Cap"
   },
   raichu: {
     name: "Raichu"
   },
+  raichumegax: {
+    name: "Raichu-Mega-X",
+    forme: "Mega Raichu X"
+  },
+  raichumegay: {
+    name: "Raichu-Mega-Y",
+    forme: "Mega Raichu Y"
+  },
   raichualola: {
-    name: "Raichu-Alola"
+    name: "Raichu-Alola",
+    forme: "Alolan Form"
   },
   sandshrew: {
     name: "Sandshrew"
   },
   sandshrewalola: {
-    name: "Sandshrew-Alola"
+    name: "Sandshrew-Alola",
+    forme: "Alolan Form"
   },
   sandslash: {
     name: "Sandslash"
   },
   sandslashalola: {
-    name: "Sandslash-Alola"
+    name: "Sandslash-Alola",
+    forme: "Alolan Form"
   },
   nidoranf: {
     name: "Nidoran-F"
@@ -226,17 +266,23 @@ const PokedexText = {
   clefable: {
     name: "Clefable"
   },
+  clefablemega: {
+    name: "Clefable-Mega",
+    forme: "Mega Clefable"
+  },
   vulpix: {
     name: "Vulpix"
   },
   vulpixalola: {
-    name: "Vulpix-Alola"
+    name: "Vulpix-Alola",
+    forme: "Alolan Form"
   },
   ninetales: {
     name: "Ninetales"
   },
   ninetalesalola: {
-    name: "Ninetales-Alola"
+    name: "Ninetales-Alola",
+    forme: "Alolan Form"
   },
   jigglypuff: {
     name: "Jigglypuff"
@@ -275,31 +321,37 @@ const PokedexText = {
     name: "Diglett"
   },
   diglettalola: {
-    name: "Diglett-Alola"
+    name: "Diglett-Alola",
+    forme: "Alolan Form"
   },
   dugtrio: {
     name: "Dugtrio"
   },
   dugtrioalola: {
-    name: "Dugtrio-Alola"
+    name: "Dugtrio-Alola",
+    forme: "Alolan Form"
   },
   meowth: {
     name: "Meowth"
   },
   meowthalola: {
-    name: "Meowth-Alola"
+    name: "Meowth-Alola",
+    forme: "Alolan Form"
   },
   meowthgalar: {
-    name: "Meowth-Galar"
+    name: "Meowth-Galar",
+    forme: "Galarian Form"
   },
   meowthgmax: {
-    name: "Meowth-Gmax"
+    name: "Meowth-Gmax",
+    forme: "Gigantamax"
   },
   persian: {
     name: "Persian"
   },
   persianalola: {
-    name: "Persian-Alola"
+    name: "Persian-Alola",
+    forme: "Alolan Form"
   },
   psyduck: {
     name: "Psyduck"
@@ -317,13 +369,15 @@ const PokedexText = {
     name: "Growlithe"
   },
   growlithehisui: {
-    name: "Growlithe-Hisui"
+    name: "Growlithe-Hisui",
+    forme: "Hisuian Form"
   },
   arcanine: {
     name: "Arcanine"
   },
   arcaninehisui: {
-    name: "Arcanine-Hisui"
+    name: "Arcanine-Hisui",
+    forme: "Hisuian Form"
   },
   poliwag: {
     name: "Poliwag"
@@ -344,7 +398,8 @@ const PokedexText = {
     name: "Alakazam"
   },
   alakazammega: {
-    name: "Alakazam-Mega"
+    name: "Alakazam-Mega",
+    forme: "Mega Alakazam"
   },
   machop: {
     name: "Machop"
@@ -356,7 +411,8 @@ const PokedexText = {
     name: "Machamp"
   },
   machampgmax: {
-    name: "Machamp-Gmax"
+    name: "Machamp-Gmax",
+    forme: "Gigantamax"
   },
   bellsprout: {
     name: "Bellsprout"
@@ -366,6 +422,10 @@ const PokedexText = {
   },
   victreebel: {
     name: "Victreebel"
+  },
+  victreebelmega: {
+    name: "Victreebel-Mega",
+    forme: "Mega Victreebel"
   },
   tentacool: {
     name: "Tentacool"
@@ -377,46 +437,54 @@ const PokedexText = {
     name: "Geodude"
   },
   geodudealola: {
-    name: "Geodude-Alola"
+    name: "Geodude-Alola",
+    forme: "Alolan Form"
   },
   graveler: {
     name: "Graveler"
   },
   graveleralola: {
-    name: "Graveler-Alola"
+    name: "Graveler-Alola",
+    forme: "Alolan Form"
   },
   golem: {
     name: "Golem"
   },
   golemalola: {
-    name: "Golem-Alola"
+    name: "Golem-Alola",
+    forme: "Alolan Form"
   },
   ponyta: {
     name: "Ponyta"
   },
   ponytagalar: {
-    name: "Ponyta-Galar"
+    name: "Ponyta-Galar",
+    forme: "Galarian Form"
   },
   rapidash: {
     name: "Rapidash"
   },
   rapidashgalar: {
-    name: "Rapidash-Galar"
+    name: "Rapidash-Galar",
+    forme: "Galarian Form"
   },
   slowpoke: {
     name: "Slowpoke"
   },
   slowpokegalar: {
-    name: "Slowpoke-Galar"
+    name: "Slowpoke-Galar",
+    forme: "Galarian Form"
   },
   slowbro: {
     name: "Slowbro"
   },
   slowbromega: {
-    name: "Slowbro-Mega"
+    name: "Slowbro-Mega",
+    forme: "Mega Slowbro"
   },
   slowbrogalar: {
-    name: "Slowbro-Galar"
+    name: "Slowbro-Galar",
+    forme: "Galarian Form"
   },
   magnemite: {
     name: "Magnemite"
@@ -428,7 +496,8 @@ const PokedexText = {
     name: "Farfetch\u2019d"
   },
   farfetchdgalar: {
-    name: "Farfetch\u2019d-Galar"
+    name: "Farfetch\u2019d-Galar",
+    forme: "Galarian Form"
   },
   doduo: {
     name: "Doduo"
@@ -446,13 +515,15 @@ const PokedexText = {
     name: "Grimer"
   },
   grimeralola: {
-    name: "Grimer-Alola"
+    name: "Grimer-Alola",
+    forme: "Alolan Form"
   },
   muk: {
     name: "Muk"
   },
   mukalola: {
-    name: "Muk-Alola"
+    name: "Muk-Alola",
+    forme: "Alolan Form"
   },
   shellder: {
     name: "Shellder"
@@ -470,10 +541,12 @@ const PokedexText = {
     name: "Gengar"
   },
   gengarmega: {
-    name: "Gengar-Mega"
+    name: "Gengar-Mega",
+    forme: "Mega Gengar"
   },
   gengargmax: {
-    name: "Gengar-Gmax"
+    name: "Gengar-Gmax",
+    forme: "Gigantamax"
   },
   onix: {
     name: "Onix"
@@ -491,19 +564,22 @@ const PokedexText = {
     name: "Kingler"
   },
   kinglergmax: {
-    name: "Kingler-Gmax"
+    name: "Kingler-Gmax",
+    forme: "Gigantamax"
   },
   voltorb: {
     name: "Voltorb"
   },
   voltorbhisui: {
-    name: "Voltorb-Hisui"
+    name: "Voltorb-Hisui",
+    forme: "Hisuian Form"
   },
   electrode: {
     name: "Electrode"
   },
   electrodehisui: {
-    name: "Electrode-Hisui"
+    name: "Electrode-Hisui",
+    forme: "Hisuian Form"
   },
   exeggcute: {
     name: "Exeggcute"
@@ -512,7 +588,8 @@ const PokedexText = {
     name: "Exeggutor"
   },
   exeggutoralola: {
-    name: "Exeggutor-Alola"
+    name: "Exeggutor-Alola",
+    forme: "Alolan Form"
   },
   cubone: {
     name: "Cubone"
@@ -521,10 +598,12 @@ const PokedexText = {
     name: "Marowak"
   },
   marowakalola: {
-    name: "Marowak-Alola"
+    name: "Marowak-Alola",
+    forme: "Alolan Form"
   },
   marowakalolatotem: {
-    name: "Marowak-Alola-Totem"
+    name: "Marowak-Alola-Totem",
+    forme: "Totem (Alolan Form)"
   },
   hitmonlee: {
     name: "Hitmonlee"
@@ -542,7 +621,8 @@ const PokedexText = {
     name: "Weezing"
   },
   weezinggalar: {
-    name: "Weezing-Galar"
+    name: "Weezing-Galar",
+    forme: "Galarian Form"
   },
   rhyhorn: {
     name: "Rhyhorn"
@@ -560,7 +640,8 @@ const PokedexText = {
     name: "Kangaskhan"
   },
   kangaskhanmega: {
-    name: "Kangaskhan-Mega"
+    name: "Kangaskhan-Mega",
+    forme: "Mega Kangaskhan"
   },
   horsea: {
     name: "Horsea"
@@ -580,11 +661,16 @@ const PokedexText = {
   starmie: {
     name: "Starmie"
   },
+  starmiemega: {
+    name: "Starmie-Mega",
+    forme: "Mega Starmie"
+  },
   mrmime: {
     name: "Mr. Mime"
   },
   mrmimegalar: {
-    name: "Mr. Mime-Galar"
+    name: "Mr. Mime-Galar",
+    forme: "Galarian Form"
   },
   scyther: {
     name: "Scyther"
@@ -602,10 +688,23 @@ const PokedexText = {
     name: "Pinsir"
   },
   pinsirmega: {
-    name: "Pinsir-Mega"
+    name: "Pinsir-Mega",
+    forme: "Mega Pinsir"
   },
   tauros: {
     name: "Tauros"
+  },
+  taurospaldeacombat: {
+    name: "Tauros-Paldea-Combat",
+    forme: "Combat Breed (Paldean Form)"
+  },
+  taurospaldeablaze: {
+    name: "Tauros-Paldea-Blaze",
+    forme: "Blaze Breed (Paldean Form)"
+  },
+  taurospaldeaaqua: {
+    name: "Tauros-Paldea-Aqua",
+    forme: "Aqua Breed (Paldean Form)"
   },
   magikarp: {
     name: "Magikarp"
@@ -614,13 +713,15 @@ const PokedexText = {
     name: "Gyarados"
   },
   gyaradosmega: {
-    name: "Gyarados-Mega"
+    name: "Gyarados-Mega",
+    forme: "Mega Gyarados"
   },
   lapras: {
     name: "Lapras"
   },
   laprasgmax: {
-    name: "Lapras-Gmax"
+    name: "Lapras-Gmax",
+    forme: "Gigantamax"
   },
   ditto: {
     name: "Ditto"
@@ -629,10 +730,12 @@ const PokedexText = {
     name: "Eevee"
   },
   eeveestarter: {
-    name: "Eevee-Starter"
+    name: "Eevee-Starter",
+    forme: "Partner Eevee"
   },
   eeveegmax: {
-    name: "Eevee-Gmax"
+    name: "Eevee-Gmax",
+    forme: "Gigantamax"
   },
   vaporeon: {
     name: "Vaporeon"
@@ -662,22 +765,36 @@ const PokedexText = {
     name: "Aerodactyl"
   },
   aerodactylmega: {
-    name: "Aerodactyl-Mega"
+    name: "Aerodactyl-Mega",
+    forme: "Mega Aerodactyl"
   },
   snorlax: {
     name: "Snorlax"
   },
   snorlaxgmax: {
-    name: "Snorlax-Gmax"
+    name: "Snorlax-Gmax",
+    forme: "Gigantamax"
   },
   articuno: {
     name: "Articuno"
   },
+  articunogalar: {
+    name: "Articuno-Galar",
+    forme: "Galarian Form"
+  },
   zapdos: {
     name: "Zapdos"
   },
+  zapdosgalar: {
+    name: "Zapdos-Galar",
+    forme: "Galarian Form"
+  },
   moltres: {
     name: "Moltres"
+  },
+  moltresgalar: {
+    name: "Moltres-Galar",
+    forme: "Galarian Form"
   },
   dratini: {
     name: "Dratini"
@@ -688,14 +805,20 @@ const PokedexText = {
   dragonite: {
     name: "Dragonite"
   },
+  dragonitemega: {
+    name: "Dragonite-Mega",
+    forme: "Mega Dragonite"
+  },
   mewtwo: {
     name: "Mewtwo"
   },
   mewtwomegax: {
-    name: "Mewtwo-Mega-X"
+    name: "Mewtwo-Mega-X",
+    forme: "Mega Mewtwo X"
   },
   mewtwomegay: {
-    name: "Mewtwo-Mega-Y"
+    name: "Mewtwo-Mega-Y",
+    forme: "Mega Mewtwo Y"
   },
   mew: {
     name: "Mew"
@@ -709,6 +832,10 @@ const PokedexText = {
   meganium: {
     name: "Meganium"
   },
+  meganiummega: {
+    name: "Meganium-Mega",
+    forme: "Mega Meganium"
+  },
   cyndaquil: {
     name: "Cyndaquil"
   },
@@ -719,7 +846,8 @@ const PokedexText = {
     name: "Typhlosion"
   },
   typhlosionhisui: {
-    name: "Typhlosion-Hisui"
+    name: "Typhlosion-Hisui",
+    forme: "Hisuian Form"
   },
   totodile: {
     name: "Totodile"
@@ -729,6 +857,10 @@ const PokedexText = {
   },
   feraligatr: {
     name: "Feraligatr"
+  },
+  feraligatrmega: {
+    name: "Feraligatr-Mega",
+    forme: "Mega Feraligatr"
   },
   sentret: {
     name: "Sentret"
@@ -767,7 +899,8 @@ const PokedexText = {
     name: "Pichu"
   },
   pichuspikyeared: {
-    name: "Pichu-Spiky-eared"
+    name: "Pichu-Spiky-eared",
+    forme: "Spiky-eared"
   },
   cleffa: {
     name: "Cleffa"
@@ -797,7 +930,8 @@ const PokedexText = {
     name: "Ampharos"
   },
   ampharosmega: {
-    name: "Ampharos-Mega"
+    name: "Ampharos-Mega",
+    forme: "Mega Ampharos"
   },
   bellossom: {
     name: "Bellossom"
@@ -839,13 +973,11 @@ const PokedexText = {
     name: "Wooper"
   },
   wooperpaldea: {
-    name: "Wooper-Paldea"
+    name: "Wooper-Paldea",
+    forme: "Paldean Form"
   },
   quagsire: {
     name: "Quagsire"
-  },
-  quagsirepaldea: {
-    name: "Quagsire-Paldea"
   },
   espeon: {
     name: "Espeon"
@@ -859,11 +991,125 @@ const PokedexText = {
   slowking: {
     name: "Slowking"
   },
+  slowkinggalar: {
+    name: "Slowking-Galar",
+    forme: "Galarian Form"
+  },
   misdreavus: {
     name: "Misdreavus"
   },
   unown: {
-    name: "Unown"
+    name: "Unown-A",
+    baseSpecies: "Unown",
+    forme: "A"
+  },
+  unownb: {
+    name: "Unown-B",
+    forme: "B"
+  },
+  unownc: {
+    name: "Unown-C",
+    forme: "C"
+  },
+  unownd: {
+    name: "Unown-D",
+    forme: "D"
+  },
+  unowne: {
+    name: "Unown-E",
+    forme: "E"
+  },
+  unownf: {
+    name: "Unown-F",
+    forme: "F"
+  },
+  unowng: {
+    name: "Unown-G",
+    forme: "G"
+  },
+  unownh: {
+    name: "Unown-H",
+    forme: "H"
+  },
+  unowni: {
+    name: "Unown-I",
+    forme: "I"
+  },
+  unownj: {
+    name: "Unown-J",
+    forme: "J"
+  },
+  unownk: {
+    name: "Unown-K",
+    forme: "K"
+  },
+  unownl: {
+    name: "Unown-L",
+    forme: "L"
+  },
+  unownm: {
+    name: "Unown-M",
+    forme: "M"
+  },
+  unownn: {
+    name: "Unown-N",
+    forme: "N"
+  },
+  unowno: {
+    name: "Unown-O",
+    forme: "O"
+  },
+  unownp: {
+    name: "Unown-P",
+    forme: "P"
+  },
+  unownq: {
+    name: "Unown-Q",
+    forme: "Q"
+  },
+  unownr: {
+    name: "Unown-R",
+    forme: "R"
+  },
+  unowns: {
+    name: "Unown-S",
+    forme: "S"
+  },
+  unownt: {
+    name: "Unown-T",
+    forme: "T"
+  },
+  unownu: {
+    name: "Unown-U",
+    forme: "U"
+  },
+  unownv: {
+    name: "Unown-V",
+    forme: "V"
+  },
+  unownw: {
+    name: "Unown-W",
+    forme: "W"
+  },
+  unownx: {
+    name: "Unown-X",
+    forme: "X"
+  },
+  unowny: {
+    name: "Unown-Y",
+    forme: "Y"
+  },
+  unownz: {
+    name: "Unown-Z",
+    forme: "Z"
+  },
+  unownexclamation: {
+    name: "Unown-Exclamation",
+    forme: "!"
+  },
+  unownquestion: {
+    name: "Unown-Question",
+    forme: "?"
   },
   wobbuffet: {
     name: "Wobbuffet"
@@ -887,7 +1133,8 @@ const PokedexText = {
     name: "Steelix"
   },
   steelixmega: {
-    name: "Steelix-Mega"
+    name: "Steelix-Mega",
+    forme: "Mega Steelix"
   },
   snubbull: {
     name: "Snubbull"
@@ -899,13 +1146,15 @@ const PokedexText = {
     name: "Qwilfish"
   },
   qwilfishhisui: {
-    name: "Qwilfish-Hisui"
+    name: "Qwilfish-Hisui",
+    forme: "Hisuian Form"
   },
   scizor: {
     name: "Scizor"
   },
   scizormega: {
-    name: "Scizor-Mega"
+    name: "Scizor-Mega",
+    forme: "Mega Scizor"
   },
   shuckle: {
     name: "Shuckle"
@@ -914,13 +1163,15 @@ const PokedexText = {
     name: "Heracross"
   },
   heracrossmega: {
-    name: "Heracross-Mega"
+    name: "Heracross-Mega",
+    forme: "Mega Heracross"
   },
   sneasel: {
     name: "Sneasel"
   },
   sneaselhisui: {
-    name: "Sneasel-Hisui"
+    name: "Sneasel-Hisui",
+    forme: "Hisuian Form"
   },
   teddiursa: {
     name: "Teddiursa"
@@ -944,7 +1195,8 @@ const PokedexText = {
     name: "Corsola"
   },
   corsolagalar: {
-    name: "Corsola-Galar"
+    name: "Corsola-Galar",
+    forme: "Galarian Form"
   },
   remoraid: {
     name: "Remoraid"
@@ -961,6 +1213,10 @@ const PokedexText = {
   skarmory: {
     name: "Skarmory"
   },
+  skarmorymega: {
+    name: "Skarmory-Mega",
+    forme: "Mega Skarmory"
+  },
   houndour: {
     name: "Houndour"
   },
@@ -968,7 +1224,8 @@ const PokedexText = {
     name: "Houndoom"
   },
   houndoommega: {
-    name: "Houndoom-Mega"
+    name: "Houndoom-Mega",
+    forme: "Mega Houndoom"
   },
   kingdra: {
     name: "Kingdra"
@@ -1028,7 +1285,8 @@ const PokedexText = {
     name: "Tyranitar"
   },
   tyranitarmega: {
-    name: "Tyranitar-Mega"
+    name: "Tyranitar-Mega",
+    forme: "Mega Tyranitar"
   },
   lugia: {
     name: "Lugia"
@@ -1049,7 +1307,8 @@ const PokedexText = {
     name: "Sceptile"
   },
   sceptilemega: {
-    name: "Sceptile-Mega"
+    name: "Sceptile-Mega",
+    forme: "Mega Sceptile"
   },
   torchic: {
     name: "Torchic"
@@ -1061,7 +1320,8 @@ const PokedexText = {
     name: "Blaziken"
   },
   blazikenmega: {
-    name: "Blaziken-Mega"
+    name: "Blaziken-Mega",
+    forme: "Mega Blaziken"
   },
   mudkip: {
     name: "Mudkip"
@@ -1073,7 +1333,8 @@ const PokedexText = {
     name: "Swampert"
   },
   swampertmega: {
-    name: "Swampert-Mega"
+    name: "Swampert-Mega",
+    forme: "Mega Swampert"
   },
   poochyena: {
     name: "Poochyena"
@@ -1085,13 +1346,15 @@ const PokedexText = {
     name: "Zigzagoon"
   },
   zigzagoongalar: {
-    name: "Zigzagoon-Galar"
+    name: "Zigzagoon-Galar",
+    forme: "Galarian Form"
   },
   linoone: {
     name: "Linoone"
   },
   linoonegalar: {
-    name: "Linoone-Galar"
+    name: "Linoone-Galar",
+    forme: "Galarian Form"
   },
   wurmple: {
     name: "Wurmple"
@@ -1148,7 +1411,8 @@ const PokedexText = {
     name: "Gardevoir"
   },
   gardevoirmega: {
-    name: "Gardevoir-Mega"
+    name: "Gardevoir-Mega",
+    forme: "Mega Gardevoir"
   },
   surskit: {
     name: "Surskit"
@@ -1211,13 +1475,15 @@ const PokedexText = {
     name: "Sableye"
   },
   sableyemega: {
-    name: "Sableye-Mega"
+    name: "Sableye-Mega",
+    forme: "Mega Sableye"
   },
   mawile: {
     name: "Mawile"
   },
   mawilemega: {
-    name: "Mawile-Mega"
+    name: "Mawile-Mega",
+    forme: "Mega Mawile"
   },
   aron: {
     name: "Aron"
@@ -1229,7 +1495,8 @@ const PokedexText = {
     name: "Aggron"
   },
   aggronmega: {
-    name: "Aggron-Mega"
+    name: "Aggron-Mega",
+    forme: "Mega Aggron"
   },
   meditite: {
     name: "Meditite"
@@ -1238,7 +1505,8 @@ const PokedexText = {
     name: "Medicham"
   },
   medichammega: {
-    name: "Medicham-Mega"
+    name: "Medicham-Mega",
+    forme: "Mega Medicham"
   },
   electrike: {
     name: "Electrike"
@@ -1247,7 +1515,8 @@ const PokedexText = {
     name: "Manectric"
   },
   manectricmega: {
-    name: "Manectric-Mega"
+    name: "Manectric-Mega",
+    forme: "Mega Manectric"
   },
   plusle: {
     name: "Plusle"
@@ -1277,7 +1546,8 @@ const PokedexText = {
     name: "Sharpedo"
   },
   sharpedomega: {
-    name: "Sharpedo-Mega"
+    name: "Sharpedo-Mega",
+    forme: "Mega Sharpedo"
   },
   wailmer: {
     name: "Wailmer"
@@ -1292,7 +1562,8 @@ const PokedexText = {
     name: "Camerupt"
   },
   cameruptmega: {
-    name: "Camerupt-Mega"
+    name: "Camerupt-Mega",
+    forme: "Mega Camerupt"
   },
   torkoal: {
     name: "Torkoal"
@@ -1328,7 +1599,8 @@ const PokedexText = {
     name: "Altaria"
   },
   altariamega: {
-    name: "Altaria-Mega"
+    name: "Altaria-Mega",
+    forme: "Mega Altaria"
   },
   zangoose: {
     name: "Zangoose"
@@ -1379,16 +1651,20 @@ const PokedexText = {
     name: "Milotic"
   },
   castform: {
-    name: "Castform"
+    name: "Castform",
+    forme: "Normal"
   },
   castformsunny: {
-    name: "Castform-Sunny"
+    name: "Castform-Sunny",
+    forme: "Sunny Form"
   },
   castformrainy: {
-    name: "Castform-Rainy"
+    name: "Castform-Rainy",
+    forme: "Rainy Form"
   },
   castformsnowy: {
-    name: "Castform-Snowy"
+    name: "Castform-Snowy",
+    forme: "Snowy Form"
   },
   kecleon: {
     name: "Kecleon"
@@ -1400,7 +1676,8 @@ const PokedexText = {
     name: "Banette"
   },
   banettemega: {
-    name: "Banette-Mega"
+    name: "Banette-Mega",
+    forme: "Mega Banette"
   },
   duskull: {
     name: "Duskull"
@@ -1414,11 +1691,20 @@ const PokedexText = {
   chimecho: {
     name: "Chimecho"
   },
+  chimechomega: {
+    name: "Chimecho-Mega",
+    forme: "Mega Chimecho"
+  },
   absol: {
     name: "Absol"
   },
+  absolmegaz: {
+    name: "Absol-Mega-Z",
+    forme: "Mega Absol Z"
+  },
   absolmega: {
-    name: "Absol-Mega"
+    name: "Absol-Mega",
+    forme: "Mega Absol"
   },
   wynaut: {
     name: "Wynaut"
@@ -1430,7 +1716,8 @@ const PokedexText = {
     name: "Glalie"
   },
   glaliemega: {
-    name: "Glalie-Mega"
+    name: "Glalie-Mega",
+    forme: "Mega Glalie"
   },
   spheal: {
     name: "Spheal"
@@ -1466,7 +1753,8 @@ const PokedexText = {
     name: "Salamence"
   },
   salamencemega: {
-    name: "Salamence-Mega"
+    name: "Salamence-Mega",
+    forme: "Mega Salamence"
   },
   beldum: {
     name: "Beldum"
@@ -1478,7 +1766,8 @@ const PokedexText = {
     name: "Metagross"
   },
   metagrossmega: {
-    name: "Metagross-Mega"
+    name: "Metagross-Mega",
+    forme: "Mega Metagross"
   },
   regirock: {
     name: "Regirock"
@@ -1493,46 +1782,55 @@ const PokedexText = {
     name: "Latias"
   },
   latiasmega: {
-    name: "Latias-Mega"
+    name: "Latias-Mega",
+    forme: "Mega Latias"
   },
   latios: {
     name: "Latios"
   },
   latiosmega: {
-    name: "Latios-Mega"
+    name: "Latios-Mega",
+    forme: "Mega Latios"
   },
   kyogre: {
     name: "Kyogre"
   },
   kyogreprimal: {
-    name: "Kyogre-Primal"
+    name: "Kyogre-Primal",
+    forme: "Primal Reversion"
   },
   groudon: {
     name: "Groudon"
   },
   groudonprimal: {
-    name: "Groudon-Primal"
+    name: "Groudon-Primal",
+    forme: "Primal Reversion"
   },
   rayquaza: {
     name: "Rayquaza"
   },
   rayquazamega: {
-    name: "Rayquaza-Mega"
+    name: "Rayquaza-Mega",
+    forme: "Mega Rayquaza"
   },
   jirachi: {
     name: "Jirachi"
   },
   deoxys: {
-    name: "Deoxys"
+    name: "Deoxys",
+    forme: "Normal Forme"
   },
   deoxysattack: {
-    name: "Deoxys-Attack"
+    name: "Deoxys-Attack",
+    forme: "Attack Forme"
   },
   deoxysdefense: {
-    name: "Deoxys-Defense"
+    name: "Deoxys-Defense",
+    forme: "Defense Forme"
   },
   deoxysspeed: {
-    name: "Deoxys-Speed"
+    name: "Deoxys-Speed",
+    forme: "Speed Forme"
   },
   turtwig: {
     name: "Turtwig"
@@ -1569,6 +1867,10 @@ const PokedexText = {
   },
   staraptor: {
     name: "Staraptor"
+  },
+  staraptormega: {
+    name: "Staraptor-Mega",
+    forme: "Mega Staraptor"
   },
   bidoof: {
     name: "Bidoof"
@@ -1610,16 +1912,30 @@ const PokedexText = {
     name: "Bastiodon"
   },
   burmy: {
-    name: "Burmy"
+    name: "Burmy-Plant",
+    baseSpecies: "Burmy",
+    forme: "Plant Cloak"
+  },
+  burmysandy: {
+    name: "Burmy-Sandy",
+    forme: "Sandy Cloak"
+  },
+  burmytrash: {
+    name: "Burmy-Trash",
+    forme: "Trash Cloak"
   },
   wormadam: {
-    name: "Wormadam"
+    name: "Wormadam-Plant",
+    baseSpecies: "Wormadam",
+    forme: "Plant Cloak"
   },
   wormadamsandy: {
-    name: "Wormadam-Sandy"
+    name: "Wormadam-Sandy",
+    forme: "Sandy Cloak"
   },
   wormadamtrash: {
-    name: "Wormadam-Trash"
+    name: "Wormadam-Trash",
+    forme: "Trash Cloak"
   },
   mothim: {
     name: "Mothim"
@@ -1643,16 +1959,30 @@ const PokedexText = {
     name: "Cherubi"
   },
   cherrim: {
-    name: "Cherrim"
+    name: "Cherrim",
+    forme: "Overcast Form"
   },
   cherrimsunshine: {
-    name: "Cherrim-Sunshine"
+    name: "Cherrim-Sunshine",
+    forme: "Sunshine Form"
   },
   shellos: {
-    name: "Shellos"
+    name: "Shellos-West",
+    baseSpecies: "Shellos",
+    forme: "West Sea"
+  },
+  shelloseast: {
+    name: "Shellos-East",
+    forme: "East Sea"
   },
   gastrodon: {
-    name: "Gastrodon"
+    name: "Gastrodon-West",
+    baseSpecies: "Gastrodon",
+    forme: "West Sea"
+  },
+  gastrodoneast: {
+    name: "Gastrodon-East",
+    forme: "East Sea"
   },
   ambipom: {
     name: "Ambipom"
@@ -1670,7 +2000,8 @@ const PokedexText = {
     name: "Lopunny"
   },
   lopunnymega: {
-    name: "Lopunny-Mega"
+    name: "Lopunny-Mega",
+    forme: "Mega Lopunny"
   },
   mismagius: {
     name: "Mismagius"
@@ -1723,8 +2054,13 @@ const PokedexText = {
   garchomp: {
     name: "Garchomp"
   },
+  garchompmegaz: {
+    name: "Garchomp-Mega-Z",
+    forme: "Mega Garchomp Z"
+  },
   garchompmega: {
-    name: "Garchomp-Mega"
+    name: "Garchomp-Mega",
+    forme: "Mega Garchomp"
   },
   munchlax: {
     name: "Munchlax"
@@ -1735,8 +2071,13 @@ const PokedexText = {
   lucario: {
     name: "Lucario"
   },
+  lucariomegaz: {
+    name: "Lucario-Mega-Z",
+    forme: "Mega Lucario Z"
+  },
   lucariomega: {
-    name: "Lucario-Mega"
+    name: "Lucario-Mega",
+    forme: "Mega Lucario"
   },
   hippopotas: {
     name: "Hippopotas"
@@ -1775,7 +2116,8 @@ const PokedexText = {
     name: "Abomasnow"
   },
   abomasnowmega: {
-    name: "Abomasnow-Mega"
+    name: "Abomasnow-Mega",
+    forme: "Mega Abomasnow"
   },
   weavile: {
     name: "Weavile"
@@ -1823,7 +2165,8 @@ const PokedexText = {
     name: "Gallade"
   },
   gallademega: {
-    name: "Gallade-Mega"
+    name: "Gallade-Mega",
+    forme: "Mega Gallade"
   },
   probopass: {
     name: "Probopass"
@@ -1834,23 +2177,32 @@ const PokedexText = {
   froslass: {
     name: "Froslass"
   },
+  froslassmega: {
+    name: "Froslass-Mega",
+    forme: "Mega Froslass"
+  },
   rotom: {
     name: "Rotom"
   },
   rotomheat: {
-    name: "Rotom-Heat"
+    name: "Rotom-Heat",
+    forme: "Heat Rotom"
   },
   rotomwash: {
-    name: "Rotom-Wash"
+    name: "Rotom-Wash",
+    forme: "Wash Rotom"
   },
   rotomfrost: {
-    name: "Rotom-Frost"
+    name: "Rotom-Frost",
+    forme: "Frost Rotom"
   },
   rotomfan: {
-    name: "Rotom-Fan"
+    name: "Rotom-Fan",
+    forme: "Fan Rotom"
   },
   rotommow: {
-    name: "Rotom-Mow"
+    name: "Rotom-Mow",
+    forme: "Mow Rotom"
   },
   uxie: {
     name: "Uxie"
@@ -1865,25 +2217,34 @@ const PokedexText = {
     name: "Dialga"
   },
   dialgaorigin: {
-    name: "Dialga-Origin"
+    name: "Dialga-Origin",
+    forme: "Origin Forme"
   },
   palkia: {
     name: "Palkia"
   },
   palkiaorigin: {
-    name: "Palkia-Origin"
+    name: "Palkia-Origin",
+    forme: "Origin Forme"
   },
   heatran: {
     name: "Heatran"
+  },
+  heatranmega: {
+    name: "Heatran-Mega",
+    forme: "Mega Heatran"
   },
   regigigas: {
     name: "Regigigas"
   },
   giratina: {
-    name: "Giratina"
+    name: "Giratina-Altered",
+    baseSpecies: "Giratina",
+    forme: "Altered Forme"
   },
   giratinaorigin: {
-    name: "Giratina-Origin"
+    name: "Giratina-Origin",
+    forme: "Origin Forme"
   },
   cresselia: {
     name: "Cresselia"
@@ -1897,65 +2258,89 @@ const PokedexText = {
   darkrai: {
     name: "Darkrai"
   },
+  darkraimega: {
+    name: "Darkrai-Mega",
+    forme: "Mega Darkrai"
+  },
   shaymin: {
-    name: "Shaymin"
+    name: "Shaymin-Land",
+    baseSpecies: "Shaymin",
+    forme: "Land Forme"
   },
   shayminsky: {
-    name: "Shaymin-Sky"
+    name: "Shaymin-Sky",
+    forme: "Sky Forme"
   },
   arceus: {
     name: "Arceus"
   },
   arceusbug: {
-    name: "Arceus-Bug"
+    name: "Arceus-Bug",
+    forme: "Bug"
   },
   arceusdark: {
-    name: "Arceus-Dark"
+    name: "Arceus-Dark",
+    forme: "Dark"
   },
   arceusdragon: {
-    name: "Arceus-Dragon"
+    name: "Arceus-Dragon",
+    forme: "Dragon"
   },
   arceuselectric: {
-    name: "Arceus-Electric"
+    name: "Arceus-Electric",
+    forme: "Electric"
   },
   arceusfairy: {
-    name: "Arceus-Fairy"
+    name: "Arceus-Fairy",
+    forme: "Fairy"
   },
   arceusfighting: {
-    name: "Arceus-Fighting"
+    name: "Arceus-Fighting",
+    forme: "Fighting"
   },
   arceusfire: {
-    name: "Arceus-Fire"
+    name: "Arceus-Fire",
+    forme: "Fire"
   },
   arceusflying: {
-    name: "Arceus-Flying"
+    name: "Arceus-Flying",
+    forme: "Flying"
   },
   arceusghost: {
-    name: "Arceus-Ghost"
+    name: "Arceus-Ghost",
+    forme: "Ghost"
   },
   arceusgrass: {
-    name: "Arceus-Grass"
+    name: "Arceus-Grass",
+    forme: "Grass"
   },
   arceusground: {
-    name: "Arceus-Ground"
+    name: "Arceus-Ground",
+    forme: "Ground"
   },
   arceusice: {
-    name: "Arceus-Ice"
+    name: "Arceus-Ice",
+    forme: "Ice"
   },
   arceuspoison: {
-    name: "Arceus-Poison"
+    name: "Arceus-Poison",
+    forme: "Poison"
   },
   arceuspsychic: {
-    name: "Arceus-Psychic"
+    name: "Arceus-Psychic",
+    forme: "Psychic"
   },
   arceusrock: {
-    name: "Arceus-Rock"
+    name: "Arceus-Rock",
+    forme: "Rock"
   },
   arceussteel: {
-    name: "Arceus-Steel"
+    name: "Arceus-Steel",
+    forme: "Steel"
   },
   arceuswater: {
-    name: "Arceus-Water"
+    name: "Arceus-Water",
+    forme: "Water"
   },
   victini: {
     name: "Victini"
@@ -1978,6 +2363,10 @@ const PokedexText = {
   emboar: {
     name: "Emboar"
   },
+  emboarmega: {
+    name: "Emboar-Mega",
+    forme: "Mega Emboar"
+  },
   oshawott: {
     name: "Oshawott"
   },
@@ -1988,7 +2377,8 @@ const PokedexText = {
     name: "Samurott"
   },
   samurotthisui: {
-    name: "Samurott-Hisui"
+    name: "Samurott-Hisui",
+    forme: "Hisuian Form"
   },
   patrat: {
     name: "Patrat"
@@ -2071,11 +2461,16 @@ const PokedexText = {
   excadrill: {
     name: "Excadrill"
   },
+  excadrillmega: {
+    name: "Excadrill-Mega",
+    forme: "Mega Excadrill"
+  },
   audino: {
     name: "Audino"
   },
   audinomega: {
-    name: "Audino-Mega"
+    name: "Audino-Mega",
+    forme: "Mega Audino"
   },
   timburr: {
     name: "Timburr"
@@ -2119,6 +2514,10 @@ const PokedexText = {
   scolipede: {
     name: "Scolipede"
   },
+  scolipedemega: {
+    name: "Scolipede-Mega",
+    forme: "Mega Scolipede"
+  },
   cottonee: {
     name: "Cottonee"
   },
@@ -2132,16 +2531,21 @@ const PokedexText = {
     name: "Lilligant"
   },
   lilliganthisui: {
-    name: "Lilligant-Hisui"
+    name: "Lilligant-Hisui",
+    forme: "Hisuian Form"
   },
   basculin: {
-    name: "Basculin"
+    name: "Basculin-Red",
+    baseSpecies: "Basculin",
+    forme: "Red-Striped Form"
   },
   basculinbluestriped: {
-    name: "Basculin-Blue-Striped"
+    name: "Basculin-Blue",
+    forme: "Blue-Striped Form"
   },
   basculinwhitestriped: {
-    name: "Basculin-White-Striped"
+    name: "Basculin-White",
+    forme: "White-Striped Form"
   },
   sandile: {
     name: "Sandile"
@@ -2156,19 +2560,24 @@ const PokedexText = {
     name: "Darumaka"
   },
   darumakagalar: {
-    name: "Darumaka-Galar"
+    name: "Darumaka-Galar",
+    forme: "Galarian Form"
   },
   darmanitan: {
-    name: "Darmanitan"
+    name: "Darmanitan",
+    forme: "Standard Mode"
   },
   darmanitanzen: {
-    name: "Darmanitan-Zen"
+    name: "Darmanitan-Zen",
+    forme: "Zen Mode"
   },
   darmanitangalar: {
-    name: "Darmanitan-Galar"
+    name: "Darmanitan-Galar",
+    forme: "Standard Mode (Galarian Form)"
   },
   darmanitangalarzen: {
-    name: "Darmanitan-Galar-Zen"
+    name: "Darmanitan-Galar-Zen",
+    forme: "Zen Mode (Galarian Form)"
   },
   maractus: {
     name: "Maractus"
@@ -2185,6 +2594,10 @@ const PokedexText = {
   scrafty: {
     name: "Scrafty"
   },
+  scraftymega: {
+    name: "Scrafty-Mega",
+    forme: "Mega Scrafty"
+  },
   sigilyph: {
     name: "Sigilyph"
   },
@@ -2192,7 +2605,8 @@ const PokedexText = {
     name: "Yamask"
   },
   yamaskgalar: {
-    name: "Yamask-Galar"
+    name: "Yamask-Galar",
+    forme: "Galarian Form"
   },
   cofagrigus: {
     name: "Cofagrigus"
@@ -2216,19 +2630,22 @@ const PokedexText = {
     name: "Garbodor"
   },
   garbodorgmax: {
-    name: "Garbodor-Gmax"
+    name: "Garbodor-Gmax",
+    forme: "Gigantamax"
   },
   zorua: {
     name: "Zorua"
   },
   zoruahisui: {
-    name: "Zorua-Hisui"
+    name: "Zorua-Hisui",
+    forme: "Hisuian Form"
   },
   zoroark: {
     name: "Zoroark"
   },
   zoroarkhisui: {
-    name: "Zoroark-Hisui"
+    name: "Zoroark-Hisui",
+    forme: "Hisuian Form"
   },
   minccino: {
     name: "Minccino"
@@ -2270,10 +2687,38 @@ const PokedexText = {
     name: "Vanilluxe"
   },
   deerling: {
-    name: "Deerling"
+    name: "Deerling-Spring",
+    baseSpecies: "Deerling",
+    forme: "Spring Form"
+  },
+  deerlingsummer: {
+    name: "Deerling-Summer",
+    forme: "Summer Form"
+  },
+  deerlingautumn: {
+    name: "Deerling-Autumn",
+    forme: "Autumn Form"
+  },
+  deerlingwinter: {
+    name: "Deerling-Winter",
+    forme: "Winter Form"
   },
   sawsbuck: {
-    name: "Sawsbuck"
+    name: "Sawsbuck-Spring",
+    baseSpecies: "Sawsbuck",
+    forme: "Spring Form"
+  },
+  sawsbucksummer: {
+    name: "Sawsbuck-Summer",
+    forme: "Summer Form"
+  },
+  sawsbuckautumn: {
+    name: "Sawsbuck-Autumn",
+    forme: "Autumn Form"
+  },
+  sawsbuckwinter: {
+    name: "Sawsbuck-Winter",
+    forme: "Winter Form"
   },
   emolga: {
     name: "Emolga"
@@ -2329,6 +2774,10 @@ const PokedexText = {
   eelektross: {
     name: "Eelektross"
   },
+  eelektrossmega: {
+    name: "Eelektross-Mega",
+    forme: "Mega Eelektross"
+  },
   elgyem: {
     name: "Elgyem"
   },
@@ -2343,6 +2792,10 @@ const PokedexText = {
   },
   chandelure: {
     name: "Chandelure"
+  },
+  chandeluremega: {
+    name: "Chandelure-Mega",
+    forme: "Mega Chandelure"
   },
   axew: {
     name: "Axew"
@@ -2372,7 +2825,8 @@ const PokedexText = {
     name: "Stunfisk"
   },
   stunfiskgalar: {
-    name: "Stunfisk-Galar"
+    name: "Stunfisk-Galar",
+    forme: "Galarian Form"
   },
   mienfoo: {
     name: "Mienfoo"
@@ -2388,6 +2842,10 @@ const PokedexText = {
   },
   golurk: {
     name: "Golurk"
+  },
+  golurkmega: {
+    name: "Golurk-Mega",
+    forme: "Mega Golurk"
   },
   pawniard: {
     name: "Pawniard"
@@ -2405,7 +2863,8 @@ const PokedexText = {
     name: "Braviary"
   },
   braviaryhisui: {
-    name: "Braviary-Hisui"
+    name: "Braviary-Hisui",
+    forme: "Hisuian Form"
   },
   vullaby: {
     name: "Vullaby"
@@ -2444,16 +2903,22 @@ const PokedexText = {
     name: "Virizion"
   },
   tornadus: {
-    name: "Tornadus"
+    name: "Tornadus-Incarnate",
+    baseSpecies: "Tornadus",
+    forme: "Incarnate Forme"
   },
   tornadustherian: {
-    name: "Tornadus-Therian"
+    name: "Tornadus-Therian",
+    forme: "Therian Forme"
   },
   thundurus: {
-    name: "Thundurus"
+    name: "Thundurus-Incarnate",
+    baseSpecies: "Thundurus",
+    forme: "Incarnate Forme"
   },
   thundurustherian: {
-    name: "Thundurus-Therian"
+    name: "Thundurus-Therian",
+    forme: "Therian Forme"
   },
   reshiram: {
     name: "Reshiram"
@@ -2462,46 +2927,59 @@ const PokedexText = {
     name: "Zekrom"
   },
   landorus: {
-    name: "Landorus"
+    name: "Landorus-Incarnate",
+    baseSpecies: "Landorus",
+    forme: "Incarnate Forme"
   },
   landorustherian: {
-    name: "Landorus-Therian"
+    name: "Landorus-Therian",
+    forme: "Therian Forme"
   },
   kyurem: {
     name: "Kyurem"
   },
   kyuremblack: {
-    name: "Kyurem-Black"
+    name: "Kyurem-Black",
+    forme: "Black Kyurem"
   },
   kyuremwhite: {
-    name: "Kyurem-White"
+    name: "Kyurem-White",
+    forme: "White Kyurem"
   },
   keldeo: {
-    name: "Keldeo"
+    name: "Keldeo",
+    forme: "Ordinary Form"
   },
   keldeoresolute: {
-    name: "Keldeo-Resolute"
+    name: "Keldeo-Resolute",
+    forme: "Resolute Form"
   },
   meloetta: {
-    name: "Meloetta"
+    name: "Meloetta",
+    forme: "Aria Forme"
   },
   meloettapirouette: {
-    name: "Meloetta-Pirouette"
+    name: "Meloetta-Pirouette",
+    forme: "Pirouette Forme"
   },
   genesect: {
     name: "Genesect"
   },
   genesectdouse: {
-    name: "Genesect-Douse"
+    name: "Genesect-Douse",
+    forme: "Douse Drive"
   },
   genesectshock: {
-    name: "Genesect-Shock"
+    name: "Genesect-Shock",
+    forme: "Shock Drive"
   },
   genesectburn: {
-    name: "Genesect-Burn"
+    name: "Genesect-Burn",
+    forme: "Burn Drive"
   },
   genesectchill: {
-    name: "Genesect-Chill"
+    name: "Genesect-Chill",
+    forme: "Chill Drive"
   },
   chespin: {
     name: "Chespin"
@@ -2512,6 +2990,10 @@ const PokedexText = {
   chesnaught: {
     name: "Chesnaught"
   },
+  chesnaughtmega: {
+    name: "Chesnaught-Mega",
+    forme: "Mega Chesnaught"
+  },
   fennekin: {
     name: "Fennekin"
   },
@@ -2520,6 +3002,10 @@ const PokedexText = {
   },
   delphox: {
     name: "Delphox"
+  },
+  delphoxmega: {
+    name: "Delphox-Mega",
+    forme: "Mega Delphox"
   },
   froakie: {
     name: "Froakie"
@@ -2530,11 +3016,17 @@ const PokedexText = {
   greninja: {
     name: "Greninja"
   },
+  greninjamega: {
+    name: "Greninja-Mega",
+    forme: "Mega Greninja"
+  },
   greninjabond: {
-    name: "Greninja-Bond"
+    name: "Greninja-Bond",
+    forme: "Battle Bond"
   },
   greninjaash: {
-    name: "Greninja-Ash"
+    name: "Greninja-Ash",
+    forme: "Ash-Greninja"
   },
   bunnelby: {
     name: "Bunnelby"
@@ -2558,13 +3050,85 @@ const PokedexText = {
     name: "Spewpa"
   },
   vivillon: {
-    name: "Vivillon"
+    name: "Vivillon-Meadow",
+    baseSpecies: "Vivillon",
+    forme: "Meadow Pattern"
+  },
+  vivillonarchipelago: {
+    name: "Vivillon-Archipelago",
+    forme: "Archipelago Pattern"
+  },
+  vivilloncontinental: {
+    name: "Vivillon-Continental",
+    forme: "Continental Pattern"
+  },
+  vivillonelegant: {
+    name: "Vivillon-Elegant",
+    forme: "Elegant Pattern"
+  },
+  vivillongarden: {
+    name: "Vivillon-Garden",
+    forme: "Garden Pattern"
+  },
+  vivillonhighplains: {
+    name: "Vivillon-High Plains",
+    forme: "High Plains Pattern"
+  },
+  vivillonicysnow: {
+    name: "Vivillon-Icy Snow",
+    forme: "Icy Snow Pattern"
+  },
+  vivillonjungle: {
+    name: "Vivillon-Jungle",
+    forme: "Jungle Pattern"
+  },
+  vivillonmarine: {
+    name: "Vivillon-Marine",
+    forme: "Marine Pattern"
+  },
+  vivillonmodern: {
+    name: "Vivillon-Modern",
+    forme: "Modern Pattern"
+  },
+  vivillonmonsoon: {
+    name: "Vivillon-Monsoon",
+    forme: "Monsoon Pattern"
+  },
+  vivillonocean: {
+    name: "Vivillon-Ocean",
+    forme: "Ocean Pattern"
+  },
+  vivillonpolar: {
+    name: "Vivillon-Polar",
+    forme: "Polar Pattern"
+  },
+  vivillonriver: {
+    name: "Vivillon-River",
+    forme: "River Pattern"
+  },
+  vivillonsandstorm: {
+    name: "Vivillon-Sandstorm",
+    forme: "Sandstorm Pattern"
+  },
+  vivillonsavanna: {
+    name: "Vivillon-Savanna",
+    forme: "Savanna Pattern"
+  },
+  vivillonsun: {
+    name: "Vivillon-Sun",
+    forme: "Sun Pattern"
+  },
+  vivillontundra: {
+    name: "Vivillon-Tundra",
+    forme: "Tundra Pattern"
   },
   vivillonfancy: {
-    name: "Vivillon-Fancy"
+    name: "Vivillon-Fancy",
+    forme: "Fancy Pattern"
   },
   vivillonpokeball: {
-    name: "Vivillon-Pokeball"
+    name: "Vivillon-Pokeball",
+    forme: "Pok\xE9 Ball Pattern"
   },
   litleo: {
     name: "Litleo"
@@ -2572,17 +3136,80 @@ const PokedexText = {
   pyroar: {
     name: "Pyroar"
   },
+  pyroarmega: {
+    name: "Pyroar-Mega",
+    forme: "Mega Pyroar"
+  },
   flabebe: {
-    name: "Flabe\u0301be\u0301"
+    name: "Flabe\u0301be\u0301-Red",
+    baseSpecies: "Flabe\u0301be\u0301",
+    forme: "Red Flower"
+  },
+  flabebeblue: {
+    name: "Flabe\u0301be\u0301-Blue",
+    forme: "Blue Flower"
+  },
+  flabebeorange: {
+    name: "Flabe\u0301be\u0301-Orange",
+    forme: "Orange Flower"
+  },
+  flabebewhite: {
+    name: "Flabe\u0301be\u0301-White",
+    forme: "White Flower"
+  },
+  flabebeyellow: {
+    name: "Flabe\u0301be\u0301-Yellow",
+    forme: "Yellow Flower"
   },
   floette: {
-    name: "Floette"
+    name: "Floette-Red",
+    baseSpecies: "Floette",
+    forme: "Red Flower"
+  },
+  floettemega: {
+    name: "Floette-Mega",
+    forme: "Mega Floette"
+  },
+  floetteblue: {
+    name: "Floette-Blue",
+    forme: "Blue Flower"
+  },
+  floetteorange: {
+    name: "Floette-Orange",
+    forme: "Orange Flower"
+  },
+  floettewhite: {
+    name: "Floette-White",
+    forme: "White Flower"
+  },
+  floetteyellow: {
+    name: "Floette-Yellow",
+    forme: "Yellow Flower"
   },
   floetteeternal: {
-    name: "Floette-Eternal"
+    name: "Floette-Eternal",
+    forme: "Eternal Flower"
   },
   florges: {
-    name: "Florges"
+    name: "Florges-Red",
+    baseSpecies: "Florges",
+    forme: "Red Flower"
+  },
+  florgesblue: {
+    name: "Florges-Blue",
+    forme: "Blue Flower"
+  },
+  florgesorange: {
+    name: "Florges-Orange",
+    forme: "Orange Flower"
+  },
+  florgeswhite: {
+    name: "Florges-White",
+    forme: "White Flower"
+  },
+  florgesyellow: {
+    name: "Florges-Yellow",
+    forme: "Yellow Flower"
   },
   skiddo: {
     name: "Skiddo"
@@ -2597,16 +3224,64 @@ const PokedexText = {
     name: "Pangoro"
   },
   furfrou: {
-    name: "Furfrou"
+    name: "Furfrou",
+    forme: "Natural Form"
+  },
+  furfroudandy: {
+    name: "Furfrou-Dandy",
+    forme: "Dandy Trim"
+  },
+  furfroudebutante: {
+    name: "Furfrou-Debutante",
+    forme: "Debutante Trim"
+  },
+  furfroudiamond: {
+    name: "Furfrou-Diamond",
+    forme: "Diamond Trim"
+  },
+  furfrouheart: {
+    name: "Furfrou-Heart",
+    forme: "Heart Trim"
+  },
+  furfroukabuki: {
+    name: "Furfrou-Kabuki",
+    forme: "Kabuki Trim"
+  },
+  furfroulareine: {
+    name: "Furfrou-La Reine",
+    forme: "La Reine Trim"
+  },
+  furfroumatron: {
+    name: "Furfrou-Matron",
+    forme: "Matron Trim"
+  },
+  furfroupharaoh: {
+    name: "Furfrou-Pharaoh",
+    forme: "Pharaoh Trim"
+  },
+  furfroustar: {
+    name: "Furfrou-Star",
+    forme: "Star Trim"
   },
   espurr: {
     name: "Espurr"
   },
   meowstic: {
-    name: "Meowstic"
+    name: "Meowstic-M",
+    baseSpecies: "Meowstic",
+    forme: "Male"
+  },
+  meowsticmmega: {
+    name: "Meowstic-M-Mega",
+    forme: "Mega Meowstic (Male)"
+  },
+  meowsticfmega: {
+    name: "Meowstic-F-Mega",
+    forme: "Mega Meowstic (Female)"
   },
   meowsticf: {
-    name: "Meowstic-F"
+    name: "Meowstic-F",
+    forme: "Female"
   },
   honedge: {
     name: "Honedge"
@@ -2615,10 +3290,12 @@ const PokedexText = {
     name: "Doublade"
   },
   aegislash: {
-    name: "Aegislash"
+    name: "Aegislash",
+    forme: "Shield Forme"
   },
   aegislashblade: {
-    name: "Aegislash-Blade"
+    name: "Aegislash-Blade",
+    forme: "Blade Forme"
   },
   spritzee: {
     name: "Spritzee"
@@ -2638,17 +3315,29 @@ const PokedexText = {
   malamar: {
     name: "Malamar"
   },
+  malamarmega: {
+    name: "Malamar-Mega",
+    forme: "Mega Malamar"
+  },
   binacle: {
     name: "Binacle"
   },
   barbaracle: {
     name: "Barbaracle"
   },
+  barbaraclemega: {
+    name: "Barbaracle-Mega",
+    forme: "Mega Barbaracle"
+  },
   skrelp: {
     name: "Skrelp"
   },
   dragalge: {
     name: "Dragalge"
+  },
+  dragalgemega: {
+    name: "Dragalge-Mega",
+    forme: "Mega Dragalge"
   },
   clauncher: {
     name: "Clauncher"
@@ -2680,6 +3369,10 @@ const PokedexText = {
   hawlucha: {
     name: "Hawlucha"
   },
+  hawluchamega: {
+    name: "Hawlucha-Mega",
+    forme: "Mega Hawlucha"
+  },
   dedenne: {
     name: "Dedenne"
   },
@@ -2693,13 +3386,15 @@ const PokedexText = {
     name: "Sliggoo"
   },
   sliggoohisui: {
-    name: "Sliggoo-Hisui"
+    name: "Sliggoo-Hisui",
+    forme: "Hisuian Form"
   },
   goodra: {
     name: "Goodra"
   },
   goodrahisui: {
-    name: "Goodra-Hisui"
+    name: "Goodra-Hisui",
+    forme: "Hisuian Form"
   },
   klefki: {
     name: "Klefki"
@@ -2711,28 +3406,36 @@ const PokedexText = {
     name: "Trevenant"
   },
   pumpkaboo: {
-    name: "Pumpkaboo"
+    name: "Pumpkaboo",
+    forme: "Medium Variety"
   },
   pumpkaboosmall: {
-    name: "Pumpkaboo-Small"
+    name: "Pumpkaboo-Small",
+    forme: "Small Variety"
   },
   pumpkaboolarge: {
-    name: "Pumpkaboo-Large"
+    name: "Pumpkaboo-Large",
+    forme: "Large Variety"
   },
   pumpkaboosuper: {
-    name: "Pumpkaboo-Super"
+    name: "Pumpkaboo-Super",
+    forme: "Jumbo Variety"
   },
   gourgeist: {
-    name: "Gourgeist"
+    name: "Gourgeist",
+    forme: "Medium Variety"
   },
   gourgeistsmall: {
-    name: "Gourgeist-Small"
+    name: "Gourgeist-Small",
+    forme: "Small Variety"
   },
   gourgeistlarge: {
-    name: "Gourgeist-Large"
+    name: "Gourgeist-Large",
+    forme: "Large Variety"
   },
   gourgeistsuper: {
-    name: "Gourgeist-Super"
+    name: "Gourgeist-Super",
+    forme: "Jumbo Variety"
   },
   bergmite: {
     name: "Bergmite"
@@ -2741,7 +3444,8 @@ const PokedexText = {
     name: "Avalugg"
   },
   avalugghisui: {
-    name: "Avalugg-Hisui"
+    name: "Avalugg-Hisui",
+    forme: "Hisuian Form"
   },
   noibat: {
     name: "Noibat"
@@ -2750,34 +3454,48 @@ const PokedexText = {
     name: "Noivern"
   },
   xerneas: {
-    name: "Xerneas"
+    name: "Xerneas",
+    forme: "Active Mode"
   },
   xerneasneutral: {
-    name: "Xerneas-Neutral"
+    name: "Xerneas-Neutral",
+    forme: "Neutral Mode"
   },
   yveltal: {
     name: "Yveltal"
   },
   zygarde: {
-    name: "Zygarde"
+    name: "Zygarde-50%",
+    baseSpecies: "Zygarde",
+    forme: "50% Forme"
+  },
+  zygardemega: {
+    name: "Zygarde-Mega",
+    forme: "Mega Zygarde"
   },
   zygarde10: {
-    name: "Zygarde-10%"
+    name: "Zygarde-10%",
+    forme: "10% Forme"
   },
   zygardecomplete: {
-    name: "Zygarde-Complete"
+    name: "Zygarde-Complete",
+    forme: "Complete Forme"
   },
   diancie: {
     name: "Diancie"
   },
   dianciemega: {
-    name: "Diancie-Mega"
+    name: "Diancie-Mega",
+    forme: "Mega Diancie"
   },
   hoopa: {
-    name: "Hoopa"
+    name: "Hoopa-Confined",
+    baseSpecies: "Hoopa",
+    forme: "Hoopa Confined"
   },
   hoopaunbound: {
-    name: "Hoopa-Unbound"
+    name: "Hoopa-Unbound",
+    forme: "Hoopa Unbound"
   },
   volcanion: {
     name: "Volcanion"
@@ -2792,7 +3510,8 @@ const PokedexText = {
     name: "Decidueye"
   },
   decidueyehisui: {
-    name: "Decidueye-Hisui"
+    name: "Decidueye-Hisui",
+    forme: "Hisuian Form"
   },
   litten: {
     name: "Litten"
@@ -2828,7 +3547,8 @@ const PokedexText = {
     name: "Gumshoos"
   },
   gumshoostotem: {
-    name: "Gumshoos-Totem"
+    name: "Gumshoos-Totem",
+    forme: "Totem"
   },
   grubbin: {
     name: "Grubbin"
@@ -2840,7 +3560,8 @@ const PokedexText = {
     name: "Vikavolt"
   },
   vikavolttotem: {
-    name: "Vikavolt-Totem"
+    name: "Vikavolt-Totem",
+    forme: "Totem"
   },
   crabrawler: {
     name: "Crabrawler"
@@ -2848,17 +3569,26 @@ const PokedexText = {
   crabominable: {
     name: "Crabominable"
   },
+  crabominablemega: {
+    name: "Crabominable-Mega",
+    forme: "Mega Crabominable"
+  },
   oricorio: {
-    name: "Oricorio"
+    name: "Oricorio-Baile",
+    baseSpecies: "Oricorio",
+    forme: "Baile Style"
   },
   oricoriopompom: {
-    name: "Oricorio-Pom-Pom"
+    name: "Oricorio-Pom-Pom",
+    forme: "Pom-Pom Style"
   },
   oricoriopau: {
-    name: "Oricorio-Pa'u"
+    name: "Oricorio-Pa'u",
+    forme: "Pa\u2019u Style"
   },
   oricoriosensu: {
-    name: "Oricorio-Sensu"
+    name: "Oricorio-Sensu",
+    forme: "Sensu Style"
   },
   cutiefly: {
     name: "Cutiefly"
@@ -2867,25 +3597,36 @@ const PokedexText = {
     name: "Ribombee"
   },
   ribombeetotem: {
-    name: "Ribombee-Totem"
+    name: "Ribombee-Totem",
+    forme: "Totem"
   },
   rockruff: {
     name: "Rockruff"
   },
+  rockruffdusk: {
+    name: "Rockruff-Dusk",
+    forme: "Own Tempo"
+  },
   lycanroc: {
-    name: "Lycanroc"
+    name: "Lycanroc-Midday",
+    baseSpecies: "Lycanroc",
+    forme: "Midday Form"
   },
   lycanrocmidnight: {
-    name: "Lycanroc-Midnight"
+    name: "Lycanroc-Midnight",
+    forme: "Midnight Form"
   },
   lycanrocdusk: {
-    name: "Lycanroc-Dusk"
+    name: "Lycanroc-Dusk",
+    forme: "Dusk Form"
   },
   wishiwashi: {
-    name: "Wishiwashi"
+    name: "Wishiwashi",
+    forme: "Solo Form"
   },
   wishiwashischool: {
-    name: "Wishiwashi-School"
+    name: "Wishiwashi-School",
+    forme: "School Form"
   },
   mareanie: {
     name: "Mareanie"
@@ -2906,7 +3647,8 @@ const PokedexText = {
     name: "Araquanid"
   },
   araquanidtotem: {
-    name: "Araquanid-Totem"
+    name: "Araquanid-Totem",
+    forme: "Totem"
   },
   fomantis: {
     name: "Fomantis"
@@ -2915,7 +3657,8 @@ const PokedexText = {
     name: "Lurantis"
   },
   lurantistotem: {
-    name: "Lurantis-Totem"
+    name: "Lurantis-Totem",
+    forme: "Totem"
   },
   morelull: {
     name: "Morelull"
@@ -2930,7 +3673,8 @@ const PokedexText = {
     name: "Salazzle"
   },
   salazzletotem: {
-    name: "Salazzle-Totem"
+    name: "Salazzle-Totem",
+    forme: "Totem"
   },
   stufful: {
     name: "Stufful"
@@ -2962,6 +3706,10 @@ const PokedexText = {
   golisopod: {
     name: "Golisopod"
   },
+  golisopodmega: {
+    name: "Golisopod-Mega",
+    forme: "Mega Golisopod"
+  },
   sandygast: {
     name: "Sandygast"
   },
@@ -2975,64 +3723,109 @@ const PokedexText = {
     name: "Type: Null"
   },
   silvally: {
-    name: "Silvally"
+    name: "Silvally",
+    forme: "Type: Normal"
   },
   silvallybug: {
-    name: "Silvally-Bug"
+    name: "Silvally-Bug",
+    forme: "Type: Bug"
   },
   silvallydark: {
-    name: "Silvally-Dark"
+    name: "Silvally-Dark",
+    forme: "Type: Dark"
   },
   silvallydragon: {
-    name: "Silvally-Dragon"
+    name: "Silvally-Dragon",
+    forme: "Type: Dragon"
   },
   silvallyelectric: {
-    name: "Silvally-Electric"
+    name: "Silvally-Electric",
+    forme: "Type: Electric"
   },
   silvallyfairy: {
-    name: "Silvally-Fairy"
+    name: "Silvally-Fairy",
+    forme: "Type: Fairy"
   },
   silvallyfighting: {
-    name: "Silvally-Fighting"
+    name: "Silvally-Fighting",
+    forme: "Type: Fighting"
   },
   silvallyfire: {
-    name: "Silvally-Fire"
+    name: "Silvally-Fire",
+    forme: "Type: Fire"
   },
   silvallyflying: {
-    name: "Silvally-Flying"
+    name: "Silvally-Flying",
+    forme: "Type: Flying"
   },
   silvallyghost: {
-    name: "Silvally-Ghost"
+    name: "Silvally-Ghost",
+    forme: "Type: Ghost"
   },
   silvallygrass: {
-    name: "Silvally-Grass"
+    name: "Silvally-Grass",
+    forme: "Type: Grass"
   },
   silvallyground: {
-    name: "Silvally-Ground"
+    name: "Silvally-Ground",
+    forme: "Type: Ground"
   },
   silvallyice: {
-    name: "Silvally-Ice"
+    name: "Silvally-Ice",
+    forme: "Type: Ice"
   },
   silvallypoison: {
-    name: "Silvally-Poison"
+    name: "Silvally-Poison",
+    forme: "Type: Poison"
   },
   silvallypsychic: {
-    name: "Silvally-Psychic"
+    name: "Silvally-Psychic",
+    forme: "Type: Psychic"
   },
   silvallyrock: {
-    name: "Silvally-Rock"
+    name: "Silvally-Rock",
+    forme: "Type: Rock"
   },
   silvallysteel: {
-    name: "Silvally-Steel"
+    name: "Silvally-Steel",
+    forme: "Type: Steel"
   },
   silvallywater: {
-    name: "Silvally-Water"
+    name: "Silvally-Water",
+    forme: "Type: Water"
   },
   minior: {
-    name: "Minior"
+    name: "Minior-Red",
+    baseSpecies: "Minior",
+    forme: "Red Core"
+  },
+  miniororange: {
+    name: "Minior-Orange",
+    forme: "Orange Core"
+  },
+  minioryellow: {
+    name: "Minior-Yellow",
+    forme: "Yellow Core"
+  },
+  miniorgreen: {
+    name: "Minior-Green",
+    forme: "Green Core"
+  },
+  miniorblue: {
+    name: "Minior-Blue",
+    forme: "Blue Core"
+  },
+  miniorindigo: {
+    name: "Minior-Indigo",
+    forme: "Indigo Core"
+  },
+  miniorviolet: {
+    name: "Minior-Violet",
+    forme: "Violet Core"
   },
   miniormeteor: {
-    name: "Minior-Meteor"
+    name: "Minior-Meteor",
+    forme: "Meteor Form"
   },
   komala: {
     name: "Komala"
@@ -3044,25 +3837,34 @@ const PokedexText = {
     name: "Togedemaru"
   },
   togedemarutotem: {
-    name: "Togedemaru-Totem"
+    name: "Togedemaru-Totem",
+    forme: "Totem"
   },
   mimikyu: {
-    name: "Mimikyu"
+    name: "Mimikyu",
+    forme: "Disguised Form"
   },
   mimikyubusted: {
-    name: "Mimikyu-Busted"
+    name: "Mimikyu-Busted",
+    forme: "Busted Form"
   },
   mimikyutotem: {
-    name: "Mimikyu-Totem"
+    name: "Mimikyu-Totem",
+    forme: "Totem (Disguised Form)"
   },
   mimikyubustedtotem: {
-    name: "Mimikyu-Busted-Totem"
+    name: "Mimikyu-Busted-Totem",
+    forme: "Totem (Busted Form)"
   },
   bruxish: {
     name: "Bruxish"
   },
   drampa: {
     name: "Drampa"
+  },
+  drampamega: {
+    name: "Drampa-Mega",
+    forme: "Mega Drampa"
   },
   dhelmise: {
     name: "Dhelmise"
@@ -3077,7 +3879,8 @@ const PokedexText = {
     name: "Kommo-o"
   },
   kommoototem: {
-    name: "Kommo-o-Totem"
+    name: "Kommo-o-Totem",
+    forme: "Totem"
   },
   tapukoko: {
     name: "Tapu Koko"
@@ -3128,19 +3931,31 @@ const PokedexText = {
     name: "Necrozma"
   },
   necrozmaduskmane: {
-    name: "Necrozma-Dusk-Mane"
+    name: "Necrozma-Dusk-Mane",
+    forme: "Dusk Mane"
   },
   necrozmadawnwings: {
-    name: "Necrozma-Dawn-Wings"
+    name: "Necrozma-Dawn-Wings",
+    forme: "Dawn Wings"
   },
   necrozmaultra: {
-    name: "Necrozma-Ultra"
+    name: "Necrozma-Ultra",
+    forme: "Ultra Necrozma"
   },
   magearna: {
     name: "Magearna"
   },
+  magearnamega: {
+    name: "Magearna-Mega",
+    forme: "Mega Magearna"
+  },
+  magearnaoriginalmega: {
+    name: "Magearna-Original-Mega",
+    forme: "Mega Magearna (Original Color)"
+  },
   magearnaoriginal: {
-    name: "Magearna-Original"
+    name: "Magearna-Original",
+    forme: "Original Color"
   },
   marshadow: {
     name: "Marshadow"
@@ -3160,6 +3975,10 @@ const PokedexText = {
   zeraora: {
     name: "Zeraora"
   },
+  zeraoramega: {
+    name: "Zeraora-Mega",
+    forme: "Mega Zeraora"
+  },
   meltan: {
     name: "Meltan"
   },
@@ -3167,7 +3986,8 @@ const PokedexText = {
     name: "Melmetal"
   },
   melmetalgmax: {
-    name: "Melmetal-Gmax"
+    name: "Melmetal-Gmax",
+    forme: "Gigantamax"
   },
   grookey: {
     name: "Grookey"
@@ -3179,7 +3999,8 @@ const PokedexText = {
     name: "Rillaboom"
   },
   rillaboomgmax: {
-    name: "Rillaboom-Gmax"
+    name: "Rillaboom-Gmax",
+    forme: "Gigantamax"
   },
   scorbunny: {
     name: "Scorbunny"
@@ -3191,7 +4012,8 @@ const PokedexText = {
     name: "Cinderace"
   },
   cinderacegmax: {
-    name: "Cinderace-Gmax"
+    name: "Cinderace-Gmax",
+    forme: "Gigantamax"
   },
   sobble: {
     name: "Sobble"
@@ -3203,7 +4025,8 @@ const PokedexText = {
     name: "Inteleon"
   },
   inteleongmax: {
-    name: "Inteleon-Gmax"
+    name: "Inteleon-Gmax",
+    forme: "Gigantamax"
   },
   skwovet: {
     name: "Skwovet"
@@ -3221,7 +4044,8 @@ const PokedexText = {
     name: "Corviknight"
   },
   corviknightgmax: {
-    name: "Corviknight-Gmax"
+    name: "Corviknight-Gmax",
+    forme: "Gigantamax"
   },
   blipbug: {
     name: "Blipbug"
@@ -3233,7 +4057,8 @@ const PokedexText = {
     name: "Orbeetle"
   },
   orbeetlegmax: {
-    name: "Orbeetle-Gmax"
+    name: "Orbeetle-Gmax",
+    forme: "Gigantamax"
   },
   nickit: {
     name: "Nickit"
@@ -3260,7 +4085,8 @@ const PokedexText = {
     name: "Drednaw"
   },
   drednawgmax: {
-    name: "Drednaw-Gmax"
+    name: "Drednaw-Gmax",
+    forme: "Gigantamax"
   },
   yamper: {
     name: "Yamper"
@@ -3278,7 +4104,8 @@ const PokedexText = {
     name: "Coalossal"
   },
   coalossalgmax: {
-    name: "Coalossal-Gmax"
+    name: "Coalossal-Gmax",
+    forme: "Gigantamax"
   },
   applin: {
     name: "Applin"
@@ -3287,13 +4114,15 @@ const PokedexText = {
     name: "Flapple"
   },
   flapplegmax: {
-    name: "Flapple-Gmax"
+    name: "Flapple-Gmax",
+    forme: "Gigantamax"
   },
   appletun: {
     name: "Appletun"
   },
   appletungmax: {
-    name: "Appletun-Gmax"
+    name: "Appletun-Gmax",
+    forme: "Gigantamax"
   },
   silicobra: {
     name: "Silicobra"
@@ -3302,16 +4131,19 @@ const PokedexText = {
     name: "Sandaconda"
   },
   sandacondagmax: {
-    name: "Sandaconda-Gmax"
+    name: "Sandaconda-Gmax",
+    forme: "Gigantamax"
   },
   cramorant: {
     name: "Cramorant"
   },
   cramorantgulping: {
-    name: "Cramorant-Gulping"
+    name: "Cramorant-Gulping",
+    forme: "Gulping Form"
   },
   cramorantgorging: {
-    name: "Cramorant-Gorging"
+    name: "Cramorant-Gorging",
+    forme: "Gorging Form"
   },
   arrokuda: {
     name: "Arrokuda"
@@ -3323,16 +4155,21 @@ const PokedexText = {
     name: "Toxel"
   },
   toxtricity: {
-    name: "Toxtricity"
+    name: "Toxtricity-Amped",
+    baseSpecies: "Toxtricity",
+    forme: "Amped Form"
   },
   toxtricitylowkey: {
-    name: "Toxtricity-Low-Key"
+    name: "Toxtricity-Low-Key",
+    forme: "Low Key Form"
   },
   toxtricitygmax: {
-    name: "Toxtricity-Gmax"
+    name: "Toxtricity-Gmax",
+    forme: "Gigantamax (Amped Form)"
   },
   toxtricitylowkeygmax: {
-    name: "Toxtricity-Low-Key-Gmax"
+    name: "Toxtricity-Low-Key-Gmax",
+    forme: "Gigantamax (Low Key Form)"
   },
   sizzlipede: {
     name: "Sizzlipede"
@@ -3341,7 +4178,8 @@ const PokedexText = {
     name: "Centiskorch"
   },
   centiskorchgmax: {
-    name: "Centiskorch-Gmax"
+    name: "Centiskorch-Gmax",
+    forme: "Gigantamax"
   },
   clobbopus: {
     name: "Clobbopus"
@@ -3350,16 +4188,20 @@ const PokedexText = {
     name: "Grapploct"
   },
   sinistea: {
-    name: "Sinistea"
+    name: "Sinistea",
+    forme: "Phony Form"
   },
   sinisteaantique: {
-    name: "Sinistea-Antique"
+    name: "Sinistea-Antique",
+    forme: "Antique Form"
   },
   polteageist: {
-    name: "Polteageist"
+    name: "Polteageist",
+    forme: "Phony Form"
   },
   polteageistantique: {
-    name: "Polteageist-Antique"
+    name: "Polteageist-Antique",
+    forme: "Antique Form"
   },
   hatenna: {
     name: "Hatenna"
@@ -3371,7 +4213,8 @@ const PokedexText = {
     name: "Hatterene"
   },
   hatterenegmax: {
-    name: "Hatterene-Gmax"
+    name: "Hatterene-Gmax",
+    forme: "Gigantamax"
   },
   impidimp: {
     name: "Impidimp"
@@ -3383,7 +4226,8 @@ const PokedexText = {
     name: "Grimmsnarl"
   },
   grimmsnarlgmax: {
-    name: "Grimmsnarl-Gmax"
+    name: "Grimmsnarl-Gmax",
+    forme: "Gigantamax"
   },
   obstagoon: {
     name: "Obstagoon"
@@ -3407,13 +4251,52 @@ const PokedexText = {
     name: "Milcery"
   },
   alcremie: {
-    name: "Alcremie"
+    name: "Alcremie-Vanilla",
+    baseSpecies: "Alcremie",
+    forme: "Vanilla Cream"
+  },
+  alcremierubycream: {
+    name: "Alcremie-Ruby",
+    forme: "Ruby Cream"
+  },
+  alcremiematchacream: {
+    name: "Alcremie-Matcha",
+    forme: "Matcha Cream"
+  },
+  alcremiemintcream: {
+    name: "Alcremie-Mint",
+    forme: "Mint Cream"
+  },
+  alcremielemoncream: {
+    name: "Alcremie-Lemon",
+    forme: "Lemon Cream"
+  },
+  alcremiesaltedcream: {
+    name: "Alcremie-Salted",
+    forme: "Salted Cream"
+  },
+  alcremierubyswirl: {
+    name: "Alcremie-Ruby-Swirl",
+    forme: "Ruby Swirl"
+  },
+  alcremiecaramelswirl: {
+    name: "Alcremie-Caramel-Swirl",
+    forme: "Caramel Swirl"
+  },
+  alcremierainbowswirl: {
+    name: "Alcremie-Rainbow-Swirl",
+    forme: "Rainbow Swirl"
   },
   alcremiegmax: {
-    name: "Alcremie-Gmax"
+    name: "Alcremie-Gmax",
+    forme: "Gigantamax"
   },
   falinks: {
     name: "Falinks"
+  },
+  falinksmega: {
+    name: "Falinks-Mega",
+    forme: "Mega Falinks"
   },
   pincurchin: {
     name: "Pincurchin"
@@ -3428,22 +4311,29 @@ const PokedexText = {
     name: "Stonjourner"
   },
   eiscue: {
-    name: "Eiscue"
+    name: "Eiscue",
+    forme: "Ice Face"
   },
   eiscuenoice: {
-    name: "Eiscue-Noice"
+    name: "Eiscue-Noice",
+    forme: "Noice Face"
   },
   indeedee: {
-    name: "Indeedee"
+    name: "Indeedee-M",
+    baseSpecies: "Indeedee",
+    forme: "Male"
   },
   indeedeef: {
-    name: "Indeedee-F"
+    name: "Indeedee-F",
+    forme: "Female"
   },
   morpeko: {
-    name: "Morpeko"
+    name: "Morpeko",
+    forme: "Full Belly Mode"
   },
   morpekohangry: {
-    name: "Morpeko-Hangry"
+    name: "Morpeko-Hangry",
+    forme: "Hangry Mode"
   },
   cufant: {
     name: "Cufant"
@@ -3452,7 +4342,8 @@ const PokedexText = {
     name: "Copperajah"
   },
   copperajahgmax: {
-    name: "Copperajah-Gmax"
+    name: "Copperajah-Gmax",
+    forme: "Gigantamax"
   },
   dracozolt: {
     name: "Dracozolt"
@@ -3470,7 +4361,8 @@ const PokedexText = {
     name: "Duraludon"
   },
   duraludongmax: {
-    name: "Duraludon-Gmax"
+    name: "Duraludon-Gmax",
+    forme: "Gigantamax"
   },
   dreepy: {
     name: "Dreepy"
@@ -3482,43 +4374,54 @@ const PokedexText = {
     name: "Dragapult"
   },
   zacian: {
-    name: "Zacian"
+    name: "Zacian",
+    forme: "Hero of Many Battles"
   },
   zaciancrowned: {
-    name: "Zacian-Crowned"
+    name: "Zacian-Crowned",
+    forme: "Crowned Sword"
   },
   zamazenta: {
-    name: "Zamazenta"
+    name: "Zamazenta",
+    forme: "Hero of Many Battles"
   },
   zamazentacrowned: {
-    name: "Zamazenta-Crowned"
+    name: "Zamazenta-Crowned",
+    forme: "Crowned Shield"
   },
   eternatus: {
     name: "Eternatus"
   },
   eternatuseternamax: {
-    name: "Eternatus-Eternamax"
+    name: "Eternatus-Eternamax",
+    forme: "Eternamax"
   },
   kubfu: {
     name: "Kubfu"
   },
   urshifu: {
-    name: "Urshifu"
+    name: "Urshifu-Single",
+    baseSpecies: "Urshifu",
+    forme: "Single Strike Style"
   },
   urshifurapidstrike: {
-    name: "Urshifu-Rapid-Strike"
+    name: "Urshifu-Rapid",
+    forme: "Rapid Strike Style"
   },
   urshifugmax: {
-    name: "Urshifu-Gmax"
+    name: "Urshifu-Gmax",
+    forme: "Gigantamax (Single Strike Style)"
   },
   urshifurapidstrikegmax: {
-    name: "Urshifu-Rapid-Strike-Gmax"
+    name: "Urshifu-Rapid-Gmax",
+    forme: "Gigantamax (Rapid Strike Style)"
   },
   zarude: {
     name: "Zarude"
   },
   zarudedada: {
-    name: "Zarude-Dada"
+    name: "Zarude-Dada",
+    forme: "Dada"
   },
   regieleki: {
     name: "Regieleki"
@@ -3536,10 +4439,12 @@ const PokedexText = {
     name: "Calyrex"
   },
   calyrexice: {
-    name: "Calyrex-Ice"
+    name: "Calyrex-Ice",
+    forme: "Ice Rider"
   },
   calyrexshadow: {
-    name: "Calyrex-Shadow"
+    name: "Calyrex-Shadow",
+    forme: "Shadow Rider"
   },
   wyrdeer: {
     name: "Wyrdeer"
@@ -3550,11 +4455,18 @@ const PokedexText = {
   ursaluna: {
     name: "Ursaluna"
   },
+  ursalunabloodmoon: {
+    name: "Ursaluna-Bloodmoon",
+    forme: "Bloodmoon"
+  },
   basculegion: {
-    name: "Basculegion"
+    name: "Basculegion-M",
+    baseSpecies: "Basculegion",
+    forme: "Male"
   },
   basculegionf: {
-    name: "Basculegion-F"
+    name: "Basculegion-F",
+    forme: "Female"
   },
   sneasler: {
     name: "Sneasler"
@@ -3563,10 +4475,498 @@ const PokedexText = {
     name: "Overqwil"
   },
   enamorus: {
-    name: "Enamorus"
+    name: "Enamorus-Incarnate",
+    baseSpecies: "Enamorus",
+    forme: "Incarnate Forme"
   },
   enamorustherian: {
-    name: "Enamorus-Therian"
+    name: "Enamorus-Therian",
+    forme: "Therian Forme"
+  },
+  sprigatito: {
+    name: "Sprigatito"
+  },
+  floragato: {
+    name: "Floragato"
+  },
+  meowscarada: {
+    name: "Meowscarada"
+  },
+  fuecoco: {
+    name: "Fuecoco"
+  },
+  crocalor: {
+    name: "Crocalor"
+  },
+  skeledirge: {
+    name: "Skeledirge"
+  },
+  quaxly: {
+    name: "Quaxly"
+  },
+  quaxwell: {
+    name: "Quaxwell"
+  },
+  quaquaval: {
+    name: "Quaquaval"
+  },
+  lechonk: {
+    name: "Lechonk"
+  },
+  oinkologne: {
+    name: "Oinkologne-M",
+    baseSpecies: "Oinkologne",
+    forme: "Male"
+  },
+  oinkolognef: {
+    name: "Oinkologne-F",
+    forme: "Female"
+  },
+  tarountula: {
+    name: "Tarountula"
+  },
+  spidops: {
+    name: "Spidops"
+  },
+  nymble: {
+    name: "Nymble"
+  },
+  lokix: {
+    name: "Lokix"
+  },
+  pawmi: {
+    name: "Pawmi"
+  },
+  pawmo: {
+    name: "Pawmo"
+  },
+  pawmot: {
+    name: "Pawmot"
+  },
+  tandemaus: {
+    name: "Tandemaus"
+  },
+  maushold: {
+    name: "Maushold-Three",
+    baseSpecies: "Maushold",
+    forme: "Family of Three"
+  },
+  mausholdfour: {
+    name: "Maushold-Four",
+    forme: "Family of Four"
+  },
+  fidough: {
+    name: "Fidough"
+  },
+  dachsbun: {
+    name: "Dachsbun"
+  },
+  smoliv: {
+    name: "Smoliv"
+  },
+  dolliv: {
+    name: "Dolliv"
+  },
+  arboliva: {
+    name: "Arboliva"
+  },
+  squawkabilly: {
+    name: "Squawkabilly-Green",
+    baseSpecies: "Squawkabilly",
+    forme: "Green Plumage"
+  },
+  squawkabillyyellow: {
+    name: "Squawkabilly-Yellow",
+    forme: "Yellow Plumage"
+  },
+  squawkabillywhite: {
+    name: "Squawkabilly-White",
+    forme: "White Plumage"
+  },
+  squawkabillyblue: {
+    name: "Squawkabilly-Blue",
+    forme: "Blue Plumage"
+  },
+  nacli: {
+    name: "Nacli"
+  },
+  naclstack: {
+    name: "Naclstack"
+  },
+  garganacl: {
+    name: "Garganacl"
+  },
+  charcadet: {
+    name: "Charcadet"
+  },
+  armarouge: {
+    name: "Armarouge"
+  },
+  ceruledge: {
+    name: "Ceruledge"
+  },
+  tadbulb: {
+    name: "Tadbulb"
+  },
+  bellibolt: {
+    name: "Bellibolt"
+  },
+  wattrel: {
+    name: "Wattrel"
+  },
+  kilowattrel: {
+    name: "Kilowattrel"
+  },
+  maschiff: {
+    name: "Maschiff"
+  },
+  mabosstiff: {
+    name: "Mabosstiff"
+  },
+  shroodle: {
+    name: "Shroodle"
+  },
+  grafaiai: {
+    name: "Grafaiai"
+  },
+  bramblin: {
+    name: "Bramblin"
+  },
+  brambleghast: {
+    name: "Brambleghast"
+  },
+  toedscool: {
+    name: "Toedscool"
+  },
+  toedscruel: {
+    name: "Toedscruel"
+  },
+  klawf: {
+    name: "Klawf"
+  },
+  capsakid: {
+    name: "Capsakid"
+  },
+  scovillain: {
+    name: "Scovillain"
+  },
+  scovillainmega: {
+    name: "Scovillain-Mega",
+    forme: "Mega Scovillain"
+  },
+  rellor: {
+    name: "Rellor"
+  },
+  rabsca: {
+    name: "Rabsca"
+  },
+  flittle: {
+    name: "Flittle"
+  },
+  espathra: {
+    name: "Espathra"
+  },
+  tinkatink: {
+    name: "Tinkatink"
+  },
+  tinkatuff: {
+    name: "Tinkatuff"
+  },
+  tinkaton: {
+    name: "Tinkaton"
+  },
+  wiglett: {
+    name: "Wiglett"
+  },
+  wugtrio: {
+    name: "Wugtrio"
+  },
+  bombirdier: {
+    name: "Bombirdier"
+  },
+  finizen: {
+    name: "Finizen"
+  },
+  palafin: {
+    name: "Palafin",
+    forme: "Zero Form"
+  },
+  palafinhero: {
+    name: "Palafin-Hero",
+    forme: "Hero Form"
+  },
+  varoom: {
+    name: "Varoom"
+  },
+  revavroom: {
+    name: "Revavroom"
+  },
+  cyclizar: {
+    name: "Cyclizar"
+  },
+  orthworm: {
+    name: "Orthworm"
+  },
+  glimmet: {
+    name: "Glimmet"
+  },
+  glimmora: {
+    name: "Glimmora"
+  },
+  glimmoramega: {
+    name: "Glimmora-Mega",
+    forme: "Mega Glimmora"
+  },
+  greavard: {
+    name: "Greavard"
+  },
+  houndstone: {
+    name: "Houndstone"
+  },
+  flamigo: {
+    name: "Flamigo"
+  },
+  cetoddle: {
+    name: "Cetoddle"
+  },
+  cetitan: {
+    name: "Cetitan"
+  },
+  veluza: {
+    name: "Veluza"
+  },
+  dondozo: {
+    name: "Dondozo"
+  },
+  tatsugiri: {
+    name: "Tatsugiri-Curly",
+    baseSpecies: "Tatsugiri",
+    forme: "Curly Form"
+  },
+  tatsugiricurlymega: {
+    name: "Tatsugiri-Curly-Mega",
+    forme: "Mega Tatsugiri (Curly Form)"
+  },
+  tatsugiridroopymega: {
+    name: "Tatsugiri-Droopy-Mega",
+    forme: "Mega Tatsugiri (Droopy Form)"
+  },
+  tatsugiristretchymega: {
+    name: "Tatsugiri-Stretchy-Mega",
+    forme: "Mega Tatsugiri (Stretchy Form)"
+  },
+  tatsugiridroopy: {
+    name: "Tatsugiri-Droopy",
+    forme: "Droopy Form"
+  },
+  tatsugiristretchy: {
+    name: "Tatsugiri-Stretchy",
+    forme: "Stretchy Form"
+  },
+  annihilape: {
+    name: "Annihilape"
+  },
+  clodsire: {
+    name: "Clodsire"
+  },
+  farigiraf: {
+    name: "Farigiraf"
+  },
+  dudunsparce: {
+    name: "Dudunsparce-Two",
+    baseSpecies: "Dudunsparce",
+    forme: "Two-Segment Form"
+  },
+  dudunsparcethreesegment: {
+    name: "Dudunsparce-Three",
+    forme: "Three-Segment Form"
+  },
+  kingambit: {
+    name: "Kingambit"
+  },
+  greattusk: {
+    name: "Great Tusk"
+  },
+  screamtail: {
+    name: "Scream Tail"
+  },
+  brutebonnet: {
+    name: "Brute Bonnet"
+  },
+  fluttermane: {
+    name: "Flutter Mane"
+  },
+  slitherwing: {
+    name: "Slither Wing"
+  },
+  sandyshocks: {
+    name: "Sandy Shocks"
+  },
+  irontreads: {
+    name: "Iron Treads"
+  },
+  ironbundle: {
+    name: "Iron Bundle"
+  },
+  ironhands: {
+    name: "Iron Hands"
+  },
+  ironjugulis: {
+    name: "Iron Jugulis"
+  },
+  ironmoth: {
+    name: "Iron Moth"
+  },
+  ironthorns: {
+    name: "Iron Thorns"
+  },
+  frigibax: {
+    name: "Frigibax"
+  },
+  arctibax: {
+    name: "Arctibax"
+  },
+  baxcalibur: {
+    name: "Baxcalibur"
+  },
+  baxcaliburmega: {
+    name: "Baxcalibur-Mega",
+    forme: "Mega Baxcalibur"
+  },
+  gimmighoul: {
+    name: "Gimmighoul",
+    forme: "Chest Form"
+  },
+  gimmighoulroaming: {
+    name: "Gimmighoul-Roaming",
+    forme: "Roaming Form"
+  },
+  gholdengo: {
+    name: "Gholdengo"
+  },
+  wochien: {
+    name: "Wo-Chien"
+  },
+  chienpao: {
+    name: "Chien-Pao"
+  },
+  tinglu: {
+    name: "Ting-Lu"
+  },
+  chiyu: {
+    name: "Chi-Yu"
+  },
+  roaringmoon: {
+    name: "Roaring Moon"
+  },
+  ironvaliant: {
+    name: "Iron Valiant"
+  },
+  koraidon: {
+    name: "Koraidon"
+  },
+  miraidon: {
+    name: "Miraidon"
+  },
+  walkingwake: {
+    name: "Walking Wake"
+  },
+  ironleaves: {
+    name: "Iron Leaves"
+  },
+  dipplin: {
+    name: "Dipplin"
+  },
+  poltchageist: {
+    name: "Poltchageist",
+    forme: "Counterfeit Form"
+  },
+  poltchageistartisan: {
+    name: "Poltchageist-Artisan",
+    forme: "Artisan Form"
+  },
+  sinistcha: {
+    name: "Sinistcha",
+    forme: "Unremarkable Form"
+  },
+  sinistchamasterpiece: {
+    name: "Sinistcha-Masterpiece",
+    forme: "Masterpiece Form"
+  },
+  okidogi: {
+    name: "Okidogi"
+  },
+  munkidori: {
+    name: "Munkidori"
+  },
+  fezandipiti: {
+    name: "Fezandipiti"
+  },
+  ogerpon: {
+    name: "Ogerpon-Teal",
+    baseSpecies: "Ogerpon",
+    forme: "Teal Mask"
+  },
+  ogerponcornerstonetera: {
+    name: "Ogerpon-Cornerstone-Tera",
+    forme: "Terastal (Cornerstone Mask)"
+  },
+  ogerponhearthflametera: {
+    name: "Ogerpon-Hearthflame-Tera",
+    forme: "Terastal (Hearthflame Mask)"
+  },
+  ogerponwellspringtera: {
+    name: "Ogerpon-Wellspring-Tera",
+    forme: "Terastal (Wellspring Mask)"
+  },
+  ogerpontealtera: {
+    name: "Ogerpon-Teal-Tera",
+    forme: "Terastal (Teal Mask)"
+  },
+  ogerponwellspring: {
+    name: "Ogerpon-Wellspring",
+    forme: "Wellspring Mask"
+  },
+  ogerponhearthflame: {
+    name: "Ogerpon-Hearthflame",
+    forme: "Hearthflame Mask"
+  },
+  ogerponcornerstone: {
+    name: "Ogerpon-Cornerstone",
+    forme: "Cornerstone Mask"
+  },
+  archaludon: {
+    name: "Archaludon"
+  },
+  hydrapple: {
+    name: "Hydrapple"
+  },
+  gougingfire: {
+    name: "Gouging Fire"
+  },
+  ragingbolt: {
+    name: "Raging Bolt"
+  },
+  ironboulder: {
+    name: "Iron Boulder"
+  },
+  ironcrown: {
+    name: "Iron Crown"
+  },
+  terapagos: {
+    name: "Terapagos",
+    forme: "Normal Form"
+  },
+  terapagosterastal: {
+    name: "Terapagos-Terastal",
+    forme: "Terastal Form"
+  },
+  terapagosstellar: {
+    name: "Terapagos-Stellar",
+    forme: "Stellar Form"
+  },
+  pecharunt: {
+    name: "Pecharunt"
   },
   missingno: {
     name: "MissingNo."
@@ -3745,47 +5145,95 @@ const PokedexText = {
   pokestarufo: {
     name: "Pokestar UFO"
   },
+  pokestarufopropu1: {
+    name: "Pokestar UFO-PropU1"
+  },
   pokestarufo2: {
     name: "Pokestar UFO-2"
   },
   pokestarbrycenman: {
     name: "Pokestar Brycen-Man"
   },
+  pokestarbrycenmanprop: {
+    name: "Pokestar Brycen-Man-Prop"
+  },
   pokestarmt: {
     name: "Pokestar MT"
+  },
+  pokestarmtprop: {
+    name: "Pokestar MT-Prop"
   },
   pokestarmt2: {
     name: "Pokestar MT2"
   },
+  pokestarmt2prop: {
+    name: "Pokestar MT2-Prop"
+  },
   pokestartransport: {
     name: "Pokestar Transport"
+  },
+  pokestartransportprop: {
+    name: "Pokestar Transport-Prop"
   },
   pokestargiant: {
     name: "Pokestar Giant"
   },
+  pokestargiant2: {
+    name: "Pokestar Giant-2"
+  },
+  pokestargiantpropo1: {
+    name: "Pokestar Giant-PropO1"
+  },
+  pokestargiantpropo2: {
+    name: "Pokestar Giant-PropO2"
+  },
   pokestarhumanoid: {
     name: "Pokestar Humanoid"
+  },
+  pokestarhumanoidprop: {
+    name: "Pokestar Humanoid-Prop"
   },
   pokestarmonster: {
     name: "Pokestar Monster"
   },
+  pokestarmonsterprop: {
+    name: "Pokestar Monster-Prop"
+  },
   pokestarf00: {
     name: "Pokestar F-00"
+  },
+  pokestarf00prop: {
+    name: "Pokestar F-00-Prop"
   },
   pokestarf002: {
     name: "Pokestar F-002"
   },
+  pokestarf002prop: {
+    name: "Pokestar F-002-Prop"
+  },
   pokestarspirit: {
     name: "Pokestar Spirit"
+  },
+  pokestarspiritprop: {
+    name: "Pokestar Spirit-Prop"
   },
   pokestarblackdoor: {
     name: "Pokestar Black Door"
   },
+  pokestarblackdoorprop: {
+    name: "Pokestar Black Door-Prop"
+  },
   pokestarwhitedoor: {
     name: "Pokestar White Door"
   },
+  pokestarwhitedoorprop: {
+    name: "Pokestar White Door-Prop"
+  },
   pokestarblackbelt: {
     name: "Pokestar Black Belt"
+  },
+  pokestarblackbeltprop: {
+    name: "Pokestar Black Belt-Prop"
   },
   pokestarufopropu2: {
     name: "Pokestar UFO-PropU2"

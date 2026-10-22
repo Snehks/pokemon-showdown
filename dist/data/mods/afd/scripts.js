@@ -100,18 +100,19 @@ const Scripts = {
         if (sourceEffect && typeof sourceEffect.selfSwitch === "string") {
           switchCopyFlag = sourceEffect.selfSwitch;
         }
-        if (!oldActive.skipBeforeSwitchOutEventFlag && !isDrag) {
+        if (!oldActive.skipPursuit && !isDrag) {
           this.battle.runEvent("BeforeSwitchOut", oldActive);
           if (this.battle.gen >= 5) {
             this.battle.eachEvent("Update");
           }
         }
-        oldActive.skipBeforeSwitchOutEventFlag = false;
+        oldActive.skipPursuit = false;
+        oldActive.pursuitActivated = false;
         if (!this.battle.runEvent("SwitchOut", oldActive)) {
           return false;
         }
         if (!oldActive.hp) {
-          return "pursuitfaint";
+          return false;
         }
         this.battle.singleEvent("End", oldActive.getAbility(), oldActive.abilityState, oldActive);
         this.battle.singleEvent("End", oldActive.getItem(), oldActive.itemState, oldActive);
@@ -157,7 +158,6 @@ const Scripts = {
       } else {
         this.battle.add(isDrag ? "drag" : "switch", pokemon, pokemon.getFullDetails);
       }
-      if (isDrag && this.battle.gen === 2) pokemon.draggedIn = this.battle.turn;
       pokemon.previouslySwitchedIn++;
       if (isDrag && this.battle.gen >= 5) {
         this.runSwitch(pokemon);

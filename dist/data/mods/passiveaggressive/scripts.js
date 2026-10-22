@@ -125,7 +125,7 @@ const Scripts = {
       }
       if (hit === 1) return damage.fill(false);
       if (nullDamage) damage.fill(false);
-      this.battle.faintMessages(false, false, !pokemon.hp);
+      this.battle.resolveFaints({ checkWin: !pokemon.hp });
       if (move.multihit && typeof move.smartTarget !== "boolean") {
         this.battle.add("-hitcount", targets[0], hit - 1);
       }
@@ -146,15 +146,13 @@ const Scripts = {
       if (move.ohko && !targets[0].hp) this.battle.add("-ohko");
       if (!damage.some((val) => !!val || val === 0)) return damage;
       this.battle.eachEvent("Update");
-      this.afterMoveSecondaryEvent(targetsCopy.filter((val) => !!val), pokemon, move);
-      if (!(move.hasSheerForce && pokemon.hasAbility("sheerforce"))) {
+      if (!this.battle.suppressingSecondaries()) {
+        this.afterMoveSecondaryEvent(targetsCopy.filter((val) => !!val), pokemon, move);
         for (const [i, d] of damage.entries()) {
           const curDamage = targets.length === 1 ? move.totalDamage : d;
           if (typeof curDamage === "number" && targets[i].hp) {
             const targetHPBeforeDamage = (targets[i].hurtThisTurn || 0) + curDamage;
-            if (targets[i].hp <= targets[i].maxhp / 2 && targetHPBeforeDamage > targets[i].maxhp / 2) {
-              this.battle.runEvent("EmergencyExit", targets[i], pokemon);
-            }
+            this.battle.runEvent("EmergencyExit", targets[i], pokemon, void 0, targetHPBeforeDamage);
           }
         }
       }
@@ -176,9 +174,7 @@ const Scripts = {
         const effect = move.mindBlownRecoil ? this.dex.conditions.get(move.name) : "recoil";
         this.battle.damage(recoilDamage, pokemon, pokemon, effect);
       }
-      if (pokemon.hp <= pokemon.maxhp / 2 && hpBeforeRecoil > pokemon.maxhp / 2) {
-        this.battle.runEvent("EmergencyExit", pokemon, pokemon);
-      }
+      this.battle.runEvent("EmergencyExit", pokemon, pokemon, void 0, hpBeforeRecoil);
       return recoilDamage;
     }
   }

@@ -320,18 +320,18 @@ ${e.stack}`), `Socket process ${process.pid}`);
           if (config.customhttpresponse?.(req, res)) {
             return;
           }
-          let server2 = staticServer;
+          let server = staticServer;
           if (req.url) {
             if (req.url === "/custom.css" || req.url.startsWith("/custom.css?")) {
-              server2 = cssServer;
+              server = cssServer;
             } else if (req.url.startsWith("/avatars/")) {
               req.url = req.url.slice(8);
-              server2 = avatarServer;
+              server = avatarServer;
             } else if (roomidRegex.test(req.url)) {
               req.url = "/";
             }
           }
-          void server2.serve(req, res, (e) => {
+          void server.serve(req, res, (e) => {
             if (e.status === 404) {
               void staticServer.serveFile("404.html", 404, {}, req, res);
               return true;
@@ -344,6 +344,18 @@ ${e.stack}`), `Socket process ${process.pid}`);
     } catch {
       console.log("Could not start static server");
     }
+    this.setupSockJS(config.wsdeflate);
+    process.once("disconnect", () => this.cleanup());
+    process.once("exit", () => this.cleanup());
+    this.server.listen(config.port, config.bindaddress);
+    console.log(`Worker ${PM.workerid} now listening on ${config.bindaddress}:${config.port}`);
+    if (this.serverSsl) {
+      this.serverSsl.listen(config.ssl.port, config.bindaddress);
+      console.log(`Worker ${PM.workerid} now listening for SSL on port ${config.ssl.port}`);
+    }
+    console.log(`Test your server at http://${config.bindaddress === "0.0.0.0" ? "localhost" : config.bindaddress}:${config.port}`);
+  }
+  setupSockJS(wsdeflate) {
     const sockjs = require("sockjs");
     const options = {
       sockjs_url: `//play.pokemonshowdown.com/js/lib/sockjs-1.4.0-nwjsfix.min.js`,
@@ -352,9 +364,9 @@ ${e.stack}`), `Socket process ${process.pid}`);
         if (severity === "error") console.log(`ERROR: ${message}`);
       }
     };
-    if (config.wsdeflate !== null) {
+    if (wsdeflate !== null) {
       try {
-        const deflate = require("permessage-deflate").configure(config.wsdeflate);
+        const deflate = require("permessage-deflate").configure(wsdeflate);
         options.faye_server_options = { extensions: [deflate] };
       } catch {
         (0, import_lib.crashlogger)(
@@ -364,18 +376,22 @@ ${e.stack}`), `Socket process ${process.pid}`);
       }
     }
     const server = sockjs.createServer(options);
-    process.once("disconnect", () => this.cleanup());
-    process.once("exit", () => this.cleanup());
     server.on("connection", (connection) => this.onConnection(connection));
-    server.installHandlers(this.server, {});
-    this.server.listen(config.port, config.bindaddress);
-    console.log(`Worker ${PM.workerid} now listening on ${config.bindaddress}:${config.port}`);
-    if (this.serverSsl) {
-      server.installHandlers(this.serverSsl, {});
-      this.serverSsl.listen(config.ssl.port, config.bindaddress);
-      console.log(`Worker ${PM.workerid} now listening for SSL on port ${config.ssl.port}`);
+    for (const httpServer of [this.server, this.serverSsl]) {
+      if (!httpServer) continue;
+      server.installHandlers(httpServer, {});
+      const upgradeHandler = httpServer.listeners("upgrade")[0];
+      httpServer.removeAllListeners("upgrade");
+      httpServer.on("upgrade", (req, socket, head) => {
+        socket.on("error", () => socket.destroy());
+        const pathname = (req.url || "").split("?", 1)[0];
+        if (req.method !== "GET" || req.headers.upgrade?.toLowerCase() !== "websocket" || !/^\/showdown(?:\/[^/.]+\/[^/.]+)?\/websocket\/?$/.test(pathname)) {
+          socket.end("HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Length: 0\r\n\r\n", () => socket.destroy());
+          return;
+        }
+        upgradeHandler.call(httpServer, req, socket, head);
+      });
     }
-    console.log(`Test your server at http://${config.bindaddress === "0.0.0.0" ? "localhost" : config.bindaddress}:${config.port}`);
   }
   /**
    * Clean up any remaining connections on disconnect. If this isn't done,

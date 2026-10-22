@@ -766,7 +766,7 @@ const Conditions = {
       if (target.illusion) return;
       if (effect.name === "Intimidate" && boost.atk) {
         delete boost.atk;
-        this.add("-fail", target, "unboost", "Attack", "[from] ability: Oblivious", `[of] ${target}`);
+        this.add("-fail", target, "unboost", "atk", "[from] ability: Oblivious", `[of] ${target}`);
       }
     }
   },

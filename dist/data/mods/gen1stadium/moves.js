@@ -45,7 +45,7 @@ const Moves = {
       },
       onDamage(damage, target, source, move) {
         if (!source || source.isAlly(target)) return;
-        if (!move || move.effectType !== "Move") return;
+        if (move?.effectType !== "Move") return;
         if (!damage && this.effectState.lastDamage > 0) {
           damage = this.effectState.totalDamage;
         }
@@ -116,7 +116,7 @@ const Moves = {
     willCrit: false,
     basePower: 1,
     damageCallback(pokemon, target) {
-      const lastMoveThisTurn = target.side.lastMove && target.side.lastMove.id === target.side.lastSelectedMove && !this.queue.willMove(target) && this.dex.moves.get(target.side.lastMove.id);
+      const lastMoveThisTurn = target.side.lastMove?.id === target.side.lastSelectedMove && !this.queue.willMove(target) && this.dex.moves.get(target.side.lastMove.id);
       if (!lastMoveThisTurn) {
         this.debug("Stadium 1 Counter: last move was not this turn");
         this.add("-fail", pokemon);

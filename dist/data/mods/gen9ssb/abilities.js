@@ -133,7 +133,7 @@ const Abilities = {
     onTryBoost(boost, target, source, effect) {
       if (effect.name === "Intimidate" && boost.atk) {
         delete boost.atk;
-        this.add("-fail", target, "unboost", "Attack", "[from] ability: Paw Prints", `[of] ${target}`);
+        this.add("-fail", target, "unboost", "atk", "[from] ability: Paw Prints", `[of] ${target}`);
       }
     },
     onModifyMove(move) {
@@ -647,7 +647,7 @@ const Abilities = {
     name: "Masquerade",
     onDamagePriority: 1,
     onDamage(damage, target, source, effect) {
-      if (effect && effect.effectType === "Move" && ["mimikyu", "mimikyutotem"].includes(target.species.id) && !target.transformed) {
+      if (effect?.effectType === "Move" && ["mimikyu", "mimikyutotem"].includes(target.species.id) && !target.transformed) {
         this.add("-activate", target, "ability: Masquerade");
         this.effectState.busted = true;
         return 0;
@@ -707,7 +707,7 @@ const Abilities = {
       this.field.clearWeather();
     },
     onDamage(damage, target, source, effect) {
-      if (effect && effect.name === "Stealth Rock") {
+      if (effect?.name === "Stealth Rock") {
         return false;
       }
     },
@@ -1021,7 +1021,7 @@ const Abilities = {
     },
     onDamagePriority: -30,
     onDamage(damage, target, source, effect) {
-      if (target.hp === target.maxhp && damage >= target.hp && effect && effect.effectType === "Move") {
+      if (target.hp === target.maxhp && damage >= target.hp && effect?.effectType === "Move") {
         this.add("-ability", target, "Hydrostatic Positivity");
         return target.hp - 1;
       }
@@ -1277,7 +1277,7 @@ const Abilities = {
       }
     },
     onDamage(damage, target, source, effect) {
-      if (effect && effect.id === "brn") {
+      if (effect?.id === "brn") {
         return damage / 2;
       }
     },
@@ -2320,7 +2320,7 @@ const Abilities = {
       }
     },
     onSourceAfterFaint(length, target, source, effect) {
-      if (effect && effect.effectType === "Move") {
+      if (effect?.effectType === "Move") {
         this.boost({ atk: -length }, source);
       }
     },
@@ -2516,7 +2516,7 @@ const Abilities = {
     shortDesc: "Mountaineer + Fur Coat.",
     name: "Gale Guard",
     onDamage(damage, target, source, effect) {
-      if (effect && effect.name === "Stealth Rock") {
+      if (effect?.name === "Stealth Rock") {
         return false;
       }
     },

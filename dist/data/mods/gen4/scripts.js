@@ -35,43 +35,20 @@ const Scripts = {
       return speed;
     }
   },
+  checkFainted() {
+    for (const side of this.sides) {
+      if (!this.canSwitch(side)) continue;
+      for (const pokemon of side.active) {
+        if (pokemon.fainted) {
+          pokemon.status = "fnt";
+          pokemon.switchFlag = true;
+          break;
+        }
+      }
+    }
+  },
   actions: {
     inherit: true,
-    runSwitch(pokemon) {
-      this.battle.runEvent("EntryHazard", pokemon);
-      this.battle.runEvent("SwitchIn", pokemon);
-      if (this.battle.gen <= 2) {
-        for (const poke of this.battle.getAllActive()) poke.lastMove = null;
-        if (this.battle.gen === 1) {
-          pokemon.side.lastSelectedMoveSlot = 0;
-          for (const poke of pokemon.foes()) {
-            if (poke.volatiles["partialtrappinglock"] && poke.moveSlots[poke.side.lastSelectedMoveSlot].id === "metronome") {
-              poke.side.lastSelectedMove = "metronome";
-              poke.side.lastEnemySelectedMove = "metronome";
-              if (this.battle.queue.willMove(poke)) {
-                this.battle.queue.changeAction(poke, { choice: "move", poke, moveid: "metronome" });
-              }
-            }
-          }
-        }
-        if (!pokemon.side.faintedThisTurn && pokemon.draggedIn !== this.battle.turn) {
-          this.battle.runEvent("AfterSwitchInSelf", pokemon);
-        }
-      }
-      if (!pokemon.hp) return false;
-      pokemon.isStarted = true;
-      if (!pokemon.fainted) {
-        this.battle.singleEvent("Start", pokemon.getAbility(), pokemon.abilityState, pokemon);
-        this.battle.singleEvent("Start", pokemon.getItem(), pokemon.itemState, pokemon);
-      }
-      if (this.battle.gen === 4) {
-        for (const foeActive of pokemon.foes()) {
-          foeActive.removeVolatile("substitutebroken");
-        }
-      }
-      pokemon.draggedIn = null;
-      return true;
-    },
     modifyDamage(baseDamage, pokemon, target, move, suppressMessages = false) {
       if (!move.type) move.type = "???";
       const type = move.type;

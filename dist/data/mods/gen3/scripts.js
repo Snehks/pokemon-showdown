@@ -36,6 +36,18 @@ const Scripts = {
       }
     }
   },
+  checkFainted() {
+    const queuedSwitchOuts = this.queue.getSwitches().map((action) => action.pokemon);
+    const candidatesBySide = this.sides.filter((side) => this.canSwitch(side)).map((side) => side.active.filter((pokemon) => pokemon.fainted && !queuedSwitchOuts.includes(pokemon))).filter((candidates) => candidates.length);
+    const onePerSide = candidatesBySide.length === 1;
+    for (const candidates of candidatesBySide) {
+      for (const pokemon of candidates) {
+        pokemon.status = "fnt";
+        pokemon.switchFlag = true;
+        if (onePerSide) break;
+      }
+    }
+  },
   pokemon: {
     inherit: true,
     getActionSpeed() {
@@ -109,7 +121,7 @@ const Scripts = {
       let sourceEffect = options?.sourceEffect;
       let target = options?.target;
       if (!sourceEffect && this.battle.effect.id) sourceEffect = this.battle.effect;
-      if (sourceEffect && sourceEffect.id === "instruct") sourceEffect = null;
+      if (sourceEffect?.id === "instruct") sourceEffect = null;
       let move = this.dex.getActiveMove(moveOrMoveName);
       pokemon.lastMoveUsed = move;
       if (this.battle.activeMove) {
@@ -148,7 +160,8 @@ const Scripts = {
         return false;
       }
       const { targets, pressureTargets } = pokemon.getMoveTargets(move, target);
-      if (!sourceEffect || sourceEffect.id === "pursuit") {
+      const callerMoveForPressure = sourceEffect && sourceEffect.pp ? sourceEffect : null;
+      if (!sourceEffect || callerMoveForPressure) {
         let extraPP = 0;
         for (const source of pressureTargets) {
           const ppDrop = this.battle.runEvent("DeductPP", source, pokemon, move);
@@ -157,7 +170,7 @@ const Scripts = {
           }
         }
         if (extraPP > 0) {
-          pokemon.deductPP(move, extraPP);
+          pokemon.deductPP(callerMoveForPressure || move, extraPP);
         }
       }
       if (!this.battle.singleEvent("TryMove", move, null, pokemon, target, move) || !this.battle.runEvent("TryMove", pokemon, target, move)) {
@@ -222,7 +235,7 @@ const Scripts = {
         this.battle.singleEvent("MoveFail", move, null, target, pokemon, move);
         return false;
       }
-      if (!(move.hasSheerForce && pokemon.hasAbility("sheerforce"))) {
+      if (!this.battle.suppressingSecondaries()) {
         this.battle.singleEvent("AfterMoveSecondarySelf", move, null, pokemon, target, move);
         this.battle.runEvent("AfterMoveSecondarySelf", pokemon, target, move);
       }

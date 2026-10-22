@@ -129,7 +129,7 @@ const Scripts = {
         }
       }
       const lockedMove = pokemon.getLockedMove() || pokemon.getSemiLockedMove();
-      if (!lockedMove && (!pokemon.volatiles["partialtrappinglock"] || pokemon.volatiles["partialtrappinglock"].locked !== target)) {
+      if (!lockedMove && pokemon.volatiles["partialtrappinglock"]?.locked !== target) {
         pokemon.deductPP(move, null, target);
       } else {
         sourceEffect = move;
@@ -474,8 +474,8 @@ const Scripts = {
           }
         }
       }
-      if (move.selfSwitch && pokemon.hp) {
-        pokemon.switchFlag = move.selfSwitch === true ? true : this.dex.toID(move.selfSwitch);
+      if (move.selfSwitch && pokemon.hp && !pokemon.volatiles["commanded"] && (this.battle.canSwitch(pokemon.side) || move.id === "revivalblessing")) {
+        pokemon.switchFlag = move.id;
       }
       return damage;
     },
@@ -509,7 +509,7 @@ const Scripts = {
       if (move.volatileStatus === "partiallytrapped" && move.type === "Normal" && target.hasType("Ghost")) {
         return 0;
       }
-      if (source.volatiles["partialtrappinglock"] && target === source.volatiles["partialtrappinglock"].locked) {
+      if (target === source.volatiles["partialtrappinglock"]?.locked) {
         return source.volatiles["partialtrappinglock"].damage;
       }
       if (!move.category) move.category = "Physical";

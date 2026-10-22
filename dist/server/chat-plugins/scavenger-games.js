@@ -451,7 +451,7 @@ const TWISTS = {
           }
         }
       }
-      for (const mineSet of mines) mineSet.sort();
+      for (const mineSet of mines) import_lib.Utils.sortBy(mineSet, (mine) => mine.mine);
       this.announce(
         `The ${this.gameType ? `${this.gameType} ` : ""}scavenger hunt by ${hosts} was ended ${endedBy ? "by " + import_lib.Utils.escapeHTML(endedBy.name) : "automatically"}.<br />${this.completed.slice(0, sliceIndex).map((p, i) => `${import_lib.Utils.formatOrder(i + 1)} place: <em>${import_lib.Utils.escapeHTML(p.name)}</em> <span style="color: lightgreen;">[${p.time}]</span>.<br />`).join("")}${this.completed.length > sliceIndex ? `Consolation Prize: ${this.completed.slice(sliceIndex).map((e) => `<em>${import_lib.Utils.escapeHTML(e.name)}</em> <span style="color: lightgreen;">[${e.time}]</span>`).join(", ")}<br />` : ""}<br /><details style="cursor: pointer;"><summary>Solution: </summary><br />${this.questions.map((q, i) => `${i + 1}) ${this.formatOutput(q.hint)} <span style="color: lightgreen">[<em>${import_lib.Utils.escapeHTML(q.answer.join(" / "))}</em>]</span><br/><details style="cursor: pointer;"><summary>Mines: </summary>${mines[i].map(({ mine, users }) => import_lib.Utils.escapeHTML(`${mine}: ${users.join(" / ") || "-"}`)).join("<br />")}</details>`).join("<br />")}</details>`
       );

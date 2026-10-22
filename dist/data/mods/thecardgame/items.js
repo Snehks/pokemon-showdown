@@ -62,7 +62,7 @@ const Items = {
   earthplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Fighting") {
+      if (move?.type === "Fighting") {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -122,7 +122,7 @@ const Items = {
   hardstone: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Fighting") {
+      if (move?.type === "Fighting") {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -199,7 +199,7 @@ const Items = {
   pixieplate: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Psychic") {
+      if (move?.type === "Psychic") {
         return this.chainModify([4915, 4096]);
       }
     }
@@ -255,7 +255,7 @@ const Items = {
   sharpbeak: {
     inherit: true,
     onBasePower(basePower, user, target, move) {
-      if (move && move.type === "Normal") {
+      if (move?.type === "Normal") {
         return this.chainModify([4915, 4096]);
       }
     }

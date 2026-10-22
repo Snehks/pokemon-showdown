@@ -135,7 +135,7 @@ const Abilities = {
   },
   angershell: {
     onDamage(damage, target, source, effect) {
-      this.effectState.checkedAngerShell = !(effect.effectType === "Move" && !effect.multihit && !(effect.hasSheerForce && source.hasAbility("sheerforce")));
+      this.effectState.checkedAngerShell = !(effect.effectType === "Move" && !effect.multihit && !this.suppressingSecondaries());
     },
     onTryEatItem(item) {
       const healingItems = [
@@ -255,7 +255,7 @@ const Abilities = {
       return !this.effectState.unnerved;
     },
     onSourceAfterFaint(length, target, source, effect) {
-      if (effect && effect.effectType === "Move") {
+      if (effect?.effectType === "Move") {
         this.boost({ atk: length }, source, source, this.dex.abilities.get("chillingneigh"));
       }
     },
@@ -279,7 +279,7 @@ const Abilities = {
       return !this.effectState.unnerved;
     },
     onSourceAfterFaint(length, target, source, effect) {
-      if (effect && effect.effectType === "Move") {
+      if (effect?.effectType === "Move") {
         this.boost({ spa: length }, source, source, this.dex.abilities.get("grimneigh"));
       }
     },
@@ -300,6 +300,17 @@ const Abilities = {
     name: "Aura Break",
     rating: 1,
     num: 188
+  },
+  auraguard: {
+    isNonstandard: "Future",
+    onSourceModifyDamage(damage, source, target, move) {
+      if (move.flags["contact"]) return this.chainModify(0.5);
+    },
+    flags: { breakable: 1 },
+    // TODO check breakable
+    name: "Aura Guard",
+    rating: 3.5,
+    num: 319
   },
   baddreams: {
     onResidualOrder: 28,
@@ -384,7 +395,7 @@ const Abilities = {
   },
   beastboost: {
     onSourceAfterFaint(length, target, source, effect) {
-      if (effect && effect.effectType === "Move") {
+      if (effect?.effectType === "Move") {
         const bestStat = source.getBestStat(true, true);
         this.boost({ [bestStat]: length }, source);
       }
@@ -396,7 +407,7 @@ const Abilities = {
   },
   berserk: {
     onDamage(damage, target, source, effect) {
-      this.effectState.checkedBerserk = !(effect.effectType === "Move" && !effect.multihit && !(effect.hasSheerForce && source.hasAbility("sheerforce")));
+      this.effectState.checkedBerserk = !(effect.effectType === "Move" && !effect.multihit && !this.suppressingSecondaries());
     },
     onTryEatItem(item) {
       const healingItems = [
@@ -436,7 +447,7 @@ const Abilities = {
       if (boost.def && boost.def < 0) {
         delete boost.def;
         if (!effect.secondaries && effect.id !== "octolock") {
-          this.add("-fail", target, "unboost", "Defense", "[from] ability: Big Pecks", `[of] ${target}`);
+          this.add("-fail", target, "unboost", "def", "[from] ability: Big Pecks", `[of] ${target}`);
         }
       }
     },
@@ -488,7 +499,7 @@ const Abilities = {
   },
   chillingneigh: {
     onSourceAfterFaint(length, target, source, effect) {
-      if (effect && effect.effectType === "Move") {
+      if (effect?.effectType === "Move") {
         this.boost({ atk: length }, source);
       }
     },
@@ -556,7 +567,7 @@ const Abilities = {
         this.add("-start", target, "typechange", type, "[from] ability: Color Change");
         if (target.side.active.length === 2 && target.position === 1) {
           const action = this.queue.willMove(target);
-          if (action && action.move.id === "curse") {
+          if (action?.move.id === "curse") {
             action.targetLoc = -1;
           }
         }
@@ -651,7 +662,7 @@ const Abilities = {
   },
   contrary: {
     onChangeBoost(boost, target, source, effect) {
-      if (effect && effect.id === "zpower") return;
+      if (effect?.id === "zpower") return;
       let i;
       for (i in boost) {
         boost[i] *= -1;
@@ -788,7 +799,7 @@ const Abilities = {
       }
     },
     onAnyDamage(damage, target, source, effect) {
-      if (effect && effect.name === "Aftermath") {
+      if (effect?.name === "Aftermath") {
         return false;
       }
     },
@@ -1125,7 +1136,7 @@ const Abilities = {
   eelevate: {
     isNonstandard: "Future",
     onSourceAfterFaint(length, target, source, effect) {
-      if (effect && effect.effectType === "Move") {
+      if (effect?.effectType === "Move") {
         const bestStat = source.getBestStat(true, true);
         this.boost({ [bestStat]: length }, source);
       }
@@ -1222,7 +1233,8 @@ const Abilities = {
     num: 302
   },
   emergencyexit: {
-    onEmergencyExit(target) {
+    onEmergencyExit(originalHp, target) {
+      if (!target.hp || target.hp > target.maxhp / 2 || originalHp <= target.maxhp / 2) return;
       if (!this.canSwitch(target.side) || target.forceSwitchFlag || target.switchFlag) return;
       for (const side of this.sides) {
         for (const active of side.active) {
@@ -1693,7 +1705,7 @@ const Abilities = {
   },
   grimneigh: {
     onSourceAfterFaint(length, target, source, effect) {
-      if (effect && effect.effectType === "Move") {
+      if (effect?.effectType === "Move") {
         this.boost({ spa: length }, source);
       }
     },
@@ -1824,7 +1836,7 @@ const Abilities = {
       }
     },
     onDamage(damage, target, source, effect) {
-      if (effect && effect.id === "brn") {
+      if (effect?.id === "brn") {
         return damage / 2;
       }
     },
@@ -1921,7 +1933,7 @@ const Abilities = {
       if (boost.atk && boost.atk < 0) {
         delete boost.atk;
         if (!effect.secondaries) {
-          this.add("-fail", target, "unboost", "Attack", "[from] ability: Hyper Cutter", `[of] ${target}`);
+          this.add("-fail", target, "unboost", "atk", "[from] ability: Hyper Cutter", `[of] ${target}`);
         }
       }
     },
@@ -2131,7 +2143,7 @@ const Abilities = {
     onTryBoost(boost, target, source, effect) {
       if (effect.name === "Intimidate" && boost.atk) {
         delete boost.atk;
-        this.add("-fail", target, "unboost", "Attack", "[from] ability: Inner Focus", `[of] ${target}`);
+        this.add("-fail", target, "unboost", "atk", "[from] ability: Inner Focus", `[of] ${target}`);
       }
     },
     flags: { breakable: 1 },
@@ -2717,7 +2729,7 @@ const Abilities = {
   },
   moxie: {
     onSourceAfterFaint(length, target, source, effect) {
-      if (effect && effect.effectType === "Move") {
+      if (effect?.effectType === "Move") {
         this.boost({ atk: length }, source);
       }
     },
@@ -2964,7 +2976,7 @@ const Abilities = {
     onTryBoost(boost, target, source, effect) {
       if (effect.name === "Intimidate" && boost.atk) {
         delete boost.atk;
-        this.add("-fail", target, "unboost", "Attack", "[from] ability: Oblivious", `[of] ${target}`);
+        this.add("-fail", target, "unboost", "atk", "[from] ability: Oblivious", `[of] ${target}`);
       }
     },
     flags: { breakable: 1 },
@@ -3093,7 +3105,7 @@ const Abilities = {
     onTryBoost(boost, target, source, effect) {
       if (effect.name === "Intimidate" && boost.atk) {
         delete boost.atk;
-        this.add("-fail", target, "unboost", "Attack", "[from] ability: Own Tempo", `[of] ${target}`);
+        this.add("-fail", target, "unboost", "atk", "[from] ability: Own Tempo", `[of] ${target}`);
       }
     },
     flags: { breakable: 1 },
@@ -4037,7 +4049,7 @@ const Abilities = {
     onTryBoost(boost, target, source, effect) {
       if (effect.name === "Intimidate" && boost.atk) {
         delete boost.atk;
-        this.add("-fail", target, "unboost", "Attack", "[from] ability: Scrappy", `[of] ${target}`);
+        this.add("-fail", target, "unboost", "atk", "[from] ability: Scrappy", `[of] ${target}`);
       }
     },
     flags: {},
@@ -4230,7 +4242,7 @@ const Abilities = {
   },
   simple: {
     onChangeBoost(boost, target, source, effect) {
-      if (effect && effect.id === "zpower") return;
+      if (effect?.id === "zpower") return;
       let i;
       for (i in boost) {
         boost[i] *= 2;
@@ -4283,7 +4295,7 @@ const Abilities = {
       }
     },
     onEnd(pokemon) {
-      if (pokemon.beingCalledBack) return;
+      if (pokemon.beingCalledBack || !this.effectState.counter) return;
       this.add("-end", pokemon, "Slow Start", "[silent]");
     },
     flags: {},
@@ -4413,9 +4425,7 @@ const Abilities = {
   spicyspray: {
     isNonstandard: "Future",
     onDamagingHit(damage, target, source, move) {
-      if (!source.trySetStatus("brn", target) && !source.status && source.hasType("Fire")) {
-        this.add("-immune", source);
-      }
+      source.trySetStatus("brn", target);
     },
     flags: {},
     name: "Spicy Spray",
@@ -4627,7 +4637,7 @@ const Abilities = {
     },
     onDamagePriority: -30,
     onDamage(damage, target, source, effect) {
-      if (target.hp === target.maxhp && damage >= target.hp && effect && effect.effectType === "Move") {
+      if (target.hp === target.maxhp && damage >= target.hp && effect?.effectType === "Move") {
         this.add("-ability", target, "Sturdy");
         return target.hp - 1;
       }
@@ -4685,6 +4695,7 @@ const Abilities = {
       }
     },
     onEnd(pokemon) {
+      if (pokemon.beingCalledBack || !this.effectState.fallen) return;
       this.add("-end", pokemon, `fallen${this.effectState.fallen}`, "[silent]");
     },
     onBasePowerPriority: 21,
@@ -4802,7 +4813,7 @@ const Abilities = {
   synchronize: {
     onAfterSetStatus(status, target, source, effect) {
       if (!source || source === target) return;
-      if (effect && effect.id === "toxicspikes") return;
+      if (effect?.id === "toxicspikes") return;
       if (status.id === "slp" || status.id === "frz") return;
       this.add("-activate", target, "ability: Synchronize");
       source.trySetStatus(status, target, { status: status.id, id: "synchronize" });
@@ -5427,7 +5438,8 @@ const Abilities = {
     num: 73
   },
   wimpout: {
-    onEmergencyExit(target) {
+    onEmergencyExit(originalHp, target) {
+      if (!target.hp || target.hp > target.maxhp / 2 || originalHp <= target.maxhp / 2) return;
       if (!this.canSwitch(target.side) || target.forceSwitchFlag || target.switchFlag) return;
       for (const side of this.sides) {
         for (const active of side.active) {
@@ -5581,7 +5593,7 @@ const Abilities = {
   // CAP
   mountaineer: {
     onDamage(damage, target, source, effect) {
-      if (effect && effect.id === "stealthrock") {
+      if (effect?.id === "stealthrock") {
         return false;
       }
     },

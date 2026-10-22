@@ -72,11 +72,9 @@ class DexAbilities {
       ability = this.get(this.dex.getAlias(id));
     } else if (id && this.dex.data.Abilities.hasOwnProperty(id)) {
       const abilityData = this.dex.data.Abilities[id];
-      const abilityTextData = this.dex.getDescs("Abilities", id, abilityData);
       ability = new Ability({
         name: id,
-        ...abilityData,
-        ...abilityTextData
+        ...abilityData
       });
       if (ability.gen > this.dex.gen) {
         ability.isNonstandard = "Future";

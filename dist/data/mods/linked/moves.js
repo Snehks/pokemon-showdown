@@ -51,7 +51,7 @@ const Moves = {
     inherit: true,
     onTry(source, target) {
       const action = this.queue.willMove(target);
-      if (!action || action.choice !== "move") return false;
+      if (action?.choice !== "move") return false;
       if (!action.linked) {
         const move = action.move;
         if (move.category === "Status" && move.id !== "mefirst") {
@@ -71,7 +71,7 @@ const Moves = {
     inherit: true,
     onTry(source, target) {
       const action = this.queue.willMove(target);
-      if (!action || action.choice !== "move") return false;
+      if (action?.choice !== "move") return false;
       if (!action.linked) {
         const move = action.move;
         if (move.category === "Status" && move.id !== "mefirst") {
@@ -91,7 +91,7 @@ const Moves = {
     inherit: true,
     onTry(source, target) {
       const action = this.queue.willMove(target);
-      if (!action || action.choice !== "move") return false;
+      if (action?.choice !== "move") return false;
       if (!action.linked) {
         const move = action.move;
         if (move.priority < 0.1 || move.category === "Status") {

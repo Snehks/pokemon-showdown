@@ -62,9 +62,9 @@ function appendCause(error) {
   } else {
     stack += `
 
-[cause]: ${error.cause.message}
+[cause]: ${error.cause?.message}
 `;
-    stack += `  ${error.cause?.stack}`;
+    stack += `  ${error.cause?.stack ?? error.cause}`;
   }
   return stack;
 }
@@ -95,7 +95,7 @@ Additional information:
     out.end();
   }).on("error", (err) => {
     console.error(`
-SUBCRASH: ${err.stack}
+SUBCRASH: ${err.stack ?? err}
 `);
   });
   const emailOpts = emailConfig || global.Config?.crashguardemail;

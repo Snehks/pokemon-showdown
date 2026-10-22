@@ -24,8 +24,10 @@ module.exports = __toCommonJS(abilities_exports);
 const Abilities = {
   airlock: {
     inherit: true,
-    onSwitchIn: void 0,
-    // no inherit
+    onSwitchInPriority: 13,
+    onSwitchIn(pokemon) {
+      pokemon.abilityState.ending = false;
+    },
     onStart(pokemon) {
       pokemon.abilityState.ending = false;
     }
@@ -34,12 +36,16 @@ const Abilities = {
     inherit: true,
     onAfterSubDamage(damage, target, source, move) {
       if (!target.hp) return;
-      if (move && move.effectType === "Move" && target.getMoveHitData(move).crit) {
+      if (move?.effectType === "Move" && target.getMoveHitData(move).crit) {
         target.setBoost({ atk: 6 });
         this.add("-setboost", target, "atk", 12, "[from] ability: Anger Point");
       }
     },
     rating: 1.5
+  },
+  anticipation: {
+    inherit: true,
+    onSwitchInPriority: 8
   },
   baddreams: {
     inherit: true,
@@ -62,8 +68,10 @@ const Abilities = {
   },
   cloudnine: {
     inherit: true,
-    onSwitchIn: void 0,
-    // no inherit
+    onSwitchInPriority: 13,
+    onSwitchIn(pokemon) {
+      pokemon.abilityState.ending = false;
+    },
     onStart(pokemon) {
       pokemon.abilityState.ending = false;
     }
@@ -102,6 +110,7 @@ const Abilities = {
   },
   download: {
     inherit: true,
+    onSwitchInPriority: 9,
     onStart(pokemon) {
       let totaldef = 0;
       let totalspd = 0;
@@ -116,6 +125,14 @@ const Abilities = {
         this.boost({ atk: 1 });
       }
     }
+  },
+  drizzle: {
+    inherit: true,
+    onSwitchInPriority: 11
+  },
+  drought: {
+    inherit: true,
+    onSwitchInPriority: 11
   },
   effectspore: {
     inherit: true,
@@ -165,6 +182,7 @@ const Abilities = {
   },
   flowergift: {
     inherit: true,
+    onSwitchInPriority: 2,
     onAllyModifyAtk(atk) {
       if (this.field.isWeather("sunnyday")) {
         return this.chainModify(1.5);
@@ -179,10 +197,12 @@ const Abilities = {
   },
   forecast: {
     inherit: true,
+    onSwitchInPriority: 2,
     flags: { notrace: 1 }
   },
   forewarn: {
     inherit: true,
+    onSwitchInPriority: 7,
     onStart(pokemon) {
       let warnMoves = [];
       let warnBp = 1;
@@ -208,6 +228,7 @@ const Abilities = {
   },
   frisk: {
     inherit: true,
+    onSwitchInPriority: 6,
     onStart(pokemon) {
       const target = pokemon.side.randomFoe();
       if (target?.item) {
@@ -241,6 +262,7 @@ const Abilities = {
   },
   intimidate: {
     inherit: true,
+    onSwitchInPriority: 10,
     onStart(pokemon) {
       const activated = pokemon.adjacentFoes().some((target) => !(target.volatiles["substitute"] || target.volatiles["substitutebroken"]?.move === "uturn"));
       if (!activated) {
@@ -262,7 +284,7 @@ const Abilities = {
   leafguard: {
     inherit: true,
     onSetStatus(status, target, source, effect) {
-      if (effect && effect.id === "rest") {
+      if (effect?.id === "rest") {
       } else if (this.field.isWeather("sunnyday")) {
         return false;
       }
@@ -288,7 +310,7 @@ const Abilities = {
   magicguard: {
     inherit: true,
     onSetStatus(status, target, source, effect) {
-      if (effect && effect.id === "toxicspikes") {
+      if (effect?.id === "toxicspikes") {
         return false;
       }
     },
@@ -305,6 +327,10 @@ const Abilities = {
         }
       }
     }
+  },
+  moldbreaker: {
+    inherit: true,
+    onSwitchInPriority: 4
   },
   multitype: {
     inherit: true,
@@ -375,6 +401,7 @@ const Abilities = {
   },
   pressure: {
     inherit: true,
+    onSwitchInPriority: 3,
     onDeductPP(target, source) {
       if (target === source) return;
       return 1;
@@ -388,6 +415,10 @@ const Abilities = {
         this.damage(source.baseMaxhp / 8, source, target);
       }
     }
+  },
+  sandstream: {
+    inherit: true,
+    onSwitchInPriority: 11
   },
   sandveil: {
     inherit: true,
@@ -427,6 +458,10 @@ const Abilities = {
       }
     }
   },
+  slowstart: {
+    inherit: true,
+    onSwitchInPriority: 5
+  },
   snowcloak: {
     inherit: true,
     onModifyAccuracyPriority: 8,
@@ -437,6 +472,10 @@ const Abilities = {
         return this.chainModify(0.8);
       }
     }
+  },
+  snowwarning: {
+    inherit: true,
+    onSwitchInPriority: 11
   },
   speedboost: {
     inherit: true,
@@ -469,7 +508,7 @@ const Abilities = {
   stickyhold: {
     inherit: true,
     onTakeItem(item, pokemon, source) {
-      if (source && source !== pokemon || this.activeMove && this.activeMove.id === "knockoff") {
+      if (source && source !== pokemon || this.activeMove?.id === "knockoff") {
         this.add("-activate", pokemon, "ability: Sticky Hold");
         return false;
       }
@@ -505,7 +544,7 @@ const Abilities = {
     inherit: true,
     onAfterSetStatus(status, target, source, effect) {
       if (!source || source === target) return;
-      if (effect && effect.id === "toxicspikes") return;
+      if (effect?.id === "toxicspikes") return;
       let id = status.id;
       if (id === "slp" || id === "frz") return;
       if (id === "tox") id = "psn";
@@ -552,6 +591,7 @@ const Abilities = {
   },
   trace: {
     inherit: true,
+    onSwitchInPriority: 12,
     onUpdate(pokemon) {
       if (!this.effectState.seek) return;
       const target = pokemon.side.randomFoe();
@@ -571,7 +611,7 @@ const Abilities = {
       }
     },
     onResidual(pokemon) {
-      if (!pokemon.removeVolatile("truant")) {
+      if (!pokemon.removeVolatile("truant") && pokemon.activeTurns) {
         pokemon.addVolatile("truant");
       }
     }
