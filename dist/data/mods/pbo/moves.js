@@ -247,6 +247,24 @@ const Moves = {
       }
     }
   },
+  // [PBO] Defense Curl is banned against Dynahax bosses (owner request). It
+  // targets the USER, so the boss's onTryHit never sees it, and the picker
+  // disable (Dynahax onFoeDisableMove) is bypassed by Sleep Talk / Metronome /
+  // Assist / Copycat / Instruct. Failing it here blocks every route. Rollout /
+  // Ice Ball are untouched (they just never get the Defense Curl doubling).
+  // Same pattern as Imprison and Baton Pass above.
+  defensecurl: {
+    inherit: true,
+    onTry(source) {
+      for (const foe of source.foes()) {
+        if (foe.hasAbility("dynahax")) {
+          this.attrLastMove("[still]");
+          this.add("-fail", source, "move: Defense Curl");
+          return null;
+        }
+      }
+    }
+  },
   // --- Truant Transfer Clause move blocks ---
   // [PBO] The picker disable (Truant Transfer Clause onDisableMove in rulesets.ts)
   // only stops a direct pick — Sleep Talk / Metronome / Assist / Instruct call

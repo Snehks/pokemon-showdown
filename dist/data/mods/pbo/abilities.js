@@ -188,7 +188,8 @@ const Abilities = {
         if (moveSlot.id === "destinybond" || moveSlot.id === "grudge" || moveSlot.id === "batonpass" || moveSlot.id === "skillswap" || moveSlot.id === "bestow" || moveSlot.id === "powertrick" || moveSlot.id === "dragoncheer" || moveSlot.id === "guardsplit" || moveSlot.id === "powersplit" || moveSlot.id === "speedswap" || moveSlot.id === "soak" || moveSlot.id === "magicpowder" || moveSlot.id === "trickortreat" || moveSlot.id === "forestscurse" || moveSlot.id === "doodle" || moveSlot.id === "imprison" || moveSlot.id === "roleplay" || moveSlot.id === "copycat" || // Attract infatuation-locks the boss; Entrainment is disabled for
         // ALL targets because in doubles raids players cast it on their own
         // partner (passing Hustle etc.), which onTryHit on the boss never sees.
-        moveSlot.id === "attract" || moveSlot.id === "entrainment") {
+        moveSlot.id === "attract" || moveSlot.id === "entrainment" || // Defense Curl targets the user; also hard-blocked in moves.ts onTry.
+        moveSlot.id === "defensecurl") {
           pokemon.disableMove(moveSlot.id);
         }
       }

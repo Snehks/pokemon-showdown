@@ -80,6 +80,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 65 | `data/mods/pbo/scripts.ts` | Halloween 2026 H5 event forms | Register 45 Halloween 2026 cosmetic forms (suffix `H5`) in PBO_EVENT_FORMS |
 | 66 | `sim/battle.ts` | Upstream sync to `8476966bb` + `faintMessages` shim | Merged 216 upstream commits (July-September 2026 Random Battles balance patches); `faintMessages()` forwards to upstream's renamed `resolveFaints()` because the game server still calls it |
 | 67 | `package.json`, `.github/workflows/upstream-sync.yml` | No build on git installs | Drop the `prepare` script (the committed `dist/` is what installs use) so `npm ci` in the game repo works on any Node version; the daily sync workflow moves to Node 22 |
+| 68 | `data/mods/pbo/abilities.ts`, `data/mods/pbo/moves.ts` | Dynahax Defense Curl ban | Owner request: disable Defense Curl in the picker (`onFoeDisableMove`) and hard-block it at move level (`onTry`) so Sleep Talk / Metronome / Assist / Copycat / Instruct can't call it against a Dynahax boss in singles or doubles; Rollout / Ice Ball unchanged |
 
 **Total: 67 changes across 15 files.**
 
@@ -1455,3 +1456,27 @@ package is allow-listed, which is how the game repo installed v76.
   `npm ci` + `node build` step needs Node 22 now.
 
 Build `dist/` with `node build` (or `npm run build`) before committing, as before.
+
+---
+
+## Change 68: Dynahax Defense Curl ban (data/mods/pbo/abilities.ts, data/mods/pbo/moves.ts)
+
+Owner request (2026-10-27): "turn off Defense Curl against Dynamax in Dynahax
+ability". While any foe has the `dynahax` ability, Defense Curl can't be used.
+
+- **Picker:** `defensecurl` is added to the Dynahax `onFoeDisableMove` list, so
+  the move is greyed out like Baton Pass / Destiny Bond / Imprison.
+- **Indirect calls:** Defense Curl targets the USER, so the boss's `onTryHit`
+  never sees it, and Sleep Talk / Metronome / Assist / Copycat / Instruct call
+  moves via `actions.useMove()` without checking disabled slots. A `defensecurl`
+  `onTry` override in `moves.ts` fails the move (`-fail` + `[still]`) when any
+  foe has Dynahax, in single and double battles. Same pattern as Imprison
+  (Change 56) and Baton Pass (Change 58).
+
+Rollout and Ice Ball stay usable; they just never get the Defense Curl power
+doubling against a Dynahax boss. Against normal foes Defense Curl is vanilla.
+
+**Tests:** `test/sim/moves/dynahax-defense-curl.js` — disabled in the picker
+(singles + doubles, Rollout / Ice Ball still enabled); fails via Sleep Talk
+(singles + doubles) and via Metronome; still works against a non-Dynahax foe,
+directly and via Sleep Talk.

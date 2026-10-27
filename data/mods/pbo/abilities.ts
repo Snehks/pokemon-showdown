@@ -189,7 +189,9 @@ export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTa
 					// ALL targets because in doubles raids players cast it on their own
 					// partner (passing Hustle etc.), which onTryHit on the boss never sees.
 					moveSlot.id === 'attract' ||
-					moveSlot.id === 'entrainment'
+					moveSlot.id === 'entrainment' ||
+					// Defense Curl targets the user; also hard-blocked in moves.ts onTry.
+					moveSlot.id === 'defensecurl'
 				) {
 					pokemon.disableMove(moveSlot.id);
 				}
