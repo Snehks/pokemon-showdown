@@ -81,6 +81,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 66 | `sim/battle.ts` | Upstream sync to `8476966bb` + `faintMessages` shim | Merged 216 upstream commits (July-September 2026 Random Battles balance patches); `faintMessages()` forwards to upstream's renamed `resolveFaints()` because the game server still calls it |
 | 67 | `package.json`, `.github/workflows/upstream-sync.yml` | No build on git installs | Drop the `prepare` script (the committed `dist/` is what installs use) so `npm ci` in the game repo works on any Node version; the daily sync workflow moves to Node 22 |
 | 68 | `data/mods/pbo/abilities.ts`, `data/mods/pbo/moves.ts` | Dynahax Defense Curl ban | Owner request: disable Defense Curl in the picker (`onFoeDisableMove`) and hard-block it at move level (`onTry`) so Sleep Talk / Metronome / Assist / Copycat / Instruct can't call it against a Dynahax boss in singles or doubles; Rollout / Ice Ball unchanged |
+| 69 | `data/mods/pbo/scripts.ts` | Halloween 2026 late forms | Register Typhlosion-H5, Mandibuzz-H5, Calyrex-Shadow-H5, Mewtwo-Shadow and Mewtwo-Shadow-MegaX/Y in PBO_EVENT_FORMS |
 
 **Total: 67 changes across 15 files.**
 
@@ -1480,3 +1481,33 @@ doubling against a Dynahax boss. Against normal foes Defense Curl is vanilla.
 (singles + doubles, Rollout / Ice Ball still enabled); fails via Sleep Talk
 (singles + doubles) and via Metronome; still works against a non-Dynahax foe,
 directly and via Sleep Talk.
+
+---
+
+## Change 69: Halloween 2026 late forms (data/mods/pbo/scripts.ts)
+
+**What it does:** Registers six more Halloween 2026 forms (Prophet's list, 2026-10-29) in
+`PBO_EVENT_FORMS`, cloned by the `init()` handler (Change 39):
+
+| Event id | Base | Name | Forme |
+|---|---|---|---|
+| `typhlosionh5` | `typhlosion` | Typhlosion-H5 | H5 |
+| `mandibuzzh5` | `mandibuzz` | Mandibuzz-H5 | H5 |
+| `calyrexshadowh5` | `calyrexshadow` | Calyrex-Shadow-H5 | H5 |
+| `mewtwoshadow` | `mewtwo` | Mewtwo-Shadow | Shadow |
+| `mewtwoshadowmegax` | `mewtwomegax` | Mewtwo-Shadow-MegaX | Shadow |
+| `mewtwoshadowmegay` | `mewtwomegay` | Mewtwo-Shadow-MegaY | Shadow |
+
+**Why:** Without registration the server packs e.g. `calyrexshadowh5` and Showdown rejects it as an
+unknown species. Calyrex-Shadow-H5 is the fusion of Calyrex with Spectrier-H5. Shadow Mewtwo keeps its own
+name (no `-H5`), as Armored-Mewtwo does.
+
+**Mega Evolution:** no logic change. `canMegaEvo` falls back to `item.megaStone[species.baseSpecies]`, so
+Mewtwo-Shadow (baseSpecies Mewtwo) holding Mewtwonite X or Y becomes the regular Mewtwo-Mega-X / -Y in
+battle, the same path Armored-Mewtwo uses. The game server shows the Shadow mega through its `megas.csv`
+(`mewtwoshadow` + stone -> `mewtwoshadowmegax` / `-y`), as Summer 2026's `gyaradoss3` -> `gyaradosmegas3`
+does. The two Shadow mega ids are registered so a team that names them directly still validates.
+
+**Tests:** `test/sim/misc/pbo-halloween-2026-late-forms.js`: each form resolves under
+`Dex.mod('pbo')` with its base's types, stats, abilities and baseSpecies; Mewtwo-Shadow mega-evolves with
+Mewtwonite X and Y; Calyrex-Shadow-H5 battles with As One (Spectrier).

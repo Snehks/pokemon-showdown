@@ -489,7 +489,14 @@ const PBO_EVENT_FORMS = [
   ["mrmimeh5", "mrmime", "Mr. Mime-H5", "H5"],
   ["obstagoonh5", "obstagoon", "Obstagoon-H5", "H5"],
   ["rotomwashh5", "rotomwash", "Rotom-Wash-H5", "H5"],
-  ["slowbroh5", "slowbro", "Slowbro-H5", "H5"]
+  ["slowbroh5", "slowbro", "Slowbro-H5", "H5"],
+  // Halloween 2026, added later: Shadow Mewtwo keeps its own name and Mega-evolves through megaStone[baseSpecies]
+  ["typhlosionh5", "typhlosion", "Typhlosion-H5", "H5"],
+  ["mandibuzzh5", "mandibuzz", "Mandibuzz-H5", "H5"],
+  ["calyrexshadowh5", "calyrexshadow", "Calyrex-Shadow-H5", "H5"],
+  ["mewtwoshadow", "mewtwo", "Mewtwo-Shadow", "Shadow"],
+  ["mewtwoshadowmegax", "mewtwomegax", "Mewtwo-Shadow-MegaX", "Shadow"],
+  ["mewtwoshadowmegay", "mewtwomegay", "Mewtwo-Shadow-MegaY", "Shadow"]
 ];
 const Scripts = {
   gen: 9,
