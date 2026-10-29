@@ -81,8 +81,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 66 | `sim/battle.ts` | Upstream sync to `8476966bb` + `faintMessages` shim | Merged 216 upstream commits (July-September 2026 Random Battles balance patches); `faintMessages()` forwards to upstream's renamed `resolveFaints()` because the game server still calls it |
 | 67 | `package.json`, `.github/workflows/upstream-sync.yml` | No build on git installs | Drop the `prepare` script (the committed `dist/` is what installs use) so `npm ci` in the game repo works on any Node version; the daily sync workflow moves to Node 22 |
 | 68 | `data/mods/pbo/abilities.ts`, `data/mods/pbo/moves.ts` | Dynahax Defense Curl ban | Owner request: disable Defense Curl in the picker (`onFoeDisableMove`) and hard-block it at move level (`onTry`) so Sleep Talk / Metronome / Assist / Copycat / Instruct can't call it against a Dynahax boss in singles or doubles; Rollout / Ice Ball unchanged |
-| 69 | `data/mods/pbo/scripts.ts` | Halloween 2026 late forms | Register Typhlosion-H5, Mandibuzz-H5, Calyrex-Shadow-H5, Mewtwo-Shadow and Mewtwo-Shadow-MegaX/Y in PBO_EVENT_FORMS |
-| 70 | `data/mods/pbo/scripts.ts` | Mewtwo-H5 | Register Mewtwo-H5, a plain Halloween 2026 Mewtwo beside Mewtwo-Shadow, in PBO_EVENT_FORMS |
+| 69 | `data/mods/pbo/scripts.ts` | Halloween 2026 late forms | Register Typhlosion-H5, Mandibuzz-H5, Calyrex-Shadow-H5, Mewtwo-Shadow and Mewtwo-Shadow-MegaX/Y in PBO_EVENT_FORMS (the Mewtwo forms renamed in Change 71) |
+| 70 | `data/mods/pbo/scripts.ts` | Mewtwo-H5 | Register Mewtwo-H5, a plain Halloween 2026 Mewtwo beside Mewtwo-Shadow, in PBO_EVENT_FORMS (merged into the renamed Change 69 form by Change 71) |
+| 71 | `data/mods/pbo/scripts.ts` | Mewtwo-H5 merge | Mewtwo-Shadow and its megas become Mewtwo-H5, Mewtwo-MegaX-H5 and Mewtwo-MegaY-H5; the separate plain Mewtwo-H5 of Change 70 is gone, so there is one |
 
 **Total: 67 changes across 15 files.**
 
@@ -1528,3 +1529,24 @@ into the regular Mewtwo-Mega-X / -Y, and the game server's `megas.csv` maps it t
 
 **Tests:** `test/sim/misc/pbo-halloween-2026-late-forms.js` now also resolves `mewtwoh5` against Mewtwo and
 mega-evolves Mewtwo-H5 with Mewtwonite X and Y.
+
+---
+
+## Change 71: Mewtwo-H5 merge (data/mods/pbo/scripts.ts)
+
+**What it does:** The owner (2026-10-29): Shadow Mewtwo is called Mewtwo-H5. The three Change 69 entries are renamed in
+place, and the Change 70 entry (a second, plain Mewtwo-H5) is dropped, so `PBO_EVENT_FORMS` has one Mewtwo-H5:
+
+| Event id | Base | Name | Forme | Was |
+|---|---|---|---|---|
+| `mewtwoh5` | `mewtwo` | Mewtwo-H5 | H5 | `mewtwoshadow` (Change 69) and `mewtwoh5` (Change 70) |
+| `mewtwomegaxh5` | `mewtwomegax` | Mewtwo-MegaX-H5 | H5 | `mewtwoshadowmegax` |
+| `mewtwomegayh5` | `mewtwomegay` | Mewtwo-MegaY-H5 | H5 | `mewtwoshadowmegay` |
+
+The mega names follow the other event megas (base mega name + event suffix: Gyarados-Mega-S3, Aggron-Mega-H4).
+
+**Mega Evolution:** unchanged. Mewtwo-H5 Mega-evolves through `megaStone[baseSpecies]` into the regular Mewtwo-Mega-X /
+-Y in battle; the game server shows its own H5 megas through `megas.csv`.
+
+**Tests:** `test/sim/misc/pbo-halloween-2026-late-forms.js`: the three ids resolve against their bases (the Shadow ids
+are gone) and Mewtwo-H5 mega-evolves with Mewtwonite X and Y.
