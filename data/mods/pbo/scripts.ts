@@ -485,6 +485,7 @@ const PBO_EVENT_FORMS: [string, string, string, string][] = [
 	["mewtwoshadow", "mewtwo", "Mewtwo-Shadow", "Shadow"],
 	["mewtwoshadowmegax", "mewtwomegax", "Mewtwo-Shadow-MegaX", "Shadow"],
 	["mewtwoshadowmegay", "mewtwomegay", "Mewtwo-Shadow-MegaY", "Shadow"],
+	["mewtwoh5", "mewtwo", "Mewtwo-H5", "H5"],
 ];
 
 export const Scripts: ModdedBattleScriptsData = {

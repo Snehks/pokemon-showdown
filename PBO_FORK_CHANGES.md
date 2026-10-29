@@ -82,6 +82,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 67 | `package.json`, `.github/workflows/upstream-sync.yml` | No build on git installs | Drop the `prepare` script (the committed `dist/` is what installs use) so `npm ci` in the game repo works on any Node version; the daily sync workflow moves to Node 22 |
 | 68 | `data/mods/pbo/abilities.ts`, `data/mods/pbo/moves.ts` | Dynahax Defense Curl ban | Owner request: disable Defense Curl in the picker (`onFoeDisableMove`) and hard-block it at move level (`onTry`) so Sleep Talk / Metronome / Assist / Copycat / Instruct can't call it against a Dynahax boss in singles or doubles; Rollout / Ice Ball unchanged |
 | 69 | `data/mods/pbo/scripts.ts` | Halloween 2026 late forms | Register Typhlosion-H5, Mandibuzz-H5, Calyrex-Shadow-H5, Mewtwo-Shadow and Mewtwo-Shadow-MegaX/Y in PBO_EVENT_FORMS |
+| 70 | `data/mods/pbo/scripts.ts` | Mewtwo-H5 | Register Mewtwo-H5, a plain Halloween 2026 Mewtwo beside Mewtwo-Shadow, in PBO_EVENT_FORMS |
 
 **Total: 67 changes across 15 files.**
 
@@ -1511,3 +1512,19 @@ does. The two Shadow mega ids are registered so a team that names them directly 
 **Tests:** `test/sim/misc/pbo-halloween-2026-late-forms.js`: each form resolves under
 `Dex.mod('pbo')` with its base's types, stats, abilities and baseSpecies; Mewtwo-Shadow mega-evolves with
 Mewtwonite X and Y; Calyrex-Shadow-H5 battles with As One (Spectrier).
+
+---
+
+## Change 70: Mewtwo-H5 (data/mods/pbo/scripts.ts)
+
+**What it does:** Registers `mewtwoh5` ("Mewtwo-H5", base `mewtwo`, forme `H5`) in `PBO_EVENT_FORMS`, cloned by the
+`init()` handler (Change 39). The owner added it on 2026-10-29: a Halloween 2026 Mewtwo next to the Shadow Mewtwo forms
+of Change 69.
+
+**Why:** Without registration the server packs `mewtwoh5` and Showdown rejects it as an unknown species.
+
+**Mega Evolution:** no logic change. Like every H5 form, it Mega-evolves through `item.megaStone[species.baseSpecies]`
+into the regular Mewtwo-Mega-X / -Y, and the game server's `megas.csv` maps it to the regular megas too.
+
+**Tests:** `test/sim/misc/pbo-halloween-2026-late-forms.js` now also resolves `mewtwoh5` against Mewtwo and
+mega-evolves Mewtwo-H5 with Mewtwonite X and Y.

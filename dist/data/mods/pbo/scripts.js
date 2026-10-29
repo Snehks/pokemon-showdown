@@ -496,7 +496,8 @@ const PBO_EVENT_FORMS = [
   ["calyrexshadowh5", "calyrexshadow", "Calyrex-Shadow-H5", "H5"],
   ["mewtwoshadow", "mewtwo", "Mewtwo-Shadow", "Shadow"],
   ["mewtwoshadowmegax", "mewtwomegax", "Mewtwo-Shadow-MegaX", "Shadow"],
-  ["mewtwoshadowmegay", "mewtwomegay", "Mewtwo-Shadow-MegaY", "Shadow"]
+  ["mewtwoshadowmegay", "mewtwomegay", "Mewtwo-Shadow-MegaY", "Shadow"],
+  ["mewtwoh5", "mewtwo", "Mewtwo-H5", "H5"]
 ];
 const Scripts = {
   gen: 9,

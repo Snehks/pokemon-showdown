@@ -6,7 +6,7 @@ const { Dex } = require('./../../../dist/sim');
 
 const FORMAT = 'gen9pbonpcnationaldex';
 
-// [event id, base id] of the Halloween 2026 forms added after the first 45 (Change 69)
+// [event id, base id] of the Halloween 2026 forms added after the first 45 (Changes 69 and 70)
 const FORMS = [
 	['typhlosionh5', 'typhlosion'],
 	['mandibuzzh5', 'mandibuzz'],
@@ -14,6 +14,7 @@ const FORMS = [
 	['mewtwoshadow', 'mewtwo'],
 	['mewtwoshadowmegax', 'mewtwomegax'],
 	['mewtwoshadowmegay', 'mewtwomegay'],
+	['mewtwoh5', 'mewtwo'],
 ];
 
 let battle;
@@ -38,10 +39,10 @@ describe('PBO Halloween 2026 late forms', () => {
 		});
 	}
 
-	it('Mewtwo-Shadow mega-evolves with Mewtwonite X and Y', () => {
+	for (const species of ['Mewtwo-Shadow', 'Mewtwo-H5']) it(`${species} mega-evolves with Mewtwonite X and Y`, () => {
 		for (const [stone, mega] of [['mewtwonitex', 'Mewtwo-Mega-X'], ['mewtwonitey', 'Mewtwo-Mega-Y']]) {
 			battle = common.createBattle({ formatid: FORMAT }, [
-				[{ species: 'Mewtwo-Shadow', ability: 'pressure', item: stone, moves: ['psystrike'] }],
+				[{ species, ability: 'pressure', item: stone, moves: ['psystrike'] }],
 				[{ species: 'Chansey', ability: 'naturalcure', moves: ['splash'] }],
 			]);
 			battle.makeChoices('move psystrike mega', 'move splash');
