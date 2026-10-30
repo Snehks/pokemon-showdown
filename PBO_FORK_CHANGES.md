@@ -85,6 +85,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 70 | `data/mods/pbo/scripts.ts` | Mewtwo-H5 | Register Mewtwo-H5, a plain Halloween 2026 Mewtwo beside Mewtwo-Shadow, in PBO_EVENT_FORMS (merged into the renamed Change 69 form by Change 71) |
 | 71 | `data/mods/pbo/scripts.ts` | Mewtwo-H5 merge | Mewtwo-Shadow and its megas become Mewtwo-H5, Mewtwo-MegaX-H5 and Mewtwo-MegaY-H5; the separate plain Mewtwo-H5 of Change 70 is gone, so there is one |
 | 72 | `data/mods/pbo/scripts.ts`, `data/mods/pbo/items.ts` | Event forms keep their evolutions | Eviolite works on every event form that can evolve (Bisharp-H5, Chansey-H5, Ursaring-H5 and 73 more): the `init()` clone keeps the base's `evos` and `isNonstandard`, so `nfe` matches the base; Change 63's Chansey-H special case is gone |
+| 73 | `data/mods/pbo/abilities.ts`, `data/mods/pbo/scripts.ts` | Mimikyu-H5 Disguise | Disguise works on Mimikyu-H5 and busts it into the new event form Mimikyu-Busted-H5 (a clone of Mimikyu-Busted, `battleOnly: Mimikyu-H5`); vanilla Mimikyu and Mimikyu-Totem unchanged |
 
 **Total: 68 changes across 15 files.**
 
@@ -1577,3 +1578,18 @@ again. `PBO_EVENT_FORMS` is exported so tests can walk it.
 **Tests:** `test/sim/items/eviolite.js` `[PBO] event forms`: Bisharp-H5, Chansey-H5 and Ursaring-H5 holding Eviolite
 get 1.5x Def and Sp. Def, the same as their bases; Kingambit-H5, Blissey-H5 and Ursaluna-H5 get nothing; every
 `PBO_EVENT_FORMS` entry has its base's `nfe` (at least 76 can evolve). The Change 63 Chansey-H tests pass unchanged.
+
+## Change 73: Mimikyu-H5 Disguise (data/mods/pbo/abilities.ts, data/mods/pbo/scripts.ts)
+
+**What it does:** The tester video (2026-10-30): Mimikyu-H5's Disguise never activated and a Hex killed it. Vanilla
+`disguise` only acts on the species ids `mimikyu` / `mimikyutotem`. The PBO mod's `disguise` override (`inherit: true`)
+runs the same four handlers off a `PBO_DISGUISE_FORMS` table (`mimikyu` -> Mimikyu-Busted, `mimikyutotem` ->
+Mimikyu-Busted-Totem, `mimikyuh5` -> Mimikyu-Busted-H5): the hit does 0, `-activate ... ability: Disguise`, then a
+permanent forme change to the busted form and 1/8 max HP damage.
+
+`PBO_EVENT_FORMS` gains `["mimikyubustedh5", "mimikyubusted", "Mimikyu-Busted-H5", "H5"]`. When a base has a string
+`battleOnly` (Mimikyu-Busted -> Mimikyu), `init()` points the clone's `battleOnly` at that form's event clone if one is
+registered (Mimikyu-Busted-H5 -> Mimikyu-H5). No earlier event form had a battle-only base, so nothing else changes.
+
+**Tests:** PBO `ShowdownMimikyuH5DisguiseTest` (Mimikyu-H5 and Mimikyu hit by Hex: Disguise, 0 damage, busted form,
+1/8 HP lost) and `ShowdownEventFormRegistrationTest`.

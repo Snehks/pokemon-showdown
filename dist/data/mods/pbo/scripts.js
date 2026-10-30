@@ -459,6 +459,7 @@ const PBO_EVENT_FORMS = [
   ["toxapexh5", "toxapex", "Toxapex-H5", "H5"],
   ["toxicroakh5", "toxicroak", "Toxicroak-H5", "H5"],
   ["mimikyuh5", "mimikyu", "Mimikyu-H5", "H5"],
+  ["mimikyubustedh5", "mimikyubusted", "Mimikyu-Busted-H5", "H5"],
   ["zangooseh5", "zangoose", "Zangoose-H5", "H5"],
   ["aerodactylh5", "aerodactyl", "Aerodactyl-H5", "H5"],
   ["aurorush5", "aurorus", "Aurorus-H5", "H5"],
@@ -520,6 +521,11 @@ const Scripts = {
         // can still evolve. No species lists an event form as an evo, so no prevo.
         prevo: ""
       };
+      if (typeof baseData.battleOnly === "string") {
+        const eventBattleOnlyId = this.toID(baseData.battleOnly) + this.toID(forme);
+        const eventBattleOnly = PBO_EVENT_FORMS.find((row) => row[0] === eventBattleOnlyId);
+        if (eventBattleOnly) this.data.Pokedex[eventId].battleOnly = eventBattleOnly[2];
+      }
       const baseNonstandard = this.data.FormatsData[baseId]?.isNonstandard;
       if (baseNonstandard) {
         this.data.FormatsData[eventId] = { ...this.data.FormatsData[eventId], isNonstandard: baseNonstandard };

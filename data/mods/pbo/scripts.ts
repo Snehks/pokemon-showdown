@@ -446,6 +446,7 @@ export const PBO_EVENT_FORMS: [string, string, string, string][] = [
 	["toxapexh5", "toxapex", "Toxapex-H5", "H5"],
 	["toxicroakh5", "toxicroak", "Toxicroak-H5", "H5"],
 	["mimikyuh5", "mimikyu", "Mimikyu-H5", "H5"],
+	["mimikyubustedh5", "mimikyubusted", "Mimikyu-Busted-H5", "H5"],
 	["zangooseh5", "zangoose", "Zangoose-H5", "H5"],
 	["aerodactylh5", "aerodactyl", "Aerodactyl-H5", "H5"],
 	["aurorush5", "aurorus", "Aurorus-H5", "H5"],
@@ -512,6 +513,13 @@ export const Scripts: ModdedBattleScriptsData = {
 				// can still evolve. No species lists an event form as an evo, so no prevo.
 				prevo: '',
 			};
+			// A battle-only base (Mimikyu-Busted) reverts to its out-of-battle form; the
+			// event clone reverts to that form's event clone (Mimikyu-Busted-H5 -> Mimikyu-H5).
+			if (typeof baseData.battleOnly === 'string') {
+				const eventBattleOnlyId = this.toID(baseData.battleOnly) + this.toID(forme);
+				const eventBattleOnly = PBO_EVENT_FORMS.find(row => row[0] === eventBattleOnlyId);
+				if (eventBattleOnly) this.data.Pokedex[eventId].battleOnly = eventBattleOnly[2];
+			}
 			// `nfe` only counts a "Past" evo for a "Past" species (Buneary -> Lopunny),
 			// so the form takes the base's isNonstandard too.
 			const baseNonstandard = this.data.FormatsData[baseId]?.isNonstandard;

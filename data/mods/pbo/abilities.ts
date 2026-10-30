@@ -3,7 +3,52 @@
 // Suppresses non-move damage, blocks status, blocks specific moves/abilities,
 // limits draining to 0 HP, and gastro-acids non-Dynahax foes on entry.
 
+// [PBO] Disguise species -> the forme it busts into.
+const PBO_DISGUISE_FORMS: { [speciesid: string]: string } = {
+	mimikyu: 'Mimikyu-Busted',
+	mimikyutotem: 'Mimikyu-Busted-Totem',
+	mimikyuh5: 'Mimikyu-Busted-H5',
+};
+
 export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTable = {
+	// [PBO] Disguise works for Mimikyu-H5 too and busts it into Mimikyu-Busted-H5.
+	// Vanilla only checks the species ids mimikyu / mimikyutotem.
+	disguise: {
+		inherit: true,
+		onDamage(damage, target, source, effect) {
+			if (effect?.effectType === 'Move' && PBO_DISGUISE_FORMS[target.species.id]) {
+				this.add('-activate', target, 'ability: Disguise');
+				this.effectState.busted = true;
+				return 0;
+			}
+		},
+		onCriticalHit(target, source, move) {
+			if (!target) return;
+			if (!PBO_DISGUISE_FORMS[target.species.id]) return;
+			const hitSub = target.volatiles['substitute'] && !move.flags['bypasssub'] && !(move.infiltrates && this.gen >= 6);
+			if (hitSub) return;
+
+			if (!target.runImmunity(move)) return;
+			return false;
+		},
+		onEffectiveness(typeMod, target, type, move) {
+			if (!target || move.category === 'Status') return;
+			if (!PBO_DISGUISE_FORMS[target.species.id]) return;
+
+			const hitSub = target.volatiles['substitute'] && !move.flags['bypasssub'] && !(move.infiltrates && this.gen >= 6);
+			if (hitSub) return;
+
+			if (!target.runImmunity(move)) return;
+			return 0;
+		},
+		onUpdate(pokemon) {
+			const bustedForme = PBO_DISGUISE_FORMS[pokemon.species.id];
+			if (bustedForme && this.effectState.busted) {
+				pokemon.formeChange(bustedForme, this.effect, true);
+				this.damage(pokemon.baseMaxhp / 8, pokemon, pokemon, this.dex.species.get(bustedForme));
+			}
+		},
+	},
 	// [PBO] Fix: vanilla onEnd emits |-end|fallenundefined when Kingambit leads
 	// with no fainted allies (effectState.fallen is never set by onStart).
 	supremeoverlord: {
