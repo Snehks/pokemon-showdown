@@ -2,12 +2,15 @@
 
 const assert = require('./../../assert');
 const common = require('./../../common');
+const { Dex } = require('./../../../dist/sim');
+const { PBO_EVENT_FORMS } = require('./../../../dist/data/mods/pbo/scripts');
 
 let battle;
 
 describe('Eviolite', () => {
 	afterEach(() => {
-		battle.destroy();
+		if (battle) battle.destroy();
+		battle = null;
 	});
 
 	it(`should multiply the defenses of a Pokemon that can evolve by 1.5`, () => {
@@ -116,6 +119,52 @@ describe('Eviolite', () => {
 			battle.field.removePseudoWeather('magicroom');
 			assert.equal(pokemon.getStat('def'), 178);
 			assert.equal(pokemon.getStat('spd'), 370);
+		});
+	});
+
+	describe('[PBO] event forms', () => {
+		// [def, spd] of each [species, item], each in its own battle
+		function defensesOf(...sets) {
+			const defenses = [];
+			for (const [species, item] of sets) {
+				if (defenses.length) battle.destroy();
+				battle = common.createBattle({ formatid: 'gen9pbopvpbattlenopreview' }, [
+					[{ species, item, moves: ['splash'], nature: 'Bold', level: 100, evs: { hp: 252, def: 252, spd: 4 } }],
+					[{ species: 'Zeraora', moves: ['splash'] }],
+				]);
+				const pokemon = battle.p1.active[0];
+				defenses.push([pokemon.getStat('def'), pokemon.getStat('spd')]);
+			}
+			return defenses;
+		}
+
+		for (const [form, base] of [['Bisharp-H5', 'Bisharp'], ['Chansey-H5', 'Chansey'], ['Ursaring-H5', 'Ursaring']]) {
+			it(`should apply Eviolite to ${form} just as it does for ${base}`, () => {
+				const [unheld, held, baseHeld] = defensesOf([form, ''], [form, 'Eviolite'], [base, 'Eviolite']);
+				assert.deepEqual(held, unheld.map(stat => Math.floor(stat * 1.5)));
+				assert.deepEqual(held, baseHeld);
+			});
+		}
+
+		for (const form of ['Kingambit-H5', 'Blissey-H5', 'Ursaluna-H5']) {
+			it(`should not apply Eviolite to the fully evolved ${form}`, () => {
+				const [unheld, held] = defensesOf([form, ''], [form, 'Eviolite']);
+				assert.deepEqual(held, unheld);
+			});
+		}
+
+		it(`should give every event form the evolution status of its base form`, () => {
+			const dex = Dex.mod('pbo');
+			let evolvable = 0;
+			for (const [eventId, baseId] of PBO_EVENT_FORMS) {
+				const form = dex.species.get(eventId);
+				const base = dex.species.get(baseId);
+				assert(form.exists, `${eventId} is not registered`);
+				assert.equal(form.nfe, base.nfe, `${form.name} should evolve exactly when ${base.name} does`);
+				if (form.nfe) evolvable++;
+			}
+			// 76 when Eviolite came to event forms (Buneary-E, Bisharp-H5, Chansey-H5, Ursaring-H5...)
+			assert(evolvable >= 76, `only ${evolvable} event forms can evolve`);
 		});
 	});
 });

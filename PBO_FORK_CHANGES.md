@@ -75,7 +75,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 60 | `data/mods/pbo/abilities.ts` | Dynahax Attract / Entrainment ban | Attract infatuation-locked the boss; Entrainment passed abilities to allies in doubles raids. Picker disable + `onTryHit` block + `onTryAddVolatile` block |
 | 61 | `.github/workflows/upstream-sync.yml` | Upstream v0.11.11 sync + daily sync automation | Merged upstream v0.11.11 (zero conflicts); daily workflow keeps a rolling sync PR against master |
 | 62 | `data/mods/pbo/rulesets.ts`, `data/mods/pbo/moves.ts`, `config/custom-formats.ts` | Truant Transfer Clause | Block Entrainment/Skill Swap from Truant users in NPC formats — Entrainment-Durant PvE exploit (picker disable + move-level `onTry` hard block) |
-| 63 | `data/mods/pbo/items.ts` | Chansey-H Eviolite eligibility | Apply both defensive boosts to Chansey-H without adding an evolution to the cosmetic form |
+| 63 | `data/mods/pbo/items.ts` | Chansey-H Eviolite eligibility | Apply both defensive boosts to Chansey-H without adding an evolution to the cosmetic form (replaced by Change 72) |
 | 64 | `data/mods/pbo/scripts.ts` | Dynahax survives Mega Evolution | `actions.runMegaEvo` restores Dynahax after the permanent forme change so Mega-stone bosses keep every Dynahax block from their first turn |
 | 65 | `data/mods/pbo/scripts.ts` | Halloween 2026 H5 event forms | Register 45 Halloween 2026 cosmetic forms (suffix `H5`) in PBO_EVENT_FORMS |
 | 66 | `sim/battle.ts` | Upstream sync to `8476966bb` + `faintMessages` shim | Merged 216 upstream commits (July-September 2026 Random Battles balance patches); `faintMessages()` forwards to upstream's renamed `resolveFaints()` because the game server still calls it |
@@ -84,8 +84,9 @@ these changes by searching for `[PBO]` comments in the source.
 | 69 | `data/mods/pbo/scripts.ts` | Halloween 2026 late forms | Register Typhlosion-H5, Mandibuzz-H5, Calyrex-Shadow-H5, Mewtwo-Shadow and Mewtwo-Shadow-MegaX/Y in PBO_EVENT_FORMS (the Mewtwo forms renamed in Change 71) |
 | 70 | `data/mods/pbo/scripts.ts` | Mewtwo-H5 | Register Mewtwo-H5, a plain Halloween 2026 Mewtwo beside Mewtwo-Shadow, in PBO_EVENT_FORMS (merged into the renamed Change 69 form by Change 71) |
 | 71 | `data/mods/pbo/scripts.ts` | Mewtwo-H5 merge | Mewtwo-Shadow and its megas become Mewtwo-H5, Mewtwo-MegaX-H5 and Mewtwo-MegaY-H5; the separate plain Mewtwo-H5 of Change 70 is gone, so there is one |
+| 72 | `data/mods/pbo/scripts.ts`, `data/mods/pbo/items.ts` | Event forms keep their evolutions | Eviolite works on every event form that can evolve (Bisharp-H5, Chansey-H5, Ursaring-H5 and 73 more): the `init()` clone keeps the base's `evos` and `isNonstandard`, so `nfe` matches the base; Change 63's Chansey-H special case is gone |
 
-**Total: 67 changes across 15 files.**
+**Total: 68 changes across 15 files.**
 
 ---
 
@@ -699,8 +700,8 @@ that iterates `PBO_EVENT_FORMS` and clones each entry as a Pokedex entry. Each e
 inherits all battle-relevant properties from its base species (stats, types, abilities,
 `canMegaEvo`, `canGigantamax`, `battleOnly`, etc.) and only overrides identity fields
 (`name`, `forme`, `baseSpecies`). Form lists (`otherFormes`, `cosmeticFormes`, `formeOrder`)
-and evolution chains (`evos`, `prevo`) are cleared so cosmetic forms don't accidentally
-inherit sub-form trees.
+and `prevo` are cleared so cosmetic forms don't accidentally inherit sub-form trees.
+(Until Change 72 `evos` was cleared too, which turned Eviolite off for every event form.)
 
 **Why:** PBO has ~372 cosmetic event forms (Halloween / Christmas / Summer / Valentine /
 Easter skins). Without this `init()` clone, Showdown doesn't know the IDs exist and treats
@@ -1311,6 +1312,9 @@ Chansey-H is registered without an evolution chain, so Showdown derives
 `nfe = false`. The inherited Eviolite checks therefore skipped both defensive
 boosts even though PBO's earlier item eligibility explicitly included Chansey-H.
 
+**Replaced by Change 72:** event forms now keep their base's evolutions, so Chansey-H is `nfe`
+like Chansey and the override below is gone. The Chansey-H tests still pass unchanged.
+
 The PBO item override accepts `chanseyh` alongside normally evolvable species
 in `onModifyDef` and `onModifySpD`. The form's evolution data stays unchanged.
 The inherited item metadata and normal item suppression still apply.
@@ -1550,3 +1554,26 @@ The mega names follow the other event megas (base mega name + event suffix: Gyar
 
 **Tests:** `test/sim/misc/pbo-halloween-2026-late-forms.js`: the three ids resolve against their bases (the Shadow ids
 are gone) and Mewtwo-H5 mega-evolves with Mewtwonite X and Y.
+
+---
+
+## Change 72: Event forms keep their evolutions (data/mods/pbo/scripts.ts, data/mods/pbo/items.ts)
+
+**What it does:** The owner (2026-10-30): Eviolite does nothing on Bisharp-H5, Chansey-H5 and Ursaring-H5. Showdown
+derives `species.nfe` from `evos` when it builds a species, and the Change 39 clone set `evos: []`, so every event form
+counted as fully evolved. `Scripts.init()` now:
+
+- keeps the base's `evos` (Bisharp-H5 lists Kingambit, Chansey-H5 lists Blissey); `prevo` stays cleared, since no species
+  lists an event form as its evo;
+- copies the base's `isNonstandard` into the form's `FormatsData`. Showdown only counts a "Past" evo for a "Past"
+  species, and the clones had no formats data, so Buneary-E, Cubone-H, Frillish-H4, Staryu-C, Togepi-E and Togetic-E
+  stayed `nfe = false` with their evos alone. No PBO format validates teams, and nothing in a battle reads
+  `isNonstandard`, so nothing else changes.
+
+All 471 event forms now have their base's `nfe`: the 76 whose base can evolve take Eviolite (every event, not only
+H5), and the rest still don't. Change 63's `chanseyh` case in `data/mods/pbo/items.ts` is gone, so Eviolite is vanilla
+again. `PBO_EVENT_FORMS` is exported so tests can walk it.
+
+**Tests:** `test/sim/items/eviolite.js` `[PBO] event forms`: Bisharp-H5, Chansey-H5 and Ursaring-H5 holding Eviolite
+get 1.5x Def and Sp. Def, the same as their bases; Kingambit-H5, Blissey-H5 and Ursaluna-H5 get nothing; every
+`PBO_EVENT_FORMS` entry has its base's `nfe` (at least 76 can evolve). The Change 63 Chansey-H tests pass unchanged.

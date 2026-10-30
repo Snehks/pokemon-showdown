@@ -7,7 +7,7 @@
 // that share stats/abilities/moves with their base species.
 // Format: [eventId, baseShowdownId, displayName, forme]
 // Auto-generated from pokemondata.json — 375 event forms.
-const PBO_EVENT_FORMS: [string, string, string, string][] = [
+export const PBO_EVENT_FORMS: [string, string, string, string][] = [
 	["abomasnowc", "abomasnow", "Abomasnow-C", "C"],
 	["absolh", "absol", "Absol-H", "H"],
 	["absolh2", "absol", "Absol-H2", "H2"],
@@ -508,10 +508,16 @@ export const Scripts: ModdedBattleScriptsData = {
 				otherFormes: null,
 				cosmeticFormes: null,
 				formeOrder: null,
-				// Don't inherit evolution chains.
-				evos: [],
+				// Keep the base's `evos` so `nfe` (Eviolite) matches the base: Bisharp-H5
+				// can still evolve. No species lists an event form as an evo, so no prevo.
 				prevo: '',
 			};
+			// `nfe` only counts a "Past" evo for a "Past" species (Buneary -> Lopunny),
+			// so the form takes the base's isNonstandard too.
+			const baseNonstandard = this.data.FormatsData[baseId]?.isNonstandard;
+			if (baseNonstandard) {
+				this.data.FormatsData[eventId] = { ...this.data.FormatsData[eventId], isNonstandard: baseNonstandard };
+			}
 		}
 	},
 	// [PBO] Bag item scripts for useitem command

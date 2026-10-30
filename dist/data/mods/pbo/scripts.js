@@ -18,6 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var scripts_exports = {};
 __export(scripts_exports, {
+  PBO_EVENT_FORMS: () => PBO_EVENT_FORMS,
   Scripts: () => Scripts
 });
 module.exports = __toCommonJS(scripts_exports);
@@ -515,10 +516,14 @@ const Scripts = {
         otherFormes: null,
         cosmeticFormes: null,
         formeOrder: null,
-        // Don't inherit evolution chains.
-        evos: [],
+        // Keep the base's `evos` so `nfe` (Eviolite) matches the base: Bisharp-H5
+        // can still evolve. No species lists an event form as an evo, so no prevo.
         prevo: ""
       };
+      const baseNonstandard = this.data.FormatsData[baseId]?.isNonstandard;
+      if (baseNonstandard) {
+        this.data.FormatsData[eventId] = { ...this.data.FormatsData[eventId], isNonstandard: baseNonstandard };
+      }
     }
   },
   // [PBO] Bag item scripts for useitem command
