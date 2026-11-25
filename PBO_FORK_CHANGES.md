@@ -86,6 +86,7 @@ these changes by searching for `[PBO]` comments in the source.
 | 71 | `data/mods/pbo/scripts.ts` | Mewtwo-H5 merge | Mewtwo-Shadow and its megas become Mewtwo-H5, Mewtwo-MegaX-H5 and Mewtwo-MegaY-H5; the separate plain Mewtwo-H5 of Change 70 is gone, so there is one |
 | 72 | `data/mods/pbo/scripts.ts`, `data/mods/pbo/items.ts` | Event forms keep their evolutions | Eviolite works on every event form that can evolve (Bisharp-H5, Chansey-H5, Ursaring-H5 and 73 more): the `init()` clone keeps the base's `evos` and `isNonstandard`, so `nfe` matches the base; Change 63's Chansey-H special case is gone |
 | 73 | `data/mods/pbo/abilities.ts`, `data/mods/pbo/scripts.ts` | Mimikyu-H5 Disguise | Disguise works on Mimikyu-H5 and busts it into the new event form Mimikyu-Busted-H5 (a clone of Mimikyu-Busted, `battleOnly: Mimikyu-H5`); vanilla Mimikyu and Mimikyu-Totem unchanged |
+| 74 | `data/mods/pbo/scripts.ts` | Forced primal weather comes back | When a temporary weather runs out over a map's forced Desolate Land, Primordial Sea or Delta Stream, the forced weather is announced with a bare `-weather` line instead of its `FieldStart` handler, which reads the ability that set it and threw (`Cannot read properties of null (reading 'name')`), ending the battle |
 
 **Total: 68 changes across 15 files.**
 
@@ -1593,3 +1594,21 @@ registered (Mimikyu-Busted-H5 -> Mimikyu-H5). No earlier event form had a battle
 
 **Tests:** PBO `ShowdownMimikyuH5DisguiseTest` (Mimikyu-H5 and Mimikyu hit by Hex: Disguise, 0 damage, busted form,
 1/8 HP lost) and `ShowdownEventFormRegistrationTest`.
+
+## Change 74: Forced primal weather comes back (data/mods/pbo/scripts.ts)
+
+**What it does:** A tester's Drought Groudon on the Volcano expedition (2026-11-25): every wild battle ended on turn 5
+with no message. The map forces harsh sunlight (`pboPermaWeather = desolateland`, set by the server with no ability
+behind it). Drought replaced it with five turns of ordinary sun, and when that ran out the mod's `clearWeather()`
+restored the forced weather through `singleEvent('FieldStart', ...)` with a null source and effect. The primal
+weathers' `onFieldStart` handlers read `effect.name`, so the engine threw `TypeError: Cannot read properties of null
+(reading 'name')` and the server dropped the battle. Any temporary weather over a forced primal one did it (Sunny Day,
+Sand Stream, Rain Dance...).
+
+`clearWeather()` now announces a restored Desolate Land, Primordial Sea or Delta Stream with a bare
+`-weather|<Name>` line, which is how the server's runner announces it at battle start (PBO `ShowdownRunner.kt`). Other
+forced weathers and forced terrain keep their `FieldStart` event.
+
+**Tests:** `test/sim/misc/pbo-permanent-weather.js`: forced `desolateland`, `primordialsea` and `deltastream` each come
+back after a five-turn temporary weather, the battle goes on and the return is in the log. PBO
+`ShowdownRunnerTest.forcedPrimalWeatherComesBackAfterATemporaryWeatherRunsOut`.

@@ -500,6 +500,7 @@ const PBO_EVENT_FORMS = [
   ["mewtwomegaxh5", "mewtwomegax", "Mewtwo-MegaX-H5", "H5"],
   ["mewtwomegayh5", "mewtwomegay", "Mewtwo-MegaY-H5", "H5"]
 ];
+const PBO_PRIMAL_WEATHERS = ["desolateland", "primordialsea", "deltastream"];
 const Scripts = {
   gen: 9,
   // [PBO] Register all cosmetic event forms as clones of their base species.
@@ -672,7 +673,11 @@ const Scripts = {
         this.weather = status.id;
         this.weatherState = this.battle.initEffectState({ id: status.id });
         this.weatherState.duration = 0;
-        this.battle.singleEvent("FieldStart", status, this.weatherState, this, null, null);
+        if (PBO_PRIMAL_WEATHERS.includes(status.id)) {
+          this.battle.add("-weather", status.name);
+        } else {
+          this.battle.singleEvent("FieldStart", status, this.weatherState, this, null, null);
+        }
       }
       this.battle.eachEvent("WeatherChange");
       return true;

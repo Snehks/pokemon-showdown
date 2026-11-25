@@ -144,4 +144,32 @@ describe('PBO Permanent Terrain', () => {
 		}
 		assert.equal(battle.field.terrain, '', 'Terrain should clear without permanent terrain');
 	});
+
+	// A map's forced primal weather (Volcano's harsh sunlight) has no ability behind it. Restoring it after a
+	// temporary weather ran out threw "Cannot read properties of null (reading 'name')" in its start handler and
+	// ended the battle (tester report, 2026-11-25: a Drought Groudon on Volcano, every battle gone on turn 5).
+	for (const [primal, temporary] of [['desolateland', 'raindance'], ['primordialsea', 'sunnyday'], ['deltastream', 'sandstorm']]) {
+		it(`should restore forced ${primal} after temporary ${temporary} expires`, () => {
+			battle = common.createBattle({ formatid: FORMAT }, [
+				[{ species: 'Blissey', ability: 'naturalcure', moves: [temporary, 'softboiled'] }],
+				[{ species: 'Blissey', ability: 'naturalcure', moves: ['softboiled'] }],
+			]);
+			const status = battle.dex.conditions.get(primal);
+			battle.field.weather = status.id;
+			battle.field.weatherState = battle.initEffectState({ id: status.id });
+			battle.field.weatherState.duration = 0;
+			battle.field.pboPermaWeather = status.id;
+			battle.add('-weather', status.name);
+
+			battle.makeChoices('move ' + temporary, 'move softboiled');
+			assert.equal(battle.field.weather, temporary, 'The temporary weather should replace the forced one');
+
+			for (let i = 0; i < 5; i++) {
+				battle.makeChoices('move softboiled', 'move softboiled');
+			}
+			assert.equal(battle.field.weather, primal, 'The forced primal weather should be back');
+			assert.false(battle.ended, 'The battle goes on');
+			assert(battle.log.some(line => line === '|-weather|' + status.name), 'Its return is announced');
+		});
+	}
 });

@@ -488,6 +488,9 @@ export const PBO_EVENT_FORMS: [string, string, string, string][] = [
 	["mewtwomegayh5", "mewtwomegay", "Mewtwo-MegaY-H5", "H5"],
 ];
 
+/** Weathers whose own start handlers expect the ability that set them (Desolate Land, Primordial Sea, Delta Stream). */
+const PBO_PRIMAL_WEATHERS = ['desolateland', 'primordialsea', 'deltastream'];
+
 export const Scripts: ModdedBattleScriptsData = {
 	gen: 9,
 	// [PBO] Register all cosmetic event forms as clones of their base species.
@@ -676,7 +679,13 @@ export const Scripts: ModdedBattleScriptsData = {
 				this.weather = status.id;
 				this.weatherState = this.battle.initEffectState({id: status.id});
 				this.weatherState.duration = 0;
-				this.battle.singleEvent('FieldStart', status, this.weatherState, this, null, null);
+				// The primal weathers' start handlers read the ability that set them, which a map's forced weather
+				// doesn't have: they are announced as the server announces them at battle start.
+				if (PBO_PRIMAL_WEATHERS.includes(status.id)) {
+					this.battle.add('-weather', status.name);
+				} else {
+					this.battle.singleEvent('FieldStart', status, this.weatherState, this, null, null);
+				}
 			}
 
 			this.battle.eachEvent('WeatherChange');
